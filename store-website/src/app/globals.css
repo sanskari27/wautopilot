@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+	font-family: 'aura-bella';
+	src: url('/font/aura-bella.ttf');
+}
+
+@layer utilities {
+	.aura-bella {
+		font-family: 'aura-bella';
+	}
+	.navbar {
+		@apply w-[96%] absolute mx-[2%] bg-gray-100 md:bg-transparent   shadow-[inset_0_0_300px_rgba(220,220,220,0.2)] backdrop-blur-lg rounded-2xl z-50;
+	}
+	.nav-active::before {
+		@apply absolute content-[''] -bottom-2 w-[130%] -left-[15%] h-[2px]  bg-accent-dark inline-block  rounded-full;
+	}
+
+	.shadow-div {
+		@apply absolute content-['']  left-0 right-0 bottom-0 bg-gradient-to-t from-black/30 to-transparent rounded-2xl;
+	}
+	.shadow-light {
+		@apply !from-accent-light rounded-2xl;
+	}
+}
+
+.custom-table,
+.custom-table table,
+.custom-table table tr {
+	width: 100%;
+}
+
+.custom-table {
+	border: 1px rgb(0, 0, 0) solid;
+	padding: 1rem;
+	border-radius: 1rem;
+}
+
+.custom-table table tr {
+	border-bottom: 1px rgb(167, 167, 167) solid;
+}
+
+.custom-table table td {
+	width: 50%;
+}
+
+.custom-table table td:last-child {
+	text-align: right;
+	font-weight: 500;
+}
+
+.custom-table table td > div {
+	padding: 0.25rem 0;
+}
