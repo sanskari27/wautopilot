@@ -1,11 +1,13 @@
-import { useMemo } from 'react';
-import { useNavbar } from './useNavbar';
+import { useMemo, useState } from 'react';
 
 export default function useFilteredList<T extends object>(
 	list: T[],
 	opts: { [K in keyof T]?: number }
-): T[] {
-	const { searchText } = useNavbar();
+): {
+	filtered: T[];
+	setSearchText: (text: string) => void;
+} {
+	const [searchText, setSearchText] = useState('');
 
 	const filtered = useMemo(
 		() =>
@@ -21,5 +23,5 @@ export default function useFilteredList<T extends object>(
 			}),
 		[list, searchText, opts]
 	);
-	return filtered;
+	return { filtered, setSearchText };
 }

@@ -1,7 +1,7 @@
 import { Flex, Image, Text } from '@chakra-ui/react';
 import Lottie from 'lottie-react';
-import { LOGO } from '../../../assets/Images';
 import { LOTTIE_LOADER } from '../../../assets/Lottie';
+import { LOGO_PRIMARY } from '../../../config/const';
 
 export default function Loading({ isLoaded }: { isLoaded: boolean }) {
 	if (isLoaded) {
@@ -33,7 +33,7 @@ export default function Loading({ isLoaded }: { isLoaded: boolean }) {
 				aspectRatio={'1/1'}
 				rounded={'lg'}
 			>
-				<Image src={LOGO} height={'100px'} mixBlendMode={'multiply'} />
+				<Image src={LOGO_PRIMARY} height={'100px'} mixBlendMode={'multiply'} />
 				<Lottie animationData={LOTTIE_LOADER} loop={true} />
 				<Text mt={'1rem'} className='text-black ' fontSize={'xs'}>
 					Fetching Data
