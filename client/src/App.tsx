@@ -6,6 +6,8 @@ import { NAVIGATION } from './config/const';
 import { Flex, Progress } from '@chakra-ui/react';
 
 const Home = lazy(() => import('./views/pages/_'));
+const Terms = lazy(() => import('./views/pages/terms'));
+// const Privacy = lazy(() => import('./views/pages/privacy'));
 
 function App() {
 	return (
@@ -14,7 +16,9 @@ function App() {
 				<Suspense fallback={<Loading />}>
 					<Routes>
 						<Route path={NAVIGATION.LOGIN} element={<>LOGIN</>} />
-						<Route path={NAVIGATION.HOME} element={<Home />}></Route>
+						<Route path={NAVIGATION.HOME} element={<Home />} />
+						<Route path={NAVIGATION.TERMS} element={<Terms />} />
+						{/* <Route path={NAVIGATION.PRIVACY} element={<Privacy />} /> */}
 						{/* <Route path='*' element={<PageNotFound />} /> */}
 					</Routes>
 				</Suspense>
