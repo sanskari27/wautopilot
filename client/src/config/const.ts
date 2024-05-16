@@ -8,4 +8,6 @@ export const WHO = '/images/who.svg';
 export const NAVIGATION = {
 	LOGIN: '/login',
 	HOME: '/',
+	TERMS: '/terms',
+	PRIVACY: '/privacy',
 };

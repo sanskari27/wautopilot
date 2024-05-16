@@ -5,6 +5,7 @@ import {
 	AccordionItem,
 	AccordionPanel,
 	Box,
+	Button,
 	Center,
 	Flex,
 	Grid,
@@ -15,19 +16,46 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { FaPhoneAlt, FaRobot } from 'react-icons/fa';
+import { FaArrowRightLong } from 'react-icons/fa6';
 import { MdContactMail } from 'react-icons/md';
 import { PiBroadcastFill } from 'react-icons/pi';
 import { RiInbox2Line } from 'react-icons/ri';
 import { TbMessageCheck } from 'react-icons/tb';
 import { Link } from 'react-router-dom';
+import { HERO_IMG } from '../../../assets/Images';
 import { LOGO_WHITE, WHO } from '../../../config/const';
 import HomeNavbar from '../../components/navbar/homeNavbar';
 import Each from '../../components/utils/Each';
 
 const FAQs = [
 	{
-		title: 'Title 1',
-		info: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+		title: 'What is WhatsApp Business API?',
+		info: 'WhatsApp Business API is a solution that allows businesses to communicate with their customers on the WhatsApp platform at scale. It provides advanced features and capabilities for businesses to send notifications, provide customer support, and engage with users.',
+	},
+	{
+		title: 'What types of payment do you accept?',
+		info: 'We accept payments from all credit cards enabled for international online transactions. You can also pay through bank transfers if you choose an annual plan.',
+	},
+	{
+		title: 'How do I get started with WhatsApp Business API?',
+		info: 'To get started with WhatsApp Business API, you need to sign up for a Wautopilot account. Once you have signed up, you can create a WhatsApp Business API account and start sending messages to your customers.',
+	},
+	{
+		title: 'Are there any hidden fees in your pricing structure?',
+		info: 'We believe in transparency, and there are no hidden fees in our pricing structure. What you see is what you get. Our pricing is straightforward, and we provide detailed information about the costs associated with each plan.',
+	},
+	{
+		title: 'Do you have any cancellation fees?',
+		info: 'No, Watopilot is a pay-as-you-go service, and we do not have any cancellation fees. You can cancel your plan at any time. However, we do not provide any refunds on payments made for your existing subscription or credits',
+	},
+	{
+		title:
+			'Are there any limitations on the number of contacts I can reach with the basic pricing plan?',
+		info: 'Our pricing plans come with different contact limits to cater to businesses of all sizes. The basic plan has a specified contact limit, but if your needs exceed that, we offer scalable options and can discuss a tailored plan to accommodate your specific requirements.',
+	},
+	{
+		title: 'What does WhatsApp conversational-based pricing mean if WhatsApp is free?',
+		info: "While regular WhatsApp usage is free, businesses using WhatsApp Business API to grow their business will incur charges for sending customer messages. WhatsApp conversation pricing depends on your customer's country code and your message template.",
 	},
 ];
 
@@ -35,11 +63,52 @@ export default function Home() {
 	return (
 		<Box className='h-screen overflow-x-hidden overflow-y-scroll pt=[70px]'>
 			<HomeNavbar />
-			<main className='px-6 md:px-[5%] '>
-				<section id='home' className='h-[50vh]'>
-					<Box>Home Page</Box>
+			<main className='px-6 md:px-[5%]'>
+				<section id='home' className='md:h-[77vh]'>
+					<Grid
+						className='grid-cols-1 md:grid-cols-2 gap-x-16 items-center justify-center'
+						marginTop={'15%'}
+						gridAutoRows={'1fr'}
+					>
+						<GridItem>
+							<Box className='text-center md:text-left '>
+								<Text fontWeight={'medium'} className='text-[2rem] md:text-[3rem]'>
+									<Box as='span' className='text-primary-dark'>
+										Grow
+									</Box>{' '}
+									your business
+								</Text>
+								<Text fontWeight={'medium'} className='text-[2rem] md:text-[3rem]'>
+									on{' '}
+									<Box as='span' className='text-primary-dark'>
+										WhatsApp
+									</Box>
+								</Text>
+								<Text className='text-[1.25rem] md:text-[1.5rem]'>
+									Personalize communication and sell more with theWhatsApp Business API platform
+									that automates marketing, sales, service and support.
+								</Text>
+								<Button
+									rightIcon={<FaArrowRightLong />}
+									className='!bg-primary-dark !text-white'
+									rounded={'full'}
+									marginTop={'2rem'}
+									fontSize={'1.5rem'}
+								>
+									Explore
+								</Button>
+							</Box>
+						</GridItem>
+						<GridItem marginX={'auto'}>
+							<Image
+								src={HERO_IMG}
+								alt='Hero Image'
+								className='h-[90%]  max-h-[500px] w-[100%]  max-w-[500px] '
+							/>
+						</GridItem>
+					</Grid>
 				</section>
-				<section id='what' className='py-[7%] md:py-[4%]'>
+				<section id='works' className='py-[7%] md:py-[4%]'>
 					<Heading className='text-center text-primary-dark mb-[5rem] md:mb-0'>What we do</Heading>
 					<Grid
 						className='grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-12'
@@ -116,9 +185,9 @@ export default function Home() {
 							className='flex-col md:flex-row'
 						>
 							<Box className='w-1/2 md:w-1/2'>
-								<Image src={WHO} alt='Who we are' width={300} height={300} />
+								<Image src={WHO} alt='Who we are' width={400} height={400} />
 							</Box>
-							<Box className='text-right'>
+							<Box className='text-left md:text-right'>
 								<Heading className='text-3xl md:text-5xl mt-4 text-black'>
 									We Provide <span className='text-primary-dark'>Whatsapp</span>
 								</Heading>
@@ -126,7 +195,7 @@ export default function Home() {
 									Business API
 								</Heading>
 
-								<ul className='end_dot text-base md:text-2xl font-medium mt-[2rem] flex flex-col gap-2'>
+								<ul className='end_dot text-base md:text-xl font-medium mt-[2rem] flex flex-col gap-2'>
 									<li>Share Great Deals with Everyone Instantly</li>
 									<li>Template Messages Approvals</li>
 									<li>Streamline Messaging with Automated Connections</li>
@@ -264,61 +333,29 @@ function Footer() {
 									className='justify-center md:justify-start'
 									gap={'0.75rem'}
 								>
-									<Image src={LOGO_WHITE} alt='Logo' width={'40px'} className=' h-[40px]' />
+									<Image src={LOGO_WHITE} alt='Logo' width={'40px'} className='h-[40px]' />
 									<Text fontSize={'2xl'} className='text-accent font-bold text-2xl'>
 										Wautopilot
 									</Text>
 								</Flex>
-								<Box className='mx-auto md:mx-0 w-full md:w-[350px]'>
-									lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
-									Ipsum
+								<Box className='mx-auto md:mx-0 w-full md:w-[500px] pt-4'>
+									<Box>Stellar Coaching & Consulting</Box>
+									<Box>B-502, Sahara Apartment, Plot No. 11, Sector 6 Dwarka, Dwarka,</Box>
+									<Box>New Delhi, Delhi 110075, India</Box>
 								</Box>
 							</Box>
 						</VStack>
 					</Box>
-					<VStack className='w-full md:w-2/5' justifyContent={'end'}>
-						<Grid className='grid-cols-1 md:grid-cols-2  font-medium text-lg text-center md:text-right gap-y-1 gap-x-9'>
-							<GridItem>
-								<Link to={'/products'}>
-									<Text>Products</Text>
-								</Link>
-							</GridItem>
-							<GridItem>
-								<Link to={'/terms'}>
-									<Text>Terms & Conditions</Text>
-								</Link>
-							</GridItem>
-							<GridItem>
-								<Link to={'/about'}>
-									<Text>About Keeth</Text>
-								</Link>
-							</GridItem>
-							<GridItem>
-								<Link to={'/privacy'}>
-									<Text>Privacy Policy</Text>
-								</Link>
-							</GridItem>
-							<GridItem>
-								<Link to={'mailto:keethjewels@gmail.com'} target='_blank'>
-									<Text>Contact us</Text>
-								</Link>
-							</GridItem>
-							<GridItem>
-								<Link to={'/returns'}>
-									<Text>Return Policy</Text>
-								</Link>
-							</GridItem>
-							<GridItem>
-								<Link to={'/about'}>
-									<Text>Connect via Whatsapp</Text>
-								</Link>
-							</GridItem>
-							<GridItem>
-								<Link to={'/shipping-policy'}>
-									<Text>Shipping Policy</Text>
-								</Link>
-							</GridItem>
-						</Grid>
+					<VStack className='w-full md:w-2/5 justify-end md:!items-end'>
+						<Link to={'/terms'}>
+							<Text>Terms & Conditions</Text>
+						</Link>
+						<Link to={'/privacy'}>
+							<Text>Privacy Policy</Text>
+						</Link>
+						<Link to={'mailto:keethjewels@gmail.com'} target='_blank'>
+							<Text>Contact us</Text>
+						</Link>
 					</VStack>
 				</Flex>
 				<Flex
@@ -327,20 +364,7 @@ function Footer() {
 					justifyContent={'center'}
 					marginTop={'2rem'}
 				>
-					<Text className='border-r-0 md:border-r px-4'>© Stellar Coaching info </Text>
-					<Link
-						to={'https://www.prashantvarma.in/'}
-						target='_blank'
-						className='underline px-4 border-r-0 md:border-r underline-offset-4'
-					>
-						<Text>Prashant Verma</Text>
-					</Link>
-					<Link to={'/terms'} className='underline px-4 border-r-0 md:border-r underline-offset-4'>
-						<Text>Terms & Conditions</Text>
-					</Link>
-					<Link to={'/terms'} className='underline px-4 underline-offset-4'>
-						<Text>Privacy Policy</Text>
-					</Link>
+					<Text className=' px-4'>© Wautopilot</Text>
 				</Flex>
 			</Box>
 		</footer>

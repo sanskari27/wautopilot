@@ -18,16 +18,16 @@ const HomeNavbar = () => {
 						<div className='md:inline-block hidden'>
 							<ul className='flex gap-12'>
 								<li className={`relative cursor-pointer font-medium`}>
-									<a href='#works'>What we do</a>
+									<a href='/#works'>What we do</a>
 								</li>
 								<li className={`relative cursor-pointer font-medium`}>
-									<a href='#who'>Who we are</a>
+									<a href='/#who'>Who we are</a>
 								</li>
 								<li className={`relative cursor-pointer font-medium`}>
-									<a href='#how'>How it works</a>
+									<a href='/#how'>How it works</a>
 								</li>
 								<li className={`relative cursor-pointer font-medium`}>
-									<a href='#faq'>FAQ</a>
+									<a href='/#faq'>FAQ</a>
 								</li>
 							</ul>
 						</div>
@@ -41,7 +41,7 @@ const HomeNavbar = () => {
 										rounded={'full'}
 										className='bg-accent text-primary-dark'
 									>
-										Console
+										Dashboard
 									</Button>
 								</a>
 							</li>
