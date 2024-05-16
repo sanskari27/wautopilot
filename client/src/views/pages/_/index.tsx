@@ -71,7 +71,7 @@ export default function Home() {
 						gridAutoRows={'1fr'}
 					>
 						<GridItem>
-							<Box className='text-center md:text-left '>
+							<Box className='text-center md:text-left mt-[50%] md:mt-0'>
 								<Text fontWeight={'medium'} className='text-[2rem] md:text-[3rem]'>
 									<Box as='span' className='text-primary-dark'>
 										Grow
@@ -103,7 +103,7 @@ export default function Home() {
 							<Image
 								src={HERO_IMG}
 								alt='Hero Image'
-								className='h-[90%]  max-h-[500px] w-[100%]  max-w-[500px] '
+								className='h-[90%]  max-h-[500px] w-[100%]  max-w-[500px] mt-[5%] md:mt-0'
 							/>
 						</GridItem>
 					</Grid>
