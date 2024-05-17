@@ -9,7 +9,7 @@ export default function Disclaimer() {
 			<main className='px-6 md:px-[5%]'>
 				<section id='disclaimer' className='my-[17%]'>
 					<Heading className='text-primary-dark'>Disclaimer</Heading>
-					<Text className=' mt-6 text-md' fontSize={'large'} pt={'1rem'}>
+					<Text className=' mt-6 text-md' fontSize={'large'} pt={'1rem'} textAlign={'justify'}>
 						This site is not a part of WhatsApp or Facebook / Meta. All mentioned names or logos are
 						properties of their respective companies. The information provided on this website is
 						for educational purposes only. We neither support nor can be held responsible for any
