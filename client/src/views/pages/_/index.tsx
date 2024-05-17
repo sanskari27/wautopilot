@@ -153,8 +153,8 @@ export default function Home() {
 									Automated Chat Bots
 								</Heading>
 								<Text marginTop={'1rem'} fontSize={'lg'}>
-									Intuitive WhatsApp inbox for seamless 2-way communication with your contacts.
-									Multi-agent support to allow you to add your team members
+									Enhance engagement with chatbots that handle inquiries, provide instant responses,
+									and ensure 24/7 support without manual intervention.
 								</Text>
 							</Box>
 						</GridItem>

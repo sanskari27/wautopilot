@@ -35,7 +35,7 @@ const HomeNavbar = () => {
 					<div className='inline-block '>
 						<ul className='flex gap-6'>
 							<li className={`relative cursor-pointer font-medium`}>
-								<a href={`/login`} className={`flex items-center}`}>
+								{/* <a href={`/login`} className={`flex items-center}`}> */}
 									<Button
 										variant={'outline'}
 										rounded={'full'}
@@ -43,7 +43,7 @@ const HomeNavbar = () => {
 									>
 										Try Now
 									</Button>
-								</a>
+								{/* </a> */}
 							</li>
 						</ul>
 					</div>
