@@ -13,7 +13,6 @@ import {
 	Heading,
 	Image,
 	Text,
-	VStack,
 } from '@chakra-ui/react';
 import { FaPhoneAlt, FaRobot } from 'react-icons/fa';
 import { FaArrowRightLong } from 'react-icons/fa6';
@@ -21,9 +20,9 @@ import { MdContactMail } from 'react-icons/md';
 import { PiBroadcastFill } from 'react-icons/pi';
 import { RiInbox2Line } from 'react-icons/ri';
 import { TbMessageCheck } from 'react-icons/tb';
-import { Link } from 'react-router-dom';
 import { HERO_IMG } from '../../../assets/Images';
-import { LOGO_WHITE, WHO } from '../../../config/const';
+import { WHO } from '../../../config/const';
+import Footer from '../../components/footer';
 import HomeNavbar from '../../components/navbar/homeNavbar';
 import Each from '../../components/utils/Each';
 
@@ -64,38 +63,43 @@ export default function Home() {
 		<Box className='h-screen overflow-x-hidden overflow-y-scroll pt=[70px]'>
 			<HomeNavbar />
 			<main className='px-6 md:px-[5%]'>
-				<section id='home' className='md:h-[77vh]'>
+				<section id='home' className=''>
 					<Grid
 						className='grid-cols-1 md:grid-cols-2 gap-x-16 items-center justify-center'
 						marginTop={'15%'}
 						gridAutoRows={'1fr'}
 					>
 						<GridItem>
-							<Box className='text-center md:text-left mt-[50%] md:mt-0'>
-								<Text fontWeight={'medium'} className='text-[2rem] md:text-[3rem]'>
+							<Box className='text-center md:text-left mt-[40%] md:mt-0'>
+								<Text fontWeight={'medium'} className='text-[2rem] md:text-[2.5rem]'>
 									<Box as='span' className='text-primary-dark'>
-										Grow
+										Transform
 									</Box>{' '}
-									your business
+									Your Business
 								</Text>
-								<Text fontWeight={'medium'} className='text-[2rem] md:text-[3rem]'>
-									on{' '}
+								<Text fontWeight={'medium'} className='text-[2rem] md:text-[2.5rem]'>
+									with{' '}
 									<Box as='span' className='text-primary-dark'>
-										WhatsApp
+										Wautopilot's{' '}
 									</Box>
+									Official{' '}
+									<Box as='span' className='text-primary-dark'>
+										WhatsApp{' '}
+									</Box>
+									API
 								</Text>
-								<Text className='text-[1.25rem] md:text-[1.5rem]'>
-									Personalize communication and sell more with theWhatsApp Business API platform
-									that automates marketing, sales, service and support.
+								<Text className='text-[1rem] md:text-[1.25rem] mt-4'>
+									Revolutionize customer engagement with seamless bulk messaging and personalized
+									chatbots—join Wautopilot today!
 								</Text>
 								<Button
 									rightIcon={<FaArrowRightLong />}
 									className='!bg-primary-dark !text-white'
 									rounded={'full'}
 									marginTop={'2rem'}
-									fontSize={'1.5rem'}
+									fontSize={'1.25rem'}
 								>
-									Explore
+									Try Now
 								</Button>
 							</Box>
 						</GridItem>
@@ -149,8 +153,8 @@ export default function Home() {
 									Automated Chat Bots
 								</Heading>
 								<Text marginTop={'1rem'} fontSize={'lg'}>
-									Intuitive WhatsApp inbox for seamless 2-way communication with your contacts.
-									Multi-agent support to allow you to add your team members
+									Enhance engagement with chatbots that handle inquiries, provide instant responses,
+									and ensure 24/7 support without manual intervention.
 								</Text>
 							</Box>
 						</GridItem>
@@ -175,16 +179,16 @@ export default function Home() {
 						</GridItem>
 					</Grid>
 				</section>
-				<section id='who' className='py-[7%] md:py-[4%] md:px-[10%]'>
+				<section id='who' className='py-[7%] md:py-[4%] md:px-[5%]'>
 					<Heading className='text-center text-primary-dark mb-[5rem] md:mb-0'>Who We are</Heading>
 					<Box marginTop={'5%'}>
 						<Flex
 							width={'full'}
 							justifyContent={'space-between'}
 							alignItems={'center'}
-							className='flex-col md:flex-row'
+							className='flex-col md:flex-row gap-12 md:gap-0'
 						>
-							<Box className='w-1/2 md:w-1/2'>
+							<Box className='w-1/2 md:w-1/3'>
 								<Image src={WHO} alt='Who we are' width={400} height={400} />
 							</Box>
 							<Box className='text-left md:text-right'>
@@ -195,7 +199,7 @@ export default function Home() {
 									Business API
 								</Heading>
 
-								<ul className='end_dot text-base md:text-xl font-medium mt-[2rem] flex flex-col gap-2'>
+								<ul className='end_dot text-base md:text-lg mt-[2rem] flex flex-col gap-2'>
 									<li>Share Great Deals with Everyone Instantly</li>
 									<li>Template Messages Approvals</li>
 									<li>Streamline Messaging with Automated Connections</li>
@@ -283,7 +287,7 @@ export default function Home() {
 						</GridItem>
 					</Grid>
 				</section>
-				<section id='faq' className='py-[7%] md:py-[4%] px-0 md:px-[7%]'>
+				<section id='faq' className='py-[7%] md:py-[4%] px-0 md:px-[7%] hidden'>
 					<Heading className='text-center text-primary-dark '>FAQ</Heading>
 					<Box marginTop={'5%'}>
 						<Accordion className='border-primary-dark' allowToggle>
@@ -314,59 +318,5 @@ export default function Home() {
 			</main>
 			<Footer />
 		</Box>
-	);
-}
-
-function Footer() {
-	return (
-		<footer className='bg-primary-dark text-accent'>
-			<Box pt={'4rem'} pb='1rem' paddingX={'4%'}>
-				<Flex
-					width='full'
-					className='flex-col md:flex-row text-center md:text-left  gap-12 md:gap-0'
-				>
-					<Box width='full'>
-						<VStack width='full'>
-							<Box width='full'>
-								<Flex
-									alignItems={'end'}
-									className='justify-center md:justify-start'
-									gap={'0.75rem'}
-								>
-									<Image src={LOGO_WHITE} alt='Logo' width={'40px'} className='h-[40px]' />
-									<Text fontSize={'2xl'} className='text-accent font-bold text-2xl'>
-										Wautopilot
-									</Text>
-								</Flex>
-								<Box className='mx-auto md:mx-0 w-full md:w-[500px] pt-4'>
-									<Box>Stellar Coaching & Consulting</Box>
-									<Box>B-502, Sahara Apartment, Plot No. 11, Sector 6 Dwarka, Dwarka,</Box>
-									<Box>New Delhi, Delhi 110075, India</Box>
-								</Box>
-							</Box>
-						</VStack>
-					</Box>
-					<VStack className='w-full md:w-2/5 justify-end md:!items-end'>
-						<Link to={'/terms'}>
-							<Text>Terms & Conditions</Text>
-						</Link>
-						<Link to={'/privacy'}>
-							<Text>Privacy Policy</Text>
-						</Link>
-						<Link to={'mailto:keethjewels@gmail.com'} target='_blank'>
-							<Text>Contact us</Text>
-						</Link>
-					</VStack>
-				</Flex>
-				<Flex
-					className='flex-col md:flex-row items-center '
-					width={'full'}
-					justifyContent={'center'}
-					marginTop={'2rem'}
-				>
-					<Text className=' px-4'>© Wautopilot</Text>
-				</Flex>
-			</Box>
-		</footer>
 	);
 }

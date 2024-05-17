@@ -18,16 +18,16 @@ const HomeNavbar = () => {
 						<div className='md:inline-block hidden'>
 							<ul className='flex gap-12'>
 								<li className={`relative cursor-pointer font-medium`}>
-									<a href='/#works'>What we do</a>
+									<a href='/#works' className='hover:text-slate-300'>What we do</a>
 								</li>
 								<li className={`relative cursor-pointer font-medium`}>
-									<a href='/#who'>Who we are</a>
+									<a href='/#who' className='hover:text-slate-300'>Who we are</a>
 								</li>
 								<li className={`relative cursor-pointer font-medium`}>
-									<a href='/#how'>How it works</a>
+									<a href='/#how' className='hover:text-slate-300'>How it works</a>
 								</li>
 								<li className={`relative cursor-pointer font-medium`}>
-									<a href='/#faq'>FAQ</a>
+									<a href='/#faq' className='hover:text-slate-300'>FAQ</a>
 								</li>
 							</ul>
 						</div>
@@ -35,15 +35,15 @@ const HomeNavbar = () => {
 					<div className='inline-block '>
 						<ul className='flex gap-6'>
 							<li className={`relative cursor-pointer font-medium`}>
-								<a href={`/login`} className={`flex items-center}`}>
+								{/* <a href={`/login`} className={`flex items-center}`}> */}
 									<Button
 										variant={'outline'}
 										rounded={'full'}
 										className='bg-accent text-primary-dark'
 									>
-										Dashboard
+										Try Now
 									</Button>
-								</a>
+								{/* </a> */}
 							</li>
 						</ul>
 					</div>
