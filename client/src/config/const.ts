@@ -11,4 +11,5 @@ export const NAVIGATION = {
 	HOME: '/',
 	TERMS: '/terms',
 	PRIVACY: '/privacy',
+	DISCLAIMER: '/disclaimer',
 };
