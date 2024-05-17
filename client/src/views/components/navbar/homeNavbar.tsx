@@ -26,9 +26,9 @@ const HomeNavbar = () => {
 								<li className={`relative cursor-pointer font-medium`}>
 									<a href='/#how' className='hover:text-slate-300'>How it works</a>
 								</li>
-								<li className={`relative cursor-pointer font-medium`}>
+								{/* <li className={`relative cursor-pointer font-medium`}>
 									<a href='/#faq' className='hover:text-slate-300'>FAQ</a>
-								</li>
+								</li> */}
 							</ul>
 						</div>
 					</div>
