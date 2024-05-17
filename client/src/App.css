@@ -35,3 +35,21 @@ body {
 		@apply w-full absolute md:fixed  top-0 bg-primary-dark  z-50;
 	}
 }
+
+.end_dot li {
+	text-align: right;
+	position: relative;
+	padding: 0 10px 0 0;
+}
+
+.end_dot li::after {
+	content: '';
+	position: absolute;
+	right: -10px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 10px;
+	height: 10px;
+	background-color: #0b826f;
+	border-radius: 50%;
+}
