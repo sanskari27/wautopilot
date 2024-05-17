@@ -1,4 +1,4 @@
-import { Box, Heading } from '@chakra-ui/react';
+import { Box, Heading, Text } from '@chakra-ui/react';
 import Footer from '../../components/footer';
 import HomeNavbar from '../../components/navbar/homeNavbar';
 
@@ -8,8 +8,8 @@ export default function Disclaimer() {
 			<HomeNavbar />
 			<main className='px-6 md:px-[5%]'>
 				<section id='disclaimer' className='my-[17%]'>
-					<Heading >Disclaimer</Heading>
-					<Box className=' mt-6 text-md'>
+					<Heading className='text-primary-dark'>Disclaimer</Heading>
+					<Text className=' mt-6 text-md' fontSize={'large'} pt={'1rem'}>
 						This site is not a part of WhatsApp or Facebook / Meta. All mentioned names or logos are
 						properties of their respective companies. The information provided on this website is
 						for educational purposes only. We neither support nor can be held responsible for any
@@ -21,7 +21,7 @@ export default function Disclaimer() {
 						save time in manually performing tasks and collecting data that is already publicly
 						available. We do not take responsibility for how users employ this software. All users
 						are expected to use Wautopilot in a lawful and ethical manner.
-					</Box>
+					</Text>
 				</section>
 			</main>
 			<Footer />
