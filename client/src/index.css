@@ -54,24 +54,4 @@ button:focus-visible {
 	outline: 4px auto -webkit-focus-ring-color;
 }
 
-.end_dot li {
-	list-style-type: none;
-	display: inline;
-}
 
-.end_dot li::before {
-	content: '•';
-	margin-right: 0 0.5em;
-}
-
-@media (min-width: 768px) {
-	.end_dot li::after {
-		content: '•';
-		margin-left: 0.5rem;
-	}
-
-	.end_dot li::before {
-		content: '';
-		margin: 0;
-	}
-}
