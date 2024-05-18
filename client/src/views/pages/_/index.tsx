@@ -63,14 +63,13 @@ export default function Home() {
 		<Box className='h-screen overflow-x-hidden overflow-y-scroll pt=[70px]'>
 			<HomeNavbar />
 			<main className='px-6 md:px-[5%]'>
-				<section id='home' className=''>
+				<section id='home' className='min-h-[70vh]'>
 					<Grid
-						className='grid-cols-1 md:grid-cols-2 gap-x-16 items-center justify-center'
-						marginTop={'15%'}
+						className='grid-cols-1 md:grid-cols-2 gap-x-16 items-center justify-center md:mt-[15%]'
 						gridAutoRows={'1fr'}
 					>
 						<GridItem>
-							<Box className='text-center md:text-left mt-[40%] md:mt-0'>
+							<Box className='text-center md:text-left mt-[20%] md:mt-0'>
 								<Text fontWeight={'medium'} className='text-[2rem] md:text-[2.5rem]'>
 									<Box as='span' className='text-primary-dark'>
 										Transform
@@ -180,13 +179,13 @@ export default function Home() {
 					</Grid>
 				</section>
 				<section id='who' className='py-[7%] md:py-[4%] md:px-[5%]'>
-					<Heading className='text-center text-primary-dark mb-[5rem] md:mb-0'>Who We are</Heading>
+					<Heading className='text-center text-primary-dark'>Who We are</Heading>
 					<Box marginTop={'5%'}>
 						<Flex
 							width={'full'}
 							justifyContent={'space-between'}
 							alignItems={'center'}
-							className='flex-col md:flex-row gap-12 md:gap-0'
+							className='flex-col md:flex-row'
 						>
 							<Box className='w-1/2 md:w-1/3'>
 								<Image src={WHO} alt='Who we are' width={400} height={400} />
@@ -199,7 +198,7 @@ export default function Home() {
 									Business API
 								</Heading>
 
-								<ul className='end_dot text-base md:text-lg mt-[2rem] flex flex-col gap-2'>
+								<ul className='end_dot text-sm md:text-lg mt-[2rem] flex flex-col gap-2 ml-3 md:ml-0'>
 									<li>Share Great Deals with Everyone Instantly</li>
 									<li>Template Messages Approvals</li>
 									<li>Streamline Messaging with Automated Connections</li>
