@@ -1,6 +1,7 @@
 import express from 'express';
 import SessionRoute from './session/session.route';
 
+import Logger from 'n23-logger';
 import { CustomError, ERRORS } from '../errors';
 import PhonePeProvider from '../provider/phonepe';
 import { Respond, RespondFile } from '../utils/ExpressUtils';
@@ -47,6 +48,15 @@ router.get('/media/:path/:filename', async function (req, res, next) {
 	} catch (err: unknown) {
 		return next(new CustomError(ERRORS.NOT_FOUND));
 	}
+});
+
+router.post('/webhooks/meta/whatsapp', async function (req, res) {
+	Logger.http('Webhook', {
+		body: req.body,
+		headers: req.headers,
+		label: 'Whatsapp Webhook',
+	});
+	return res.status(200).send('OK');
 });
 
 export default router;
