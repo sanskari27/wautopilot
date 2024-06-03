@@ -4,6 +4,8 @@ import './App.css';
 import { NAVIGATION } from './config/const';
 
 import { Flex, Progress } from '@chakra-ui/react';
+import useAuth from './hooks/useAuth';
+import { useGeoLocation } from './hooks/useGeolocation';
 
 const Home = lazy(() => import('./views/pages/_'));
 const Terms = lazy(() => import('./views/pages/terms'));
@@ -11,6 +13,9 @@ const Privacy = lazy(() => import('./views/pages/privacy'));
 const Disclaimer = lazy(() => import('./views/pages/disclaimer'));
 
 function App() {
+	useAuth();
+	useGeoLocation();
+
 	return (
 		<Flex minHeight={'100vh'} width={'100vw'} className='bg-background '>
 			<Router>

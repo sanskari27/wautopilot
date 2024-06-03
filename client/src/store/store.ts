@@ -2,10 +2,12 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import { StoreNames } from './config';
 import { default as CollectionsReducer } from './reducers/CollectionsReducer';
+import UserReducers from './reducers/UserReducers';
 
 const store = configureStore({
 	reducer: {
 		[StoreNames.COLLECTIONS]: CollectionsReducer,
+		[StoreNames.USER]: UserReducers,
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({

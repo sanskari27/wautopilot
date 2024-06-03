@@ -25,6 +25,9 @@ import { WHO } from '../../../config/const';
 import Footer from '../../components/footer';
 import HomeNavbar from '../../components/navbar/homeNavbar';
 import Each from '../../components/utils/Each';
+import useAuth from '../../../hooks/useAuth';
+import { useRef } from 'react';
+import LoginDialog, { LoginDialogProps } from '../../components/user-login/indes';
 
 const FAQs = [
 	{
@@ -59,6 +62,22 @@ const FAQs = [
 ];
 
 export default function Home() {
+
+	const LoginRef = useRef<LoginDialogProps>(null);
+
+	const {isAuthChecking,isLoggedIn} = useAuth();
+
+	const handleLoginButton = () => {
+		if(isAuthChecking){
+			return;
+		}
+		if(isLoggedIn){
+			console.log('User is logged in');
+		}else{
+			LoginRef.current?.open();
+		}
+	}
+
 	return (
 		<Box className='h-screen overflow-x-hidden overflow-y-scroll pt=[70px]'>
 			<HomeNavbar />
@@ -97,6 +116,7 @@ export default function Home() {
 									rounded={'full'}
 									marginTop={'2rem'}
 									fontSize={'1.25rem'}
+									onClick={handleLoginButton}
 								>
 									Try Now
 								</Button>
@@ -316,6 +336,7 @@ export default function Home() {
 				</section>
 			</main>
 			<Footer />
+			<LoginDialog ref={LoginRef} />
 		</Box>
 	);
 }
