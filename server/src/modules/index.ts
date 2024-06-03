@@ -1,5 +1,5 @@
 import express from 'express';
-import SessionRoute from './session/session.route';
+import SessionRoute from './auth/auth.route';
 
 import Logger from 'n23-logger';
 import { CustomError, ERRORS } from '../errors';

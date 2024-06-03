@@ -1,5 +1,6 @@
 import { randomBytes, scrypt } from 'crypto';
 import mongoose from 'mongoose';
+import { UserLevel } from '../../src/config/const';
 import IAccount from '../types/account';
 
 export const AccountDB_name = 'Account';
@@ -20,6 +21,11 @@ const schema = new mongoose.Schema<IAccount>({
 		type: String,
 		select: false,
 	},
+	userLevel: {
+		type: Number,
+		enum: Object.values(UserLevel),
+		default: UserLevel.Admin,
+	},
 });
 
 schema.pre('save', async function (next) {
@@ -36,6 +42,8 @@ schema.pre('save', async function (next) {
 schema.methods.verifyPassword = async function (password: string) {
 	return await matchPassword(password, this.password);
 };
+
+schema.index({ email: 1, userLevel: 1 }, { unique: true });
 
 const AccountDB = mongoose.model<IAccount>(AccountDB_name, schema);
 

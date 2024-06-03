@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
+import { UserLevel } from '../../config/const';
 import { CustomError } from '../../errors';
 
 export type LoginValidationResult = {
 	email: string;
 	password: string;
-	type: 'user' | 'admin';
+	accessLevel: UserLevel;
 	latitude?: number;
 	longitude?: number;
 };
@@ -28,9 +29,9 @@ export async function LoginAccountValidator(req: Request, res: Response, next: N
 	const reqValidator = z.object({
 		email: z.string().email(),
 		password: z.string(),
-		type: z.enum(['user', 'admin']).default('user'),
-		latitude: z.number().optional(),
-		longitude: z.number().optional(),
+		accessLevel: z.nativeEnum(UserLevel).default(UserLevel.Admin),
+		latitude: z.number().default(0),
+		longitude: z.number().default(0),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

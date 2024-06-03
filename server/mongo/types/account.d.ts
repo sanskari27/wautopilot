@@ -1,4 +1,5 @@
 import { Document, Types } from 'mongoose';
+import { UserLevel } from '../../src/config/const';
 
 export default interface IAccount extends Document {
 	_id: Types.ObjectId;

@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import fs from 'fs';
 import { Types } from 'mongoose';
 import { z } from 'zod';
+import { IS_PRODUCTION } from '../config/const';
 import { IDType } from '../types';
 import DateUtils from './DateUtils';
 
@@ -49,6 +50,18 @@ export const Delay = async (seconds: number) => {
 
 export const parseAmount = (amount: number) => {
 	return Number(amount.toFixed(2));
+};
+
+export const setCookie = (
+	res: Response,
+	{ key, expires, value }: { key: string; value: string; expires: number }
+) => {
+	res.cookie(key, value, {
+		sameSite: 'strict',
+		expires: new Date(Date.now() + expires),
+		httpOnly: IS_PRODUCTION,
+		secure: IS_PRODUCTION,
+	});
 };
 
 export const getRequestIP = (req: Request) => {
