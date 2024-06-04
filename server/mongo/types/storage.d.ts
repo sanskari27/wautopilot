@@ -5,6 +5,7 @@ export interface IStorageModel extends IStorage, Document {
 	getObject(key: string): Promise<object | null>;
 	setString(key: string, value: string): Promise<void>;
 	setObject(key: string, value: object): Promise<void>;
+	deleteKey(key: string): Promise<void>;
 }
 
 export default interface IStorage extends Document {

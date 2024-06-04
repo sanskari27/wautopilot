@@ -9,15 +9,18 @@ const schema = new mongoose.Schema<IPhoneBook>({
 		ref: PhoneBookDB_name,
 	},
 
-	salutation: String,
-	first_name: String,
-	last_name: String,
-	middle_name: String,
-	phone_number: String,
-	email: String,
-	birthday: String,
-	anniversary: String,
-	labels: [String],
+	salutation: { type: String, default: '' },
+	first_name: { type: String, default: '' },
+	last_name: { type: String, default: '' },
+	middle_name: { type: String, default: '' },
+	phone_number: { type: String, default: '' },
+	email: { type: String, default: '' },
+	birthday: { type: String, default: '' },
+	anniversary: { type: String, default: '' },
+	labels: {
+		type: [String],
+		default: [],
+	},
 
 	others: {
 		type: Schema.Types.Mixed,

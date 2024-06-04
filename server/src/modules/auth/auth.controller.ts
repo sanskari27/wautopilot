@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { JwtPayload, verify } from 'jsonwebtoken';
+import { StorageDB } from '../../../mongo';
 import { Cookie, REFRESH_SECRET } from '../../config/const';
 import { AUTH_ERRORS, CustomError } from '../../errors';
+import COMMON_ERRORS from '../../errors/common-errors';
 import { sendPasswordResetEmail } from '../../provider/email';
 import { UserService } from '../../services';
 import { Respond, setCookie } from '../../utils/ExpressUtils';
@@ -36,7 +38,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
 		setCookie(res, {
 			key: Cookie.Refresh,
 			value: refreshToken,
-			expires: JWT_EXPIRE_TIME,
+			expires: SESSION_EXPIRE_TIME,
 		});
 
 		return Respond({
@@ -48,7 +50,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
-async function resetPassword(req: Request, res: Response, next: NextFunction) {
+async function forgotPassword(req: Request, res: Response, next: NextFunction) {
 	const { email, callbackURL } = req.locals.data as ResetPasswordValidationResult;
 
 	try {
@@ -66,30 +68,23 @@ async function resetPassword(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
-async function updatePassword(req: Request, res: Response, next: NextFunction) {
-	const { password, token: update_token } = req.locals.data as UpdatePasswordValidationResult;
+async function resetPassword(req: Request, res: Response, next: NextFunction) {
+	const user_id = await StorageDB.getString(req.params.id);
+	const { password } = req.locals.data as UpdatePasswordValidationResult;
 
 	try {
-		const { authToken, refreshToken } = await UserService.saveResetPassword(update_token, password);
+		if (!user_id) {
+			return res.send('Error resetting password');
+		}
 
-		setCookie(res, {
-			key: Cookie.Auth,
-			value: authToken,
-			expires: JWT_EXPIRE_TIME,
-		});
-
-		setCookie(res, {
-			key: Cookie.Refresh,
-			value: refreshToken,
-			expires: JWT_EXPIRE_TIME,
-		});
+		await UserService.saveResetPassword(req.params.id, password);
 
 		return Respond({
 			res,
 			status: 200,
 		});
 	} catch (err) {
-		return next(new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR));
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
 
@@ -137,8 +132,8 @@ async function logout(req: Request, res: Response, next: NextFunction) {
 const Controller = {
 	validateAuth,
 	login,
+	forgotPassword,
 	resetPassword,
-	updatePassword,
 	register,
 	logout,
 };

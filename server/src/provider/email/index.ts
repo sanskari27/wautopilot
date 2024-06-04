@@ -7,7 +7,7 @@ const resend = new Resend(RESEND_API_KEY);
 
 export async function sendPasswordResetEmail(to: string, token: string) {
 	const { error } = await resend.emails.send({
-		from: 'Wautopilot <no-reply@wautopilot.in>',
+		from: 'Wautopilot <no-reply@wautopilot.com>',
 		to: [to],
 		subject: 'Password reset request for Wautopilot',
 		html: PasswordResetTemplate(token),
@@ -22,7 +22,7 @@ export async function sendPasswordResetEmail(to: string, token: string) {
 
 export async function sendLoginCredentialsEmail(to: string, username: string, password: string) {
 	const { error } = await resend.emails.send({
-		from: 'Wautopilot <no-reply@wautopilot.in>',
+		from: 'Wautopilot <no-reply@wautopilot.com>',
 		to: [to],
 		subject: 'Login Credentials for Wautopilot',
 		html: LoginCredentialsTemplate(username, password),

@@ -15,6 +15,7 @@ export default async function VerifySession(req: Request, res: Response, next: N
 			const session = await SessionService.findSessionById(decoded.id);
 
 			req.locals.user = await UserService.findById(session.userId);
+			req.locals.account = req.locals.user.account;
 
 			setCookie(res, {
 				key: Cookie.Auth,
@@ -35,6 +36,7 @@ export default async function VerifySession(req: Request, res: Response, next: N
 			const session = await SessionService.findSessionByRefreshToken(decoded.id);
 
 			req.locals.user = await UserService.findById(session.userId);
+			req.locals.account = req.locals.user.account;
 
 			setCookie(res, {
 				key: Cookie.Auth,

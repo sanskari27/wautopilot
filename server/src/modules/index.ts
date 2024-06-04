@@ -1,17 +1,19 @@
 import express from 'express';
 import SessionRoute from './auth/auth.route';
+import PhonebookRoute from './phonebook/phonebook.route';
 
 import Logger from 'n23-logger';
+import FileUpload, { ONLY_MEDIA_ALLOWED, SingleFileUploadOptions } from '../config/FileUpload';
 import { CustomError, ERRORS } from '../errors';
 import PhonePeProvider from '../provider/phonepe';
 import { Respond, RespondFile } from '../utils/ExpressUtils';
-import FileUpload, { SingleFileUploadOptions, ONLY_MEDIA_ALLOWED } from '../config/FileUpload';
 
 const router = express.Router();
 
 // Next routes will be webhooks routes
 
 router.use('/sessions', SessionRoute);
+router.use('/phonebook', PhonebookRoute);
 
 router.use('/phonepe/callback', PhonePeProvider.Callbacks.transactionCallback);
 

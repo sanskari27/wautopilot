@@ -17,12 +17,17 @@ type SessionDetails = {
 };
 
 export default class UserService {
+	getUser(): any {
+		throw new Error('Method not implemented.');
+	}
 	private _user_id: IDType;
 	private _level: UserLevel;
+	private _account: IAccount;
 
 	public constructor(account: IAccount) {
 		this._user_id = account._id;
 		this._level = account.userLevel;
+		this._account = account;
 	}
 
 	static async findById(id: IDType) {
@@ -108,14 +113,6 @@ export default class UserService {
 		await StorageDB.deleteOne({
 			key: token,
 		});
-
-		const session = await SessionService.createSession(user._id, {});
-
-		return {
-			authToken: session.authToken,
-			refreshToken: session.refreshToken,
-			userService: new UserService(user),
-		};
 	}
 
 	static async markLogout(token: string) {
@@ -130,5 +127,9 @@ export default class UserService {
 
 	public get userId() {
 		return this._user_id;
+	}
+
+	public get account() {
+		return this._account;
 	}
 }

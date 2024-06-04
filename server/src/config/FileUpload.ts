@@ -106,4 +106,15 @@ const ONLY_MEDIA_ALLOWED = (
 	cb(null, true);
 };
 
-export { ONLY_MEDIA_ALLOWED };
+const ONLY_CSV_ALLOWED = (
+	req: Request,
+	file: Express.Multer.File,
+	cb: multer.FileFilterCallback
+) => {
+	if (file.mimetype !== 'text/csv') {
+		return cb(new Error('Only CSV are allowed'));
+	}
+	cb(null, true);
+};
+
+export { ONLY_CSV_ALLOWED, ONLY_MEDIA_ALLOWED };

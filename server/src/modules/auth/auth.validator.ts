@@ -25,7 +25,6 @@ export type ResetPasswordValidationResult = {
 
 export type UpdatePasswordValidationResult = {
 	password: string;
-	token: string;
 };
 
 export type GoogleLoginValidationResult = {
@@ -120,7 +119,6 @@ export async function ResetPasswordValidator(req: Request, res: Response, next: 
 
 export async function UpdatePasswordValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		token: z.string(),
 		password: z.string(),
 	});
 
