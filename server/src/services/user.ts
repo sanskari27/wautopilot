@@ -3,7 +3,9 @@ import { AccountDB, SessionDB, StorageDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import { UserLevel } from '../config/const';
 import { AUTH_ERRORS, CustomError } from '../errors';
+import { sendLoginCredentialsEmail } from '../provider/email';
 import { IDType } from '../types';
+import { generateNewPassword } from '../utils/ExpressUtils';
 import SessionService from './session';
 
 type SessionDetails = {
@@ -54,7 +56,6 @@ export default class UserService {
 
 	static async register(
 		email: string,
-		password: string,
 		opts: SessionDetails & {
 			name?: string;
 			phone?: string;
@@ -62,6 +63,7 @@ export default class UserService {
 		}
 	) {
 		try {
+			const password = generateNewPassword();
 			const user = await AccountDB.create({
 				email,
 				password,
@@ -71,7 +73,7 @@ export default class UserService {
 			});
 
 			const session = await SessionService.createSession(user._id, opts);
-
+			sendLoginCredentialsEmail(email, email, password);
 			return {
 				authToken: session.authToken,
 				refreshToken: session.refreshToken,

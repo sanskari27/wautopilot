@@ -2,11 +2,12 @@ import { NextFunction, Request, Response } from 'express';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import { Cookie, REFRESH_SECRET } from '../../config/const';
 import { AUTH_ERRORS, CustomError } from '../../errors';
-import { sendPasswordResetEmail, sendWelcomeEmail } from '../../provider/email';
+import { sendPasswordResetEmail } from '../../provider/email';
 import { UserService } from '../../services';
 import { Respond, setCookie } from '../../utils/ExpressUtils';
 import {
 	LoginValidationResult,
+	RegisterValidationResult,
 	ResetPasswordValidationResult,
 	UpdatePasswordValidationResult,
 } from './auth.validator';
@@ -93,17 +94,18 @@ async function updatePassword(req: Request, res: Response, next: NextFunction) {
 }
 
 async function register(req: Request, res: Response, next: NextFunction) {
-	const { email, password, latitude, longitude, accessLevel } = req.locals
-		.data as LoginValidationResult;
+	const { email, name, phone, latitude, longitude, accessLevel } = req.locals
+		.data as RegisterValidationResult;
 	try {
-		const { authToken, refreshToken } = await UserService.register(email, password, {
+		const { authToken, refreshToken } = await UserService.register(email, {
+			name,
+			phone,
 			level: accessLevel,
 			latitude: latitude ?? 0,
 			longitude: longitude ?? 0,
 			platform: req.useragent?.platform || '',
 			browser: req.useragent?.browser || '',
 		});
-		sendWelcomeEmail(email);
 
 		setCookie(res, {
 			key: Cookie.Auth,
