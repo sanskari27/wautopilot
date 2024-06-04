@@ -5,7 +5,7 @@ import Logger from 'n23-logger';
 import { CustomError, ERRORS } from '../errors';
 import PhonePeProvider from '../provider/phonepe';
 import { Respond, RespondFile } from '../utils/ExpressUtils';
-import { FileUpload, ONLY_MEDIA_ALLOWED, SingleFileUploadOptions } from '../config/files';
+import FileUpload, { SingleFileUploadOptions, ONLY_MEDIA_ALLOWED } from '../config/FileUpload';
 
 const router = express.Router();
 
