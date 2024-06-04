@@ -56,7 +56,7 @@ export default class UserService {
 
 	static async register(
 		email: string,
-		opts: SessionDetails & {
+		opts: {
 			name?: string;
 			phone?: string;
 			level: UserLevel;
@@ -64,7 +64,7 @@ export default class UserService {
 	) {
 		try {
 			const password = generateNewPassword();
-			const user = await AccountDB.create({
+			await AccountDB.create({
 				email,
 				password,
 				name: opts.name,
@@ -72,13 +72,7 @@ export default class UserService {
 				userLevel: opts.level,
 			});
 
-			const session = await SessionService.createSession(user._id, opts);
 			sendLoginCredentialsEmail(email, email, password);
-			return {
-				authToken: session.authToken,
-				refreshToken: session.refreshToken,
-				userService: new UserService(user),
-			};
 		} catch (err) {
 			throw new CustomError(AUTH_ERRORS.USER_ALREADY_EXISTS);
 		}

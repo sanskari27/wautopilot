@@ -14,8 +14,6 @@ export type LoginValidationResult = {
 export type RegisterValidationResult = {
 	email: string;
 	accessLevel: UserLevel;
-	latitude: number;
-	longitude: number;
 	name: string;
 	phone: string;
 };
@@ -70,8 +68,6 @@ export async function RegisterAccountValidator(req: Request, res: Response, next
 		phone: z.string(),
 		email: z.string().email(),
 		accessLevel: z.nativeEnum(UserLevel).default(UserLevel.Admin),
-		latitude: z.number().default(0),
-		longitude: z.number().default(0),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

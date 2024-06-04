@@ -94,30 +94,14 @@ async function updatePassword(req: Request, res: Response, next: NextFunction) {
 }
 
 async function register(req: Request, res: Response, next: NextFunction) {
-	const { email, name, phone, latitude, longitude, accessLevel } = req.locals
-		.data as RegisterValidationResult;
+	const { email, name, phone, accessLevel } = req.locals.data as RegisterValidationResult;
 	try {
-		const { authToken, refreshToken } = await UserService.register(email, {
+		await UserService.register(email, {
 			name,
 			phone,
 			level: accessLevel,
-			latitude: latitude ?? 0,
-			longitude: longitude ?? 0,
-			platform: req.useragent?.platform || '',
-			browser: req.useragent?.browser || '',
 		});
 
-		setCookie(res, {
-			key: Cookie.Auth,
-			value: authToken,
-			expires: JWT_EXPIRE_TIME,
-		});
-
-		setCookie(res, {
-			key: Cookie.Refresh,
-			value: refreshToken,
-			expires: JWT_EXPIRE_TIME,
-		});
 		return Respond({
 			res,
 			status: 200,
