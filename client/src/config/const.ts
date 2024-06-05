@@ -1,5 +1,6 @@
-import { MdOutlineDashboard, MdOutlinePayments } from "react-icons/md";
-import { PiUsersFourDuotone } from "react-icons/pi";
+import { MdOutlineDashboard } from 'react-icons/md';
+import { RiContactsBook2Fill } from 'react-icons/ri';
+import { TbMessages } from 'react-icons/tb';
 
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 export const WEBPAGE_URL = import.meta.env.VITE_WEBPAGE_URL;
@@ -14,7 +15,7 @@ export const NAVIGATION = {
 	LOGIN: 'login',
 	RESET: 'reset-password',
 	AUTH: '/auth',
-	PASSBOOK:'passbook',
+	PHONEBOOK: 'phonebook',
 	DASHBOARD: 'dashboard',
 	INBOX: 'inbox',
 	HOME: '/',
@@ -27,16 +28,16 @@ export const MenuItems = [
 	{
 		icon: MdOutlineDashboard,
 		route: NAVIGATION.DASHBOARD,
-		title:"Dashboard",
+		title: 'Dashboard',
 	},
 	{
-		icon: PiUsersFourDuotone,
+		icon: TbMessages,
 		route: NAVIGATION.INBOX,
-		title:"Inbox",
+		title: 'Inbox',
 	},
 	{
-		icon: MdOutlinePayments,
-		route: NAVIGATION.PASSBOOK,
-		title:"Passbook",
+		icon: RiContactsBook2Fill,
+		route: NAVIGATION.PHONEBOOK,
+		title: 'Passbook',
 	},
 ];

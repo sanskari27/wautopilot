@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
+import { setAuthenticated } from '../../../hooks/useAuth';
 import { useGeoLocation } from '../../../hooks/useGeolocation';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
@@ -23,9 +24,13 @@ function LoginTab() {
 	const toast = useToast();
 	const dispatch = useDispatch();
 
-	const { uiDetails:{isAuthenticating}, email, password, error, accessLevel } = useSelector(
-		(state: StoreState) => state[StoreNames.USER]
-	);
+	const {
+		uiDetails: { isAuthenticating },
+		email,
+		password,
+		error,
+		accessLevel,
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const forgotPassword = async () => {
 		if (!email) {
@@ -66,6 +71,7 @@ function LoginTab() {
 		);
 		dispatch(stopUserAuthenticating());
 		if (valid) {
+			setAuthenticated(true);
 			dispatch(setIsAuthenticated(true));
 			return navigate(NAVIGATION.HOME);
 		}

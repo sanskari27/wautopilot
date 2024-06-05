@@ -9,7 +9,7 @@ const HomeNavbar = () => {
 
 	const handleClick = () => {
 		if (isAuthenticated) {
-			return navigate(NAVIGATION.DASHBOARD);
+			return navigate(`${NAVIGATION.APP}/${NAVIGATION.DASHBOARD}`);
 		}
 		navigate(`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`);
 	};

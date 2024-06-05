@@ -10,31 +10,38 @@ import { IS_PRODUCTION, IS_WINDOWS, Path } from './config/const';
 import { CustomError, ERRORS } from './errors';
 import { RespondFile } from './utils/ExpressUtils';
 
-const allowlist = [
-	'http://localhost:5173',
-	'http://localhost:3000',
-	'https://keethjewels.com',
-	'https://www.keethjewels.com',
-	'https://admin.keethjewels.com',
-];
+// const allowlist = [
+// 	'http://localhost:5173',
+// 	'http://localhost:3000',
+// 	'http://192.168.29.112:3000',
+// 	'https://keethjewels.com',
+// 	'https://www.keethjewels.com',
+// 	'https://admin.keethjewels.com',
+// ];
 
 const corsOptionsDelegate = (req: any, callback: any) => {
-	let corsOptions;
-	let isDomainAllowed = allowlist.indexOf(req.header('Origin')) !== -1;
+	let corsOptions = {
+		origin: true,
+		credentials: true,
+		exposedHeaders: ['Content-Disposition'],
+		methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+		optionsSuccessStatus: 204,
+	};
+	// let isDomainAllowed = allowlist.indexOf(req.header('Origin')) !== -1;
 
-	if (isDomainAllowed) {
-		// Enable CORS for this request
-		corsOptions = {
-			origin: true,
-			credentials: true,
-			exposedHeaders: ['Content-Disposition'],
-			methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-			optionsSuccessStatus: 204,
-		};
-	} else {
-		// Disable CORS for this request
-		corsOptions = { origin: false };
-	}
+	// if (isDomainAllowed) {
+	// 	// Enable CORS for this request
+	// 	corsOptions = {
+	// 		origin: true,
+	// 		credentials: true,
+	// 		exposedHeaders: ['Content-Disposition'],
+	// 		methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+	// 		optionsSuccessStatus: 204,
+	// 	};
+	// } else {
+	// 	// Disable CORS for this request
+	// 	corsOptions = { origin: false };
+	// }
 	callback(null, corsOptions);
 };
 

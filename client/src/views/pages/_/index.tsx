@@ -66,7 +66,7 @@ export default function Home() {
 
 	const handleLoginButton = () => {
 		if (isAuthenticated) {
-			return navigate(NAVIGATION.DASHBOARD);
+			return navigate(`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`);
 		}
 		navigate(`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`);
 	};

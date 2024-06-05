@@ -10,10 +10,10 @@ import {
 } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { NAVIGATION } from '../../../config/const';
-import useAuth from '../../../hooks/useAuth';
-import LoginTab from '../../components/user-login/login-tab';
-import SignupTab from '../../components/user-login/signup-tab';
+import { NAVIGATION } from '../../../../config/const';
+import useAuth from '../../../../hooks/useAuth';
+import LoginTab from '../../../components/user-login/login-tab';
+import SignupTab from '../../../components/user-login/signup-tab';
 
 const Login = () => {
 	const navigate = useNavigate();
@@ -22,7 +22,7 @@ const Login = () => {
 
 	useEffect(() => {
 		if (isAuthenticated) {
-			navigate(`${NAVIGATION.DASHBOARD}`);
+			navigate(`${NAVIGATION.APP}/${NAVIGATION.DASHBOARD}`);
 		}
 	}, [isAuthenticated, navigate]);
 
@@ -34,7 +34,7 @@ const Login = () => {
 			closeOnOverlayClick={false}
 			isOpen={true}
 			isCentered
-			size={'2xl'}
+			size={'md'}
 		>
 			<ModalContent>
 				<ModalBody>

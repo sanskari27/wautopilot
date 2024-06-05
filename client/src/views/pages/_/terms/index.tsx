@@ -1,6 +1,6 @@
 import { Box, Heading, Text } from '@chakra-ui/react';
-import Footer from '../../components/footer';
-import HomeNavbar from '../../components/navbar/homeNavbar';
+import Footer from '../../../components/footer';
+import HomeNavbar from '../../../components/navbar/homeNavbar';
 
 // **Interpretation**
 

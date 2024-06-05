@@ -2,9 +2,9 @@ import { Button, Modal, ModalBody, ModalContent, ModalHeader, Stack, Text } from
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { NAVIGATION } from '../../../config/const';
-import AuthService from '../../../services/auth.service';
-import { StoreNames, StoreState } from '../../../store';
+import { NAVIGATION } from '../../../../config/const';
+import AuthService from '../../../../services/auth.service';
+import { StoreNames, StoreState } from '../../../../store';
 import {
 	reset,
 	setConfirmPassword,
@@ -12,8 +12,8 @@ import {
 	setPassword,
 	startResettingPassword,
 	stopResettingPassword,
-} from '../../../store/reducers/UserReducers';
-import PasswordInput from '../../components/user-login/password-input';
+} from '../../../../store/reducers/UserReducers';
+import PasswordInput from '../../../components/user-login/password-input';
 
 const ResetPassword = () => {
 	// const { isLocating } = useGeoLocation();

@@ -1,23 +1,34 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import { NAVIGATION } from './config/const';
 
 import { Flex, Progress } from '@chakra-ui/react';
-import useAuth from './hooks/useAuth';
+import { useDispatch } from 'react-redux';
 import { useGeoLocation } from './hooks/useGeolocation';
+import AuthService from './services/auth.service';
+import { setIsAuthenticated } from './store/reducers/UserReducers';
 
 const Home = lazy(() => import('./views/pages/_'));
-const Terms = lazy(() => import('./views/pages/terms'));
-const Privacy = lazy(() => import('./views/pages/privacy'));
-const Disclaimer = lazy(() => import('./views/pages/disclaimer'));
-const Login = lazy(() => import('./views/pages/login'));
+const Terms = lazy(() => import('./views/pages/_/terms'));
+const Privacy = lazy(() => import('./views/pages/_/privacy'));
+const Disclaimer = lazy(() => import('./views/pages/_/disclaimer'));
+const Login = lazy(() => import('./views/pages/auth/login'));
 const AuthPage = lazy(() => import('./views/pages/auth'));
-const ResetPassword = lazy(() => import('./views/pages/reset-password'));
+const ResetPassword = lazy(() => import('./views/pages/auth/reset-password'));
 const AppPage = lazy(() => import('./views/pages/app'));
+const PhoneBook = lazy(() => import('./views/pages/app/phonebook'));
 
 function App() {
-	useAuth();
+	const dispatch = useDispatch();
+	useEffect(() => {
+		AuthService.isAuthenticated().then((res) => {
+			console.log(res);
+			if (res) {
+				dispatch(setIsAuthenticated(true));
+			}
+		});
+	}, [dispatch]);
 	useGeoLocation();
 
 	return (
@@ -34,9 +45,9 @@ function App() {
 							<Route path={NAVIGATION.RESET} element={<ResetPassword />} />
 						</Route>
 						<Route path={NAVIGATION.APP} element={<AppPage />}>
-							<Route path={NAVIGATION.DASHBOARD} element={<>sdf</>} />
+							<Route path={NAVIGATION.DASHBOARD} element={<>sadf</>} />
 							<Route path={NAVIGATION.INBOX} element={<>sdf</>} />
-							<Route path={NAVIGATION.PASSBOOK} element={<>sdf</>} />
+							<Route path={NAVIGATION.PHONEBOOK} element={<PhoneBook />} />
 						</Route>
 						{/* <Route path='*' element={<Home />} /> */}
 					</Routes>

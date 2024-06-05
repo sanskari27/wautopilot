@@ -22,7 +22,7 @@ const initialState: UserState = {
 };
 
 const UserSlice = createSlice({
-	name: StoreNames.COLLECTIONS,
+	name: StoreNames.USER,
 	initialState,
 	reducers: {
 		reset: (state) => {
