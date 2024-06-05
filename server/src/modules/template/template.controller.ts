@@ -30,6 +30,28 @@ async function addTemplate(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function editTemplate(req: Request, res: Response, next: NextFunction) {
+	try {
+		const { id, ...data } = req.locals.data as Template & { id: string };
+		const whatsappLinkService = new WhatsappLinkService(req.locals.account);
+		const device = await whatsappLinkService.fetchDeviceDoc(req.locals.id);
+
+		const templateService = new TemplateService(req.locals.account, device);
+		const success = await templateService.editTemplate(id, data);
+
+		if (!success) {
+			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+		}
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 async function deleteTemplate(req: Request, res: Response, next: NextFunction) {
 	const { id, name } = req.locals.data as TemplateRemoveValidationResult;
 	try {
@@ -73,6 +95,7 @@ async function fetchTemplates(req: Request, res: Response, next: NextFunction) {
 
 const Controller = {
 	addTemplate,
+	editTemplate,
 	deleteTemplate,
 	fetchTemplates,
 };

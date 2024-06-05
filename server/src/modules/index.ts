@@ -1,5 +1,6 @@
 import express from 'express';
 import SessionRoute from './auth/auth.route';
+import MessageRoute from './message/message.route';
 import PhonebookRoute from './phonebook/phonebook.route';
 import TemplateRoute from './template/template.route';
 import WhatsappLinkRoute from './whatsapp-link/whatsappLink.route';
@@ -18,6 +19,7 @@ router.use('/sessions', SessionRoute);
 router.use('/phonebook', PhonebookRoute);
 router.use('/whatsapp-link', WhatsappLinkRoute);
 router.use('/template', TemplateRoute);
+router.use('/message', MessageRoute);
 
 router.use('/phonepe/callback', PhonePeProvider.Callbacks.transactionCallback);
 

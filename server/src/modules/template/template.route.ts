@@ -1,7 +1,11 @@
 import express from 'express';
 import { IDValidator, VerifySession } from '../../middleware';
 import Controller from './template.controller';
-import { TemplateCreateValidator, TemplateRemoveValidator } from './template.validator';
+import {
+	TemplateCreateValidator,
+	TemplateEditValidator,
+	TemplateRemoveValidator,
+} from './template.validator';
 
 const router = express.Router();
 
@@ -9,6 +13,11 @@ router
 	.route('/:id/add-template')
 	.all(VerifySession, IDValidator, TemplateCreateValidator)
 	.post(Controller.addTemplate);
+
+router
+	.route('/:id/edit-template')
+	.all(VerifySession, IDValidator, TemplateEditValidator)
+	.post(Controller.editTemplate);
 
 router
 	.route('/:id/delete-template')

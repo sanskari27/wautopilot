@@ -4,7 +4,7 @@ import FileUpload, { ONLY_CSV_ALLOWED, SingleFileUploadOptions } from '../../con
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import PhoneBookService from '../../services/phonebook';
-import { Respond } from '../../utils/ExpressUtils';
+import { Respond, idValidator } from '../../utils/ExpressUtils';
 import {
 	LabelsResult,
 	RecordsValidationResult,
@@ -134,16 +134,20 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 
 	try {
 		const uploadedFile = await FileUpload.SingleFileUpload(req, res, fileUploadOptions);
+		const labels = req.body.labels ? req.body.labels.split(',') : [];
 
 		const parsed_csv = await csv().fromFile(uploadedFile.path);
 
 		if (!parsed_csv) {
 			return next(new CustomError(COMMON_ERRORS.ERROR_PARSING_CSV));
 		}
-		console.log(parsed_csv);
 
 		const phoneBookService = new PhoneBookService(req.locals.account);
 		const created = await phoneBookService.addRecords(parsed_csv);
+
+		created.forEach(async (record) => {
+			await phoneBookService.setLabels(idValidator(record.id)[1]!, labels);
+		});
 
 		return Respond({
 			res,
