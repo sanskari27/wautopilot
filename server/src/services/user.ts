@@ -3,7 +3,9 @@ import { AccountDB, SessionDB, StorageDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import { UserLevel } from '../config/const';
 import { AUTH_ERRORS, CustomError } from '../errors';
+import { sendLoginCredentialsEmail } from '../provider/email';
 import { IDType } from '../types';
+import { generateNewPassword } from '../utils/ExpressUtils';
 import SessionService from './session';
 
 type SessionDetails = {
@@ -15,12 +17,17 @@ type SessionDetails = {
 };
 
 export default class UserService {
+	getUser(): any {
+		throw new Error('Method not implemented.');
+	}
 	private _user_id: IDType;
 	private _level: UserLevel;
+	private _account: IAccount;
 
 	public constructor(account: IAccount) {
 		this._user_id = account._id;
 		this._level = account.userLevel;
+		this._account = account;
 	}
 
 	static async findById(id: IDType) {
@@ -54,15 +61,15 @@ export default class UserService {
 
 	static async register(
 		email: string,
-		password: string,
-		opts: SessionDetails & {
+		opts: {
 			name?: string;
 			phone?: string;
 			level: UserLevel;
 		}
 	) {
 		try {
-			const user = await AccountDB.create({
+			const password = generateNewPassword();
+			await AccountDB.create({
 				email,
 				password,
 				name: opts.name,
@@ -70,13 +77,7 @@ export default class UserService {
 				userLevel: opts.level,
 			});
 
-			const session = await SessionService.createSession(user._id, opts);
-
-			return {
-				authToken: session.authToken,
-				refreshToken: session.refreshToken,
-				userService: new UserService(user),
-			};
+			sendLoginCredentialsEmail(email, email, password);
 		} catch (err) {
 			throw new CustomError(AUTH_ERRORS.USER_ALREADY_EXISTS);
 		}
@@ -112,14 +113,6 @@ export default class UserService {
 		await StorageDB.deleteOne({
 			key: token,
 		});
-
-		const session = await SessionService.createSession(user._id, {});
-
-		return {
-			authToken: session.authToken,
-			refreshToken: session.refreshToken,
-			userService: new UserService(user),
-		};
 	}
 
 	static async markLogout(token: string) {
@@ -134,5 +127,9 @@ export default class UserService {
 
 	public get userId() {
 		return this._user_id;
+	}
+
+	public get account() {
+		return this._account;
 	}
 }

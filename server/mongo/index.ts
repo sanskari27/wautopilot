@@ -3,6 +3,7 @@ export { AccountDB, SessionDB, StorageDB } from './repo';
 
 export default function connectDB(database_url: string) {
 	return new Promise((resolve, reject) => {
+		mongoose.set('strict', false);
 		mongoose.set('strictQuery', false);
 		mongoose.set('strictPopulate', false);
 		mongoose

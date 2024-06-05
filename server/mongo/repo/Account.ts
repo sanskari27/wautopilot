@@ -23,7 +23,6 @@ const schema = new mongoose.Schema<IAccount>({
 	},
 	userLevel: {
 		type: Number,
-		enum: Object.values(UserLevel),
 		default: UserLevel.Admin,
 	},
 });

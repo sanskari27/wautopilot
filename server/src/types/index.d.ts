@@ -1,6 +1,7 @@
 /* eslint-disable no-var */
 
 import { Types } from 'mongoose';
+import IAccount from '../../mongo/types/account';
 import { UserService } from '../services';
 
 declare global {
@@ -23,6 +24,7 @@ export interface LocalVariables {
 	query: any;
 	data: any;
 	id: IDType;
+	account: IAccount;
 	user: UserService;
 }
 

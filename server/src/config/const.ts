@@ -15,6 +15,8 @@ export const COOKIE_DOMAIN_VALUE = process.env.COOKIE_DOMAIN_VALUE ?? 'localhost
 
 export const RESEND_API_KEY = process.env.RESEND_API_KEY ?? 'RESEND_API_KEY';
 
+export const LOGO_PATH = '/static/assets/logo.png';
+
 export enum Cookie {
 	Auth = 'auth-cookie',
 	Refresh = 'refresh-cookie',

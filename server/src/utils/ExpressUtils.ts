@@ -72,6 +72,10 @@ export function generateRandomID() {
 	return crypto.randomUUID();
 }
 
+export function generateNewPassword() {
+	return crypto.randomBytes(4).toString('hex');
+}
+
 export function generateInvoiceID(id: string) {
 	// 23-24/Saas/000001
 	const moment_now = DateUtils.getMomentNow();

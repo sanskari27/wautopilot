@@ -11,6 +11,13 @@ export type LoginValidationResult = {
 	longitude?: number;
 };
 
+export type RegisterValidationResult = {
+	email: string;
+	accessLevel: UserLevel;
+	name: string;
+	phone: string;
+};
+
 export type ResetPasswordValidationResult = {
 	email: string;
 	callbackURL: string;
@@ -18,7 +25,6 @@ export type ResetPasswordValidationResult = {
 
 export type UpdatePasswordValidationResult = {
 	password: string;
-	token: string;
 };
 
 export type GoogleLoginValidationResult = {
@@ -32,6 +38,35 @@ export async function LoginAccountValidator(req: Request, res: Response, next: N
 		accessLevel: z.nativeEnum(UserLevel).default(UserLevel.Admin),
 		latitude: z.number().default(0),
 		longitude: z.number().default(0),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function RegisterAccountValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z.object({
+		name: z.string(),
+		phone: z.string(),
+		email: z.string().email(),
+		accessLevel: z.nativeEnum(UserLevel).default(UserLevel.Admin),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
@@ -84,7 +119,6 @@ export async function ResetPasswordValidator(req: Request, res: Response, next: 
 
 export async function UpdatePasswordValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		token: z.string(),
 		password: z.string(),
 	});
 
