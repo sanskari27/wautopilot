@@ -10,6 +10,8 @@ import {
 	setConfirmPassword,
 	setError,
 	setPassword,
+	startResettingPassword,
+	stopResettingPassword,
 } from '../../../store/reducers/UserReducers';
 import PasswordInput from '../../components/user-login/password-input';
 
@@ -20,37 +22,46 @@ const ResetPassword = () => {
 	const searchParams = useSearchParams();
 	const code = searchParams[0].get('code');
 
-	const { password, confirmPassword, error } = useSelector(
-		(state: StoreState) => state[StoreNames.USER]
-	);
+	const {
+		password,
+		confirmPassword,
+		error,
+		uiDetails: { resettingPassword },
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	useEffect(() => {
 		dispatch(reset());
 	}, [dispatch]);
 
 	if (!code) {
-		return navigate(`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`);
+		navigate(`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`);
 	}
 
 	const handleResetPassword = async () => {
 		if (!password) {
 			return dispatch(setError({ message: 'Password is required', type: 'password' }));
 		}
+
 		if (!confirmPassword) {
 			return dispatch(setError({ message: 'Confirm Password is required', type: 'password' }));
 		}
+
 		if (password !== confirmPassword) {
 			return dispatch(setError({ message: 'Passwords do not match', type: 'password' }));
 		}
+
+		dispatch(startResettingPassword());
+
 		const valid = await AuthService.resetPassword(password, code as string);
+
+		dispatch(stopResettingPassword());
+
 		if (valid) {
 			navigate(`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`);
 			return;
 		}
 
 		dispatch(setError({ message: 'Password reset failed', type: 'server' }));
-
-		console.log(password, confirmPassword, code);
 	};
 
 	return (
@@ -88,7 +99,11 @@ const ResetPassword = () => {
 						</Stack>
 						<Stack>{error.type && <Text color={'red.400'}>{error.message}</Text>}</Stack>
 						<Stack pb={'1rem'}>
-							<Button colorScheme={error.type ? 'red' : 'green'} onClick={handleResetPassword}>
+							<Button
+								colorScheme={error.type ? 'red' : 'green'}
+								onClick={handleResetPassword}
+								isLoading={resettingPassword}
+							>
 								Reset Password
 							</Button>
 						</Stack>

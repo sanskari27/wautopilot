@@ -11,15 +11,18 @@ import {
 	startUserAuthenticating,
 	stopUserAuthenticating,
 } from '../../../store/reducers/UserReducers';
-import { UserLevel } from '../../../store/types/UserState';
 
 export default function SignupTab() {
 	const toast = useToast();
 	const dispatch = useDispatch();
 
-	const { isAuthenticating, email, phone, name, error } = useSelector(
-		(state: StoreState) => state[StoreNames.USER]
-	);
+	const {
+		uiDetails: { isAuthenticating },
+		email,
+		phone,
+		name,
+		error,
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const handleSignup = async () => {
 		if (!email) {
@@ -34,7 +37,7 @@ export default function SignupTab() {
 
 		dispatch(startUserAuthenticating());
 
-		const success = await AuthService.registerUser(name, phone, email, UserLevel.Admin);
+		const success = await AuthService.registerUser(name, phone, email, 20);
 		if (!success) {
 			toast({
 				title: 'Account creation failed.',

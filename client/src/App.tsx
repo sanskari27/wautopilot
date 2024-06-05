@@ -14,6 +14,7 @@ const Disclaimer = lazy(() => import('./views/pages/disclaimer'));
 const Login = lazy(() => import('./views/pages/login'));
 const AuthPage = lazy(() => import('./views/pages/auth'));
 const ResetPassword = lazy(() => import('./views/pages/reset-password'));
+const AppPage = lazy(() => import('./views/pages/app'));
 
 function App() {
 	useAuth();
@@ -31,6 +32,11 @@ function App() {
 						<Route path={NAVIGATION.AUTH} element={<AuthPage />}>
 							<Route path={NAVIGATION.LOGIN} element={<Login />} />
 							<Route path={NAVIGATION.RESET} element={<ResetPassword />} />
+						</Route>
+						<Route path={NAVIGATION.APP} element={<AppPage />}>
+							<Route path={NAVIGATION.DASHBOARD} element={<>sdf</>} />
+							<Route path={NAVIGATION.INBOX} element={<>sdf</>} />
+							<Route path={NAVIGATION.PASSBOOK} element={<>sdf</>} />
 						</Route>
 						{/* <Route path='*' element={<Home />} /> */}
 					</Routes>

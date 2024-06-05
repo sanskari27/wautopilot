@@ -4,7 +4,11 @@ import { UserState } from '../types/UserState';
 
 const initialState: UserState = {
 	isAuthenticated: false,
-	isAuthenticating: false,
+	uiDetails: {
+		isAuthenticated: false,
+		isAuthenticating: false,
+		resettingPassword: false,
+	},
 	email: '',
 	name: '',
 	phone: '',
@@ -24,7 +28,7 @@ const UserSlice = createSlice({
 		reset: (state) => {
 			state.email = initialState.email;
 			state.isAuthenticated = initialState.isAuthenticated;
-			state.isAuthenticating = initialState.isAuthenticating;
+			state.uiDetails = initialState.uiDetails;
 			state.password = initialState.password;
 			state.confirmPassword = initialState.confirmPassword;
 			state.error = initialState.error;
@@ -34,11 +38,16 @@ const UserSlice = createSlice({
 		},
 
 		startUserAuthenticating(state) {
-			state.isAuthenticating = true;
+			state.uiDetails.isAuthenticating = true;
 		},
-
 		stopUserAuthenticating(state) {
-			state.isAuthenticating = false;
+			state.uiDetails.isAuthenticating = false;
+		},
+		startResettingPassword(state) {
+			state.uiDetails.resettingPassword = true;
+		},
+		stopResettingPassword(state) {
+			state.uiDetails.resettingPassword = false;
 		},
 		setIsAuthenticated: (state, action: PayloadAction<boolean>) => {
 			state.isAuthenticated = action.payload;
@@ -80,6 +89,8 @@ export const {
 	setIsAuthenticated,
 	setName,
 	setPhone,
+	startResettingPassword,
+	stopResettingPassword,
 } = UserSlice.actions;
 
 export default UserSlice.reducer;

@@ -23,7 +23,7 @@ function LoginTab() {
 	const toast = useToast();
 	const dispatch = useDispatch();
 
-	const { isAuthenticating, email, password, error, accessLevel } = useSelector(
+	const { uiDetails:{isAuthenticating}, email, password, error, accessLevel } = useSelector(
 		(state: StoreState) => state[StoreNames.USER]
 	);
 

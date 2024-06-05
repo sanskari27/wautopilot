@@ -1,6 +1,6 @@
 export type UserState = {
 	isAuthenticated: boolean;
-	isAuthenticating: boolean;
+	uiDetails: UserUIDetails;
 	email: string;
 	password: string;
 	name: string;
@@ -19,3 +19,9 @@ export enum UserLevel {
 	WhiteLabel = 30,
 	Master = 100,
 }
+
+export type UserUIDetails = {
+	isAuthenticated: boolean;
+	isAuthenticating: boolean;
+	resettingPassword: boolean;
+};
