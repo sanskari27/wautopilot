@@ -20,8 +20,10 @@ import { MdContactMail } from 'react-icons/md';
 import { PiBroadcastFill } from 'react-icons/pi';
 import { RiInbox2Line } from 'react-icons/ri';
 import { TbMessageCheck } from 'react-icons/tb';
+import { useNavigate } from 'react-router-dom';
 import { HERO_IMG } from '../../../assets/Images';
-import { WHO } from '../../../config/const';
+import { NAVIGATION, WHO } from '../../../config/const';
+import useAuth from '../../../hooks/useAuth';
 import Footer from '../../components/footer';
 import HomeNavbar from '../../components/navbar/homeNavbar';
 import Each from '../../components/utils/Each';
@@ -59,6 +61,16 @@ const FAQs = [
 ];
 
 export default function Home() {
+	const { isAuthenticated } = useAuth();
+	const navigate = useNavigate();
+
+	const handleLoginButton = () => {
+		if (isAuthenticated) {
+			return navigate(NAVIGATION.DASHBOARD);
+		}
+		navigate(`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`);
+	};
+
 	return (
 		<Box className='h-screen overflow-x-hidden overflow-y-scroll pt=[70px]'>
 			<HomeNavbar />
@@ -97,6 +109,7 @@ export default function Home() {
 									rounded={'full'}
 									marginTop={'2rem'}
 									fontSize={'1.25rem'}
+									onClick={handleLoginButton}
 								>
 									Try Now
 								</Button>

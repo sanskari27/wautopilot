@@ -1,7 +1,19 @@
 import { Button, Flex, Image, Text } from '@chakra-ui/react';
-import { LOGO_WHITE } from '../../../config/const';
+import { useNavigate } from 'react-router-dom';
+import { LOGO_WHITE, NAVIGATION } from '../../../config/const';
+import useAuth from '../../../hooks/useAuth';
 
 const HomeNavbar = () => {
+	const { isAuthenticated } = useAuth();
+	const navigate = useNavigate();
+
+	const handleClick = () => {
+		if (isAuthenticated) {
+			return navigate(NAVIGATION.DASHBOARD);
+		}
+		navigate(`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`);
+	};
+
 	return (
 		<div>
 			<nav className='navbar   h-[60px] text-accent'>
@@ -18,13 +30,19 @@ const HomeNavbar = () => {
 						<div className='md:inline-block hidden'>
 							<ul className='flex gap-12'>
 								<li className={`relative cursor-pointer font-medium`}>
-									<a href='/#works' className='hover:text-slate-300'>What we do</a>
+									<a href='/#works' className='hover:text-slate-300'>
+										What we do
+									</a>
 								</li>
 								<li className={`relative cursor-pointer font-medium`}>
-									<a href='/#who' className='hover:text-slate-300'>Who we are</a>
+									<a href='/#who' className='hover:text-slate-300'>
+										Who we are
+									</a>
 								</li>
 								<li className={`relative cursor-pointer font-medium`}>
-									<a href='/#how' className='hover:text-slate-300'>How it works</a>
+									<a href='/#how' className='hover:text-slate-300'>
+										How it works
+									</a>
 								</li>
 								{/* <li className={`relative cursor-pointer font-medium`}>
 									<a href='/#faq' className='hover:text-slate-300'>FAQ</a>
@@ -36,13 +54,14 @@ const HomeNavbar = () => {
 						<ul className='flex gap-6'>
 							<li className={`relative cursor-pointer font-medium`}>
 								{/* <a href={`/login`} className={`flex items-center}`}> */}
-									<Button
-										variant={'outline'}
-										rounded={'full'}
-										className='bg-accent text-primary-dark'
-									>
-										Try Now
-									</Button>
+								<Button
+									variant={'outline'}
+									rounded={'full'}
+									className='bg-accent text-primary-dark'
+									onClick={handleClick}
+								>
+									Try Now
+								</Button>
 								{/* </a> */}
 							</li>
 						</ul>
