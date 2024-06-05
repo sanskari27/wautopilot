@@ -2,25 +2,32 @@ import { useEffect, useState } from 'react';
 import { singletonHook } from 'react-singleton-hook';
 import AuthService from '../services/auth.service';
 
-const init = { isLoggedIn: false, isAuthChecking: false };
+const initStatus = { isAuthenticated: false };
 
-const useAuth = singletonHook(init, () => {
-	const [isLoggedIn, setIsLoggedIn] = useState(init.isLoggedIn);
-	const [isAuthChecking, setIsAuthChecking] = useState(init.isAuthChecking);
+let globalSet: React.Dispatch<
+	React.SetStateAction<{
+		isAuthenticated: boolean;
+	}>
+> = () => {
+	throw new Error('you must useAuth before setting its state');
+};
 
+const useAuth = singletonHook(initStatus, () => {
+	const [auth, setAuth] = useState(initStatus);
+	globalSet = setAuth;
 	useEffect(() => {
-		const checkLoginStatus = async () => {
-			setIsAuthChecking(true);
-			const loggedIn = await AuthService.isAuthenticated();
-			console.log('Logged in:', loggedIn);
-			setIsLoggedIn(loggedIn);
-			setIsAuthChecking(false);
+		const checkAuthStatus = async () => {
+			const isLoggedIn = await AuthService.isAuthenticated();
+			setAuth({ isAuthenticated: isLoggedIn });
 		};
-
-		checkLoginStatus();
+		checkAuthStatus();
 	}, []);
 
-	return { isLoggedIn, isAuthChecking };
+	return auth;
 });
+
+export const setAuthenticated = (status: boolean) => {
+	globalSet({ isAuthenticated: status });
+};
 
 export default useAuth;

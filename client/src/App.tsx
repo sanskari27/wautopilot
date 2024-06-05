@@ -11,6 +11,9 @@ const Home = lazy(() => import('./views/pages/_'));
 const Terms = lazy(() => import('./views/pages/terms'));
 const Privacy = lazy(() => import('./views/pages/privacy'));
 const Disclaimer = lazy(() => import('./views/pages/disclaimer'));
+const Login = lazy(() => import('./views/pages/login'));
+const AuthPage = lazy(() => import('./views/pages/auth'));
+const ResetPassword = lazy(() => import('./views/pages/reset-password'));
 
 function App() {
 	useAuth();
@@ -21,12 +24,15 @@ function App() {
 			<Router>
 				<Suspense fallback={<Loading />}>
 					<Routes>
-						<Route path={NAVIGATION.LOGIN} element={<>LOGIN</>} />
 						<Route path={NAVIGATION.HOME} element={<Home />} />
 						<Route path={NAVIGATION.TERMS} element={<Terms />} />
 						<Route path={NAVIGATION.PRIVACY} element={<Privacy />} />
 						<Route path={NAVIGATION.DISCLAIMER} element={<Disclaimer />} />
-						{/* <Route path='*' element={<PageNotFound />} /> */}
+						<Route path={NAVIGATION.AUTH} element={<AuthPage />}>
+							<Route path={NAVIGATION.LOGIN} element={<Login />} />
+							<Route path={NAVIGATION.RESET} element={<ResetPassword />} />
+						</Route>
+						{/* <Route path='*' element={<Home />} /> */}
 					</Routes>
 				</Suspense>
 			</Router>

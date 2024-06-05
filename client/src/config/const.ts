@@ -7,9 +7,14 @@ export const LOGO_PRIMARY = '/images/logo-primary.svg';
 export const WHO = '/images/who.svg';
 
 export const NAVIGATION = {
-	LOGIN: '/login',
+	LOGIN: 'login',
+	RESET: 'reset-password',
 	HOME: '/',
 	TERMS: '/terms',
 	PRIVACY: '/privacy',
 	DISCLAIMER: '/disclaimer',
+	AUTH: '/auth',
+	DASHBOARD: '/dashboard',
+	PASSBOOK:'/passbook',
+	APP: '/app',
 };

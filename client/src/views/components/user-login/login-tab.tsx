@@ -1,4 +1,5 @@
 import { Button, FormControl, FormLabel, Input, Stack, Text, useToast } from '@chakra-ui/react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
@@ -6,21 +7,23 @@ import { useGeoLocation } from '../../../hooks/useGeolocation';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
 import {
+	reset,
 	setEmail,
 	setError,
+	setIsAuthenticated,
 	setPassword,
 	startUserAuthenticating,
 	stopUserAuthenticating,
 } from '../../../store/reducers/UserReducers';
-import PasswordInput from './Password-input';
+import PasswordInput from './password-input';
 
 function LoginTab() {
-	const { location, isLocating } = useGeoLocation();
+	const { location } = useGeoLocation();
 	const navigate = useNavigate();
 	const toast = useToast();
 	const dispatch = useDispatch();
 
-	const { isAuthenticating, email, password, error } = useSelector(
+	const { isAuthenticating, email, password, error, accessLevel } = useSelector(
 		(state: StoreState) => state[StoreNames.USER]
 	);
 
@@ -28,9 +31,12 @@ function LoginTab() {
 		if (!email) {
 			return dispatch(setError({ message: 'Email is required', type: 'email' }));
 		}
-		const valid = await AuthService.forgotPassword(email, 'http://localhost:5173/');
+		const valid = await AuthService.forgotPassword(
+			email,
+			'http://localhost:5173/auth/reset-password'
+		);
 		if (valid) {
-			toast({
+			return toast({
 				title: 'Password reset link sent to your email',
 				status: 'success',
 				duration: 4000,
@@ -51,16 +57,27 @@ function LoginTab() {
 			return dispatch(setError({ message: 'Password is required', type: 'password' }));
 		}
 		dispatch(startUserAuthenticating());
-		const valid = await AuthService.login(email, password, location.latitude, location.longitude);
+		const valid = await AuthService.login(
+			email,
+			password,
+			accessLevel,
+			location.latitude,
+			location.longitude
+		);
+		dispatch(stopUserAuthenticating());
 		if (valid) {
-			return navigate(NAVIGATION.LOGIN);
+			dispatch(setIsAuthenticated(true));
+			return navigate(NAVIGATION.HOME);
 		}
 		dispatch(setError({ message: 'Invalid credentials', type: 'server' }));
-		dispatch(stopUserAuthenticating());
 		setTimeout(() => {
 			dispatch(setError({ message: '', type: '' }));
 		}, 2000);
 	};
+
+	useEffect(() => {
+		dispatch(reset());
+	}, [dispatch]);
 
 	return (
 		<>
@@ -108,7 +125,12 @@ function LoginTab() {
 					>
 						Sign in
 					</Button>
-					<Text textAlign={'center'} cursor={'pointer'} onClick={forgotPassword}>
+					<Text
+						textAlign={'center'}
+						cursor={'pointer'}
+						onClick={forgotPassword}
+						_hover={{ textDecoration: 'underline' }}
+					>
 						forgot password?
 					</Text>
 				</Stack>

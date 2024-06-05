@@ -20,14 +20,13 @@ import { MdContactMail } from 'react-icons/md';
 import { PiBroadcastFill } from 'react-icons/pi';
 import { RiInbox2Line } from 'react-icons/ri';
 import { TbMessageCheck } from 'react-icons/tb';
+import { useNavigate } from 'react-router-dom';
 import { HERO_IMG } from '../../../assets/Images';
-import { WHO } from '../../../config/const';
+import { NAVIGATION, WHO } from '../../../config/const';
+import useAuth from '../../../hooks/useAuth';
 import Footer from '../../components/footer';
 import HomeNavbar from '../../components/navbar/homeNavbar';
 import Each from '../../components/utils/Each';
-import useAuth from '../../../hooks/useAuth';
-import { useRef } from 'react';
-import LoginDialog, { LoginDialogProps } from '../../components/user-login/indes';
 
 const FAQs = [
 	{
@@ -62,21 +61,15 @@ const FAQs = [
 ];
 
 export default function Home() {
-
-	const LoginRef = useRef<LoginDialogProps>(null);
-
-	const {isAuthChecking,isLoggedIn} = useAuth();
+	const { isAuthenticated } = useAuth();
+	const navigate = useNavigate();
 
 	const handleLoginButton = () => {
-		if(isAuthChecking){
-			return;
+		if (isAuthenticated) {
+			return navigate(NAVIGATION.DASHBOARD);
 		}
-		if(isLoggedIn){
-			console.log('User is logged in');
-		}else{
-			LoginRef.current?.open();
-		}
-	}
+		navigate(`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`);
+	};
 
 	return (
 		<Box className='h-screen overflow-x-hidden overflow-y-scroll pt=[70px]'>
@@ -336,7 +329,6 @@ export default function Home() {
 				</section>
 			</main>
 			<Footer />
-			<LoginDialog ref={LoginRef} />
 		</Box>
 	);
 }

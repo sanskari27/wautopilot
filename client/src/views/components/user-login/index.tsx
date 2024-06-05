@@ -2,7 +2,6 @@ import {
 	Button,
 	Modal,
 	ModalBody,
-	ModalCloseButton,
 	ModalContent,
 	ModalFooter,
 	ModalOverlay,
@@ -12,7 +11,9 @@ import {
 	TabPanels,
 	Tabs,
 } from '@chakra-ui/react';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { reset } from '../../../store/reducers/UserReducers';
 import LoginTab from './login-tab';
 import SignupTab from './signup-tab';
 
@@ -24,6 +25,8 @@ export type LoginDialogProps = {
 
 const LoginDialog = forwardRef<LoginDialogProps>((_, ref) => {
 	const [isOpen, onClose] = useState(false);
+	// const { isLocating } = useGeoLocation();
+	const dispatch = useDispatch();
 
 	useImperativeHandle(ref, () => ({
 		open: () => onClose(true),
@@ -32,11 +35,14 @@ const LoginDialog = forwardRef<LoginDialogProps>((_, ref) => {
 
 	const handleClose = () => onClose(false);
 
+	useEffect(() => {
+		dispatch(reset());
+	}, [dispatch]);
+
 	return (
 		<Modal isOpen={isOpen} onClose={handleClose} isCentered size={'2xl'}>
 			<ModalOverlay />
 			<ModalContent>
-				<ModalCloseButton />
 				<ModalBody>
 					<Tabs
 						width={'full'}
@@ -61,7 +67,9 @@ const LoginDialog = forwardRef<LoginDialogProps>((_, ref) => {
 					</Tabs>
 				</ModalBody>
 				<ModalFooter>
-					<Button onClick={handleClose}>Close</Button>
+					<Button colorScheme='red' onClick={handleClose}>
+						Close
+					</Button>
 				</ModalFooter>
 			</ModalContent>
 		</Modal>

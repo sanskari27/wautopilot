@@ -1,25 +1,23 @@
 import { Button, FormControl, FormLabel, Input, Stack, Text, useToast } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGeoLocation } from '../../../hooks/useGeolocation';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
 import {
 	reset,
-	setConfirmPassword,
 	setEmail,
 	setError,
-	setPassword,
+	setName,
+	setPhone,
 	startUserAuthenticating,
 	stopUserAuthenticating,
 } from '../../../store/reducers/UserReducers';
-import PasswordInput from './Password-input';
+import { UserLevel } from '../../../store/types/UserState';
 
 export default function SignupTab() {
-	const { location } = useGeoLocation();
 	const toast = useToast();
 	const dispatch = useDispatch();
 
-	const { isAuthenticating, email, password, confirmPassword, error } = useSelector(
+	const { isAuthenticating, email, phone, name, error } = useSelector(
 		(state: StoreState) => state[StoreNames.USER]
 	);
 
@@ -27,26 +25,16 @@ export default function SignupTab() {
 		if (!email) {
 			return dispatch(setError({ message: 'Email is required', type: 'email' }));
 		}
-		if (!password) {
-			return dispatch(setError({ message: 'Password is required', type: 'password' }));
+		if (!phone) {
+			return dispatch(setError({ message: 'Phone Number is required', type: 'phone' }));
 		}
-		if (!confirmPassword) {
-			return dispatch(setError({ message: 'Confirm Password', type: 'confirm password' }));
-		}
-
-		if (password !== confirmPassword) {
-			return dispatch(setError({ message: 'Passwords do not match', type: 'confirm password' }));
+		if (!name) {
+			return dispatch(setError({ message: 'Name is required', type: 'name' }));
 		}
 
 		dispatch(startUserAuthenticating());
 
-		const success = await AuthService.registerUser(
-			email,
-			password,
-			'client',
-			location.latitude,
-			location.longitude
-		);
+		const success = await AuthService.registerUser(name, phone, email, UserLevel.Admin);
 		if (!success) {
 			toast({
 				title: 'Account creation failed.',
@@ -80,7 +68,7 @@ export default function SignupTab() {
 							type='email'
 							variant='unstyled'
 							bgColor={'white'}
-							placeholder='email'
+							placeholder='eg. jhon@example.com'
 							_placeholder={{
 								color: '#0b826f',
 								opacity: 0.7,
@@ -93,20 +81,48 @@ export default function SignupTab() {
 							onChange={(e) => dispatch(setEmail(e.target.value))}
 						/>
 					</FormControl>
-					<PasswordInput
-						isInvalid={error.type === 'password' || error.type === 'confirm password'}
-						name='password'
-						value={password}
-						onChange={(e) => dispatch(setPassword(e.target.value))}
-						placeholder='********'
-					/>
-					<PasswordInput
-						isInvalid={error.type === 'confirm password'}
-						name='password'
-						value={confirmPassword}
-						onChange={(e) => dispatch(setConfirmPassword(e.target.value))}
-						placeholder='********'
-					/>
+					<FormControl isInvalid={error.type === 'name'}>
+						<FormLabel htmlFor='email' color={'#0b826f'}>
+							Name
+						</FormLabel>
+						<Input
+							type='text'
+							variant='unstyled'
+							bgColor={'white'}
+							placeholder='eg. John Doe'
+							_placeholder={{
+								color: '#0b826f',
+								opacity: 0.7,
+							}}
+							borderColor={'#0b826f'}
+							borderWidth={'1px'}
+							padding={'0.5rem'}
+							name='name'
+							value={name}
+							onChange={(e) => dispatch(setName(e.target.value))}
+						/>
+					</FormControl>
+					<FormControl isInvalid={error.type === 'email'}>
+						<FormLabel htmlFor='email' color={'#0b826f'}>
+							Phone (with country code)
+						</FormLabel>
+						<Input
+							type='number'
+							variant='unstyled'
+							bgColor={'white'}
+							placeholder='eg. 9189XXXXXXX'
+							_placeholder={{
+								color: '#0b826f',
+								opacity: 0.7,
+							}}
+							borderColor={'#0b826f'}
+							borderWidth={'1px'}
+							padding={'0.5rem'}
+							name='email'
+							value={phone}
+							onChange={(e) => dispatch(setPhone(e.target.value))}
+						/>
+					</FormControl>
 				</Stack>
 
 				<Stack spacing='0'>
