@@ -1,6 +1,8 @@
 import express from 'express';
 import SessionRoute from './auth/auth.route';
 import PhonebookRoute from './phonebook/phonebook.route';
+import TemplateRoute from './template/template.route';
+import WhatsappLinkRoute from './whatsapp-link/whatsappLink.route';
 
 import Logger from 'n23-logger';
 import FileUpload, { ONLY_MEDIA_ALLOWED, SingleFileUploadOptions } from '../config/FileUpload';
@@ -14,6 +16,8 @@ const router = express.Router();
 
 router.use('/sessions', SessionRoute);
 router.use('/phonebook', PhonebookRoute);
+router.use('/whatsapp-link', WhatsappLinkRoute);
+router.use('/template', TemplateRoute);
 
 router.use('/phonepe/callback', PhonePeProvider.Callbacks.transactionCallback);
 

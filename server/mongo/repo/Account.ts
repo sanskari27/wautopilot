@@ -25,6 +25,14 @@ const schema = new mongoose.Schema<IAccount>({
 		type: Number,
 		default: UserLevel.Admin,
 	},
+	marketingPrice: {
+		type: Number,
+		default: 0.05,
+	},
+	otherPrice: {
+		type: Number,
+		default: 0.03,
+	},
 });
 
 schema.pre('save', async function (next) {

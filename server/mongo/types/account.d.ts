@@ -9,5 +9,8 @@ export default interface IAccount extends Document {
 	password: string;
 	userLevel: UserLevel;
 
+	marketingPrice: number;
+	otherPrice: number;
+
 	verifyPassword(password: string): Promise<boolean>;
 }

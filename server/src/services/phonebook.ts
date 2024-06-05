@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import PhoneBookDB from '../../mongo/repo/PhoneBook';
+import { PhoneBookDB } from '../../mongo/repo';
 import IAccount from '../../mongo/types/account';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
