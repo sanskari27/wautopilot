@@ -2,52 +2,56 @@ import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import { CustomError } from '../../errors';
 
-export type SendTemplateMessageValidationResult = {
+export type CreateBroadcastValidationResult = {
+	name: string;
+	description: string;
+	template_id: string;
 	template_name: string;
 	to: string[];
 	components: (
 		| {
 				type: 'HEADER';
-				parameters:
-					| {
-							type: 'text';
-							text: string;
-					  }
-					| {
-							type: 'image';
-							image: {
-								link: string;
-							};
-					  };
+				parameters: {
+					type: 'image' | 'document' | 'video' | 'text';
+					content: string;
+				}[];
 		  }
 		| {
 				type: 'BODY';
 				parameters: {
-					type: 'text';
 					text: string;
+					type: 'text';
 				}[];
 		  }
 	)[];
+
+	broadcast_options:
+		| {
+				broadcast_type: 'instant';
+		  }
+		| {
+				broadcast_type: 'scheduled';
+				startDate: string;
+				startTime: string;
+				endTime: string;
+				daily_messages_count: number;
+		  };
 };
 
-export async function SendTemplateMessage(req: Request, res: Response, next: NextFunction) {
+export async function CreateBroadcastValidator(req: Request, res: Response, next: NextFunction) {
 	const textSchema = z.object({
 		type: z.literal('text'),
 		text: z.string(),
 	});
 
 	const imageHeaderSchema = z.object({
-		type: z.literal('image'),
-		image: z.object({
-			link: z.string(),
-		}),
+		type: z.enum(['text', 'image', 'document', 'video']),
+		content: z.string(),
 	});
-
-	const headerParameterSchema = z.discriminatedUnion('type', [textSchema, imageHeaderSchema]);
 
 	const headerSchema = z.object({
 		type: z.literal('HEADER'),
-		parameters: z.array(headerParameterSchema),
+		parameters: z.array(imageHeaderSchema),
 	});
 
 	const bodySchema = z.object({
@@ -58,7 +62,24 @@ export async function SendTemplateMessage(req: Request, res: Response, next: Nex
 	const componentSchema = z.discriminatedUnion('type', [headerSchema, bodySchema]);
 
 	const reqValidator = z.object({
+		name: z.string(),
+		description: z.string(),
+		template_id: z.string(),
 		template_name: z.string(),
+		broadcast_options: z
+			.object({
+				broadcast_type: z.enum(['instant', 'scheduled']),
+				startDate: z.string().optional(),
+				startTime: z.string().optional(),
+				endTime: z.string().optional(),
+				daily_messages_count: z.number().optional(),
+			})
+			.refine((data) => {
+				if (data.broadcast_type === 'scheduled') {
+					return data.startDate && data.startTime && data.endTime && data.daily_messages_count;
+				}
+				return true;
+			}),
 		to: z.string().array(),
 		components: z.array(componentSchema),
 	});

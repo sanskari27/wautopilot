@@ -1,28 +1,21 @@
 import express from 'express';
-import { IDValidator, VerifySession } from '../../middleware';
+import { IDValidator } from '../../middleware';
 import Controller from './phonebook.controller';
 import { LabelValidator, RecordUpdateValidator, RecordsValidator } from './phonebook.validator';
 
 const router = express.Router();
 
-router.route('/all-labels').all(VerifySession).get(Controller.getAllLabels);
-router
-	.route('/set-labels/:id')
-	.all(VerifySession, IDValidator, LabelValidator)
-	.post(Controller.setLabels);
+router.route('/all-labels').get(Controller.getAllLabels);
 
-router.route('/bulk-upload').all(VerifySession).post(Controller.bulkUpload);
+router.route('/set-labels/:id').all(IDValidator, LabelValidator).post(Controller.setLabels);
 
-router
-	.route('/')
-	.all(VerifySession)
-	.get(Controller.records)
-	.all(RecordsValidator)
-	.post(Controller.addRecords);
+router.route('/bulk-upload').post(Controller.bulkUpload);
+
+router.route('/').get(Controller.records).all(RecordsValidator).post(Controller.addRecords);
 
 router
 	.route('/:id')
-	.all(VerifySession, IDValidator)
+	.all(IDValidator)
 	.delete(Controller.deleteRecords)
 	.all(RecordUpdateValidator)
 	.put(Controller.updateRecords);

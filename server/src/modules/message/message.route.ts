@@ -1,14 +1,10 @@
 import express from 'express';
-import { IDValidator, VerifySession } from '../../middleware';
 import Controller from './message.controller';
-import { SendTemplateMessage } from './message.validator';
+import { CreateBroadcastValidator } from './message.validator';
 
 const router = express.Router();
 
-router
-	.route('/:id/send-template')
-	.all(VerifySession, IDValidator, SendTemplateMessage)
-	.post(Controller.sendTemplateMessage);
+router.route('/send-broadcast').all(CreateBroadcastValidator).post(Controller.sendTemplateMessage);
 
 // router
 // 	.route('/:id/schedule-template')

@@ -1,27 +1,40 @@
 import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
-import TemplateService from '../../services/templates';
-import WhatsappLinkService from '../../services/whatsappLink';
+import BroadcastService from '../../services/broadcast';
 import { Respond } from '../../utils/ExpressUtils';
-import { SendTemplateMessageValidationResult } from './message.validator';
+import { CreateBroadcastValidationResult } from './message.validator';
 export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
 export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
 async function sendTemplateMessage(req: Request, res: Response, next: NextFunction) {
-	const { template_name, to, components } = req.locals.data as SendTemplateMessageValidationResult;
+	const { components, description, name, template_id, template_name, to, broadcast_options } = req
+		.locals.data as CreateBroadcastValidationResult;
 
 	try {
-		const whatsappLinkService = new WhatsappLinkService(req.locals.account);
-		const devices = await whatsappLinkService.fetchDeviceDoc(req.locals.id);
+		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
 
-		const templateService = new TemplateService(req.locals.account, devices);
+		const messages = to.map((number) => {
+			return {
+				to: number,
+				messageObject: {
+					template_name,
+					to: number,
+					components,
+				},
+			};
+		});
 
-		const success = await templateService.sendTemplateMessage(template_name, to, components);
-
-		if (!success) {
-			return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
-		}
+		await broadcastService.startBroadcast(
+			{
+				description,
+				name,
+				template_id,
+				template_name,
+				messages,
+			},
+			broadcast_options
+		);
 
 		return Respond({
 			res,

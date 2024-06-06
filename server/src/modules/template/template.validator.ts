@@ -37,7 +37,7 @@ export async function TemplateRemoveValidator(req: Request, res: Response, next:
 export async function TemplateCreateValidator(req: Request, res: Response, next: NextFunction) {
 	const headerSchema = z.object({
 		type: z.literal('HEADER'),
-		format: z.enum(['TEXT', 'IMAGE', 'DOCUMENT']),
+		format: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
 		text: z.string(),
 		example: z
 			.object({
@@ -83,7 +83,7 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 
 	const reqValidator = z.object({
 		name: z.string(),
-		category: z.enum(['AUTHENTICATION', 'MARKETING', 'UTILITY']),
+		category: z.enum(['MARKETING', 'UTILITY']),
 		allow_category_change: z.boolean().default(true),
 		language: z.string().default('en_US'),
 		components: z.array(componentSchema),
@@ -114,7 +114,7 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 export async function TemplateEditValidator(req: Request, res: Response, next: NextFunction) {
 	const headerSchema = z.object({
 		type: z.literal('HEADER'),
-		format: z.enum(['TEXT', 'IMAGE']),
+		format: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
 		text: z.string(),
 		example: z
 			.object({
@@ -161,7 +161,7 @@ export async function TemplateEditValidator(req: Request, res: Response, next: N
 	const reqValidator = z.object({
 		id: z.string(),
 		name: z.string(),
-		category: z.enum(['AUTHENTICATION', 'MARKETING', 'UTILITY']),
+		category: z.enum(['MARKETING', 'UTILITY']),
 		allow_category_change: z.boolean().default(true),
 		language: z.string().default('en_US'),
 		components: z.array(componentSchema),

@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import TemplateService from '../../services/templates';
-import WhatsappLinkService from '../../services/whatsappLink';
 import { Template } from '../../types/template';
 import { Respond } from '../../utils/ExpressUtils';
 import { TemplateRemoveValidationResult } from './template.validator';
@@ -11,10 +10,7 @@ export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
 async function addTemplate(req: Request, res: Response, next: NextFunction) {
 	try {
-		const whatsappLinkService = new WhatsappLinkService(req.locals.account);
-		const device = await whatsappLinkService.fetchDeviceDoc(req.locals.id);
-
-		const templateService = new TemplateService(req.locals.account, device);
+		const templateService = new TemplateService(req.locals.account, req.locals.device);
 		const success = await templateService.addTemplate(req.locals.data as Template);
 
 		if (!success) {
@@ -33,10 +29,8 @@ async function addTemplate(req: Request, res: Response, next: NextFunction) {
 async function editTemplate(req: Request, res: Response, next: NextFunction) {
 	try {
 		const { id, ...data } = req.locals.data as Template & { id: string };
-		const whatsappLinkService = new WhatsappLinkService(req.locals.account);
-		const device = await whatsappLinkService.fetchDeviceDoc(req.locals.id);
 
-		const templateService = new TemplateService(req.locals.account, device);
+		const templateService = new TemplateService(req.locals.account, req.locals.device);
 		const success = await templateService.editTemplate(id, data);
 
 		if (!success) {
@@ -55,10 +49,7 @@ async function editTemplate(req: Request, res: Response, next: NextFunction) {
 async function deleteTemplate(req: Request, res: Response, next: NextFunction) {
 	const { id, name } = req.locals.data as TemplateRemoveValidationResult;
 	try {
-		const whatsappLinkService = new WhatsappLinkService(req.locals.account);
-		const device = await whatsappLinkService.fetchDeviceDoc(req.locals.id);
-
-		const templateService = new TemplateService(req.locals.account, device);
+		const templateService = new TemplateService(req.locals.account, req.locals.device);
 		const success = await templateService.deleteTemplate(id, name);
 
 		if (!success) {
@@ -75,10 +66,7 @@ async function deleteTemplate(req: Request, res: Response, next: NextFunction) {
 }
 async function fetchTemplates(req: Request, res: Response, next: NextFunction) {
 	try {
-		const whatsappLinkService = new WhatsappLinkService(req.locals.account);
-		const device = await whatsappLinkService.fetchDeviceDoc(req.locals.id);
-
-		const templateService = new TemplateService(req.locals.account, device);
+		const templateService = new TemplateService(req.locals.account, req.locals.device);
 		const templates = await templateService.fetchTemplates();
 
 		return Respond({

@@ -13,7 +13,8 @@ export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60;
 
 export const COOKIE_DOMAIN_VALUE = process.env.COOKIE_DOMAIN_VALUE ?? 'localhost';
 
-export const RESEND_API_KEY = process.env.RESEND_API_KEY ?? 'RESEND_API_KEY';
+export const RESEND_API_KEY = process.env.RESEND_API_KEY ?? '';
+export const META_VERIFY_STRING = process.env.META_VERIFY_STRING ?? '';
 
 export const LOGO_PATH = '/static/assets/logo.png';
 
@@ -34,3 +35,21 @@ export enum Path {
 
 export const CACHE_TIMEOUT = 60 * 60; //seconds
 export const REFRESH_CACHE_TIMEOUT = 30 * 24 * 60 * 60; //seconds
+
+export enum BROADCAST_STATUS {
+	ACTIVE = 'ACTIVE',
+	PAUSED = 'PAUSED',
+}
+
+export enum MESSAGE_STATUS {
+	SENT = 'SENT',
+	FAILED = 'FAILED',
+	PENDING = 'PENDING',
+	PROCESSING = 'PROCESSING',
+	PAUSED = 'PAUSED',
+}
+
+export enum MESSAGE_SCHEDULER_TYPE {
+	CAMPAIGN = 'CAMPAIGN',
+	INDIVIDUAL = 'INDIVIDUAL',
+}

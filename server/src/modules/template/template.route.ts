@@ -1,5 +1,4 @@
 import express from 'express';
-import { IDValidator, VerifySession } from '../../middleware';
 import Controller from './template.controller';
 import {
 	TemplateCreateValidator,
@@ -9,21 +8,12 @@ import {
 
 const router = express.Router();
 
-router
-	.route('/:id/add-template')
-	.all(VerifySession, IDValidator, TemplateCreateValidator)
-	.post(Controller.addTemplate);
+router.route('/add-template').all(TemplateCreateValidator).post(Controller.addTemplate);
 
-router
-	.route('/:id/edit-template')
-	.all(VerifySession, IDValidator, TemplateEditValidator)
-	.post(Controller.editTemplate);
+router.route('/edit-template').all(TemplateEditValidator).post(Controller.editTemplate);
 
-router
-	.route('/:id/delete-template')
-	.all(VerifySession, IDValidator, TemplateRemoveValidator)
-	.post(Controller.deleteTemplate);
+router.route('/delete-template').all(TemplateRemoveValidator).post(Controller.deleteTemplate);
 
-router.route('/:id/').all(VerifySession, IDValidator).get(Controller.fetchTemplates);
+router.route('/').get(Controller.fetchTemplates);
 
 export default router;
