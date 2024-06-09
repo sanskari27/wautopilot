@@ -26,7 +26,7 @@ import { HERO_IMG } from '../../../assets/Images';
 import { NAVIGATION, WHO } from '../../../config/const';
 import { StoreNames, StoreState } from '../../../store';
 import Footer from '../../components/footer';
-import HomeNavbar from '../../components/navbar/HomeNav';
+import HomeNavbar from '../../components/navbar/HomeNavbar';
 import Each from '../../components/utils/Each';
 
 const FAQs = [

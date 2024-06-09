@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Navigate, useOutlet } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
 import { StoreNames, StoreState } from '../../../store';
-import AppNavbar from '../../components/navbar/AppNav';
+import AppNavbar from '../../components/navbar/AppNavbar';
 import NavigationDrawer from '../../components/navbar/NavigationDrawer';
 
 const AppPage = () => {

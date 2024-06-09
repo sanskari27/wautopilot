@@ -1,6 +1,6 @@
 import { Box, Heading, Text } from '@chakra-ui/react';
 import Footer from '../../../components/footer';
-import HomeNavbar from '../../../components/navbar/HomeNav';
+import HomeNavbar from '../../../components/navbar/HomeNavbar';
 
 export default function Privacy() {
 	return (
