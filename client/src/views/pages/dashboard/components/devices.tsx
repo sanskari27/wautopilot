@@ -40,7 +40,9 @@ export default function Devices() {
 		DeviceService.listDevices()
 			.then((devices) => {
 				setDevices(devices);
-				dispatch(setSelectedDeviceId(devices[0]?.id ?? '')); // TODO
+				if (devices.length > 0) {
+					dispatch(setSelectedDeviceId(devices[0].id ?? '')); // TODO
+				}
 			})
 			.finally(() => setLoading(false));
 	}, []);
