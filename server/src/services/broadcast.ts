@@ -6,6 +6,7 @@ import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import MetaAPI from '../config/MetaAPI';
 import { MESSAGE_STATUS } from '../config/const';
+import DateUtils from '../utils/DateUtils';
 import TimeGenerator from '../utils/TimeGenerator';
 import WhatsappLinkService from './whatsappLink';
 
@@ -146,5 +147,31 @@ export default class BroadcastService extends WhatsappLinkService {
 				msg.save();
 			}
 		});
+	}
+
+	public static async updateStatus(
+		msgID: string,
+		status: string,
+		timestamp: number,
+		error?: string
+	) {
+		const details = {} as Record<string, unknown>;
+		if (status === 'sent') {
+			details.sent_at = DateUtils.fromUnixTime(timestamp).toDate();
+		} else if (status === 'read') {
+			details.read_at = DateUtils.fromUnixTime(timestamp).toDate();
+		} else if (status === 'delivered') {
+			details.delivered_at = DateUtils.fromUnixTime(timestamp).toDate();
+		} else if (status === 'failed') {
+			details.failed_at = DateUtils.fromUnixTime(timestamp).toDate();
+			details.failed_reason = error;
+		}
+
+		await BroadcastMessageDB.updateOne(
+			{
+				message_id: msgID,
+			},
+			details
+		);
 	}
 }

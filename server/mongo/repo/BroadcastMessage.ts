@@ -38,6 +38,9 @@ const schema = new mongoose.Schema<IBroadcastMessage>(
 		message_id: String,
 		delivered_at: Date,
 		read_at: Date,
+		sent_at: Date,
+		failed_at: Date,
+		failed_reason: String,
 
 		header_type: String,
 		header_content: String,

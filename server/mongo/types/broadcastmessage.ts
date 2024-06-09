@@ -14,6 +14,9 @@ export default interface IBroadcastMessage extends Document {
 	message_id: string;
 	delivered_at: Date;
 	read_at: Date;
+	sent_at: Date;
+	failed_at: Date;
+	failed_reason: string;
 
 	header_type: 'text' | 'image' | 'video' | 'document';
 	header_content: string;

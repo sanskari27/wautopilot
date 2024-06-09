@@ -97,6 +97,10 @@ function getBetween(start: string | moment.Moment, end: string | moment.Moment) 
 	return randomTime;
 }
 
+function fromUnixTime(unixTime: number) {
+	return moment.unix(unixTime);
+}
+
 export default {
 	getDate,
 	getMonth,
@@ -112,4 +116,5 @@ export default {
 	getLocalTime,
 	isTimeBetween,
 	getBetween,
+	fromUnixTime,
 };
