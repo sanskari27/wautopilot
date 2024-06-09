@@ -10,6 +10,7 @@ import AuthService from './services/auth.service';
 import { setIsAuthenticated } from './store/reducers/UserReducers';
 import AddDevice from './views/components/addDevice';
 import LoginPopup from './views/components/loginPopup';
+import Broadcast from './views/pages/broadcast';
 import Dashboard from './views/pages/dashboard';
 import Phonebook from './views/pages/phonebook';
 import Templates from './views/pages/templates';
@@ -59,7 +60,7 @@ function App() {
 								element={<EditTemplate />}
 							/>
 							<Route path={NAVIGATION.TEMPLATES} element={<Templates />} />
-							<Route path={NAVIGATION.BROADCAST} element={<>sdf</>} />
+							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
 							<Route path={NAVIGATION.INBOX} element={<>sdf</>} />
 						</Route>
 						{/* <Route path='*' element={<Home />} /> */}

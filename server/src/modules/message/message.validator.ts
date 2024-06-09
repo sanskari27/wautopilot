@@ -8,22 +8,13 @@ export type CreateBroadcastValidationResult = {
 	template_id: string;
 	template_name: string;
 	to: string[];
-	components: (
-		| {
-				type: 'HEADER';
-				parameters: {
-					type: 'image' | 'document' | 'video' | 'text';
-					content: string;
-				}[];
-		  }
-		| {
-				type: 'BODY';
-				parameters: {
-					text: string;
-					type: 'text';
-				}[];
-		  }
-	)[];
+	labels: string[];
+	body: {
+		custom_text: string;
+		phonebook_data: string;
+		variable_from: 'custom_text' | 'phonebook_data';
+		fallback_value: string;
+	}[];
 
 	broadcast_options:
 		| {
@@ -39,28 +30,6 @@ export type CreateBroadcastValidationResult = {
 };
 
 export async function CreateBroadcastValidator(req: Request, res: Response, next: NextFunction) {
-	const textSchema = z.object({
-		type: z.literal('text'),
-		text: z.string(),
-	});
-
-	const imageHeaderSchema = z.object({
-		type: z.enum(['text', 'image', 'document', 'video']),
-		content: z.string(),
-	});
-
-	const headerSchema = z.object({
-		type: z.literal('HEADER'),
-		parameters: z.array(imageHeaderSchema),
-	});
-
-	const bodySchema = z.object({
-		type: z.literal('BODY'),
-		parameters: z.array(textSchema),
-	});
-
-	const componentSchema = z.discriminatedUnion('type', [headerSchema, bodySchema]);
-
 	const reqValidator = z.object({
 		name: z.string(),
 		description: z.string().default(''),
@@ -80,8 +49,16 @@ export async function CreateBroadcastValidator(req: Request, res: Response, next
 				}
 				return true;
 			}),
-		to: z.string().array(),
-		components: z.array(componentSchema),
+		to: z.string().array().default([]),
+		labels: z.string().array().default([]),
+		body: z.array(
+			z.object({
+				custom_text: z.string(),
+				phonebook_data: z.string(),
+				variable_from: z.enum(['custom_text', 'phonebook_data']),
+				fallback_value: z.string(),
+			})
+		),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

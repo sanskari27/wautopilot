@@ -28,7 +28,7 @@ export default function RadioBox(
 					boxShadow: 'outline',
 				}}
 				px={4}
-				py={0.5}
+				py={1}
 			>
 				{props.children}
 			</Box>

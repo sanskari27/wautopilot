@@ -1,8 +1,6 @@
 export type TemplatesState = {
 	list: Template[];
-	details: Template & {
-		components: Record[];
-	};
+	details: Template;
 	uiDetails: {
 		isSaving: boolean;
 		isFetching: boolean;
@@ -15,4 +13,5 @@ type Template = {
 	name: string;
 	status: string;
 	category: string;
+	components: Record[];
 };

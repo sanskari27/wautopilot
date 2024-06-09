@@ -36,7 +36,9 @@ import {
 	setTemplateCategory,
 	setTemplateName,
 } from '../../../../store/reducers/TemplateReducer';
+import { countOccurrences } from '../../../../utils/templateHelper';
 import { RadioBoxGroup } from '../../../components/radioBox';
+import SampleMessage from '../../../components/sampleMessage';
 import Each from '../../../components/utils/Each';
 import AddQuickReply from './AddQuickReply';
 import PhoneNumberButton from './PhoneNumberButton';
@@ -148,14 +150,6 @@ export default function EditTemplate() {
 			},
 		});
 	};
-
-	function countOccurrences(inputString: string) {
-		const regex = /\{\{\d+\}\}/g;
-
-		const matches = inputString.match(regex);
-
-		return matches ? matches.length : 0;
-	}
 
 	const bodyVariables = countOccurrences(body.text);
 
@@ -300,13 +294,13 @@ export default function EditTemplate() {
 						</Flex>
 
 						<HStack gap={3} mt={'0.5rem'}>
-							<AddQuickReply disabled={buttons.length >= 2} />
-							<PhoneNumberButton disabled={buttons.length >= 2} />
-							<URLButton disabled={buttons.length >= 2} />
+							<AddQuickReply disabled={buttons.length >= 3} />
+							<PhoneNumberButton disabled={buttons.length >= 3} />
+							<URLButton disabled={buttons.length >= 3} />
 						</HStack>
 					</Box>
 				</Box>
-				<Box>
+				<Box className='w-full md:w-[30%]'>
 					<Flex justifyContent={'flex-end'}>
 						<Button
 							colorScheme='red'
@@ -318,6 +312,8 @@ export default function EditTemplate() {
 							Save
 						</Button>
 					</Flex>
+
+					<SampleMessage components={components} />
 				</Box>
 			</Flex>
 		</Box>

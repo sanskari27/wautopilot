@@ -64,7 +64,7 @@ const Slice = createSlice({
 			if (action.payload !== 'none') {
 				state.details.components.push({
 					type: 'HEADER',
-					format: action.payload,
+					format: action.payload === 'TEXT' ? 'TEXT' : 'IMAGE',
 				});
 			}
 		},
@@ -181,7 +181,7 @@ const Slice = createSlice({
 						{
 							text: action.payload.text,
 							url: action.payload.url,
-							type: 'PHONE_NUMBER',
+							type: 'URL',
 						},
 					],
 				};

@@ -26,7 +26,7 @@ import {
 import SearchBar from '../serachBar';
 import Each from '../utils/Each';
 
-export default function LabelFilter() {
+export default function LabelFilter({ buttonComponent }: { buttonComponent?: React.ReactNode }) {
 	const dispatch = useDispatch();
 	const [searchText, setSearchText] = useState<string>('');
 
@@ -51,7 +51,7 @@ export default function LabelFilter() {
 	return (
 		<Popover>
 			<PopoverTrigger>
-				<IconButton aria-label='filter-button' icon={<BiFilter />} />
+				{buttonComponent || <IconButton aria-label='filter-button' icon={<BiFilter />} />}
 			</PopoverTrigger>
 			<PopoverContent>
 				<PopoverArrow />

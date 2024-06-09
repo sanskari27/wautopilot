@@ -10,6 +10,7 @@ export default class TemplateService {
 				name: string;
 				status: string;
 				category: string;
+				components: Record<string, unknown>[];
 			}[];
 
 			return templates;
