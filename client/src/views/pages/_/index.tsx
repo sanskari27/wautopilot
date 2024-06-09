@@ -20,12 +20,13 @@ import { MdContactMail } from 'react-icons/md';
 import { PiBroadcastFill } from 'react-icons/pi';
 import { RiInbox2Line } from 'react-icons/ri';
 import { TbMessageCheck } from 'react-icons/tb';
-import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useNavigate, useOutlet } from 'react-router-dom';
 import { HERO_IMG } from '../../../assets/Images';
 import { NAVIGATION, WHO } from '../../../config/const';
-import useAuth from '../../../hooks/useAuth';
+import { StoreNames, StoreState } from '../../../store';
 import Footer from '../../components/footer';
-import HomeNavbar from '../../components/navbar/homeNavbar';
+import HomeNavbar from '../../components/navbar/HomeNavbar';
 import Each from '../../components/utils/Each';
 
 const FAQs = [
@@ -61,12 +62,14 @@ const FAQs = [
 ];
 
 export default function Home() {
-	const { isAuthenticated } = useAuth();
 	const navigate = useNavigate();
+	const outlet = useOutlet();
+
+	const { isAuthenticated } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const handleLoginButton = () => {
 		if (isAuthenticated) {
-			return navigate(NAVIGATION.DASHBOARD);
+			return navigate(NAVIGATION.APP);
 		}
 		navigate(`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`);
 	};
@@ -328,6 +331,7 @@ export default function Home() {
 					</Box>
 				</section>
 			</main>
+			{outlet}
 			<Footer />
 		</Box>
 	);

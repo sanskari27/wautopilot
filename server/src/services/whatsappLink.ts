@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { WhatsappLinkDB } from '../../mongo/repo';
 import IAccount from '../../mongo/types/account';
+import MetaAPI from '../config/MetaAPI';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
 import UserService from './user';
@@ -17,12 +18,18 @@ type RecordWithAccessToken = Record & {
 function processPhonebookDocs(
 	docs: (Record & {
 		_id: Types.ObjectId;
+		phoneNumber: string;
+		verifiedName: string;
 	})[]
 ): (Record & {
 	id: string;
+	phoneNumber: string;
+	verifiedName: string;
 })[] {
 	return docs.map((doc) => ({
 		id: doc._id.toString(),
+		phoneNumber: doc.phoneNumber,
+		verifiedName: doc.verifiedName,
 		phoneNumberId: doc.phoneNumberId,
 		waid: doc.waid,
 	}));
@@ -34,8 +41,40 @@ export default class WhatsappLinkService extends UserService {
 	}
 
 	public async addRecord(details: RecordWithAccessToken) {
+		let phoneNumber: string | null = null;
+		let verifiedName: string | null = null;
+		try {
+			const {
+				data: { data },
+			} = await MetaAPI.get(`/${details.waid}/phone_numbers`, {
+				headers: {
+					Authorization: `Bearer ${details.accessToken}`,
+				},
+			});
+
+			if (!data) {
+				return null;
+			}
+
+			const phoneNumberDoc = data.find(
+				(phone: { id: string; display_phone_number: string; verified_name: string }) =>
+					phone.id === details.phoneNumberId
+			);
+
+			if (!phoneNumberDoc) {
+				return null;
+			}
+
+			phoneNumber = phoneNumberDoc.display_phone_number;
+			verifiedName = phoneNumberDoc.verified_name;
+		} catch (err) {
+			return null;
+		}
+
 		const doc = await WhatsappLinkDB.create({
 			...details,
+			phoneNumber: phoneNumber,
+			verifiedName: verifiedName,
 			linked_to: this.userId,
 		});
 

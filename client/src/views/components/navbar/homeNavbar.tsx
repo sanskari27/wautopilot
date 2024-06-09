@@ -1,15 +1,16 @@
 import { Button, Flex, Image, Text } from '@chakra-ui/react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { LOGO_WHITE, NAVIGATION } from '../../../config/const';
-import useAuth from '../../../hooks/useAuth';
+import { StoreNames, StoreState } from '../../../store';
 
 const HomeNavbar = () => {
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const navigate = useNavigate();
 
 	const handleClick = () => {
 		if (isAuthenticated) {
-			return navigate(NAVIGATION.DASHBOARD);
+			return navigate(NAVIGATION.APP);
 		}
 		navigate(`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`);
 	};

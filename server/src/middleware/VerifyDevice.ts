@@ -21,4 +21,5 @@ export default async function VerifyDevice(req: Request, res: Response, next: Ne
 	}
 
 	req.locals.device = device;
+	next();
 }

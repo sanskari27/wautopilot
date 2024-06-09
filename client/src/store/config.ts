@@ -1,4 +1,5 @@
 export enum StoreNames {
-	COLLECTIONS = 'collections',
+	TEMPLATES = 'templates',
+	PHONEBOOK = 'phonebook',
 	USER = 'user',
 }

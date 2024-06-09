@@ -23,9 +23,13 @@ function LoginTab() {
 	const toast = useToast();
 	const dispatch = useDispatch();
 
-	const { uiDetails:{isAuthenticating}, email, password, error, accessLevel } = useSelector(
-		(state: StoreState) => state[StoreNames.USER]
-	);
+	const {
+		uiDetails: { isAuthenticating },
+		email,
+		password,
+		error,
+		accessLevel,
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const forgotPassword = async () => {
 		if (!email) {
@@ -67,7 +71,7 @@ function LoginTab() {
 		dispatch(stopUserAuthenticating());
 		if (valid) {
 			dispatch(setIsAuthenticated(true));
-			return navigate(NAVIGATION.HOME);
+			return navigate(NAVIGATION.APP);
 		}
 		dispatch(setError({ message: 'Invalid credentials', type: 'server' }));
 		setTimeout(() => {

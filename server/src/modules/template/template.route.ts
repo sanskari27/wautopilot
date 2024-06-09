@@ -14,6 +14,7 @@ router.route('/edit-template').all(TemplateEditValidator).post(Controller.editTe
 
 router.route('/delete-template').all(TemplateRemoveValidator).post(Controller.deleteTemplate);
 
+router.route('/:id').get(Controller.fetchTemplate);
 router.route('/').get(Controller.fetchTemplates);
 
 export default router;

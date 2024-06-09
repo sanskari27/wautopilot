@@ -66,7 +66,7 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 		type: z.literal('BUTTONS'),
 		buttons: z.array(
 			z.object({
-				type: z.enum(['URL', 'PHONE_NUMBER', 'QUICK_REPLY']),
+				type: z.enum(['URL', 'PHONE_NUMBER', 'QUICK_REPLY', 'VOICE_CALL']),
 				text: z.string(),
 				url: z.string().optional(),
 				phone_number: z.string().optional(),
@@ -143,7 +143,7 @@ export async function TemplateEditValidator(req: Request, res: Response, next: N
 		type: z.literal('BUTTONS'),
 		buttons: z.array(
 			z.object({
-				type: z.enum(['URL', 'PHONE_NUMBER', 'QUICK_REPLY']),
+				type: z.enum(['URL', 'PHONE_NUMBER', 'QUICK_REPLY', 'VOICE_CALL']),
 				text: z.string(),
 				url: z.string().optional(),
 				phone_number: z.string().optional(),

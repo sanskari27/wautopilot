@@ -1,5 +1,7 @@
-import { MdOutlineDashboard, MdOutlinePayments } from "react-icons/md";
-import { PiUsersFourDuotone } from "react-icons/pi";
+import { BiConversation } from 'react-icons/bi';
+import { MdOutlineDashboard } from 'react-icons/md';
+import { RiContactsBook2Line } from 'react-icons/ri';
+import { TbMessage2Plus, TbTemplate } from 'react-icons/tb';
 
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 export const WEBPAGE_URL = import.meta.env.VITE_WEBPAGE_URL;
@@ -10,33 +12,60 @@ export const LOGO_PRIMARY = '/images/logo-primary.svg';
 export const WHO = '/images/who.svg';
 
 export const NAVIGATION = {
-	APP: '/app',
+	HOME: '/',
+	AUTH: '/auth',
 	LOGIN: 'login',
 	RESET: 'reset-password',
-	AUTH: '/auth',
-	PASSBOOK:'passbook',
+
+	APP: '/app',
 	DASHBOARD: 'dashboard',
+	ADD_DEVICE: 'add-device',
 	INBOX: 'inbox',
-	HOME: '/',
+
+	BROADCAST: 'broadcast',
+	PHONEBOOK: 'phonebook',
+
+	TEMPLATES: 'templates',
+	ADD_TEMPLATE: 'add-template',
+	EDIT_TEMPLATE: 'edit-template',
+
 	TERMS: '/terms',
 	PRIVACY: '/privacy',
 	DISCLAIMER: '/disclaimer',
+	WEBHOOK_SETUP_DOCS: '/docs/webhook-setup',
 };
 
 export const MenuItems = [
 	{
 		icon: MdOutlineDashboard,
 		route: NAVIGATION.DASHBOARD,
-		title:"Dashboard",
+		title: 'Dashboard',
 	},
 	{
-		icon: PiUsersFourDuotone,
+		icon: RiContactsBook2Line,
+		route: NAVIGATION.PHONEBOOK,
+		title: 'Phonebook',
+	},
+	{
+		icon: TbTemplate,
+		route: NAVIGATION.TEMPLATES,
+		title: 'Templates',
+	},
+	{
+		icon: TbMessage2Plus,
+		route: NAVIGATION.BROADCAST,
+		title: 'Broadcast',
+	},
+	{
+		icon: BiConversation,
 		route: NAVIGATION.INBOX,
-		title:"Inbox",
-	},
-	{
-		icon: MdOutlinePayments,
-		route: NAVIGATION.PASSBOOK,
-		title:"Passbook",
+		title: 'Conversations',
 	},
 ];
+
+export enum Color {
+	ACCENT_LIGHT = '#E8F2ED',
+	ACCENT_DARK = '#4F966E',
+	PRIMARY_DARK = '#0D1C12',
+	BACKGROUND_LIGHT = '#F7FCFA',
+}

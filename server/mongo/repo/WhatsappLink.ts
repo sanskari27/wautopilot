@@ -10,6 +10,12 @@ const schema = new mongoose.Schema<IWhatsappLink>({
 		ref: AccountDB_name,
 		required: true,
 	},
+	phoneNumber: {
+		type: String,
+	},
+	verifiedName: {
+		type: String,
+	},
 	phoneNumberId: {
 		type: String,
 	},

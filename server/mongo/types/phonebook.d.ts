@@ -18,4 +18,6 @@ export default interface IPhoneBook extends Document {
 	others: {
 		[key: string]: string;
 	};
+
+	createdAt: Date;
 }

@@ -1,8 +1,20 @@
-import { Button, Modal, ModalBody, ModalContent, ModalHeader, Stack, Text } from '@chakra-ui/react';
+import {
+	Button,
+	Flex,
+	Image,
+	Modal,
+	ModalBody,
+	ModalContent,
+	ModalHeader,
+	ModalOverlay,
+	Stack,
+	Text,
+	useBoolean,
+} from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { NAVIGATION } from '../../../config/const';
+import { Color, LOGO_PRIMARY, NAVIGATION } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
 import {
@@ -13,10 +25,11 @@ import {
 	startResettingPassword,
 	stopResettingPassword,
 } from '../../../store/reducers/UserReducers';
-import PasswordInput from '../../components/user-login/password-input';
+import PasswordInput from '../../components/loginPopup/password-input';
 
 const ResetPassword = () => {
-	// const { isLocating } = useGeoLocation();
+	const [isOpen, setIsOpen] = useBoolean(true);
+
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const searchParams = useSearchParams();
@@ -32,10 +45,6 @@ const ResetPassword = () => {
 	useEffect(() => {
 		dispatch(reset());
 	}, [dispatch]);
-
-	if (!code) {
-		navigate(`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`);
-	}
 
 	const handleResetPassword = async () => {
 		if (!password) {
@@ -64,20 +73,37 @@ const ResetPassword = () => {
 		dispatch(setError({ message: 'Password reset failed', type: 'server' }));
 	};
 
+	const onClose = () => {
+		navigate(NAVIGATION.HOME);
+		setIsOpen.off();
+	};
+
+	if (!code) {
+		// return <Navigate to={NAVIGATION.HOME} replace={true} />;
+	}
+
 	return (
-		<Modal
-			onClose={() => {
-				navigate(-1);
-			}}
-			closeOnOverlayClick={false}
-			isOpen={true}
-			isCentered
-			size={'2xl'}
-		>
+		<Modal onClose={onClose} isOpen={isOpen} isCentered>
+			<ModalOverlay />
 			<ModalContent>
-				<ModalHeader>Reset your password</ModalHeader>
+				<ModalHeader>
+					<Flex alignItems={'center'} gap={'0.5rem'} justifyContent={'center'}>
+						<Image src={LOGO_PRIMARY} height={'2.5rem'} />
+						<Text color={Color.ACCENT_DARK} fontWeight={'bold'} fontSize={'3xl'}>
+							Wautopilot
+						</Text>
+					</Flex>
+				</ModalHeader>
 				<ModalBody>
-					<Stack width={'full'} spacing='6'>
+					<Text
+						color={Color.PRIMARY_DARK}
+						fontWeight={'medium'}
+						fontSize={'xl'}
+						textAlign={'center'}
+					>
+						Confirm new password
+					</Text>
+					<Stack width={'full'} spacing='3'>
 						<Stack spacing='3'>
 							<PasswordInput
 								isInvalid={error.type === 'password' || error.type === 'server'}
@@ -97,7 +123,7 @@ const ResetPassword = () => {
 								placeholder='********'
 							/>
 						</Stack>
-						<Stack>{error.type && <Text color={'red.400'}>{error.message}</Text>}</Stack>
+						<Stack>{error.type && <Text color={'orange.700'}>{error.message}</Text>}</Stack>
 						<Stack pb={'1rem'}>
 							<Button
 								colorScheme={error.type ? 'red' : 'green'}

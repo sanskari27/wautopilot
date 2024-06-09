@@ -33,7 +33,7 @@ export default class TemplateService extends WhatsappLinkService {
 
 	public async editTemplate(id: string, details: Template) {
 		try {
-			await MetaAPI.post(`/${this.whatsappLink.waid}/${id}`, details, {
+			await MetaAPI.post(`/${id}`, details, {
 				headers: {
 					Authorization: `Bearer ${this.whatsappLink.accessToken}`,
 				},
@@ -73,7 +73,7 @@ export default class TemplateService extends WhatsappLinkService {
 
 	public async fetchTemplate(id: string) {
 		try {
-			const { data } = await MetaAPI.get(`/${this.whatsappLink.waid}/${id}`, {
+			const { data } = await MetaAPI.get(`/${id}`, {
 				headers: {
 					Authorization: `Bearer ${this.whatsappLink.accessToken}`,
 				},
@@ -95,6 +95,8 @@ export default class TemplateService extends WhatsappLinkService {
 				status: 'APPROVED' | 'PENDING' | 'REJECTED';
 			};
 		} catch (err) {
+			console.log((err as any).response.data);
+
 			return null;
 		}
 	}

@@ -1,7 +1,11 @@
+import axios from 'axios';
+import Logger from 'n23-logger';
 import BroadcastDB from '../../mongo/repo/Broadcast';
 import BroadcastMessageDB from '../../mongo/repo/BroadcastMessage';
 import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
+import MetaAPI from '../config/MetaAPI';
+import { MESSAGE_STATUS } from '../config/const';
 import TimeGenerator from '../utils/TimeGenerator';
 import WhatsappLinkService from './whatsappLink';
 
@@ -87,5 +91,60 @@ export default class BroadcastService extends WhatsappLinkService {
 		const message_ids = await Promise.all(messages);
 
 		await BroadcastDB.updateOne({ _id: broadcastDoc._id }, { messages: message_ids });
+	}
+
+	public static async sendScheduledBroadcastMessage() {
+		const docs = await BroadcastMessageDB.find({
+			sendAt: { $lte: new Date() },
+			status: MESSAGE_STATUS.PENDING,
+		}).populate<{
+			device_id: IWhatsappLink;
+		}>('device_id');
+
+		const message_ids = docs.map((msg) => msg._id);
+
+		await BroadcastMessageDB.updateMany(
+			{ _id: { $in: message_ids } },
+			{
+				$set: {
+					status: MESSAGE_STATUS.PROCESSING,
+				},
+			}
+		);
+
+		docs.forEach(async (msg) => {
+			try {
+				const { data } = await MetaAPI.post(
+					`${msg.device_id.phoneNumberId}/messages`,
+					{
+						messaging_product: 'whatsapp',
+						to: msg.to,
+						recipient_type: 'individual',
+						type: 'template',
+						template: {
+							name: msg.messageObject.template_name,
+							language: {
+								code: 'en_US',
+							},
+							components: msg.messageObject.components,
+						},
+					},
+					{
+						headers: {
+							Authorization: `Bearer ${msg.device_id.accessToken}`,
+						},
+					}
+				);
+				msg.message_id = data.messages[0].id;
+				msg.save();
+			} catch (err) {
+				if (axios.isAxiosError(err)) {
+					Logger.info('Error sending broadcast message', err.response?.data as string);
+				}
+
+				msg.status = MESSAGE_STATUS.FAILED;
+				msg.save();
+			}
+		});
 	}
 }

@@ -62,7 +62,7 @@ export type ButtonsTemplate = {
 export type Template = {
 	name: string;
 	category: 'AUTHENTICATION' | 'MARKETING' | 'UTILITY';
-	allow_category_change: boolean;
+	allow_category_change?: boolean;
 	language: string;
 	components: (HeaderTemplate | BodyTemplate | FooterTemplate | ButtonsTemplate)[];
 };

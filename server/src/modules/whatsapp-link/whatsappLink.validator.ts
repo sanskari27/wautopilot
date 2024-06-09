@@ -5,14 +5,16 @@ import { CustomError } from '../../errors';
 export type WhatsappLinkCreateValidationResult = {
 	phoneNumberId: string;
 	waid: string;
-	accessToken: string;
+	accessToken?: string;
+	code?: string;
 };
 
 export async function WhatsappLinkCreateValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
 		phoneNumberId: z.string(),
 		waid: z.string(),
-		accessToken: z.string(),
+		accessToken: z.string().optional(),
+		code: z.string().optional(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

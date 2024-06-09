@@ -11,6 +11,7 @@ export type UserState = {
 		message: string;
 		type: 'password' | 'email' | 'confirm password' | 'server' | 'name' | 'phone' | '';
 	};
+	selected_device_id: string;
 };
 
 export enum UserLevel {

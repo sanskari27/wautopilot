@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { Types } from 'mongoose';
 import { z } from 'zod';
 import { CustomError } from '../../errors';
 
@@ -15,6 +16,16 @@ export type SingleRecordValidationResult = {
 	others: {
 		[others: string]: string;
 	};
+	labels: string[];
+};
+
+export type SetLabelValidationResult = {
+	labels: string[];
+	ids: Types.ObjectId[];
+};
+
+export type MultiDeleteValidationResult = {
+	ids: Types.ObjectId[];
 };
 
 export type RecordsValidationResult = {
@@ -31,6 +42,7 @@ export type RecordsValidationResult = {
 		others: {
 			[others: string]: string;
 		};
+		labels: string[];
 	}[];
 };
 
@@ -43,10 +55,11 @@ export async function RecordUpdateValidator(req: Request, res: Response, next: N
 		last_name: z.string().optional(),
 		middle_name: z.string().optional(),
 		phone_number: z.string().optional(),
-		email: z.string().email().optional(),
+		email: z.string().optional(),
 		birthday: z.string().optional(),
 		anniversary: z.string().optional(),
-		others: z.object({}).default({}),
+		others: z.record(z.string(), z.string()).default({}),
+		labels: z.string().array().default([]),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
@@ -72,13 +85,50 @@ export async function RecordUpdateValidator(req: Request, res: Response, next: N
 
 export async function LabelValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
+		ids: z
+			.string()
+			.array()
+			.default([])
+			.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
+			.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
 		labels: z.string().array().default([]),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
 
 	if (reqValidatorResult.success) {
-		req.locals.data = reqValidatorResult.data.labels;
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function MultiDeleteValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z.object({
+		ids: z
+			.string()
+			.array()
+			.default([])
+			.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
+			.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
 		return next();
 	}
 	const message = reqValidatorResult.error.issues
@@ -105,10 +155,11 @@ export async function RecordsValidator(req: Request, res: Response, next: NextFu
 				last_name: z.string().optional(),
 				middle_name: z.string().optional(),
 				phone_number: z.string().optional(),
-				email: z.string().email().optional(),
+				email: z.string().optional(),
 				birthday: z.string().optional(),
 				anniversary: z.string().optional(),
-				others: z.object({}).default({}),
+				others: z.record(z.string(), z.string()).default({}),
+				labels: z.string().array().default([]),
 			})
 			.array()
 			.default([]),

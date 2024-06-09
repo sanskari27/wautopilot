@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { PhoneBookDB } from '../../mongo/repo';
 import IAccount from '../../mongo/types/account';
+import IPhoneBook from '../../mongo/types/phonebook';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
 import UserService from './user';
@@ -18,10 +19,12 @@ type Record = {
 	others: {
 		[others: string]: string;
 	};
+
+	labels: string[];
 };
 
 function processPhonebookDocs(
-	docs: (Partial<Record> & {
+	docs: (Partial<IPhoneBook> & {
 		_id: Types.ObjectId;
 	})[]
 ): (Record & {
@@ -38,6 +41,7 @@ function processPhonebookDocs(
 		birthday: doc.birthday ?? '',
 		anniversary: doc.anniversary ?? '',
 		others: doc.others ?? {},
+		labels: doc.labels ?? [],
 	}));
 }
 
@@ -64,13 +68,40 @@ export default class PhoneBookService extends UserService {
 		return processPhonebookDocs(docs);
 	}
 
-	public async fetchRecords(): Promise<
+	public async fetchRecords(
+		{
+			page,
+			limit,
+			labels,
+		}: {
+			page: number;
+			limit: number;
+			labels: string[];
+		} = {
+			page: 1,
+			limit: 2000000,
+			labels: [],
+		}
+	): Promise<
 		(Record & {
 			id: string;
 		})[]
 	> {
-		const records = await PhoneBookDB.find({ linked_to: this.userId });
+		const records = await PhoneBookDB.find({
+			linked_to: this.userId,
+			...(labels.length > 0 ? { labels: { $in: labels } } : {}),
+		})
+			.skip((page - 1) * limit)
+			.limit(limit);
 		return processPhonebookDocs(records);
+	}
+
+	public async totalRecords(labels: string[] = []): Promise<number> {
+		const records = await PhoneBookDB.count({
+			linked_to: this.userId,
+			...(labels.length > 0 ? { labels: { $in: labels } } : {}),
+		});
+		return records;
 	}
 
 	public async updateRecord(recordId: Types.ObjectId, details: Partial<Record>) {
@@ -85,24 +116,23 @@ export default class PhoneBookService extends UserService {
 		return processPhonebookDocs([{ _id: recordId, ...details }])[0];
 	}
 
-	public async deleteRecord(recordId: Types.ObjectId) {
-		const record = await PhoneBookDB.findOne({ _id: recordId, linked_to: this.userId });
-
-		if (!record) {
-			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
-		}
-
-		await PhoneBookDB.deleteOne({ _id: recordId });
+	public async deleteRecord(recordId: Types.ObjectId[]) {
+		await PhoneBookDB.deleteMany({ _id: { $in: recordId } });
 	}
 
-	public async setLabels(recordId: Types.ObjectId, tags: string[]) {
-		const record = await PhoneBookDB.findOne({ _id: recordId, linked_to: this.userId });
+	public async setLabels(recordId: Types.ObjectId[], tags: string[]) {
+		await PhoneBookDB.updateMany({ _id: { $in: recordId } }, { labels: tags });
+	}
 
-		if (!record) {
-			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
-		}
+	public async addLabels(recordId: Types.ObjectId[], tags: string[]) {
+		await PhoneBookDB.updateMany(
+			{ _id: { $in: recordId } },
+			{ $push: { labels: { $each: tags } } }
+		);
+	}
 
-		await PhoneBookDB.updateOne({ _id: recordId }, { labels: tags });
+	public async removeLabels(recordId: Types.ObjectId[], tags: string[]) {
+		await PhoneBookDB.updateMany({ _id: { $in: recordId } }, { $pull: { labels: { $in: tags } } });
 	}
 
 	public async getAllLabels() {

@@ -63,7 +63,7 @@ export async function CreateBroadcastValidator(req: Request, res: Response, next
 
 	const reqValidator = z.object({
 		name: z.string(),
-		description: z.string(),
+		description: z.string().default(''),
 		template_id: z.string(),
 		template_name: z.string(),
 		broadcast_options: z

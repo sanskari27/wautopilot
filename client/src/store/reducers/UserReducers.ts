@@ -19,10 +19,11 @@ const initialState: UserState = {
 		message: '',
 		type: '',
 	},
+	selected_device_id: '',
 };
 
-const UserSlice = createSlice({
-	name: StoreNames.COLLECTIONS,
+const Slice = createSlice({
+	name: StoreNames.USER,
 	initialState,
 	reducers: {
 		reset: (state) => {
@@ -64,7 +65,7 @@ const UserSlice = createSlice({
 			state.error = initialState.error;
 			state.password = action.payload;
 		},
-		setPhone:(state, action: PayloadAction<string>) => {
+		setPhone: (state, action: PayloadAction<string>) => {
 			state.error = initialState.error;
 			state.phone = action.payload;
 		},
@@ -74,6 +75,10 @@ const UserSlice = createSlice({
 		},
 		setError: (state, action: PayloadAction<typeof initialState.error>) => {
 			state.error = action.payload;
+		},
+
+		setSelectedDeviceId: (state, action: PayloadAction<string>) => {
+			state.selected_device_id = action.payload;
 		},
 	},
 });
@@ -91,6 +96,7 @@ export const {
 	setPhone,
 	startResettingPassword,
 	stopResettingPassword,
-} = UserSlice.actions;
+	setSelectedDeviceId,
+} = Slice.actions;
 
-export default UserSlice.reducer;
+export default Slice.reducer;

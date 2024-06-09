@@ -81,11 +81,34 @@ async function fetchTemplates(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function fetchTemplate(req: Request, res: Response, next: NextFunction) {
+	const id = req.params.id;
+	try {
+		const templateService = new TemplateService(req.locals.account, req.locals.device);
+		const template = await templateService.fetchTemplate(id);
+
+		if (!template) {
+			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+		}
+
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				template,
+			},
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 const Controller = {
 	addTemplate,
 	editTemplate,
 	deleteTemplate,
 	fetchTemplates,
+	fetchTemplate,
 };
 
 export default Controller;

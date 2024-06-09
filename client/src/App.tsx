@@ -1,42 +1,66 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import { NAVIGATION } from './config/const';
 
 import { Flex, Progress } from '@chakra-ui/react';
-import useAuth from './hooks/useAuth';
+import { useDispatch } from 'react-redux';
 import { useGeoLocation } from './hooks/useGeolocation';
+import AuthService from './services/auth.service';
+import { setIsAuthenticated } from './store/reducers/UserReducers';
+import AddDevice from './views/components/addDevice';
+import LoginPopup from './views/components/loginPopup';
+import Dashboard from './views/pages/dashboard';
+import Phonebook from './views/pages/phonebook';
+import Templates from './views/pages/templates';
+import EditTemplate from './views/pages/templates/edit-template';
 
 const Home = lazy(() => import('./views/pages/_'));
-const Terms = lazy(() => import('./views/pages/terms'));
-const Privacy = lazy(() => import('./views/pages/privacy'));
-const Disclaimer = lazy(() => import('./views/pages/disclaimer'));
-const Login = lazy(() => import('./views/pages/login'));
-const AuthPage = lazy(() => import('./views/pages/auth'));
+const Terms = lazy(() => import('./views/pages/static_pages/terms'));
+const Privacy = lazy(() => import('./views/pages/static_pages/privacy'));
+const Disclaimer = lazy(() => import('./views/pages/static_pages/disclaimer'));
 const ResetPassword = lazy(() => import('./views/pages/reset-password'));
 const AppPage = lazy(() => import('./views/pages/app'));
 
 function App() {
-	useAuth();
+	const dispatch = useDispatch();
 	useGeoLocation();
+
+	useEffect(() => {
+		AuthService.isAuthenticated().then((res) => {
+			dispatch(setIsAuthenticated(res));
+		});
+	}, [dispatch]);
 
 	return (
 		<Flex minHeight={'100vh'} width={'100vw'} className='bg-background '>
 			<Router>
 				<Suspense fallback={<Loading />}>
 					<Routes>
-						<Route path={NAVIGATION.HOME} element={<Home />} />
+						<Route path={NAVIGATION.HOME} element={<Home />}>
+							<Route path={`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`} element={<LoginPopup />} />
+							<Route path={`${NAVIGATION.AUTH}/${NAVIGATION.RESET}`} element={<ResetPassword />} />
+						</Route>
 						<Route path={NAVIGATION.TERMS} element={<Terms />} />
 						<Route path={NAVIGATION.PRIVACY} element={<Privacy />} />
 						<Route path={NAVIGATION.DISCLAIMER} element={<Disclaimer />} />
-						<Route path={NAVIGATION.AUTH} element={<AuthPage />}>
-							<Route path={NAVIGATION.LOGIN} element={<Login />} />
-							<Route path={NAVIGATION.RESET} element={<ResetPassword />} />
-						</Route>
+
 						<Route path={NAVIGATION.APP} element={<AppPage />}>
-							<Route path={NAVIGATION.DASHBOARD} element={<>sdf</>} />
+							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />}>
+								<Route path={NAVIGATION.ADD_DEVICE} element={<AddDevice />} />
+							</Route>
+							<Route path={NAVIGATION.PHONEBOOK} element={<Phonebook />} />
+							<Route
+								path={NAVIGATION.TEMPLATES + '/' + NAVIGATION.ADD_TEMPLATE}
+								element={<EditTemplate />}
+							/>
+							<Route
+								path={NAVIGATION.TEMPLATES + '/' + NAVIGATION.EDIT_TEMPLATE + '/:id'}
+								element={<EditTemplate />}
+							/>
+							<Route path={NAVIGATION.TEMPLATES} element={<Templates />} />
+							<Route path={NAVIGATION.BROADCAST} element={<>sdf</>} />
 							<Route path={NAVIGATION.INBOX} element={<>sdf</>} />
-							<Route path={NAVIGATION.PASSBOOK} element={<>sdf</>} />
 						</Route>
 						{/* <Route path='*' element={<Home />} /> */}
 					</Routes>

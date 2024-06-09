@@ -26,6 +26,6 @@ export default interface IBroadcastMessage extends Document {
 	sendAt: Date;
 
 	messageObject: {
-		[key: string]: string;
+		[key: string]: any;
 	};
 }

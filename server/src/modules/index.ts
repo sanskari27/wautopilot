@@ -7,7 +7,7 @@ import WhatsappLinkRoute from './whatsapp-link/whatsappLink.route';
 
 import FileUpload, { ONLY_MEDIA_ALLOWED, SingleFileUploadOptions } from '../config/FileUpload';
 import { CustomError, ERRORS } from '../errors';
-import { default as VerifyDevice, default as VerifySession } from '../middleware/VerifyDevice';
+import { VerifyDevice, VerifySession } from '../middleware';
 import PhonePeProvider from '../provider/phonepe';
 import { Respond, RespondFile } from '../utils/ExpressUtils';
 

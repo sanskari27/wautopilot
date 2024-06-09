@@ -82,6 +82,7 @@ export default function SignupTab() {
 							name='email'
 							value={email}
 							onChange={(e) => dispatch(setEmail(e.target.value))}
+							marginTop={'-0.5rem'}
 						/>
 					</FormControl>
 					<FormControl isInvalid={error.type === 'name'}>
@@ -103,6 +104,7 @@ export default function SignupTab() {
 							name='name'
 							value={name}
 							onChange={(e) => dispatch(setName(e.target.value))}
+							marginTop={'-0.5rem'}
 						/>
 					</FormControl>
 					<FormControl isInvalid={error.type === 'email'}>
@@ -124,6 +126,7 @@ export default function SignupTab() {
 							name='email'
 							value={phone}
 							onChange={(e) => dispatch(setPhone(e.target.value))}
+							marginTop={'-0.5rem'}
 						/>
 					</FormControl>
 				</Stack>

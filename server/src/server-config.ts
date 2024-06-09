@@ -3,19 +3,19 @@ import cors from 'cors';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import useragent from 'express-useragent';
 import fs from 'fs';
+import cron from 'node-cron';
 import routes from './modules';
 
 import Logger from 'n23-logger';
 import { IS_PRODUCTION, IS_WINDOWS, Path } from './config/const';
 import { CustomError, ERRORS } from './errors';
+import BroadcastService from './services/broadcast';
 import { RespondFile } from './utils/ExpressUtils';
 
 const allowlist = [
 	'http://localhost:5173',
-	'http://localhost:3000',
-	'https://keethjewels.com',
-	'https://www.keethjewels.com',
-	'https://admin.keethjewels.com',
+	'https://wautopilot.com',
+	'https://admin.wautopilot.com',
 ];
 
 const corsOptionsDelegate = (req: any, callback: any) => {
@@ -125,7 +125,9 @@ export default function (app: Express) {
 		});
 		next();
 	});
-
+	cron.schedule('*/2 * * * *', () => {
+		BroadcastService.sendScheduledBroadcastMessage();
+	});
 	createDir();
 }
 
