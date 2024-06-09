@@ -3,7 +3,7 @@ import APIInstance from '../config/APIInstance';
 export default class DeviceService {
 	static async listDevices() {
 		try {
-			const { data } = await APIInstance.get(`whatsapp-link/linked-devices`);
+			const { data } = await APIInstance.get(`/whatsapp-link/linked-devices`);
 
 			const devices = data.devices as {
 				id: string;
@@ -21,7 +21,7 @@ export default class DeviceService {
 
 	static async addDevice(details: { phoneNumberId: string; waid: string; accessToken: string }) {
 		try {
-			await APIInstance.post(`whatsapp-link/link-device`, {
+			await APIInstance.post(`/whatsapp-link/link-device`, {
 				phoneNumberId: details.phoneNumberId,
 				waid: details.waid,
 				accessToken: details.accessToken,
@@ -35,7 +35,7 @@ export default class DeviceService {
 
 	static async removeDevice(id: string) {
 		try {
-			await APIInstance.post(`whatsapp-link/remove-device/${id}`);
+			await APIInstance.post(`/whatsapp-link/remove-device/${id}`);
 			return true;
 		} catch (err) {
 			return false;
