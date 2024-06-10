@@ -19,8 +19,17 @@ const bodyParametersList = [
 ];
 
 async function sendTemplateMessage(req: Request, res: Response, next: NextFunction) {
-	const { body, description, name, template_id, template_name, to, broadcast_options, labels } = req
-		.locals.data as CreateBroadcastValidationResult;
+	const {
+		body,
+		description,
+		name,
+		template_id,
+		template_name,
+		to,
+		broadcast_options,
+		labels,
+		header,
+	} = req.locals.data as CreateBroadcastValidationResult;
 
 	try {
 		const phoneBookService = new PhoneBookService(req.locals.account);
@@ -37,7 +46,6 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 			)
 				.map((record) => record.phone_number)
 				.filter((number) => number);
-				
 		}
 
 		if (_to.length === 0) {
@@ -46,6 +54,45 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 
 		const messages = _to.map(async (number) => {
 			const fields = await phoneBookService.findFieldsByPhone(number);
+
+			let headers = [] as Record<string, unknown>[];
+
+			if (header) {
+				headers = [
+					{
+						type: header.type,
+						parameters:
+							header.type === 'IMAGE'
+								? [
+										{
+											type: 'image',
+											image: {
+												link: header.link,
+											},
+										},
+								  ]
+								: header.type === 'VIDEO'
+								? [
+										{
+											type: 'video',
+											video: {
+												link: header.link,
+											},
+										},
+								  ]
+								: header.type === 'DOCUMENT'
+								? [
+										{
+											type: 'document',
+											document: {
+												link: header.link,
+											},
+										},
+								  ]
+								: [],
+					},
+				];
+			}
 
 			return {
 				to: number,
@@ -89,6 +136,7 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 								}
 							}),
 						},
+						...headers,
 					],
 				},
 			};

@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { NAVIGATION } from '../../../../config/const';
 import TemplateService from '../../../../services/template.service';
+import UploadService from '../../../../services/upload.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
 	removeButtonComponent,
@@ -29,6 +30,7 @@ import {
 	setBodyExample,
 	setBodyText,
 	setDetails,
+	setFile,
 	setFooterText,
 	setHeaderText,
 	setHeaderType,
@@ -52,6 +54,7 @@ export default function EditTemplate() {
 
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const {
+		file,
 		details: { category, name, components },
 	} = useSelector((state: StoreState) => state[StoreNames.TEMPLATES]);
 
@@ -110,9 +113,7 @@ export default function EditTemplate() {
 		});
 	}, [id, dispatch, selected_device_id, toast]);
 
-	const onSave = () => {
-		dispatch(setSaving(true));
-
+	const saveTemplate = async (handle?: string) => {
 		const details = {
 			id,
 			name,
@@ -125,6 +126,20 @@ export default function EditTemplate() {
 
 		if (buttons.length === 0) {
 			details.components = details.components.filter((c: { type: string }) => c.type !== 'BUTTONS');
+		}
+
+		if (handle) {
+			details.components = details.components.map((component) => {
+				if (component.type === 'HEADER') {
+					return {
+						...component,
+						example: {
+							header_handle: [handle],
+						},
+					};
+				}
+				return component;
+			});
 		}
 
 		const promise = id
@@ -149,6 +164,28 @@ export default function EditTemplate() {
 				title: 'Saving Template',
 			},
 		});
+	};
+
+	const onSave = async () => {
+		dispatch(setSaving(true));
+		if (file) {
+			toast.promise(UploadService.uploadFile(selected_device_id, file), {
+				success: (handle) => {
+					saveTemplate(handle);
+					return {
+						title: 'File uploaded',
+					};
+				},
+				error: {
+					title: 'Failed to upload file',
+				},
+				loading: {
+					title: 'Uploading file',
+				},
+			});
+		} else {
+			saveTemplate();
+		}
 	};
 
 	const bodyVariables = countOccurrences(body.text);
@@ -203,7 +240,7 @@ export default function EditTemplate() {
 							selectedValue={
 								headers.length > 0 ? (headers[0].format === 'TEXT' ? 'TEXT' : 'MEDIA') : 'none'
 							}
-							onChange={(val) => dispatch(setHeaderType(val))}
+							onChange={(val) => dispatch(setHeaderType(val === 'MEDIA' ? 'IMAGE' : val))}
 						/>
 					</Box>
 
@@ -212,7 +249,7 @@ export default function EditTemplate() {
 							<Text mb={'0.5rem'}>Header Text</Text>
 
 							<Input
-								placeholder='Enter template name'
+								placeholder='Enter header text'
 								type='text'
 								onChange={(e) => dispatch(setHeaderText(e.target.value))}
 								value={headers[0].text ?? ''}
@@ -221,18 +258,29 @@ export default function EditTemplate() {
 					) : null}
 
 					{headers.length > 0 && headers[0].format !== 'TEXT' ? (
-						<RadioGroup
-							onChange={(value) => dispatch(setHeaderType(value))}
-							value={headers[0].format}
-							mt={'1rem'}
-							ml={'0.5rem'}
-						>
-							<Stack direction='row'>
-								<Radio value='IMAGE'>Image</Radio>
-								<Radio value='VIDEO'>Video</Radio>
-								<Radio value='DOCUMENT'>Document</Radio>
-							</Stack>
-						</RadioGroup>
+						<>
+							<RadioGroup
+								onChange={(value) => dispatch(setHeaderType(value))}
+								value={headers[0].format}
+								mt={'1rem'}
+								ml={'0.5rem'}
+							>
+								<Stack direction='row'>
+									<Radio value='IMAGE'>Image</Radio>
+									<Radio value='VIDEO'>Video</Radio>
+									<Radio value='DOCUMENT'>Document</Radio>
+								</Stack>
+							</RadioGroup>
+
+							<Box maxWidth={'500px'} marginTop={'0.5rem'}>
+								<Text mb={'0.5rem'}>Sample Header Media</Text>
+
+								<Input
+									type='file'
+									onChange={(e) => dispatch(setFile(e.target.files?.[0] ?? null))}
+								/>
+							</Box>
+						</>
 					) : null}
 
 					<Divider my={'1rem'} borderColor={'gray.400'} />

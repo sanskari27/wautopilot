@@ -7,6 +7,8 @@ type ResolvedFile = {
 	filename: string;
 	destination: string;
 	path: string;
+	mime: string;
+	size: number;
 };
 export interface SingleFileUploadOptions {
 	field_name: string;
@@ -49,6 +51,8 @@ const SingleFileUpload = (
 				filename: req.file.filename,
 				destination: req.file.destination,
 				path: req.file.path,
+				size: req.file.size,
+				mime: req.file.mimetype,
 			});
 		});
 	});
@@ -79,6 +83,8 @@ const MultiFileUpload = (
 					filename: file.filename,
 					destination: file.destination,
 					path: file.path,
+					size: file.size,
+					mime: file.mimetype,
 				}))
 			);
 		});

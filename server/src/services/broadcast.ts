@@ -63,7 +63,10 @@ export default class BroadcastService extends WhatsappLinkService {
 		});
 
 		const timeGenerator = new TimeGenerator({
-			startDate: options.broadcast_type === 'scheduled' ? options.startDate : undefined,
+			startDate:
+				options.broadcast_type === 'scheduled'
+					? options.startDate
+					: DateUtils.getDate('YYYY-MM-DD'),
 			startTime: options.broadcast_type === 'scheduled' ? options.startTime : undefined,
 			endTime: options.broadcast_type === 'scheduled' ? options.endTime : undefined,
 			daily_count:

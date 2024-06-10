@@ -3,6 +3,7 @@ import { IconType } from 'react-icons/lib';
 import { TbLogout2 } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 import { MenuItems } from '../../../config/const';
+import AuthService from '../../../services/auth.service';
 import Each from '../utils/Each';
 
 function isActiveTab(tab: string, path: string): boolean {
@@ -12,7 +13,8 @@ function isActiveTab(tab: string, path: string): boolean {
 
 export default function NavigationDrawer({ expanded }: { expanded: boolean }) {
 	const handleLogout = async () => {
-		// logout();
+		AuthService.logout();
+		window.location.reload();
 	};
 
 	const theme = 'light';

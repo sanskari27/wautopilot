@@ -6,6 +6,7 @@ export type TemplatesState = {
 		isFetching: boolean;
 		error: string;
 	};
+	file: File | null;
 };
 
 type Template = {

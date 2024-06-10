@@ -17,6 +17,7 @@ const initialState: TemplatesState = {
 		isFetching: false,
 		error: '',
 	},
+	file: null,
 };
 
 const Slice = createSlice({
@@ -27,6 +28,7 @@ const Slice = createSlice({
 			state.list = initialState.list;
 			state.details = initialState.details;
 			state.uiDetails = initialState.uiDetails;
+			state.file = initialState.file;
 		},
 		setDetails: (
 			state,
@@ -37,6 +39,9 @@ const Slice = createSlice({
 			>
 		) => {
 			state.details = action.payload;
+		},
+		setFile: (state, action: PayloadAction<File | null>) => {
+			state.file = action.payload;
 		},
 		setTemplatesList: (state, action: PayloadAction<Template[]>) => {
 			state.list = action.payload;
@@ -64,8 +69,11 @@ const Slice = createSlice({
 			if (action.payload !== 'none') {
 				state.details.components.push({
 					type: 'HEADER',
-					format: action.payload === 'TEXT' ? 'TEXT' : 'IMAGE',
+					format: action.payload,
 				});
+			}
+			if (action.payload === 'TEXT' || action.payload === 'none') {
+				state.file = null;
 			}
 		},
 		setHeaderText: (state, action: PayloadAction<string>) => {
@@ -192,6 +200,7 @@ const Slice = createSlice({
 
 export const {
 	reset,
+	setFile,
 	setTemplatesList,
 	setError,
 	setFetching,

@@ -38,7 +38,7 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 	const headerSchema = z.object({
 		type: z.literal('HEADER'),
 		format: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
-		text: z.string(),
+		text: z.string().optional(),
 		example: z
 			.object({
 				header_text: z.array(z.string()).default([]),
@@ -115,7 +115,7 @@ export async function TemplateEditValidator(req: Request, res: Response, next: N
 	const headerSchema = z.object({
 		type: z.literal('HEADER'),
 		format: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
-		text: z.string(),
+		text: z.string().optional(),
 		example: z
 			.object({
 				header_text: z.array(z.string()).default([]),

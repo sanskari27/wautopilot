@@ -43,7 +43,7 @@ export default class AuthService {
 
 	static async logout() {
 		try {
-			await APIInstance.post(`/sessions/login`);
+			await APIInstance.post(`/sessions/logout`);
 			return true;
 		} catch (err) {
 			return false;

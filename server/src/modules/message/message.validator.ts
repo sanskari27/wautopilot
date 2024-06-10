@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { Types } from 'mongoose';
 import { z } from 'zod';
 import { CustomError } from '../../errors';
 
@@ -9,6 +10,11 @@ export type CreateBroadcastValidationResult = {
 	template_name: string;
 	to: string[];
 	labels: string[];
+	header?: {
+		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+		link?: string;
+		fileID?: Types.ObjectId;
+	};
 	body: {
 		custom_text: string;
 		phonebook_data: string;
@@ -59,6 +65,17 @@ export async function CreateBroadcastValidator(req: Request, res: Response, next
 				fallback_value: z.string(),
 			})
 		),
+		header: z
+			.object({
+				type: z.enum(['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT']),
+				link: z.string().optional(),
+				fileID: z
+					.string()
+					.refine((value) => !Types.ObjectId.isValid(value))
+					.transform((value) => new Types.ObjectId(value))
+					.optional(),
+			})
+			.optional(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
