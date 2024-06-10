@@ -3,6 +3,7 @@ export type BroadcastState = {
 	template_id: string;
 	description: string;
 	to: string[];
+	labels: string[];
 
 	recipients_from: 'numbers' | 'phonebook';
 

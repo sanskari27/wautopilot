@@ -24,6 +24,7 @@ import {
 	setDailyMessagesCount,
 	setDescription,
 	setEndTime,
+	setLabels,
 	setName,
 	setRecipientsFrom,
 	setStartDate,
@@ -43,11 +44,10 @@ export default function Broadcast() {
 	const dispatch = useDispatch();
 	const toast = useToast();
 
-	const { body, broadcast_options, description, name, recipients_from, template_id, to } =
+	const { body, broadcast_options, description, name, recipients_from, template_id, to, labels } =
 		useSelector((state: StoreState) => state[StoreNames.BROADCAST]);
 	const { list: templateList } = useSelector((state: StoreState) => state[StoreNames.TEMPLATES]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
-	const { filterLabels } = useSelector((state: StoreState) => state[StoreNames.PHONEBOOK]);
 
 	useEffect(() => {
 		TemplateService.listTemplates(selected_device_id).then((res) => {
@@ -75,7 +75,7 @@ export default function Broadcast() {
 			template_id: template_id,
 			template_name: template.name,
 			to: recipients_from === 'numbers' ? to : [],
-			labels: recipients_from === 'phonebook' ? filterLabels : [],
+			labels: recipients_from === 'phonebook' ? labels : [],
 			broadcast_options,
 			body,
 		});
@@ -170,6 +170,7 @@ export default function Broadcast() {
 										Select Tags
 									</Button>
 								}
+								onChange={(labels) => dispatch(setLabels(labels))}
 							/>
 						</Box>
 					</Flex>

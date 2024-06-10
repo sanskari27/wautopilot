@@ -7,6 +7,7 @@ const initialState: BroadcastState = {
 	template_id: '',
 	description: '',
 	to: [],
+	labels: [],
 
 	recipients_from: 'numbers' as 'numbers' | 'phonebook',
 
@@ -45,6 +46,9 @@ const Slice = createSlice({
 		},
 		setTo: (state, action: PayloadAction<string[]>) => {
 			state.to = action.payload;
+		},
+		setLabels: (state, action: PayloadAction<string[]>) => {
+			state.labels = action.payload;
 		},
 		setRecipientsFrom: (state, action: PayloadAction<'numbers' | 'phonebook'>) => {
 			state.recipients_from = action.payload;
@@ -106,6 +110,7 @@ export const {
 	setStartTime,
 	setTemplateId,
 	setTo,
+	setLabels,
 } = Slice.actions;
 
 export default Slice.reducer;
