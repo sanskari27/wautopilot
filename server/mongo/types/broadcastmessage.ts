@@ -18,13 +18,6 @@ export default interface IBroadcastMessage extends Document {
 	failed_at: Date;
 	failed_reason: string;
 
-	header_type: 'text' | 'image' | 'video' | 'document';
-	header_content: string;
-	body_content: string;
-	footer_content: string;
-	button_type: 'url' | 'phone_number' | 'quick_reply';
-	button_content: string;
-
 	createdAt: Date;
 	sendAt: Date;
 

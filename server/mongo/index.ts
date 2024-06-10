@@ -1,5 +1,15 @@
 import mongoose from 'mongoose';
-export { AccountDB, SessionDB, StorageDB } from './repo';
+export {
+	AccountDB,
+	BroadcastDB,
+	BroadcastMessageDB,
+	ConversationDB,
+	ConversationMessageDB,
+	PhoneBookDB,
+	SessionDB,
+	StorageDB,
+	WhatsappLinkDB,
+} from './repo';
 
 export default function connectDB(database_url: string) {
 	return new Promise((resolve, reject) => {

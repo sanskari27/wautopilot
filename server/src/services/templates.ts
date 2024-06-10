@@ -101,6 +101,40 @@ export default class TemplateService extends WhatsappLinkService {
 		}
 	}
 
+	public async fetchTemplateByName(name: string) {
+		try {
+			const { data: res } = await MetaAPI.get(
+				`/${this.whatsappLink.waid}/message_templates?name=${name}`,
+				{
+					headers: {
+						Authorization: `Bearer ${this.whatsappLink.accessToken}`,
+					},
+				}
+			);
+			const data = res.data[0];
+
+			return {
+				id: data.id,
+				name: data.name,
+				status: data.status as 'APPROVED' | 'PENDING' | 'REJECTED',
+				category: data.category as 'AUTHENTICATION' | 'MARKETING' | 'UTILITY',
+				components: data.components as (
+					| HeaderTemplate
+					| BodyTemplate
+					| FooterTemplate
+					| ButtonsTemplate
+				)[],
+			} as Template & {
+				id: string;
+				status: 'APPROVED' | 'PENDING' | 'REJECTED';
+			};
+		} catch (err) {
+			console.log((err as any).response.data);
+
+			return null;
+		}
+	}
+
 	public async deleteTemplate(template_id: string, name: string) {
 		try {
 			await MetaAPI.delete(

@@ -17,9 +17,6 @@ type SessionDetails = {
 };
 
 export default class UserService {
-	getUser(): any {
-		throw new Error('Method not implemented.');
-	}
 	private _user_id: IDType;
 	private _level: UserLevel;
 	private _account: IAccount;
@@ -57,6 +54,10 @@ export default class UserService {
 			refreshToken: session.refreshToken,
 			userService: new UserService(user),
 		};
+	}
+
+	getUser() {
+		return this._account;
 	}
 
 	static async register(

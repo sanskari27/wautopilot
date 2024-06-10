@@ -42,13 +42,6 @@ const schema = new mongoose.Schema<IBroadcastMessage>(
 		failed_at: Date,
 		failed_reason: String,
 
-		header_type: String,
-		header_content: String,
-		body_content: String,
-		footer_content: String,
-		button_type: String,
-		button_content: String,
-
 		sendAt: {
 			type: Date,
 			required: true,

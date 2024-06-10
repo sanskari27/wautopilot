@@ -15,7 +15,6 @@ import Dashboard from './views/pages/dashboard';
 import Phonebook from './views/pages/phonebook';
 import Templates from './views/pages/templates';
 import EditTemplate from './views/pages/templates/edit-template';
-
 const Home = lazy(() => import('./views/pages/_'));
 const Terms = lazy(() => import('./views/pages/static_pages/terms'));
 const Privacy = lazy(() => import('./views/pages/static_pages/privacy'));

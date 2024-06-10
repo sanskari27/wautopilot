@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { WhatsappLinkDB } from '../../mongo/repo';
+import { WhatsappLinkDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import MetaAPI from '../config/MetaAPI';
 import { CustomError } from '../errors';

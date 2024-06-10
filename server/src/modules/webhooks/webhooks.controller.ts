@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { AccountDB } from '../../../mongo';
-import { WhatsappLinkDB } from '../../../mongo/repo';
+import { AccountDB, WhatsappLinkDB } from '../../../mongo';
 import { META_VERIFY_STRING, META_VERIFY_USER_STRING } from '../../config/const';
 import BroadcastService from '../../services/broadcast';
+import ConversationService from '../../services/conversation';
 export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
 export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
@@ -26,6 +26,18 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 	const waid = body.entry[0].id;
 	const phone_number_id = data.metadata.phone_number_id;
 
+	const link = await WhatsappLinkDB.findOne({ waid, phoneNumberId: phone_number_id });
+	if (!link) {
+		return res.status(400);
+	}
+
+	const user = await AccountDB.findOne({ _id: link.linked_to });
+	if (!user) {
+		return res.status(400);
+	}
+	const conversationService = new ConversationService(user, link);
+	console.log('MESSAGE TO', conversationService.userId);
+
 	if (data.statuses) {
 		//Handle outgoing messages status
 
@@ -36,18 +48,9 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		// const conversationExpiry = status.conversation.expiration_timestamp;
 		// const origin = status.conversation.origin.type;
 		BroadcastService.updateStatus(msgID, status.status, status.timestamp, error);
+		ConversationService.updateStatus(msgID, status.status, status.timestamp, error);
 	} else {
 		// const recipient_id = data.contacts[0].recipient_id;
-
-		const link = await WhatsappLinkDB.findOne({ waid, phoneNumberId: phone_number_id });
-		if (!link) {
-			return res.status(400);
-		}
-
-		const user = await AccountDB.findOne({ _id: link.linked_to });
-		if (!user) {
-			return res.status(400);
-		}
 	}
 
 	return res.status(200);

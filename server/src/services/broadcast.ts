@@ -1,13 +1,15 @@
 import axios from 'axios';
 import Logger from 'n23-logger';
-import BroadcastDB from '../../mongo/repo/Broadcast';
-import BroadcastMessageDB from '../../mongo/repo/BroadcastMessage';
+import { BroadcastDB, BroadcastMessageDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import MetaAPI from '../config/MetaAPI';
 import { MESSAGE_STATUS } from '../config/const';
 import DateUtils from '../utils/DateUtils';
+import { extractBody, extractButtons, extractFooter, extractHeader } from '../utils/MessageHelper';
 import TimeGenerator from '../utils/TimeGenerator';
+import ConversationService from './conversation';
+import TemplateService from './templates';
 import WhatsappLinkService from './whatsappLink';
 
 type Broadcast = {
@@ -98,13 +100,18 @@ export default class BroadcastService extends WhatsappLinkService {
 	}
 
 	public static async sendScheduledBroadcastMessage() {
-		const docs = await BroadcastMessageDB.find({
-			sendAt: { $lte: new Date() },
-			status: MESSAGE_STATUS.PENDING,
-		}).populate<{
-			device_id: IWhatsappLink;
-		}>('device_id');
-
+		let docs;
+		try {
+			docs = await BroadcastMessageDB.find({
+				sendAt: { $lte: new Date() },
+				status: MESSAGE_STATUS.PENDING,
+			}).populate<{
+				device_id: IWhatsappLink;
+				linked_to: IAccount;
+			}>('device_id linked_to');
+		} catch (err) {
+			return;
+		}
 		const message_ids = docs.map((msg) => msg._id);
 
 		await BroadcastMessageDB.updateMany(
@@ -148,6 +155,29 @@ export default class BroadcastService extends WhatsappLinkService {
 
 				msg.status = MESSAGE_STATUS.FAILED;
 				msg.save();
+				return;
+			}
+
+			const conversationService = new ConversationService(msg.linked_to, msg.device_id);
+			const templateService = new TemplateService(msg.linked_to, msg.device_id);
+			const template = await templateService.fetchTemplateByName(msg.messageObject.template_name);
+			if (template) {
+				const c_id = await conversationService.createConversation(msg.to);
+				const header = extractHeader(template.components);
+				const body = extractBody(template.components, msg.messageObject.components);
+				const footer = extractFooter(template.components);
+				const buttons = extractButtons(template.components);
+				await conversationService.addMessageToConversation(c_id, {
+					recipient: msg.to,
+					message_id: msg.message_id,
+					...(header ? { ...header } : {}),
+					body: {
+						body_type: 'TEXT',
+						text: body!,
+					},
+					...(footer ? { footer_content: footer } : {}),
+					...(buttons ? { buttons } : {}),
+				});
 			}
 		});
 	}
