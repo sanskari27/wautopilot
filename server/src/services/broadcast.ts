@@ -161,12 +161,16 @@ export default class BroadcastService extends WhatsappLinkService {
 		const details = {} as Record<string, unknown>;
 		if (status === 'sent') {
 			details.sent_at = DateUtils.fromUnixTime(timestamp).toDate();
+			details.status = MESSAGE_STATUS.SENT;
 		} else if (status === 'read') {
 			details.read_at = DateUtils.fromUnixTime(timestamp).toDate();
+			details.status = MESSAGE_STATUS.READ;
 		} else if (status === 'delivered') {
 			details.delivered_at = DateUtils.fromUnixTime(timestamp).toDate();
+			details.status = MESSAGE_STATUS.DELIVERED;
 		} else if (status === 'failed') {
 			details.failed_at = DateUtils.fromUnixTime(timestamp).toDate();
+			details.status = MESSAGE_STATUS.FAILED;
 			details.failed_reason = error;
 		}
 
