@@ -32,13 +32,14 @@ import {
 	removeSelected,
 	selectPhonebook,
 	setFetching,
+	setLabels,
 	setMaxPage,
 	setPhonebookList,
 } from '../../../store/reducers/PhonebookReducer';
 import { PhonebookRecord } from '../../../store/types/PhonebookState';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import LabelFilter from '../../components/labelFilter';
-import SearchBar from '../../components/serachBar';
+import SearchBar from '../../components/searchBar';
 import Each from '../../components/utils/Each';
 import AssignLabelDialog, { AssignLabelDialogHandle } from './components/assign-label';
 import ContactInputDialog, { ContactInputDialogHandle } from './components/contact-input-dialog';
@@ -55,7 +56,7 @@ export default function Phonebook() {
 	const {
 		list,
 		pagination,
-		filterLabels,
+		labels,
 		selected,
 		uiDetails: { isFetching },
 	} = useSelector((state: StoreState) => state[StoreNames.PHONEBOOK]);
@@ -67,7 +68,7 @@ export default function Phonebook() {
 			params: {
 				page: pagination.page,
 				limit: 20,
-				labels: filterLabels.join(','),
+				labels: labels.join(','),
 			},
 			signal: cancelToken.signal,
 		})
@@ -80,10 +81,10 @@ export default function Phonebook() {
 		return () => {
 			cancelToken.abort();
 		};
-	}, [pagination.page, filterLabels, dispatch]);
+	}, [pagination.page, labels, dispatch]);
 
 	const handleExport = () => {
-		toast.promise(PhoneBookService.export(filterLabels), {
+		toast.promise(PhoneBookService.export(labels), {
 			success: {
 				title: 'Exported successfully',
 			},
@@ -114,7 +115,7 @@ export default function Phonebook() {
 					params: {
 						page: pagination.page,
 						limit: 20,
-						labels: filterLabels.join(','),
+						labels: labels.join(','),
 					},
 				})
 					.then(({ data }) => {
@@ -201,7 +202,7 @@ export default function Phonebook() {
 			>
 				<Flex flexGrow={1} gap={3} className='w-full md:w-fit'>
 					<SearchBar onSearchTextChanged={setSearchText} />
-					<LabelFilter />
+					<LabelFilter onChange={(labels) => dispatch(setLabels(labels))} />
 				</Flex>
 				<Flex gap={3} padding={'1rem'}>
 					<IconButton
@@ -248,7 +249,7 @@ export default function Phonebook() {
 							</>
 						) : filtered.length === 0 ? (
 							<Tr>
-								<Td colSpan={5} textAlign={'center'}>
+								<Td colSpan={7} textAlign={'center'}>
 									No records found
 								</Td>
 							</Tr>

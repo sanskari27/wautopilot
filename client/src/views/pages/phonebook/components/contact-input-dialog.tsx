@@ -13,9 +13,15 @@ import {
 	IconButton,
 	Input,
 	InputGroup,
+	InputRightAddon,
 	InputRightElement,
+	Tag,
+	TagCloseButton,
+	TagLabel,
 	Text,
 	VStack,
+	Wrap,
+	WrapItem,
 	useDisclosure,
 	useToast,
 } from '@chakra-ui/react';
@@ -25,11 +31,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import PhoneBookService from '../../../../services/phonebook.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
+	addDetailsLabels,
+	addLabelInput,
 	clearDetails,
+	removeDetailsLabel,
 	removeOtherKey,
 	setAnniversary,
 	setBirthday,
-	setDetailLabels,
 	setEmail,
 	setError,
 	setFieldName,
@@ -41,6 +49,7 @@ import {
 	setSalutation,
 	setSaving,
 } from '../../../../store/reducers/PhonebookReducer';
+import LabelFilter from '../../../components/labelFilter';
 import Each from '../../../components/utils/Each';
 
 export type ContactInputDialogHandle = {
@@ -63,7 +72,7 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 		},
 	}));
 
-	const { details, uiDetails, field_name } = useSelector(
+	const { details, uiDetails, field_name, label_input } = useSelector(
 		(state: StoreState) => state[StoreNames.PHONEBOOK]
 	);
 	const {
@@ -217,16 +226,32 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 						</Box>
 						<Box>
 							<Text>Tags</Text>
+							<Wrap borderWidth={'1px'} borderColor={'gray.300'} p={'0.5rem'} rounded={'md'}>
+								<Each
+									items={labels}
+									render={(label) => (
+										<WrapItem>
+											<Tag borderRadius='full' variant='solid' colorScheme='green'>
+												<TagLabel>{label}</TagLabel>
+												<TagCloseButton onClick={() => dispatch(removeDetailsLabel(label))} />
+											</Tag>
+										</WrapItem>
+									)}
+								/>
+							</Wrap>
 							<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
 								<Input
 									type='text'
-									value={labels.join(', ') ?? ''}
-									onChange={(e) =>
-										dispatch(
-											setDetailLabels(e.target.value.split(',').map((label) => label.trim()))
-										)
-									}
+									placeholder='Enter tag'
+									value={label_input}
+									onChange={(e) => dispatch(addLabelInput(e.target.value))}
 								/>
+								<InputRightAddon px={0}>
+									<LabelFilter
+										onChange={(labels) => dispatch(addDetailsLabels(labels))}
+										clearOnClose
+									/>
+								</InputRightAddon>
 							</InputGroup>
 						</Box>
 

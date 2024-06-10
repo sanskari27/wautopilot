@@ -55,6 +55,7 @@ export default class PhoneBookService extends UserService {
 			details.map(async (record) => {
 				const doc = await PhoneBookDB.create({
 					...record,
+					phone_number: record.phone_number?.replace(/\D/g, '') ?? '',
 					linked_to: this.userId,
 				});
 

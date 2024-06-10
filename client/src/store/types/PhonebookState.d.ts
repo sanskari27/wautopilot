@@ -6,18 +6,18 @@ export type PhonebookState = {
 		isFetching: boolean;
 		error: string;
 	};
-	labels: string[];
 	pagination: {
 		page: number;
 		maxPage: number;
 	};
 	selected: string[];
-	filterLabels: string[];
 	field_name: string;
 	csv: {
 		file: File | null;
 		labels: string[];
 	};
+	label_input: string;
+	labels: string[];
 };
 
 type PhonebookRecord = {

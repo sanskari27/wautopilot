@@ -12,44 +12,69 @@ import {
 	PopoverTrigger,
 	Text,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { BiFilter } from 'react-icons/bi';
-import { useDispatch, useSelector } from 'react-redux';
 import PhoneBookService from '../../../services/phonebook.service';
-import { StoreNames, StoreState } from '../../../store';
-import {
-	addFilterLabel,
-	removeAllFilterLabels,
-	removeFilterLabel,
-	setLabels,
-} from '../../../store/reducers/PhonebookReducer';
-import SearchBar from '../serachBar';
+import SearchBar from '../searchBar';
 import Each from '../utils/Each';
 
-export default function LabelFilter({ buttonComponent }: { buttonComponent?: React.ReactNode }) {
-	const dispatch = useDispatch();
+export default function LabelFilter({
+	buttonComponent,
+	onChange = () => {},
+	onClose = () => {},
+	clearOnClose = false,
+}: {
+	buttonComponent?: React.ReactNode;
+	onChange?: (labels: string[]) => void;
+	onClose?: (labels: string[]) => void;
+	clearOnClose?: boolean;
+}) {
 	const [searchText, setSearchText] = useState<string>('');
-
-	const { labels, filterLabels } = useSelector((state: StoreState) => state[StoreNames.PHONEBOOK]);
+	const [labels, setLabels] = useState<string[]>([]);
+	const [filterLabels, dispatch] = useReducer(
+		(
+			state: string[],
+			action: { type: 'add'; label: string } | { type: 'remove'; label: string } | { type: 'clear' }
+		) => {
+			switch (action.type) {
+				case 'add':
+					return [...state, action.label];
+				case 'remove':
+					return state.filter((label) => label !== action.label);
+				case 'clear':
+					return [];
+				default:
+					return state;
+			}
+		},
+		[]
+	);
 
 	useEffect(() => {
-		PhoneBookService.allLabels().then((labels) => {
-			dispatch(setLabels(labels));
-		});
-	}, [dispatch]);
+		PhoneBookService.allLabels().then(setLabels);
+	}, [setLabels]);
+
+	useEffect(() => {
+		onChange(filterLabels);
+	}, [filterLabels, onChange]);
 
 	const filtered = labels.filter((label) => label.includes(searchText));
 
 	function handleCheckboxClick(label: string, checked: boolean): void {
 		if (checked) {
-			dispatch(addFilterLabel(label));
+			dispatch({ type: 'add', label });
 		} else {
-			dispatch(removeFilterLabel(label));
+			dispatch({ type: 'remove', label });
 		}
 	}
 
 	return (
-		<Popover>
+		<Popover
+			onClose={() => {
+				onClose(filterLabels);
+				clearOnClose && dispatch({ type: 'clear' });
+			}}
+		>
 			<PopoverTrigger>
 				{buttonComponent || <IconButton aria-label='filter-button' icon={<BiFilter />} />}
 			</PopoverTrigger>
@@ -63,7 +88,7 @@ export default function LabelFilter({ buttonComponent }: { buttonComponent?: Rea
 								cursor: 'pointer',
 								textDecoration: 'underline',
 							}}
-							onClick={() => dispatch(removeAllFilterLabels())}
+							onClick={() => dispatch({ type: 'clear' })}
 						>
 							Clear
 						</Text>
@@ -77,7 +102,7 @@ export default function LabelFilter({ buttonComponent }: { buttonComponent?: Rea
 					</Flex>
 				</PopoverHeader>
 				<PopoverBody>
-					<Box maxHeight={'300px'} overflow={'scroll'}>
+					<Box maxHeight={'300px'} overflowY={'scroll'} overflowX={'hidden'}>
 						<Each
 							items={filtered}
 							render={(label) => (

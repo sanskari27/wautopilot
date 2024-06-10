@@ -54,7 +54,10 @@ export async function RecordUpdateValidator(req: Request, res: Response, next: N
 		first_name: z.string().optional(),
 		last_name: z.string().optional(),
 		middle_name: z.string().optional(),
-		phone_number: z.string().optional(),
+		phone_number: z
+			.string()
+			.transform((val) => val.replace(/\D/g, ''))
+			.optional(),
 		email: z.string().optional(),
 		birthday: z.string().optional(),
 		anniversary: z.string().optional(),

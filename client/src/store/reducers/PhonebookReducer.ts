@@ -27,13 +27,13 @@ const initialState: PhonebookState = {
 		error: '',
 	},
 	selected: [],
-	labels: [],
 	pagination: {
 		page: 1,
 		maxPage: 1,
 	},
-	filterLabels: [],
 	field_name: '',
+	label_input: '',
+	labels: [],
 };
 
 const Slice = createSlice({
@@ -92,6 +92,31 @@ const Slice = createSlice({
 		setDetailLabels: (state, action: PayloadAction<string[]>) => {
 			state.details.labels = action.payload;
 		},
+		addDetailsLabel: (state, action: PayloadAction<string>) => {
+			if (!state.details.labels.includes(action.payload)) {
+				state.details.labels.push(action.payload);
+			}
+		},
+		addDetailsLabels: (state, action: PayloadAction<string[]>) => {
+			action.payload.forEach((label) => {
+				if (!state.details.labels.includes(label)) {
+					state.details.labels.push(label);
+				}
+			});
+		},
+		addLabelInput: (state, action: PayloadAction<string>) => {
+			state.label_input = action.payload;
+			if (state.label_input.includes(' ')) {
+				const label = state.label_input.split(' ')[0];
+				if (!state.details.labels.includes(label)) {
+					state.details.labels.push(label);
+				}
+				state.label_input = '';
+			}
+		},
+		removeDetailsLabel: (state, action: PayloadAction<string>) => {
+			state.details.labels = state.details.labels.filter((label) => label !== action.payload);
+		},
 		setSaving: (state, action: PayloadAction<boolean>) => {
 			state.uiDetails.isSaving = action.payload;
 		},
@@ -110,18 +135,6 @@ const Slice = createSlice({
 		prevPage: (state) => {
 			state.pagination.page = Math.max(state.pagination.page - 1, 1);
 		},
-		setLabels: (state, action: PayloadAction<string[]>) => {
-			state.labels = action.payload;
-		},
-		addFilterLabel: (state, action: PayloadAction<string>) => {
-			state.filterLabels.push(action.payload);
-		},
-		removeFilterLabel: (state, action: PayloadAction<string>) => {
-			state.filterLabels = state.filterLabels.filter((label) => label !== action.payload);
-		},
-		removeAllFilterLabels: (state) => {
-			state.filterLabels = [];
-		},
 		setFieldName: (state, action: PayloadAction<string>) => {
 			state.field_name = action.payload;
 		},
@@ -136,6 +149,9 @@ const Slice = createSlice({
 		},
 		removeSelected: (state, action: PayloadAction<string>) => {
 			state.selected = state.selected.filter((id) => id !== action.payload);
+		},
+		setLabels: (state, action: PayloadAction<string[]>) => {
+			state.labels = action.payload;
 		},
 	},
 });
@@ -161,16 +177,17 @@ export const {
 	setMaxPage,
 	nextPage,
 	prevPage,
-	setLabels,
-	addFilterLabel,
-	removeFilterLabel,
 	setFieldName,
-	removeAllFilterLabels,
 	setDetailLabels,
 	setFile,
 	setCSVLabels,
 	addSelected,
 	removeSelected,
+	addDetailsLabels,
+	removeDetailsLabel,
+	addDetailsLabel,
+	addLabelInput,
+	setLabels,
 } = Slice.actions;
 
 export default Slice.reducer;
