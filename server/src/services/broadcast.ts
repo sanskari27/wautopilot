@@ -69,8 +69,8 @@ export default class BroadcastService extends WhatsappLinkService {
 				options.broadcast_type === 'scheduled'
 					? options.startDate
 					: DateUtils.getDate('YYYY-MM-DD'),
-			startTime: options.broadcast_type === 'scheduled' ? options.startTime : undefined,
-			endTime: options.broadcast_type === 'scheduled' ? options.endTime : undefined,
+			startTime: options.broadcast_type === 'scheduled' ? options.startTime : '12:01',
+			endTime: options.broadcast_type === 'scheduled' ? options.endTime : '23:59',
 			daily_count:
 				options.broadcast_type === 'scheduled'
 					? options.daily_messages_count
