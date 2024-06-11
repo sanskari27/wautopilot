@@ -101,7 +101,8 @@ export default function EditTemplate() {
 
 				dispatch(setDetails(template));
 				return {
-					title: 'Template fetched',
+					title: 'Edit Template',
+					duration: 1,
 				};
 			},
 			error: {
