@@ -143,7 +143,7 @@ export default class ConversationService extends WhatsappLinkService {
 	}
 
 	public static async updateConversationDetails(
-		msgID: string,
+		recipient: string,
 		details: Partial<{
 			meta_conversation_id: string;
 			conversationExpiry: number;
@@ -151,15 +151,9 @@ export default class ConversationService extends WhatsappLinkService {
 			profile_name: string;
 		}>
 	) {
-		const msgDoc = await ConversationMessageDB.findOne({
-			message_id: msgID,
-		});
-
-		if (!msgDoc) return;
-
 		await ConversationDB.updateOne(
 			{
-				recipient: msgDoc.recipient,
+				recipient: recipient,
 			},
 			{
 				$set: filterUndefinedKeys(details),
