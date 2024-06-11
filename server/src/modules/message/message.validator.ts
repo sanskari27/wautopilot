@@ -34,6 +34,61 @@ export type CreateBroadcastValidationResult = {
 		  };
 };
 
+export type SendMessageValidationResult = {
+	type: 'text' | 'image' | 'video' | 'document' | 'audio' | 'location' | 'contact';
+	media_id?: string | undefined;
+	text?: string | undefined;
+	location?:
+		| {
+				name: string;
+				latitude: string;
+				longitude: string;
+				address: string;
+		  }
+		| undefined;
+	contacts: {
+		name: {
+			formatted_name: string;
+			first_name: string;
+			last_name: string;
+			middle_name: string;
+			suffix: string;
+			prefix: string;
+		};
+		addresses: {
+			type: 'HOME' | 'WORK';
+			street: string;
+			city: string;
+			state: string;
+			zip: string;
+			country: string;
+			country_code: string;
+		}[];
+		birthday: string;
+		emails: {
+			type: 'HOME' | 'WORK';
+			email: string;
+		}[];
+		org: {
+			company: string;
+			department: string;
+			title: string;
+		};
+		phones: {
+			type: 'HOME' | 'WORK';
+			phone: string;
+			wa_id: string;
+		}[];
+		urls: {
+			type: 'HOME' | 'WORK';
+			url: string;
+		}[];
+	}[];
+	context: {
+		message_id: string;
+	};
+};
+
 export async function CreateBroadcastValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
 		name: z.string(),
@@ -69,6 +124,97 @@ export async function CreateBroadcastValidator(req: Request, res: Response, next
 				type: z.enum(['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT']),
 				media_id: z.string().optional(),
 				link: z.string().optional(),
+			})
+			.optional(),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function SendMessageValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z.object({
+		type: z.enum(['text', 'image', 'video', 'document', 'audio', 'location', 'contact']),
+		text: z.string().optional(),
+		media_id: z.string().optional(),
+		location: z
+			.object({
+				latitude: z.string(),
+				longitude: z.string(),
+				name: z.string(),
+				address: z.string(),
+			})
+			.optional(),
+
+		contacts: z
+			.object({
+				name: z.object({
+					formatted_name: z.string(),
+					first_name: z.string(),
+					last_name: z.string(),
+					middle_name: z.string(),
+					suffix: z.string(),
+					prefix: z.string(),
+				}),
+				addresses: z.array(
+					z.object({
+						street: z.string(),
+						city: z.string(),
+						state: z.string(),
+						zip: z.string(),
+						country: z.string(),
+						country_code: z.string(),
+						type: z.enum(['HOME', 'WORK']),
+					})
+				),
+				birthday: z.string(),
+				emails: z.array(
+					z.object({
+						email: z.string(),
+						type: z.enum(['WORK', 'HOME']),
+					})
+				),
+				org: z.object({
+					company: z.string(),
+					department: z.string(),
+					title: z.string(),
+				}),
+				phones: z.array(
+					z.object({
+						phone: z.string(),
+						wa_id: z.string(),
+						type: z.enum(['HOME', 'WORK']),
+					})
+				),
+				urls: z.array(
+					z.object({
+						url: z.string(),
+						type: z.enum(['HOME', 'WORK']),
+					})
+				),
+			})
+			.array()
+			.optional(),
+		context: z
+			.object({
+				message_id: z.string(),
 			})
 			.optional(),
 	});

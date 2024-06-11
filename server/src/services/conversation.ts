@@ -87,11 +87,22 @@ export default class ConversationService extends WhatsappLinkService {
 		);
 	}
 
-	public findConversation(recipient: string) {
-		return ConversationDB.find({
+	public async findConversation(recipient: string) {
+		const doc = await ConversationDB.findOne({
 			linked_to: this.userId,
 			recipient,
 		});
+		if (!doc) return null;
+		return processConversationDocs([doc])[0];
+	}
+
+	public async findConversationByID(id: Types.ObjectId) {
+		const doc = await ConversationDB.findOne({
+			linked_to: this.userId,
+			_id: id,
+		});
+		if (!doc) return null;
+		return processConversationDocs([doc])[0];
 	}
 
 	public async addMessageToConversation(
@@ -107,7 +118,7 @@ export default class ConversationService extends WhatsappLinkService {
 			received_at?: Date;
 			status?: MESSAGE_STATUS;
 			context?: {
-				from: string;
+				from?: string;
 				id: string;
 			};
 		}
@@ -182,6 +193,22 @@ export default class ConversationService extends WhatsappLinkService {
 			},
 			{
 				$set: filterUndefinedKeys(details),
+			}
+		);
+	}
+
+	public async markMessageRead(message_id: string) {
+		await ConversationMessageDB.updateOne(
+			{
+				linked_to: this.userId,
+				device_id: this.whatsappLink._id,
+				message_id,
+			},
+			{
+				$set: {
+					read_at: new Date(),
+					status: MESSAGE_STATUS.READ,
+				},
 			}
 		);
 	}
