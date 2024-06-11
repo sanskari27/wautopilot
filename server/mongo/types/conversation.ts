@@ -14,5 +14,6 @@ export default interface IConversation extends Document {
 	expiration_timestamp: Date;
 	origin: string;
 
+	last_message_at: Date;
 	createdAt: Date;
 }

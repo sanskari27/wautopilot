@@ -10,15 +10,35 @@ import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import WhatsappLinkService from './whatsappLink';
 
 function processConversationDocs(docs: IConversation[]) {
-	return docs.map((doc) => {
-		return {
-			_id: doc._id,
-			recipient: doc.recipient,
-			profile_name: doc.profile_name,
-			expiration_timestamp: doc.expiration_timestamp,
-			origin: doc.origin,
-		};
-	});
+	return docs.map((doc) => ({
+		_id: doc._id,
+		recipient: doc.recipient,
+		profile_name: doc.profile_name ?? '',
+		expiration_timestamp: doc.expiration_timestamp,
+		origin: doc.origin ?? '',
+	}));
+}
+
+function processConversationMessages(docs: IConversationMessage[]) {
+	return docs.map((doc) => ({
+		_id: doc._id,
+		recipient: doc.recipient,
+		message_id: doc.message_id,
+		header_type: doc.header_type,
+		header_content_source: doc.header_content_source,
+		header_content: doc.header_content,
+		body: doc.body,
+		footer_content: doc.footer_content,
+		buttons: doc.buttons,
+		received_at: doc.received_at,
+		delivered_at: doc.delivered_at,
+		read_at: doc.read_at,
+		sent_at: doc.sent_at,
+		failed_at: doc.failed_at,
+		failed_reason: doc.failed_reason,
+		seen_at: doc.seen_at,
+		status: doc.status,
+	}));
 }
 
 export default class ConversationService extends WhatsappLinkService {
@@ -85,6 +105,10 @@ export default class ConversationService extends WhatsappLinkService {
 			buttons?: IConversationMessage['buttons'];
 			received_at?: Date;
 			status?: MESSAGE_STATUS;
+			context?: {
+				from: string;
+				id: string;
+			};
 		}
 	) {
 		try {
@@ -168,5 +192,15 @@ export default class ConversationService extends WhatsappLinkService {
 		}).sort({ last_message_at: -1 });
 
 		return processConversationDocs(docs);
+	}
+
+	public async fetchConversationMessages(conversation_id: Types.ObjectId) {
+		const docs = await ConversationMessageDB.find({
+			linked_to: this.userId,
+			device_id: this.whatsappLink._id,
+			conversation_id,
+		}).sort({ createdAt: -1 });
+
+		return processConversationMessages(docs);
 	}
 }

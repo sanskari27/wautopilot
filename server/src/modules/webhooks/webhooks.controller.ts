@@ -80,6 +80,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				},
 				received_at: timestamp,
 				status: MESSAGE_STATUS.DELIVERED,
+				context: message.context,
 			});
 		} else if (
 			message.type === 'image' ||
@@ -97,6 +98,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				},
 				received_at: timestamp,
 				status: MESSAGE_STATUS.DELIVERED,
+				context: message.context,
 			});
 		} else if (message.contacts && message.contacts.length > 0) {
 			conversationService.addMessageToConversation(conversation_id, {
@@ -108,6 +110,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				},
 				received_at: timestamp,
 				status: MESSAGE_STATUS.DELIVERED,
+				context: message.context,
 			});
 		} else if (message.type === 'button') {
 			conversationService.addMessageToConversation(conversation_id, {
@@ -119,6 +122,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				},
 				received_at: timestamp,
 				status: MESSAGE_STATUS.DELIVERED,
+				context: message.context,
 			});
 		} else if (message.location) {
 			conversationService.addMessageToConversation(conversation_id, {
@@ -130,6 +134,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				},
 				received_at: timestamp,
 				status: MESSAGE_STATUS.DELIVERED,
+				context: message.context,
 			});
 		} else {
 			conversationService.addMessageToConversation(conversation_id, {
@@ -140,6 +145,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				},
 				received_at: timestamp,
 				status: MESSAGE_STATUS.DELIVERED,
+				context: message.context,
 			});
 		}
 	}

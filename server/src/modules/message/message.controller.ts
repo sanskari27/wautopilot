@@ -148,21 +148,35 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 }
 
 async function fetchConversations(req: Request, res: Response, next: NextFunction) {
-	const { account } = req.locals;
+	const { account, device } = req.locals;
 
-	const conversationService = new ConversationService(account, req.locals.device);
+	const conversationService = new ConversationService(account, device);
 	const conversations = await conversationService.fetchConversations();
 
 	return Respond({
 		res,
 		status: 200,
-		data: conversations,
+		data: { conversations },
+	});
+}
+
+async function fetchConversationMessages(req: Request, res: Response, next: NextFunction) {
+	const { account, id, device } = req.locals;
+
+	const conversationService = new ConversationService(account, device);
+	const messages = await conversationService.fetchConversationMessages(id);
+
+	return Respond({
+		res,
+		status: 200,
+		data: { messages },
 	});
 }
 
 const Controller = {
 	sendTemplateMessage,
 	fetchConversations,
+	fetchConversationMessages,
 };
 
 export default Controller;

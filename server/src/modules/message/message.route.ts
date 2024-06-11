@@ -1,4 +1,5 @@
 import express from 'express';
+import { IDValidator } from '../../middleware';
 import Controller from './message.controller';
 import { CreateBroadcastValidator } from './message.validator';
 
@@ -6,6 +7,10 @@ const router = express.Router();
 
 router.route('/send-broadcast').all(CreateBroadcastValidator).post(Controller.sendTemplateMessage);
 router.route('/conversations').get(Controller.fetchConversations);
+router
+	.route('/conversations/:id/messages')
+	.all(IDValidator)
+	.get(Controller.fetchConversationMessages);
 
 // router
 // 	.route('/:id/schedule-template')

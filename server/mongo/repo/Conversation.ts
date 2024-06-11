@@ -33,6 +33,7 @@ const schema = new mongoose.Schema<IConversation>(
 		],
 		expiration_timestamp: Date,
 		origin: String,
+		last_message_at: Date,
 	},
 	{
 		timestamps: { createdAt: true },

@@ -105,9 +105,34 @@ async function uploadMetaMedia(req: Request, res: Response, next: NextFunction) 
 	}
 }
 
+async function fetchMetaMediaUrl(req: Request, res: Response, next: NextFunction) {
+	const media_id = req.params.id;
+	try {
+		const { data } = await MetaAPI.get(`/${media_id}`, {
+			headers: {
+				Authorization: `Bearer ${req.locals.device.accessToken}`,
+			},
+		});
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				url: data.url,
+				size: data.file_size,
+				mime_type: data.mime_type,
+			},
+		});
+	} catch (e) {
+		console.log((e as any).response.data);
+
+		next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 const Controller = {
 	uploadMetaHandle,
 	uploadMetaMedia,
+	fetchMetaMediaUrl,
 };
 
 export default Controller;
