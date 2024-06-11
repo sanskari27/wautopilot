@@ -49,10 +49,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		// const origin = status.conversation.origin.type;
 		BroadcastService.updateStatus(msgID, status.status, status.timestamp, error);
 		ConversationService.updateStatus(msgID, status.status, status.timestamp, error);
-		console.log({
-			msgID,
-			status,
-		});
+
 		if (status.conversation) {
 			ConversationService.updateConversationDetails(msgID, {
 				meta_conversation_id: status.conversation.id,
