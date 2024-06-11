@@ -52,6 +52,7 @@ const schema = new mongoose.Schema<IConversationMessage>(
 			body_type: String,
 			text: String,
 			media_id: String,
+			media_url: String,
 			caption: String,
 			contacts: [
 				{
