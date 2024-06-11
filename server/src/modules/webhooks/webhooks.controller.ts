@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { AccountDB, WhatsappLinkDB } from '../../../mongo';
-import { META_VERIFY_STRING, META_VERIFY_USER_STRING } from '../../config/const';
+import { MESSAGE_STATUS, META_VERIFY_STRING, META_VERIFY_USER_STRING } from '../../config/const';
 import BroadcastService from '../../services/broadcast';
 import ConversationService from '../../services/conversation';
 import DateUtils from '../../utils/DateUtils';
@@ -61,6 +61,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		const timestamp = DateUtils.fromUnixTime(message.timestamp).toDate();
 
 		const conversation_id = await conversationService.createConversation(recipient);
+		console.log(message);
 
 		if (message.type === 'text') {
 			conversationService.addMessageToConversation(conversation_id, {
@@ -71,6 +72,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 					text: message.text.body,
 				},
 				received_at: timestamp,
+				status: MESSAGE_STATUS.DELIVERED,
 			});
 		} else if (message.type === 'image') {
 			conversationService.addMessageToConversation(conversation_id, {
@@ -82,6 +84,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 					caption: message.image.caption,
 				},
 				received_at: timestamp,
+				status: MESSAGE_STATUS.DELIVERED,
 			});
 		} else if (message.contacts && message.contacts.length > 0) {
 			conversationService.addMessageToConversation(conversation_id, {
@@ -92,6 +95,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 					contacts: message.contacts,
 				},
 				received_at: timestamp,
+				status: MESSAGE_STATUS.DELIVERED,
 			});
 		} else if (message.location) {
 			conversationService.addMessageToConversation(conversation_id, {
@@ -102,6 +106,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 					location: message.location,
 				},
 				received_at: timestamp,
+				status: MESSAGE_STATUS.DELIVERED,
 			});
 		} else {
 			conversationService.addMessageToConversation(conversation_id, {
@@ -111,6 +116,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 					body_type: 'UNKNOWN',
 				},
 				received_at: timestamp,
+				status: MESSAGE_STATUS.DELIVERED,
 			});
 		}
 	}

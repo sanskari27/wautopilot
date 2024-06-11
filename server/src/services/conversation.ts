@@ -71,26 +71,29 @@ export default class ConversationService extends WhatsappLinkService {
 			footer_content?: string;
 			buttons?: IConversationMessage['buttons'];
 			received_at?: Date;
+			status?: MESSAGE_STATUS;
 		}
 	) {
-		const doc = await ConversationMessageDB.create({
-			linked_to: this.userId,
-			device_id: this.whatsappLink._id,
-			conversation_id,
-			status: MESSAGE_STATUS.PROCESSING,
-			...details,
-		});
+		try {
+			const doc = await ConversationMessageDB.create({
+				linked_to: this.userId,
+				device_id: this.whatsappLink._id,
+				conversation_id,
+				status: details.status ?? MESSAGE_STATUS.PROCESSING,
+				...filterUndefinedKeys(details),
+			});
 
-		await ConversationDB.updateOne(
-			{
-				_id: conversation_id,
-			},
-			{
-				$push: {
-					messages: doc._id,
+			await ConversationDB.updateOne(
+				{
+					_id: conversation_id,
 				},
-			}
-		);
+				{
+					$push: {
+						messages: doc._id,
+					},
+				}
+			);
+		} catch (err) {}
 	}
 
 	public static async updateStatus(

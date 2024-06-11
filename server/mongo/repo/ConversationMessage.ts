@@ -107,6 +107,8 @@ const schema = new mongoose.Schema<IConversationMessage>(
 	}
 );
 
+schema.index({ conversation_id: 1 }, { unique: true });
+
 const ConversationMessageDB = mongoose.model<IConversationMessage>(
 	ConversationMessageDB_name,
 	schema
