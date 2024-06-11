@@ -38,6 +38,7 @@ function processConversationMessages(docs: IConversationMessage[]) {
 		failed_reason: doc.failed_reason,
 		seen_at: doc.seen_at,
 		status: doc.status,
+		context: doc.context,
 	}));
 }
 
