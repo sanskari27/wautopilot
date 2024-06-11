@@ -67,7 +67,6 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		const timestamp = DateUtils.fromUnixTime(message.timestamp).toDate();
 
 		const conversation_id = await conversationService.createConversation(recipient);
-		console.log(message);
 
 		if (message.type === 'text') {
 			conversationService.addMessageToConversation(conversation_id, {
