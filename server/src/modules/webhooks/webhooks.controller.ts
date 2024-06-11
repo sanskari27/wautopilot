@@ -49,11 +49,13 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		// const origin = status.conversation.origin.type;
 		BroadcastService.updateStatus(msgID, status.status, status.timestamp, error);
 		ConversationService.updateStatus(msgID, status.status, status.timestamp, error);
-		ConversationService.updateConversationDetails(msgID, {
-			meta_conversation_id: status.conversation.id,
-			conversationExpiry: status.conversation.expiration_timestamp,
-			origin: status.conversation.origin.type,
-		});
+		if (status.conversation) {
+			ConversationService.updateConversationDetails(msgID, {
+				meta_conversation_id: status.conversation.id,
+				conversationExpiry: status.conversation.expiration_timestamp,
+				origin: status.conversation.origin.type,
+			});
+		}
 	} else {
 		const message = data.messages[0];
 		const msgID = message.id;
