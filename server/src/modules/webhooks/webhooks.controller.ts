@@ -80,7 +80,12 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				received_at: timestamp,
 				status: MESSAGE_STATUS.DELIVERED,
 			});
-		} else if (message.type === 'image') {
+		} else if (
+			message.type === 'image' ||
+			message.type === 'video' ||
+			message.type === 'document' ||
+			message.type === 'audio'
+		) {
 			conversationService.addMessageToConversation(conversation_id, {
 				message_id: msgID,
 				recipient,
