@@ -79,6 +79,10 @@ export default interface IConversationMessage extends Document {
 		button_content: string;
 		button_data: string;
 	};
+	context: {
+		from: string;
+		id: string;
+	};
 
 	createdAt: Date;
 	sendAt: Date;

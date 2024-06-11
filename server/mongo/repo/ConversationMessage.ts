@@ -47,6 +47,7 @@ const schema = new mongoose.Schema<IConversationMessage>(
 		seen_at: Date,
 
 		header_type: String,
+		header_content_source: String,
 		header_content: String,
 		body: {
 			body_type: String,
@@ -105,6 +106,10 @@ const schema = new mongoose.Schema<IConversationMessage>(
 				button_data: String,
 			},
 		],
+		context: {
+			from: String,
+			id: String,
+		},
 	},
 	{
 		timestamps: { createdAt: true },
