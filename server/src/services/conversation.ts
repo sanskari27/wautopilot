@@ -5,6 +5,7 @@ import IConversationMessage from '../../mongo/types/conversationmessage';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import { MESSAGE_STATUS } from '../config/const';
 import DateUtils from '../utils/DateUtils';
+import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import WhatsappLinkService from './whatsappLink';
 
 export default class ConversationService extends WhatsappLinkService {
@@ -69,6 +70,7 @@ export default class ConversationService extends WhatsappLinkService {
 			body?: Partial<IConversationMessage['body']>;
 			footer_content?: string;
 			buttons?: IConversationMessage['buttons'];
+			received_at?: Date;
 		}
 	) {
 		const doc = await ConversationMessageDB.create({
@@ -118,6 +120,31 @@ export default class ConversationService extends WhatsappLinkService {
 				message_id: msgID,
 			},
 			details
+		);
+	}
+
+	public static async updateConversationDetails(
+		msgID: string,
+		details: Partial<{
+			meta_conversation_id: string;
+			conversationExpiry: number;
+			origin: string;
+			profile_name: string;
+		}>
+	) {
+		const msgDoc = await ConversationMessageDB.findOne({
+			message_id: msgID,
+		});
+
+		if (!msgDoc) return;
+
+		await ConversationDB.updateOne(
+			{
+				recipient: msgDoc.recipient,
+			},
+			{
+				$set: filterUndefinedKeys(details),
+			}
 		);
 	}
 }

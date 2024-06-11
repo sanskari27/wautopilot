@@ -3,6 +3,7 @@ import { AccountDB, WhatsappLinkDB } from '../../../mongo';
 import { META_VERIFY_STRING, META_VERIFY_USER_STRING } from '../../config/const';
 import BroadcastService from '../../services/broadcast';
 import ConversationService from '../../services/conversation';
+import DateUtils from '../../utils/DateUtils';
 export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
 export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
@@ -36,7 +37,6 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		return res.status(400);
 	}
 	const conversationService = new ConversationService(user, link);
-	console.log('MESSAGE TO', conversationService.userId);
 
 	if (data.statuses) {
 		//Handle outgoing messages status
@@ -49,8 +49,70 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		// const origin = status.conversation.origin.type;
 		BroadcastService.updateStatus(msgID, status.status, status.timestamp, error);
 		ConversationService.updateStatus(msgID, status.status, status.timestamp, error);
+		ConversationService.updateConversationDetails(msgID, {
+			meta_conversation_id: status.conversation.id,
+			conversationExpiry: status.conversation.expiration_timestamp,
+			origin: status.conversation.origin.type,
+		});
 	} else {
-		// const recipient_id = data.contacts[0].recipient_id;
+		const message = data.messages[0];
+		const msgID = message.id;
+		const recipient = message.from;
+		const timestamp = DateUtils.fromUnixTime(message.timestamp).toDate();
+
+		const conversation_id = await conversationService.createConversation(recipient);
+
+		if (message.type === 'text') {
+			conversationService.addMessageToConversation(conversation_id, {
+				message_id: msgID,
+				recipient,
+				body: {
+					body_type: 'TEXT',
+					text: message.text.body,
+				},
+				received_at: timestamp,
+			});
+		} else if (message.type === 'image') {
+			conversationService.addMessageToConversation(conversation_id, {
+				message_id: msgID,
+				recipient,
+				body: {
+					body_type: 'MEDIA',
+					media_id: message.image.id,
+					caption: message.image.caption,
+				},
+				received_at: timestamp,
+			});
+		} else if (message.contacts && message.contacts.length > 0) {
+			conversationService.addMessageToConversation(conversation_id, {
+				message_id: msgID,
+				recipient,
+				body: {
+					body_type: 'CONTACT',
+					contacts: message.contacts,
+				},
+				received_at: timestamp,
+			});
+		} else if (message.location) {
+			conversationService.addMessageToConversation(conversation_id, {
+				message_id: msgID,
+				recipient,
+				body: {
+					body_type: 'LOCATION',
+					location: message.location,
+				},
+				received_at: timestamp,
+			});
+		} else {
+			conversationService.addMessageToConversation(conversation_id, {
+				message_id: msgID,
+				recipient,
+				body: {
+					body_type: 'UNKNOWN',
+				},
+				received_at: timestamp,
+			});
+		}
 	}
 
 	return res.status(200);

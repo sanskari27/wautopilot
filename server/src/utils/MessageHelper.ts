@@ -29,7 +29,7 @@ export function extractBody(
 	}[];
 
 	return parameters.reduce((acc, parameter, index) => {
-		return acc.replace(`{{${index}}}`, parameter.text);
+		return acc.replace(`{{${index + 1}}}`, parameter.text);
 	}, (body.text as string) ?? '');
 }
 

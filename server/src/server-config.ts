@@ -125,7 +125,7 @@ export default function (app: Express) {
 		});
 		next();
 	});
-	cron.schedule('*/2 * * * *', () => {
+	cron.schedule('*/5 * * * * *', () => {
 		BroadcastService.sendScheduledBroadcastMessage();
 	});
 	createDir();

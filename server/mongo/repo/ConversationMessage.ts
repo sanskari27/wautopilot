@@ -40,6 +40,8 @@ const schema = new mongoose.Schema<IConversationMessage>(
 		sent_at: Date,
 		failed_at: Date,
 		failed_reason: String,
+		received_at: Date,
+		seen_at: Date,
 
 		header_type: String,
 		header_content: String,
@@ -85,8 +87,8 @@ const schema = new mongoose.Schema<IConversationMessage>(
 				},
 			],
 			location: {
-				latitude: Number,
-				longitude: Number,
+				latitude: String,
+				longitude: String,
 				name: String,
 				address: String,
 			},

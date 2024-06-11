@@ -17,6 +17,8 @@ export default interface IConversationMessage extends Document {
 	sent_at: Date;
 	failed_at: Date;
 	failed_reason: string;
+	received_at: Date;
+	seen_at: Date;
 
 	header_type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT';
 	header_content_source: 'LINK' | 'MEDIA_ID' | 'TEXT';
@@ -65,8 +67,8 @@ export default interface IConversationMessage extends Document {
 			}[];
 		}[];
 		location: {
-			latitude: number;
-			longitude: number;
+			latitude: string;
+			longitude: string;
 			name: string;
 			address: string;
 		};
