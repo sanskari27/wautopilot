@@ -62,6 +62,11 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		const msgID = message.id;
 		const recipient = message.from;
 		const timestamp = DateUtils.fromUnixTime(message.timestamp).toDate();
+		if (data.contacts && data.contacts.length > 0) {
+			ConversationService.updateConversationDetails(msgID, {
+				profile_name: data.contacts[0].profile.name,
+			});
+		}
 
 		const conversation_id = await conversationService.createConversation(recipient);
 
@@ -100,6 +105,17 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				body: {
 					body_type: 'CONTACT',
 					contacts: message.contacts,
+				},
+				received_at: timestamp,
+				status: MESSAGE_STATUS.DELIVERED,
+			});
+		} else if (message.type === 'button') {
+			conversationService.addMessageToConversation(conversation_id, {
+				message_id: msgID,
+				recipient,
+				body: {
+					body_type: 'TEXT',
+					text: message.button.text,
 				},
 				received_at: timestamp,
 				status: MESSAGE_STATUS.DELIVERED,

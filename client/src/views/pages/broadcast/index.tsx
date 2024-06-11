@@ -16,6 +16,7 @@ import { BiSend } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import APIInstance from '../../../config/APIInstance';
 import TemplateService from '../../../services/template.service';
+import UploadService from '../../../services/upload.service';
 import { StoreNames, StoreState } from '../../../store';
 import {
 	reset,
@@ -44,8 +45,18 @@ export default function Broadcast() {
 	const dispatch = useDispatch();
 	const toast = useToast();
 
-	const { body, broadcast_options, description, name, recipients_from, template_id, to, labels } =
-		useSelector((state: StoreState) => state[StoreNames.BROADCAST]);
+	const {
+		body,
+		broadcast_options,
+		description,
+		name,
+		recipients_from,
+		template_id,
+		to,
+		labels,
+		header_file,
+		header_link,
+	} = useSelector((state: StoreState) => state[StoreNames.BROADCAST]);
 	const { list: templateList } = useSelector((state: StoreState) => state[StoreNames.TEMPLATES]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
@@ -54,6 +65,10 @@ export default function Broadcast() {
 			dispatch(setTemplatesList(res));
 		});
 	}, [dispatch, selected_device_id]);
+
+	useEffect(() => {
+		dispatch(reset());
+	}, [dispatch]);
 
 	useEffect(() => {
 		const template = templateList.find((t) => t.id === template_id);
@@ -67,8 +82,9 @@ export default function Broadcast() {
 	const templateListFiltered = templateList.filter((t) => t.status === 'APPROVED');
 	const selectedTemplate = templateListFiltered.find((t) => t.id === template_id);
 
-	function onSend() {
+	function sendBroadcast(header_media: { link?: string; media_id?: string } = {}) {
 		const template = templateListFiltered.find((t) => t.id === template_id)!;
+		const header = template.components.find((c) => c.type === 'HEADER');
 		const promise = APIInstance.post(`/message/${selected_device_id}/send-broadcast`, {
 			name: name,
 			description: description,
@@ -78,6 +94,15 @@ export default function Broadcast() {
 			labels: recipients_from === 'phonebook' ? labels : [],
 			broadcast_options,
 			body,
+			...(header
+				? {
+						header: {
+							media_id: header_media.media_id,
+							link: header_media.link,
+							type: header.format,
+						},
+				  }
+				: {}),
 		});
 
 		toast.promise(promise, {
@@ -96,6 +121,29 @@ export default function Broadcast() {
 				title: 'Sending Broadcast...',
 			},
 		});
+	}
+
+	function onSend() {
+		if (header_file) {
+			toast.promise(UploadService.generateMetaMediaID(selected_device_id, header_file), {
+				success: (media_id) => {
+					sendBroadcast({ media_id });
+					return {
+						title: 'File uploaded',
+					};
+				},
+				error: {
+					title: 'Failed to upload file',
+				},
+				loading: {
+					title: 'Uploading file',
+				},
+			});
+		} else if (header_link) {
+			sendBroadcast({ link: header_link });
+		} else {
+			sendBroadcast();
+		}
 	}
 
 	return (

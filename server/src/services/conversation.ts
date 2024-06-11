@@ -1,12 +1,25 @@
 import { Types } from 'mongoose';
 import { ConversationDB, ConversationMessageDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
+import IConversation from '../../mongo/types/conversation';
 import IConversationMessage from '../../mongo/types/conversationmessage';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import { MESSAGE_STATUS } from '../config/const';
 import DateUtils from '../utils/DateUtils';
 import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import WhatsappLinkService from './whatsappLink';
+
+function processConversationDocs(docs: IConversation[]) {
+	return docs.map((doc) => {
+		return {
+			_id: doc._id,
+			recipient: doc.recipient,
+			profile_name: doc.profile_name,
+			expiration_timestamp: doc.expiration_timestamp,
+			origin: doc.origin,
+		};
+	});
+}
 
 export default class ConversationService extends WhatsappLinkService {
 	private whatsappLink: IWhatsappLink;
@@ -91,6 +104,9 @@ export default class ConversationService extends WhatsappLinkService {
 					$push: {
 						messages: doc._id,
 					},
+					$set: {
+						last_message_at: details.received_at,
+					},
 				}
 			);
 		} catch (err) {}
@@ -149,5 +165,14 @@ export default class ConversationService extends WhatsappLinkService {
 				$set: filterUndefinedKeys(details),
 			}
 		);
+	}
+
+	public async fetchConversations() {
+		const docs = await ConversationDB.find({
+			linked_to: this.userId,
+			device_id: this.whatsappLink._id,
+		}).sort({ last_message_at: -1 });
+
+		return processConversationDocs(docs);
 	}
 }

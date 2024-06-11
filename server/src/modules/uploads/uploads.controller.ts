@@ -6,10 +6,11 @@ import MetaAPI from '../../config/MetaAPI';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import { Respond } from '../../utils/ExpressUtils';
+import FileUtils from '../../utils/FileUtils';
 export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
 export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
-async function upload(req: Request, res: Response, next: NextFunction) {
+async function uploadMetaHandle(req: Request, res: Response, next: NextFunction) {
 	let uploadedFile: ResolvedFile | null = null;
 	try {
 		uploadedFile = await FileUpload.SingleFileUpload(req, res, {
@@ -37,6 +38,7 @@ async function upload(req: Request, res: Response, next: NextFunction) {
 		);
 		id = data.id;
 	} catch (e) {
+		FileUtils.deleteFile(uploadedFile.path);
 		next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR, e));
 	}
 
@@ -61,12 +63,51 @@ async function upload(req: Request, res: Response, next: NextFunction) {
 			},
 		});
 	} catch (e) {
+		FileUtils.deleteFile(uploadedFile.path);
 		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR, e));
 	}
 }
 
+async function uploadMetaMedia(req: Request, res: Response, next: NextFunction) {
+	let uploadedFile: ResolvedFile | null = null;
+	try {
+		uploadedFile = await FileUpload.SingleFileUpload(req, res, {
+			field_name: 'file',
+			options: {},
+		});
+	} catch (e) {
+		return next(new CustomError(COMMON_ERRORS.FILE_UPLOAD_ERROR));
+	}
+
+	try {
+		const form = new FormData();
+		form.append('messaging_product', 'whatsapp');
+		form.append('file', fs.createReadStream(uploadedFile.path));
+
+		const { data } = await MetaAPI.post(`/${req.locals.device.phoneNumberId}/media`, form, {
+			headers: {
+				Authorization: `Bearer ${req.locals.device.accessToken}`,
+				'Content-Type': 'multipart/form-data',
+			},
+		});
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				media_id: data.id,
+			},
+		});
+	} catch (e) {
+		console.log((e as any).response.data);
+
+		FileUtils.deleteFile(uploadedFile.path);
+		next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR, e));
+	}
+}
+
 const Controller = {
-	upload,
+	uploadMetaHandle,
+	uploadMetaMedia,
 };
 
 export default Controller;

@@ -21,4 +21,7 @@ export type BroadcastState = {
 		variable_from: 'custom_text' | 'phonebook_data';
 		fallback_value: string;
 	}[];
+
+	header_file: File | null;
+	header_link: string;
 };

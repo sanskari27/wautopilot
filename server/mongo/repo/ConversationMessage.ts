@@ -105,6 +105,7 @@ const schema = new mongoose.Schema<IConversationMessage>(
 				button_data: String,
 			},
 		],
+		last_message_at: Date,
 	},
 	{
 		timestamps: { createdAt: true },

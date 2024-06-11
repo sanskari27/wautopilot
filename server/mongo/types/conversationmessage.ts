@@ -82,4 +82,5 @@ export default interface IConversationMessage extends Document {
 
 	createdAt: Date;
 	sendAt: Date;
+	last_message_at: Date;
 }

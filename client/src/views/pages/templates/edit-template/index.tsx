@@ -170,7 +170,7 @@ export default function EditTemplate() {
 	const onSave = async () => {
 		dispatch(setSaving(true));
 		if (file) {
-			toast.promise(UploadService.uploadFile(selected_device_id, file), {
+			toast.promise(UploadService.generateMetaHandle(selected_device_id, file), {
 				success: (handle) => {
 					saveTemplate(handle);
 					return {

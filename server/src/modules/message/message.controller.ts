@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import BroadcastService from '../../services/broadcast';
+import ConversationService from '../../services/conversation';
 import PhoneBookService from '../../services/phonebook';
 import { Respond } from '../../utils/ExpressUtils';
 import { CreateBroadcastValidationResult } from './message.validator';
@@ -58,35 +59,19 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 			let headers = [] as Record<string, unknown>[];
 
 			if (header) {
+				const object = {
+					...(header.media_id ? { id: header.media_id } : header.link ? { link: header.link } : {}),
+				};
+
 				headers = [
 					{
-						type: header.type,
+						type: 'HEADER',
 						parameters:
-							header.type === 'IMAGE'
+							header.type !== 'TEXT'
 								? [
 										{
-											type: 'image',
-											image: {
-												link: header.link,
-											},
-										},
-								  ]
-								: header.type === 'VIDEO'
-								? [
-										{
-											type: 'video',
-											video: {
-												link: header.link,
-											},
-										},
-								  ]
-								: header.type === 'DOCUMENT'
-								? [
-										{
-											type: 'document',
-											document: {
-												link: header.link,
-											},
+											type: header.type,
+											[header.type.toLowerCase()]: object,
 										},
 								  ]
 								: [],
@@ -162,8 +147,22 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 	}
 }
 
+async function fetchConversations(req: Request, res: Response, next: NextFunction) {
+	const { account } = req.locals;
+
+	const conversationService = new ConversationService(account, req.locals.device);
+	const conversations = await conversationService.fetchConversations();
+
+	return Respond({
+		res,
+		status: 200,
+		data: conversations,
+	});
+}
+
 const Controller = {
 	sendTemplateMessage,
+	fetchConversations,
 };
 
 export default Controller;

@@ -20,6 +20,8 @@ const initialState: BroadcastState = {
 	},
 
 	body: [],
+	header_file: null,
+	header_link: '',
 };
 
 const Slice = createSlice({
@@ -34,6 +36,16 @@ const Slice = createSlice({
 			state.recipients_from = initialState.recipients_from;
 			state.broadcast_options = initialState.broadcast_options;
 			state.body = initialState.body;
+			state.header_file = initialState.header_file;
+			state.header_link = initialState.header_link;
+		},
+		setHeaderFile: (state, action: PayloadAction<File | null>) => {
+			state.header_file = action.payload;
+			state.header_link = '';
+		},
+		setHeaderLink: (state, action: PayloadAction<string>) => {
+			state.header_link = action.payload;
+			state.header_file = null;
 		},
 		setName: (state, action: PayloadAction<string>) => {
 			state.name = action.payload;
@@ -111,6 +123,8 @@ export const {
 	setTemplateId,
 	setTo,
 	setLabels,
+	setHeaderFile,
+	setHeaderLink,
 } = Slice.actions;
 
 export default Slice.reducer;

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+	AbsoluteCenter,
 	Box,
+	Divider,
 	Flex,
 	Input,
 	InputGroup,
@@ -11,7 +13,11 @@ import {
 } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
-import { setBodyParameter } from '../../../../store/reducers/BroadcastReducer';
+import {
+	setBodyParameter,
+	setHeaderFile,
+	setHeaderLink,
+} from '../../../../store/reducers/BroadcastReducer';
 import SampleMessage from '../../../components/sampleMessage';
 import Each from '../../../components/utils/Each';
 
@@ -47,11 +53,28 @@ export default function ComponentParameters({ components }: Props) {
 					Template details
 				</Text>
 				<Box hidden={!header || header.format === 'TEXT'} mt={'1rem'}>
-					<Text>Template Header Media</Text>
-					<Input placeholder='Link ' />
+					<Text>Header media link</Text>
+					<Input
+						placeholder='Media file link'
+						type='url'
+						onChange={(e) => dispatch(setHeaderLink(e.target.value))}
+					/>
+					<Box position='relative' my={'1rem'}>
+						<Divider />
+						<AbsoluteCenter p='4' color='gray.600' bg={'white'}>
+							or
+						</AbsoluteCenter>
+					</Box>
+					<Box marginTop={'0.5rem'}>
+						<Text mb={'0.5rem'}>Upload header media</Text>
+						<Input
+							type='file'
+							onChange={(e) => dispatch(setHeaderFile(e.target.files?.[0] ?? null))}
+						/>
+					</Box>
 				</Box>
 				<Box gap={3} mt={'1rem'} hidden={body.length === 0}>
-					<Text>Template Body Details</Text>
+					<Text>Template body details</Text>
 					<Each
 						items={body}
 						render={(parameter, index) => (

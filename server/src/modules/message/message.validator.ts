@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { Types } from 'mongoose';
 import { z } from 'zod';
 import { CustomError } from '../../errors';
 
@@ -12,8 +11,8 @@ export type CreateBroadcastValidationResult = {
 	labels: string[];
 	header?: {
 		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+		media_id?: string;
 		link?: string;
-		fileID?: Types.ObjectId;
 	};
 	body: {
 		custom_text: string;
@@ -68,12 +67,8 @@ export async function CreateBroadcastValidator(req: Request, res: Response, next
 		header: z
 			.object({
 				type: z.enum(['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT']),
+				media_id: z.string().optional(),
 				link: z.string().optional(),
-				fileID: z
-					.string()
-					.refine((value) => !Types.ObjectId.isValid(value))
-					.transform((value) => new Types.ObjectId(value))
-					.optional(),
 			})
 			.optional(),
 	});

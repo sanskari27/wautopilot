@@ -20,7 +20,9 @@ const AppPage = () => {
 		<Box width={'full'}>
 			<AppNavbar expanded={expanded} setDrawerExpanded={setDrawerExpanded} />
 			<NavigationDrawer expanded={expanded} />
-			<Box className='ml-0 md:ml-[70px]'>{outlet}</Box>
+			<Box className='ml-0 md:ml-[70px] overflow-scroll' maxHeight={'calc(100vh - 70px)'}>
+				{outlet}
+			</Box>
 		</Box>
 	);
 };
