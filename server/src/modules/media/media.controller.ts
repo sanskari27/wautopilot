@@ -6,11 +6,11 @@ import MetaAPI from '../../config/MetaAPI';
 import { Path } from '../../config/const';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
-import AttachmentService from '../../services/attachments';
+import MediaService from '../../services/media';
 import { Respond, RespondFile } from '../../utils/ExpressUtils';
 import FileUtils from '../../utils/FileUtils';
 
-async function addAttachment(req: Request, res: Response, next: NextFunction) {
+async function addMedia(req: Request, res: Response, next: NextFunction) {
 	const { account, device } = req.locals;
 	const fileUploadOptions: SingleFileUploadOptions = {
 		field_name: 'file',
@@ -25,6 +25,8 @@ async function addAttachment(req: Request, res: Response, next: NextFunction) {
 		destination = __basedir + Path.Media + uploadedFile.filename;
 		FileUtils.moveFile(uploadedFile.path, destination);
 	} catch (err: unknown) {
+		console.log(err);
+
 		return next(new CustomError(COMMON_ERRORS.FILE_UPLOAD_ERROR));
 	}
 
@@ -33,57 +35,80 @@ async function addAttachment(req: Request, res: Response, next: NextFunction) {
 		form.append('messaging_product', 'whatsapp');
 		form.append('file', fs.createReadStream(destination));
 
-		const { data } = await MetaAPI.post(`/${device.phoneNumberId}/media`, form, {
+		const {
+			data: { id: media_id },
+		} = await MetaAPI.post(`/${device.phoneNumberId}/media`, form, {
 			headers: {
 				Authorization: `Bearer ${device.accessToken}`,
 				'Content-Type': 'multipart/form-data',
 			},
 		});
 
-		const attachment = await new AttachmentService(account, device).addAttachment({
+		const { data } = await MetaAPI.get(`/${media_id}`, {
+			headers: {
+				Authorization: `Bearer ${req.locals.device.accessToken}`,
+			},
+		});
+
+		const media = await new MediaService(account, device).addMedia({
 			filename: uploadedFile.filename,
-			media_id: data.id,
+			media_id,
 			media_url: data.url,
-			file_length: data.file_size,
+			file_length: Number(data.file_size),
 			mime_type: data.mime_type,
-			local_path: destination,
+			local_path: Path.Media + uploadedFile.filename,
 		});
 
 		return Respond({
 			res,
 			status: 200,
 			data: {
-				attachment,
+				media,
 			},
 		});
 	} catch (e) {
-		console.log((e as any).response.data);
-
 		FileUtils.deleteFile(destination);
 		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR, e));
 	}
 }
 
-async function downloadAttachment(req: Request, res: Response, next: NextFunction) {
+async function downloadMedia(req: Request, res: Response, next: NextFunction) {
 	const { account, device, id } = req.locals;
 	try {
-		const path = await new AttachmentService(account, device).getAttachmentLocalPath(id);
+		let path = await new MediaService(account, device).getMediaLocalPath(id);
+		path = __basedir + path;
+
 		return RespondFile({
 			res,
-			filename: 'attachment File',
+			filename: 'Media File',
 			filepath: path,
 		});
 	} catch (err: unknown) {
+		console.log(err);
+
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
 
-async function deleteAttachment(req: Request, res: Response, next: NextFunction) {
+async function deleteMedia(req: Request, res: Response, next: NextFunction) {
 	const { account, device, id } = req.locals;
 
 	try {
-		const attachment = await new AttachmentService(account, device).delete(id);
-		const path = __basedir + Path.Media + attachment;
+		const media = await new MediaService(account, device).getMedia(id);
+		await MetaAPI.delete(`/${media.media_id}/?phone_number_id=${device.phoneNumberId}`, {
+			headers: {
+				Authorization: `Bearer ${device.accessToken}`,
+			},
+		});
+	} catch (err: unknown) {
+		console.log(err as any);
+
+		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+	}
+
+	try {
+		let path = await new MediaService(account, device).delete(id);
+		path = __basedir + path;
 		FileUtils.deleteFile(path);
 		return Respond({
 			res,
@@ -95,16 +120,16 @@ async function deleteAttachment(req: Request, res: Response, next: NextFunction)
 	}
 }
 
-async function attachmentById(req: Request, res: Response, next: NextFunction) {
+async function mediaById(req: Request, res: Response, next: NextFunction) {
 	const { account, device, id } = req.locals;
 
 	try {
-		const attachment = await new AttachmentService(account, device).getAttachment(id);
+		const media = await new MediaService(account, device).getMedia(id);
 		return Respond({
 			res,
 			status: 200,
 			data: {
-				attachment,
+				media,
 			},
 		});
 	} catch (err: unknown) {
@@ -112,25 +137,25 @@ async function attachmentById(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
-async function listAttachments(req: Request, res: Response, next: NextFunction) {
+async function listMedia(req: Request, res: Response, next: NextFunction) {
 	const { account, device } = req.locals;
 
-	const attachments = await new AttachmentService(account, device).listAttachments();
+	const list = await new MediaService(account, device).listMedias();
 	return Respond({
 		res,
 		status: 200,
 		data: {
-			attachments,
+			list,
 		},
 	});
 }
 
 const Controller = {
-	addAttachment,
-	downloadAttachment,
-	deleteAttachment,
-	attachmentById,
-	listAttachments,
+	addMedia,
+	downloadMedia,
+	deleteMedia,
+	mediaById,
+	listMedia,
 };
 
 export default Controller;

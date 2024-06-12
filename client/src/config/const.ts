@@ -1,5 +1,5 @@
 import { BiConversation } from 'react-icons/bi';
-import { MdOutlineDashboard } from 'react-icons/md';
+import { MdOutlineDashboard, MdOutlinePermMedia } from 'react-icons/md';
 import { RiContactsBook2Line } from 'react-icons/ri';
 import { TbMessage2Plus, TbTemplate } from 'react-icons/tb';
 
@@ -28,6 +28,8 @@ export const NAVIGATION = {
 	TEMPLATES: 'templates',
 	ADD_TEMPLATE: 'add-template',
 	EDIT_TEMPLATE: 'edit-template',
+
+	MEDIA: 'media',
 
 	TERMS: '/terms',
 	PRIVACY: '/privacy',
@@ -60,6 +62,11 @@ export const MenuItems = [
 		icon: BiConversation,
 		route: NAVIGATION.INBOX,
 		title: 'Conversations',
+	},
+	{
+		icon: MdOutlinePermMedia,
+		route: NAVIGATION.MEDIA,
+		title: 'Media',
 	},
 ];
 

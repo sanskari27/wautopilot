@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
-import IAttachment from '../types/attachment';
+import IMedia from '../types/media';
 import { WhatsappLinkDB_name } from './WhatsappLink';
 
-export const AttachmentDB_name = 'Attachment';
+export const MediaDB_name = 'Media';
 
-const schema = new mongoose.Schema<IAttachment>({
+const schema = new mongoose.Schema<IMedia>({
 	linked_to: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: AttachmentDB_name,
+		ref: MediaDB_name,
 	},
 	device_id: {
 		type: mongoose.Schema.Types.ObjectId,
@@ -33,6 +33,6 @@ const schema = new mongoose.Schema<IAttachment>({
 	},
 });
 
-const AttachmentDB = mongoose.model<IAttachment>(AttachmentDB_name, schema);
+const MediaDB = mongoose.model<IMedia>(MediaDB_name, schema);
 
-export default AttachmentDB;
+export default MediaDB;

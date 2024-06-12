@@ -5,6 +5,7 @@ export {
 	BroadcastMessageDB,
 	ConversationDB,
 	ConversationMessageDB,
+	MediaDB,
 	PhoneBookDB,
 	SessionDB,
 	StorageDB,

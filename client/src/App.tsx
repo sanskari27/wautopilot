@@ -12,6 +12,8 @@ import AddDevice from './views/components/addDevice';
 import LoginPopup from './views/components/loginPopup';
 import Broadcast from './views/pages/broadcast';
 import Dashboard from './views/pages/dashboard';
+import MediaPage from './views/pages/media';
+import AddMedia from './views/pages/media/add-media';
 import Phonebook from './views/pages/phonebook';
 import Templates from './views/pages/templates';
 import EditTemplate from './views/pages/templates/edit-template';
@@ -58,6 +60,9 @@ function App() {
 								path={NAVIGATION.TEMPLATES + '/' + NAVIGATION.EDIT_TEMPLATE + '/:id'}
 								element={<EditTemplate />}
 							/>
+							<Route path={NAVIGATION.MEDIA} element={<MediaPage />}>
+								<Route path={'new'} element={<AddMedia />} />
+							</Route>
 							<Route path={NAVIGATION.TEMPLATES} element={<Templates />} />
 							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
 							<Route path={NAVIGATION.INBOX} element={<>sdf</>} />

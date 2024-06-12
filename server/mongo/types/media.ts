@@ -1,6 +1,6 @@
 import { Document, Types } from 'mongoose';
 
-export default interface IAttachment extends Document {
+export default interface IMedia extends Document {
 	_id: Types.ObjectId;
 	linked_to: Types.ObjectId;
 	device_id: Types.ObjectId;

@@ -1,13 +1,13 @@
 import { Types } from 'mongoose';
-import AttachmentDB from '../../mongo/repo/Attachment';
+import { MediaDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
-import IAttachment from '../../mongo/types/attachment';
+import IMedia from '../../mongo/types/media';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
 import WhatsappLinkService from './whatsappLink';
 
-function processAttachmentDocs(docs: IAttachment[]) {
+function processMediaDocs(docs: IMedia[]) {
 	return docs.map((doc) => ({
 		id: doc._id,
 		filename: doc.filename,
@@ -18,7 +18,7 @@ function processAttachmentDocs(docs: IAttachment[]) {
 	}));
 }
 
-export default class AttachmentService extends WhatsappLinkService {
+export default class MediaService extends WhatsappLinkService {
 	private whatsappLink: IWhatsappLink;
 	public constructor(account: IAccount, whatsappLink: IWhatsappLink) {
 		super(account);
@@ -26,7 +26,7 @@ export default class AttachmentService extends WhatsappLinkService {
 	}
 
 	async delete(id: Types.ObjectId) {
-		const doc = await AttachmentDB.findOneAndDelete({
+		const doc = await MediaDB.findOneAndDelete({
 			_id: id,
 			linked_to: this.userId,
 			device_id: this.whatsappLink._id,
@@ -34,42 +34,42 @@ export default class AttachmentService extends WhatsappLinkService {
 		if (!doc) {
 			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
 		}
-		return doc.filename;
+		return doc.local_path;
 	}
 
-	async listAttachments() {
-		const attachments = await AttachmentDB.find({
+	async listMedias() {
+		const medias = await MediaDB.find({
 			linked_to: this.userId,
 			device_id: this.whatsappLink._id,
 		});
-		return processAttachmentDocs(attachments);
+		return processMediaDocs(medias);
 	}
 
-	async getAttachment(id: Types.ObjectId) {
-		const attachment = await AttachmentDB.findOne({
-			linked_to: this.userId,
-			device_id: this.whatsappLink._id,
-			_id: id,
-		});
-		if (!attachment) {
-			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
-		}
-		return processAttachmentDocs([attachment])[0];
-	}
-
-	async getAttachmentLocalPath(id: Types.ObjectId) {
-		const attachment = await AttachmentDB.findOne({
+	async getMedia(id: Types.ObjectId) {
+		const media = await MediaDB.findOne({
 			linked_to: this.userId,
 			device_id: this.whatsappLink._id,
 			_id: id,
 		});
-		if (!attachment) {
+		if (!media) {
 			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
 		}
-		return attachment.local_path;
+		return processMediaDocs([media])[0];
 	}
 
-	async addAttachment(details: {
+	async getMediaLocalPath(id: Types.ObjectId) {
+		const media = await MediaDB.findOne({
+			linked_to: this.userId,
+			device_id: this.whatsappLink._id,
+			_id: id,
+		});
+		if (!media) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+		return media.local_path;
+	}
+
+	async addMedia(details: {
 		filename: string;
 		file_length: number;
 		mime_type: string;
@@ -77,12 +77,12 @@ export default class AttachmentService extends WhatsappLinkService {
 		media_url: string;
 		local_path: string;
 	}) {
-		const attachment = await AttachmentDB.create({
+		const media = await MediaDB.create({
 			linked_to: this.userId,
 			device_id: this.whatsappLink._id,
 			...details,
 		});
 
-		return processAttachmentDocs([attachment])[0];
+		return processMediaDocs([media])[0];
 	}
 }
