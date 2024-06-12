@@ -1,9 +1,12 @@
 import { Box, Flex, Icon, IconButton, Text, VStack } from '@chakra-ui/react';
+import { useRef } from 'react';
+import { FaMobileAlt } from 'react-icons/fa';
 import { IconType } from 'react-icons/lib';
 import { TbLogout2 } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 import { MenuItems } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
+import DevicesDialog, { DevicesHandle } from '../devices';
 import Each from '../utils/Each';
 
 function isActiveTab(tab: string, path: string): boolean {
@@ -11,7 +14,23 @@ function isActiveTab(tab: string, path: string): boolean {
 	return false;
 }
 
-export default function NavigationDrawer({ expanded }: { expanded: boolean }) {
+export default function NavigationDrawer({
+	expanded,
+	setDrawerExpanded,
+}: {
+	expanded: boolean;
+	setDrawerExpanded: {
+		on: () => void;
+		off: () => void;
+		toggle: () => void;
+	};
+}) {
+	const DevicesRef = useRef<DevicesHandle>(null);
+
+	const handleDevicesDialog = () => {
+		DevicesRef.current?.open();
+	};
+
 	const handleLogout = async () => {
 		AuthService.logout();
 		window.location.reload();
@@ -46,12 +65,31 @@ export default function NavigationDrawer({ expanded }: { expanded: boolean }) {
 							<Each
 								items={MenuItems}
 								render={(item, index) => (
-									<MenuButton key={index} route={item.route} icon={item.icon} name={item.title} />
+									<MenuButton
+										setDrawerExpanded={setDrawerExpanded}
+										key={index}
+										route={item.route}
+										icon={item.icon}
+										name={item.title}
+									/>
 								)}
 							/>
 						</Flex>
 					</Box>
 					<VStack alignItems={'flex-start'} pl={4}>
+						<IconButton
+							aria-label='Devices'
+							color={theme === 'light' ? 'black' : 'white'}
+							icon={<FaMobileAlt />}
+							onClick={handleDevicesDialog}
+							className='focus:outline-none focus:border-none'
+							backgroundColor={'transparent'}
+							_hover={{
+								backgroundColor: 'transparent',
+								border: 'none',
+								outline: 'none',
+							}}
+						/>
 						<IconButton
 							aria-label='Logout'
 							color={theme === 'light' ? 'black' : 'white'}
@@ -68,6 +106,7 @@ export default function NavigationDrawer({ expanded }: { expanded: boolean }) {
 					</VStack>
 				</Flex>
 			</Flex>
+			<DevicesDialog ref={DevicesRef} />
 		</Box>
 	);
 }
@@ -76,10 +115,19 @@ type MenuButtonProps = {
 	route: string;
 	icon: IconType;
 	name: string;
+	setDrawerExpanded: {
+		on: () => void;
+		off: () => void;
+		toggle: () => void;
+	};
 };
 
-function MenuButton({ route, icon, name }: MenuButtonProps) {
+function MenuButton({ route, icon, name, setDrawerExpanded }: MenuButtonProps) {
 	const navigate = useNavigate();
+	const handleButtonClick = () => {
+		navigate(route);
+		setDrawerExpanded.off();
+	};
 	return (
 		<Flex
 			className={`cursor-pointer overflow-hidden
@@ -91,7 +139,7 @@ ${
 			padding={'0.6rem'}
 			rounded={'lg'}
 			gap={'1.1rem'}
-			onClick={() => navigate(route)}
+			onClick={handleButtonClick}
 		>
 			<Icon as={icon} color={'green.400'} width={5} height={5} />
 			<Text fontSize={'sm'}>{name}</Text>
