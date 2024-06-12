@@ -111,6 +111,7 @@ export default class ConversationService extends WhatsappLinkService {
 			recipient: string;
 			message_id: string;
 			header_type?: string;
+			header_content_source?: string;
 			header_content?: string;
 			body?: Partial<IConversationMessage['body']>;
 			footer_content?: string;
@@ -145,6 +146,8 @@ export default class ConversationService extends WhatsappLinkService {
 					},
 				}
 			);
+
+			return processConversationMessages([doc])[0];
 		} catch (err) {}
 	}
 

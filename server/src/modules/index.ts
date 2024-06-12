@@ -1,5 +1,6 @@
 import express from 'express';
 import SessionRoute from './auth/auth.route';
+import MediaRoute from './media/media.route';
 import MessageRoute from './message/message.route';
 import PhonebookRoute from './phonebook/phonebook.route';
 import TemplateRoute from './template/template.route';
@@ -22,6 +23,7 @@ router.use('/phonebook', VerifySession, PhonebookRoute);
 router.use('/whatsapp-link', VerifySession, WhatsappLinkRoute);
 router.use('/template/:device_id', VerifySession, VerifyDevice, TemplateRoute);
 router.use('/message/:device_id', VerifySession, VerifyDevice, MessageRoute);
+router.use('/media/:device_id', VerifySession, VerifyDevice, MediaRoute);
 router.use('/uploads/:device_id', VerifySession, VerifyDevice, UploadsRoute);
 router.use('/webhooks', WebhooksRoute);
 

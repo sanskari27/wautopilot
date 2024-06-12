@@ -32,6 +32,7 @@ export enum UserLevel {
 
 export enum Path {
 	Misc = '/static/misc/',
+	Media = '/static/media/',
 }
 
 export const CACHE_TIMEOUT = 60 * 60; //seconds

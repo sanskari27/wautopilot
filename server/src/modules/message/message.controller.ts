@@ -7,6 +7,7 @@ import ConversationService from '../../services/conversation';
 import PhoneBookService from '../../services/phonebook';
 import { Respond } from '../../utils/ExpressUtils';
 import { CreateBroadcastValidationResult, SendMessageValidationResult } from './message.validator';
+import SocketServer from '../../socket';
 export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
 export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
@@ -245,7 +246,7 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 			},
 		});
 
-		await conversationService.addMessageToConversation(id, {
+		const msg = await conversationService.addMessageToConversation(id, {
 			message_id: res.messages[0].id,
 			recipient: conversation.recipient,
 			body: {
@@ -268,6 +269,8 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 				id: data.context.message_id,
 			},
 		});
+
+		SocketServer.getInstance().sendMessage(id.toString(), msg);
 	} catch (err) {
 		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 	}

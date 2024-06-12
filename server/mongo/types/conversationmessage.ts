@@ -78,7 +78,7 @@ export default interface IConversationMessage extends Document {
 		button_type: 'URL' | 'PHONE_NUMBER' | 'QUICK_REPLY' | 'VOICE_CALL';
 		button_content: string;
 		button_data: string;
-	};
+	}[];
 	context: {
 		from: string;
 		id: string;
