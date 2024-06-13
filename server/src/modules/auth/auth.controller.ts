@@ -113,6 +113,18 @@ async function validateAuth(req: Request, res: Response, next: NextFunction) {
 	});
 }
 
+async function details(req: Request, res: Response, next: NextFunction) {
+	const { user } = req.locals;
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			account: await user.getDetails(),
+		},
+	});
+}
+
 async function logout(req: Request, res: Response, next: NextFunction) {
 	try {
 		const _refresh_id = req.cookies[Cookie.Refresh];
@@ -136,6 +148,7 @@ const Controller = {
 	resetPassword,
 	register,
 	logout,
+	details,
 };
 
 export default Controller;

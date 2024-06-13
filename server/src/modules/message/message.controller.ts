@@ -5,11 +5,9 @@ import COMMON_ERRORS from '../../errors/common-errors';
 import BroadcastService from '../../services/broadcast';
 import ConversationService from '../../services/conversation';
 import PhoneBookService from '../../services/phonebook';
+import SocketServer from '../../socket';
 import { Respond } from '../../utils/ExpressUtils';
 import { CreateBroadcastValidationResult, SendMessageValidationResult } from './message.validator';
-import SocketServer from '../../socket';
-export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
-export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
 const bodyParametersList = [
 	'first_name',

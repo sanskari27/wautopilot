@@ -7,8 +7,6 @@ import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import { Respond } from '../../utils/ExpressUtils';
 import FileUtils from '../../utils/FileUtils';
-export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
-export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
 async function uploadMetaHandle(req: Request, res: Response, next: NextFunction) {
 	let uploadedFile: ResolvedFile | null = null;

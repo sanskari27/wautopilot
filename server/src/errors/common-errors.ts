@@ -31,6 +31,11 @@ const COMMON_ERRORS = {
 		TITLE: 'ERROR_PARSING_CSV',
 		MESSAGE: 'There was an error while parsing the CSV file. Please try again later.',
 	},
+	PERMISSION_DENIED: {
+		STATUS: 400,
+		TITLE: 'PERMISSION_DENIED',
+		MESSAGE: 'You do not have permission to access this resource.',
+	},
 } satisfies {
 	[error: string]: ServerError;
 };

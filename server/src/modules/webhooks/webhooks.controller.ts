@@ -1,11 +1,15 @@
+import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
 import { AccountDB, WhatsappLinkDB } from '../../../mongo';
-import { MESSAGE_STATUS, META_VERIFY_STRING, META_VERIFY_USER_STRING } from '../../config/const';
+import {
+	MESSAGE_STATUS,
+	META_VERIFY_STRING,
+	META_VERIFY_USER_STRING,
+	RAZORPAY_WEBHOOK_SECRET,
+} from '../../config/const';
 import BroadcastService from '../../services/broadcast';
 import ConversationService from '../../services/conversation';
 import DateUtils from '../../utils/DateUtils';
-export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
-export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
 async function whatsappVerification(req: Request, res: Response, next: NextFunction) {
 	const mode = req.query['hub.mode'];
@@ -93,8 +97,8 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				recipient,
 				body: {
 					body_type: 'MEDIA',
-					media_id: message.image.id,
-					caption: message.image.caption,
+					media_id: message[message.type].id,
+					caption: message[message.type].caption,
 				},
 				received_at: timestamp,
 				status: MESSAGE_STATUS.DELIVERED,
@@ -153,9 +157,39 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 	return res.status(200);
 }
 
+async function razorpayPayment(req: Request, res: Response) {
+	const data = req.body;
+	const digest = crypto
+		.createHmac('sha256', RAZORPAY_WEBHOOK_SECRET)
+		.update(JSON.stringify(req.body))
+		.digest('hex');
+
+	const razorpay_signature = req.headers['x-razorpay-signature'];
+
+	if (razorpay_signature !== digest) {
+		return res.status(400).json({ status: 'Bad signature' });
+	} else if (!data.contains.includes('payment')) {
+		return res.status(400).json({ status: 'Bad Request' });
+	}
+	// const payment = data.payload.payment.entity;
+	// const { id: payment_id, order_id, status } = payment;
+
+	// if (status !== 'captured') {
+	// 	return res.status(400).json({ status: 'Bad Request' });
+	// }
+	try {
+		// const bucketService = await PaymentBucketService.getBucketByOrderID(order_id);
+		// bucketService.getPaymentService().confirmOneTimePayment(order_id, payment_id);
+		res.status(200).json({ status: 'OK' });
+	} catch (err) {
+		return res.status(404).json({ status: 'Not Found' });
+	}
+}
+
 const Controller = {
 	whatsappCallback,
 	whatsappVerification,
+	razorpayPayment,
 };
 
 export default Controller;

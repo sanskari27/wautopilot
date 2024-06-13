@@ -5,8 +5,6 @@ import COMMON_ERRORS from '../../errors/common-errors';
 import WhatsappLinkService from '../../services/whatsappLink';
 import { Respond } from '../../utils/ExpressUtils';
 import { WhatsappLinkCreateValidationResult } from './whatsappLink.validator';
-export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
-export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
 async function getAllLinkedDevices(req: Request, res: Response, next: NextFunction) {
 	try {
@@ -28,6 +26,17 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 	const data = req.locals.data as WhatsappLinkCreateValidationResult;
 	const { phoneNumberId, waid, code } = data;
 	let { accessToken } = data;
+
+	const userDetails = await req.locals.user.getDetails();
+	if (userDetails.no_of_devices < 1) {
+		return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
+	}
+
+	const devices = await new WhatsappLinkService(req.locals.account).fetchRecords();
+
+	if (devices.length >= userDetails.no_of_devices) {
+		return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
+	}
 
 	if (code) {
 		try {

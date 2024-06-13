@@ -11,6 +11,7 @@ import {
 const router = express.Router();
 
 router.route('/validate-auth').all(VerifySession).get(Controller.validateAuth);
+router.route('/details').all(VerifySession).get(Controller.details);
 
 router.route('/login').all(LoginAccountValidator).post(Controller.login);
 router.route('/register').all(RegisterAccountValidator).post(Controller.register);

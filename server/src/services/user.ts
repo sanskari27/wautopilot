@@ -1,10 +1,11 @@
 import { randomBytes } from 'crypto';
-import { AccountDB, SessionDB, StorageDB } from '../../mongo';
+import { AccountDB, PlanDB, SessionDB, StorageDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import { UserLevel } from '../config/const';
-import { AUTH_ERRORS, CustomError } from '../errors';
+import { AUTH_ERRORS, CustomError, PAYMENT_ERRORS } from '../errors';
 import { sendLoginCredentialsEmail } from '../provider/email';
 import { IDType } from '../types';
+import DateUtils from '../utils/DateUtils';
 import { generateNewPassword } from '../utils/ExpressUtils';
 import SessionService from './session';
 
@@ -58,6 +59,33 @@ export default class UserService {
 
 	getUser() {
 		return this._account;
+	}
+
+	async getDetails() {
+		const isSubscribed =
+			this._account.subscription &&
+			this._account.subscription.end_date &&
+			DateUtils.getMoment(this._account.subscription.end_date).isAfter(DateUtils.getMomentNow());
+
+		const subscription_expiry = this._account.subscription?.end_date
+			? DateUtils.getMoment(this._account.subscription.end_date).format('YYYY-MM-DD')
+			: '';
+
+		let no_of_devices = 0;
+
+		if (isSubscribed) {
+			const plan = await PlanDB.findById(this._account.subscription!.plan_id);
+			no_of_devices = plan?.no_of_devices ?? 0;
+		}
+		return {
+			name: this._account.name,
+			email: this._account.email,
+			phone: this._account.phone,
+			isSubscribed,
+			subscription_expiry,
+			walletBalance: this._account.walletBalance,
+			no_of_devices,
+		};
 	}
 
 	static async register(
@@ -132,5 +160,26 @@ export default class UserService {
 
 	public get account() {
 		return this._account;
+	}
+
+	public get walletBalance() {
+		return this._account.walletBalance;
+	}
+
+	public async addWalletBalance(amount: number) {
+		if (amount < 0) {
+			throw new CustomError(PAYMENT_ERRORS.INVALID_AMOUNT);
+		}
+		this._account.walletBalance += amount;
+		await AccountDB.updateOne(
+			{
+				_id: this._user_id,
+			},
+			{
+				$inc: {
+					walletBalance: amount,
+				},
+			}
+		);
 	}
 }

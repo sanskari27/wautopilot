@@ -5,8 +5,6 @@ import TemplateService from '../../services/templates';
 import { Template } from '../../types/template';
 import { Respond } from '../../utils/ExpressUtils';
 import { TemplateRemoveValidationResult } from './template.validator';
-export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
-export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
 async function addTemplate(req: Request, res: Response, next: NextFunction) {
 	try {

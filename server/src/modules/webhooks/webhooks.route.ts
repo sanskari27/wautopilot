@@ -8,4 +8,6 @@ router
 	.get(Controller.whatsappVerification)
 	.post(Controller.whatsappCallback);
 
+router.route('/razorpay/payment').post(Controller.razorpayPayment);
+
 export default router;

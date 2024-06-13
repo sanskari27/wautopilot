@@ -7,6 +7,7 @@ export {
 	ConversationMessageDB,
 	MediaDB,
 	PhoneBookDB,
+	PlanDB,
 	SessionDB,
 	StorageDB,
 	WhatsappLinkDB,

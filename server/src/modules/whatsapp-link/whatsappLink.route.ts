@@ -1,5 +1,7 @@
 import express from 'express';
-import { IDValidator, VerifySession } from '../../middleware';
+import { Permissions } from '../../config/const';
+import { IDValidator } from '../../middleware';
+import VerifyPermissions from '../../middleware/VerifyPermissions';
 import Controller from './whatsappLink.controller';
 import { WhatsappLinkCreateValidator } from './whatsappLink.validator';
 
@@ -7,9 +9,10 @@ const router = express.Router();
 
 router
 	.route('/link-device')
-	.all(VerifySession, WhatsappLinkCreateValidator)
+	.all(VerifyPermissions(Permissions.Devices), WhatsappLinkCreateValidator)
 	.post(Controller.linkDevice);
-router.route('/linked-devices').all(VerifySession).get(Controller.getAllLinkedDevices);
-router.route('/remove-device/:id').all(VerifySession, IDValidator).post(Controller.removeDevice);
+
+router.route('/linked-devices').get(Controller.getAllLinkedDevices);
+router.route('/remove-device/:id').all(IDValidator).post(Controller.removeDevice);
 
 export default router;

@@ -9,8 +9,15 @@ export default interface IAccount extends Document {
 	password: string;
 	userLevel: UserLevel;
 
-	marketingPrice: number;
-	otherPrice: number;
+	markupPrice: number;
+
+	subscription?: {
+		plan_id: Types.ObjectId;
+		start_date: Date;
+		end_date: Date;
+	};
+
+	walletBalance: number;
 
 	verifyPassword(password: string): Promise<boolean>;
 }

@@ -2,8 +2,9 @@
 
 import { Types } from 'mongoose';
 import IAccount from '../../mongo/types/account';
-import { UserService } from '../services';
+import IPlan from '../../mongo/types/plan';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
+import { UserService } from '../services';
 
 declare global {
 	var __basedir: string;
@@ -28,6 +29,7 @@ export interface LocalVariables {
 	account: IAccount;
 	user: UserService;
 	device: IWhatsappLink;
+	plan: IPlan;
 }
 
 export { default as ServerError } from './serverError';

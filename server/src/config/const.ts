@@ -17,6 +17,10 @@ export const RESEND_API_KEY = process.env.RESEND_API_KEY ?? '';
 export const META_VERIFY_STRING = process.env.META_VERIFY_STRING ?? '';
 export const META_VERIFY_USER_STRING = process.env.META_VERIFY_USER_STRING ?? '';
 
+export const RAZORPAY_API_KEY = process.env.RAZORPAY_API_KEY ?? '';
+export const RAZORPAY_API_SECRET = process.env.RAZORPAY_API_SECRET ?? '';
+export const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET ?? '';
+
 export const LOGO_PATH = '/static/assets/logo.png';
 
 export enum Cookie {
@@ -33,6 +37,16 @@ export enum UserLevel {
 export enum Path {
 	Misc = '/static/misc/',
 	Media = '/static/media/',
+}
+
+export enum Permissions {
+	Dashboard = 'dashboard',
+	Phonebook = 'phonebook',
+	Templates = 'templates',
+	Media = 'media',
+	Broadcast = 'broadcast',
+	Conversations = 'conversations',
+	Devices = 'devices',
 }
 
 export const CACHE_TIMEOUT = 60 * 60; //seconds
