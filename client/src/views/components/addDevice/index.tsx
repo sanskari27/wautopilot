@@ -18,19 +18,29 @@ import {
 	useBoolean,
 	useToast,
 } from '@chakra-ui/react';
-import { useCallback, useEffect, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { FaFacebook } from 'react-icons/fa';
 import { MdDataSaverOff } from 'react-icons/md';
 import { Link, useNavigate } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
 import DeviceService from '../../../services/device.service';
 
-export default function AddDevice() {
-	const [isOpen, setIsOpen] = useBoolean(true);
+export type AddDeviceHandle = {
+	open: () => void;
+};
+
+const AddDevice = forwardRef<AddDeviceHandle>((_, ref) => {
+	const [isOpen, setIsOpen] = useBoolean(false);
 	const navigate = useNavigate();
 	const [loading, setLoading] = useBoolean();
 	const [facebookSignupLoading, setFacebookSignupLoading] = useBoolean();
 	const toast = useToast();
+
+	useImperativeHandle(ref, () => ({
+		open: () => {
+			setIsOpen.on();
+		},
+	}));
 
 	const [details, setDetails] = useState({
 		phoneNumberId: '',
@@ -279,4 +289,6 @@ export default function AddDevice() {
 			</ModalContent>
 		</Modal>
 	);
-}
+});
+
+export default AddDevice;
