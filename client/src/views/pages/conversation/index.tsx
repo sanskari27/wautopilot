@@ -37,6 +37,12 @@ const Conversation = () => {
 		recipient: 1,
 	});
 
+	useEffect(() => {
+		return () => {
+			dispatch(setSelectedRecipient({} as Recipient));
+		};
+	}, []);
+
 	const handleRecipientClick = (item: Recipient) => {
 		setListExpanded.off();
 		dispatch(setMessagesLoading(true));

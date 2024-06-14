@@ -6,7 +6,6 @@ import {
 	Flex,
 	HStack,
 	Icon,
-	IconButton,
 	Menu,
 	MenuButton,
 	MenuItem,
@@ -17,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 import { ReactNode, useRef } from 'react';
 import { BiArrowBack, BiSend } from 'react-icons/bi';
-import { FaFile, FaHeadphones, FaVideo } from 'react-icons/fa';
+import { FaFile, FaHeadphones, FaUpload, FaVideo } from 'react-icons/fa';
 import { FaPhotoFilm } from 'react-icons/fa6';
 import { MdContacts } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +26,7 @@ import AttachmentSelectorDialog, {
 	AttachmentDialogHandle,
 } from '../../../components/selector-dialog/AttachmentSelectorDialog';
 import Each from '../../../components/utils/Each';
+import AddMedia, { AddMediaHandle } from './add-media';
 import ChatMessage from './chat-message';
 
 type ChatScreenProps = {
@@ -96,7 +96,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 				</Flex>
 				<HStack bg={'white'} width={'full'} p={'0.5rem'} alignItems={'flex-end'}>
 					<AttachmentSelectorPopover>
-						<IconButton aria-label='emoji' icon={<AttachmentIcon />} bgColor={'transparent'} />
+						<Icon as={AttachmentIcon} bgColor={'transparent'} />
 					</AttachmentSelectorPopover>
 					<Textarea
 						onInput={handleMessageInput}
@@ -119,6 +119,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 
 const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 	const attachmentSelectorHandle = useRef<AttachmentDialogHandle>(null);
+	const addMediaHandle = useRef<AddMediaHandle>(null);
 	const dispatch = useDispatch();
 	const {
 		message: { attachment_id },
@@ -189,6 +190,17 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 							<Text>Contact Card</Text>
 						</Flex>
 					</MenuItem>
+					<MenuItem
+						rounded={'none'}
+						width={'full'}
+						justifyContent={'flex-start'}
+						onClick={() => addMediaHandle.current?.open()}
+					>
+						<Flex gap={2} alignItems={'center'}>
+							<Icon as={FaUpload} />
+							<Text>Upload File</Text>
+						</Flex>
+					</MenuItem>
 				</MenuList>
 			</Menu>
 
@@ -196,6 +208,7 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 				ref={attachmentSelectorHandle}
 				onConfirm={(attachment) => dispatch(setAttachmentId(attachment))}
 			/>
+			<AddMedia ref={addMediaHandle} onConfirm={() => {}} />
 		</>
 	);
 };

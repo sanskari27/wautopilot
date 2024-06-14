@@ -12,15 +12,23 @@ export default class UploadService {
 
 		return data.file as string;
 	}
-	static async generateMetaMediaID(device_id: string, file: File) {
+	static async generateMetaMediaId(
+		device_id: string,
+		file: File,
+		onUploadProgress: (progress: number) => void
+	) {
 		const form = new FormData();
 		form.append('file', file);
 		const { data } = await APIInstance.post(`/uploads/${device_id}/upload-meta-media`, form, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
 			},
+			onUploadProgress: (progressEvent) => {
+				onUploadProgress(Math.round((progressEvent.loaded * 100) / (progressEvent.total ?? 1)));
+			},
 		});
 
 		return data.media_id as string;
 	}
+	
 }

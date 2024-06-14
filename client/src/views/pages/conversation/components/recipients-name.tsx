@@ -1,4 +1,6 @@
 import { Avatar, Box, Flex, Text } from '@chakra-ui/react';
+import { useSelector } from 'react-redux';
+import { StoreNames, StoreState } from '../../../../store';
 
 type Item = {
 	_id: string;
@@ -19,6 +21,8 @@ const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
 		onClick?.(item);
 	};
 
+	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
+
 	return (
 		<Flex
 			alignItems={'center'}
@@ -30,6 +34,8 @@ const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
 			gap={'0.5rem'}
 			key={item._id}
 			onClick={handleRecipientClick}
+			bg={selected_recipient._id === item._id ? 'gray.100' : 'white'}
+			rounded={'lg'}
 		>
 			<Avatar name={item.profile_name} />
 			<Box>

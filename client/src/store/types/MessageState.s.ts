@@ -2,10 +2,17 @@ export type MessageState = {
 	messageList: Message[];
 	uiDetails: {
 		messagesLoading: boolean;
+		errorMessage: string;
+		attachmentUploading:boolean;
 	};
 	message: {
 		textMessage: string;
-		attachment: File | null;
+		attachment: {
+			file: File | null;
+			name: string;
+			size: string;
+			id:string;
+		};
 		attachment_id: string[];
 		contactCard: {
 			addresses: {

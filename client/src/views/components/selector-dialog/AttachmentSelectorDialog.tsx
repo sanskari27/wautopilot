@@ -103,13 +103,13 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 									<Tr>
 										<Th width={'10%'}>
 											<Checkbox
-												isChecked={filtered.length === selected.length}
+												isChecked={filtered.length === selected.length && selected.length > 0}
 												isIndeterminate={selected.length > 0 && selected.length !== filtered.length}
 												onChange={(e) => {
 													if (!e.target.checked) {
 														setSelected([]);
 													} else {
-														setSelected(filtered.map((el) => el.id));
+														setSelected(filtered.map((el) => el.media_id));
 													}
 												}}
 											/>{' '}
@@ -128,13 +128,13 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 											<Tr>
 												<Td>
 													<Checkbox
-														isChecked={selected.includes(item.id)}
+														isChecked={selected.includes(item.media_id)}
 														mr={4}
 														onChange={(e) => {
 															if (e.target.checked) {
-																setSelected((prev) => [...prev, item.id]);
+																setSelected((prev) => [...prev, item.media_id]);
 															} else {
-																setSelected((prev) => prev.filter((i) => i !== item.id));
+																setSelected((prev) => prev.filter((i) => i !== item.media_id));
 															}
 														}}
 													/>
