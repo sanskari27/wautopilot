@@ -23,6 +23,7 @@ const Disclaimer = lazy(() => import('./views/pages/static_pages/disclaimer'));
 const ResetPassword = lazy(() => import('./views/pages/reset-password'));
 const AppPage = lazy(() => import('./views/pages/app'));
 const Conversation = lazy(() => import('./views/pages/conversation'));
+const SamplePage = lazy(() => import('./views/pages/static_pages/sample'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -46,6 +47,7 @@ function App() {
 						<Route path={NAVIGATION.TERMS} element={<Terms />} />
 						<Route path={NAVIGATION.PRIVACY} element={<Privacy />} />
 						<Route path={NAVIGATION.DISCLAIMER} element={<Disclaimer />} />
+						<Route path={NAVIGATION.SAMPLE} element={<SamplePage />} />
 
 						<Route path={NAVIGATION.APP} element={<AppPage />}>
 							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />

@@ -35,6 +35,7 @@ export const NAVIGATION = {
 	PRIVACY: '/privacy',
 	DISCLAIMER: '/disclaimer',
 	WEBHOOK_SETUP_DOCS: '/docs/webhook-setup',
+	SAMPLE: '/sample',
 };
 
 export const MenuItems = [
