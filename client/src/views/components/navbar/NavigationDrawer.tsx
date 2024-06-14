@@ -44,7 +44,7 @@ export default function NavigationDrawer({
 				direction={'column'}
 				userSelect={'none'}
 				position={'fixed'}
-				height={'calc(100vh -50px)'}
+				height={'calc(100vh - 35px)'}
 				borderRightWidth={'thin'}
 				borderRightColor={theme === 'light' ? 'gray.300' : 'gray.500'}
 				zIndex={99}
@@ -55,7 +55,7 @@ export default function NavigationDrawer({
 			>
 				<Flex
 					direction={'column'}
-					height={'calc(100vh - 50px)'}
+					height={'calc(100vh - 35px)'}
 					overflowY={'auto'}
 					paddingBottom={'1rem'}
 					flexGrow={1}

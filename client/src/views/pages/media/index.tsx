@@ -41,6 +41,7 @@ import { Media } from '../../../store/types/MediaState';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import Each from '../../components/utils/Each';
 import Preview from './preview.component';
+import { getFileSize } from '../../../utils/file-utils';
 
 const MediaPage = () => {
 	const dispatch = useDispatch();
@@ -354,8 +355,4 @@ function PreviewElement({ media, onRemove }: { media: Media; onRemove: () => voi
 	);
 }
 
-function getFileSize(size: number) {
-	const fileSizeKB = size / 1024; // Convert bytes to kilobytes
-	const fileSizeMB = fileSizeKB / 1024;
-	return fileSizeMB > 1 ? `${fileSizeMB.toFixed(2)} MB` : `${fileSizeKB.toFixed(2)} KB`;
-}
+
