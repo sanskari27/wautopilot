@@ -8,7 +8,6 @@ import { useDispatch } from 'react-redux';
 import { useGeoLocation } from './hooks/useGeolocation';
 import AuthService from './services/auth.service';
 import { setIsAuthenticated } from './store/reducers/UserReducers';
-import AddDevice from './views/components/addDevice';
 import LoginPopup from './views/components/loginPopup';
 import Broadcast from './views/pages/broadcast';
 import Dashboard from './views/pages/dashboard';
@@ -23,6 +22,7 @@ const Privacy = lazy(() => import('./views/pages/static_pages/privacy'));
 const Disclaimer = lazy(() => import('./views/pages/static_pages/disclaimer'));
 const ResetPassword = lazy(() => import('./views/pages/reset-password'));
 const AppPage = lazy(() => import('./views/pages/app'));
+const Conversation = lazy(() => import('./views/pages/conversation'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -48,9 +48,7 @@ function App() {
 						<Route path={NAVIGATION.DISCLAIMER} element={<Disclaimer />} />
 
 						<Route path={NAVIGATION.APP} element={<AppPage />}>
-							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />}>
-								<Route path={NAVIGATION.ADD_DEVICE} element={<AddDevice />} />
-							</Route>
+							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
 							<Route path={NAVIGATION.PHONEBOOK} element={<Phonebook />} />
 							<Route
 								path={NAVIGATION.TEMPLATES + '/' + NAVIGATION.ADD_TEMPLATE}
@@ -65,7 +63,7 @@ function App() {
 							</Route>
 							<Route path={NAVIGATION.TEMPLATES} element={<Templates />} />
 							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
-							<Route path={NAVIGATION.INBOX} element={<>sdf</>} />
+							<Route path={NAVIGATION.INBOX} element={<Conversation />} />
 						</Route>
 						{/* <Route path='*' element={<Home />} /> */}
 					</Routes>

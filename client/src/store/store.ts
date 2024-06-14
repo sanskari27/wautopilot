@@ -7,6 +7,8 @@ import DevicesReducers from './reducers/DevicesReducers';
 import { default as PhonebookReducer } from './reducers/PhonebookReducer';
 import { default as TemplateReducer } from './reducers/TemplateReducer';
 import UserReducers from './reducers/UserReducers';
+import RecipientReducer from './reducers/RecipientReducer';
+import MessagesReducers from './reducers/MessagesReducers';
 
 const store = configureStore({
 	reducer: {
@@ -16,6 +18,8 @@ const store = configureStore({
 		[StoreNames.PHONEBOOK]: PhonebookReducer,
 		[StoreNames.USER]: UserReducers,
 		[StoreNames.DEVICES]: DevicesReducers,
+		[StoreNames.RECIPIENT]: RecipientReducer,
+		[StoreNames.MESSAGES]: MessagesReducers,
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({

@@ -5,4 +5,6 @@ export enum StoreNames {
 	PHONEBOOK = 'phonebook',
 	USER = 'user',
 	DEVICES = 'devices',
+	RECIPIENT = 'recipient',
+	MESSAGES = 'messages',
 }

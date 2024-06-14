@@ -78,10 +78,9 @@ export default class AuthService {
 
 	static async resetPassword(password: string, code: string) {
 		try {
-			const { data } = await APIInstance.post(`/sessions/reset-password/${code}`, {
+			await APIInstance.post(`/sessions/reset-password/${code}`, {
 				password,
 			});
-			console.log(data);
 			return true;
 		} catch (err) {
 			return false;
