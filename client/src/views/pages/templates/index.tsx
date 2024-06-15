@@ -14,14 +14,14 @@ import {
 	Thead,
 	Tr,
 } from '@chakra-ui/react';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { BiPlus } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
 import TemplateService from '../../../services/template.service';
 import { StoreNames, StoreState } from '../../../store';
-import { setFetching, setTemplatesList } from '../../../store/reducers/TemplateReducer';
+import { setTemplateFetching, setTemplatesList } from '../../../store/reducers/TemplateReducer';
 import { Template } from '../../../store/types/TemplateState';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import Each from '../../components/utils/Each';
@@ -41,14 +41,6 @@ export default function Templates() {
 		navigate(`${NAVIGATION.APP}/${NAVIGATION.TEMPLATES}/${NAVIGATION.EDIT_TEMPLATE}/${record.id}`);
 	}
 
-	useEffect(() => {
-		dispatch(setFetching(true));
-		TemplateService.listTemplates(selected_device_id).then((res) => {
-			dispatch(setFetching(false));
-			dispatch(setTemplatesList(res));
-		});
-	}, [dispatch, selected_device_id]);
-
 	const handleRemoveTemplate = (id: string) => {
 		const record = list.find((item) => item.id === id);
 
@@ -56,9 +48,9 @@ export default function Templates() {
 
 		TemplateService.removeTemplate(selected_device_id, record.id, record.name).then((res) => {
 			if (!res) return;
-			dispatch(setFetching(true));
+			dispatch(setTemplateFetching(true));
 			TemplateService.listTemplates(selected_device_id).then((templates) => {
-				dispatch(setFetching(false));
+				dispatch(setTemplateFetching(false));
 				dispatch(setTemplatesList(templates));
 			});
 		});

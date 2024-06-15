@@ -15,7 +15,7 @@ export default class UploadService {
 	static async generateMetaMediaId(
 		device_id: string,
 		file: File,
-		onUploadProgress: (progress: number) => void
+		onUploadProgress?: (progress: number) => void
 	) {
 		const form = new FormData();
 		form.append('file', file);
@@ -24,7 +24,9 @@ export default class UploadService {
 				'Content-Type': 'multipart/form-data',
 			},
 			onUploadProgress: (progressEvent) => {
-				onUploadProgress(Math.round((progressEvent.loaded * 100) / (progressEvent.total ?? 1)));
+				if (onUploadProgress) {
+					onUploadProgress(Math.round((progressEvent.loaded * 100) / (progressEvent.total ?? 1)));
+				}
 			},
 		});
 

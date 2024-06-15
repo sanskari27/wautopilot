@@ -17,28 +17,10 @@ const initialState: MessageState = {
 			name: '',
 			size: '',
 			id: '',
-
+			type: '',
+			url: '',
 		},
-		contactCard: {
-			addresses: [],
-			birthday: '',
-			emails: [],
-			name: {
-				formatted_name: '',
-				first_name: '',
-				last_name: '',
-				middle_name: '',
-				suffix: '',
-				prefix: '',
-			},
-			org: {
-				company: '',
-				department: '',
-				title: '',
-			},
-			phones: [],
-			urls: [],
-		},
+		contactCard: [],
 	},
 };
 
@@ -81,6 +63,12 @@ const Slice = createSlice({
 		setMetaAttachmentId: (state, action: PayloadAction<string>) => {
 			state.message.attachment.id = action.payload;
 		},
+		setAttachmentUrl: (state, action: PayloadAction<string>) => {
+			state.message.attachment.url = action.payload;
+		},
+		setAttachmentType: (state, action: PayloadAction<string>) => {
+			state.message.attachment.type = action.payload;
+		},
 		removeFile: (state) => {
 			state.message.attachment.file = null;
 			state.message.attachment.name = '';
@@ -107,6 +95,8 @@ export const {
 	setMetaAttachmentId,
 	removeFile,
 	setAttachmentUploading,
+	setAttachmentType,
+	setAttachmentUrl,
 } = Slice.actions;
 
 export default Slice.reducer;

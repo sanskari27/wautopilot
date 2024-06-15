@@ -49,7 +49,7 @@ const Slice = createSlice({
 		setSaving: (state, action: PayloadAction<boolean>) => {
 			state.uiDetails.isSaving = action.payload;
 		},
-		setFetching: (state, action: PayloadAction<boolean>) => {
+		setTemplateFetching: (state, action: PayloadAction<boolean>) => {
 			state.uiDetails.isFetching = action.payload;
 		},
 		setError: (state, action: PayloadAction<string>) => {
@@ -203,7 +203,7 @@ export const {
 	setFile,
 	setTemplatesList,
 	setError,
-	setFetching,
+	setTemplateFetching,
 	setSaving,
 	setDetails,
 	setHeaderType,

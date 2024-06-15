@@ -20,8 +20,8 @@ import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
 import { Message } from '../../../../store/types/MessageState.s';
 import { getFileSize } from '../../../../utils/file-utils';
+import ContactDrawer, { ContactHandle } from '../../../components/contact-drawer';
 import Each from '../../../components/utils/Each';
-import ContactDrawer, { ContactHandle } from './contact-drawer';
 import ChatMessageWrapper from './message-wrapper';
 
 export const TextMessage = ({ message }: { message: Message }) => {
@@ -96,7 +96,7 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 						bgColor={'lightgray'}
 						aspectRatio={16 / 9}
 						rounded={'lg'}
-                        className=' w-[200px] md:w-[260px]'
+						className=' w-[200px] md:w-[260px]'
 					>
 						<MdOutlinePermMedia size={'2.5rem'} color='white' />
 					</Center>
@@ -148,13 +148,13 @@ export const ContactMessage = ({ message }: { message: Message }) => {
 								textAlign={'center'}
 								color={'#009de2'}
 								_hover={{ cursor: 'pointer', textDecoration: 'underline' }}
-								onClick={() => contactDrawerRef.current?.open({ contact })}
+								onClick={() => contactDrawerRef.current?.open({ contact: { id: '', ...contact }, newContact: false})}
 							>
 								View Contact
 							</Text>
 						</Box>
 					</ChatMessageWrapper>
-					<ContactDrawer ref={contactDrawerRef} />
+					<ContactDrawer ref={contactDrawerRef} onConfirm={() => {}} />
 				</>
 			)}
 		/>

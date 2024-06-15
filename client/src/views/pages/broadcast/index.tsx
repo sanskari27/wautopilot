@@ -15,11 +15,10 @@ import { useEffect } from 'react';
 import { BiSend } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import APIInstance from '../../../config/APIInstance';
-import TemplateService from '../../../services/template.service';
 import UploadService from '../../../services/upload.service';
 import { StoreNames, StoreState } from '../../../store';
 import {
-	reset,
+	resetBroadcast,
 	setBodyParameterCount,
 	setBroadcastType,
 	setDailyMessagesCount,
@@ -33,7 +32,6 @@ import {
 	setTemplateId,
 	setTo,
 } from '../../../store/reducers/BroadcastReducer';
-import { setTemplatesList } from '../../../store/reducers/TemplateReducer';
 import { countOccurrences } from '../../../utils/templateHelper';
 import LabelFilter from '../../components/labelFilter';
 import { RadioBoxGroup } from '../../components/radioBox';
@@ -61,16 +59,6 @@ export default function Broadcast() {
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	useEffect(() => {
-		TemplateService.listTemplates(selected_device_id).then((res) => {
-			dispatch(setTemplatesList(res));
-		});
-	}, [dispatch, selected_device_id]);
-
-	useEffect(() => {
-		dispatch(reset());
-	}, [dispatch]);
-
-	useEffect(() => {
 		const template = templateList.find((t) => t.id === template_id);
 		if (!template) return;
 
@@ -78,6 +66,10 @@ export default function Broadcast() {
 		const variables = countOccurrences(body?.text ?? '');
 		dispatch(setBodyParameterCount(variables));
 	}, [template_id, templateList, dispatch]);
+
+	useEffect(() => {
+		dispatch(resetBroadcast());
+	}, [dispatch]);
 
 	const templateListFiltered = templateList.filter((t) => t.status === 'APPROVED');
 	const selectedTemplate = templateListFiltered.find((t) => t.id === template_id);
@@ -107,7 +99,7 @@ export default function Broadcast() {
 
 		toast.promise(promise, {
 			success: () => {
-				dispatch(reset());
+				dispatch(resetBroadcast());
 				return {
 					title: 'Broadcast sent successfully',
 				};
@@ -125,7 +117,7 @@ export default function Broadcast() {
 
 	function onSend() {
 		if (header_file) {
-			toast.promise(UploadService.generateMetaMediaID(selected_device_id, header_file), {
+			toast.promise(UploadService.generateMetaMediaId(selected_device_id, header_file), {
 				success: (media_id) => {
 					sendBroadcast({ media_id });
 					return {
@@ -295,7 +287,7 @@ export default function Broadcast() {
 			<Flex gap={3} mt={'0.5rem'} direction={'column'}>
 				<ComponentParameters components={selectedTemplate?.components ?? []} />
 				<Flex justifyContent={'flex-end'} marginRight={'1rem'}>
-					<Button colorScheme='red' onClick={() => dispatch(reset())}>
+					<Button colorScheme='red' onClick={() => dispatch(resetBroadcast())}>
 						Reset
 					</Button>
 					<Button colorScheme='green' onClick={onSend} leftIcon={<BiSend />} ml={3}>

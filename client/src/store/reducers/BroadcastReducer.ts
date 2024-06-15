@@ -28,7 +28,7 @@ const Slice = createSlice({
 	name: StoreNames.BROADCAST,
 	initialState,
 	reducers: {
-		reset: (state) => {
+		resetBroadcast: (state) => {
 			state.name = initialState.name;
 			state.template_id = initialState.template_id;
 			state.description = initialState.description;
@@ -109,7 +109,7 @@ const Slice = createSlice({
 });
 
 export const {
-	reset,
+	resetBroadcast,
 	setBodyParameter,
 	setBodyParameterCount,
 	setBroadcastType,

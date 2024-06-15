@@ -24,6 +24,7 @@ const ResetPassword = lazy(() => import('./views/pages/reset-password'));
 const AppPage = lazy(() => import('./views/pages/app'));
 const Conversation = lazy(() => import('./views/pages/conversation'));
 const SamplePage = lazy(() => import('./views/pages/static_pages/sample'));
+const ContactPage = lazy(() => import('./views/pages/contacts'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -65,6 +66,7 @@ function App() {
 							</Route>
 							<Route path={NAVIGATION.TEMPLATES} element={<Templates />} />
 							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
+							<Route path={NAVIGATION.CONTACT} element={<ContactPage />} />
 							<Route path={NAVIGATION.INBOX} element={<Conversation />} />
 						</Route>
 						{/* <Route path='*' element={<Home />} /> */}

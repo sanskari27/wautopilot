@@ -21,10 +21,13 @@ import { FaPhotoFilm } from 'react-icons/fa6';
 import { MdContacts } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
-import { setAttachmentId, setTextMessage } from '../../../../store/reducers/MessagesReducers';
+import { setTextMessage } from '../../../../store/reducers/MessagesReducers';
 import AttachmentSelectorDialog, {
 	AttachmentDialogHandle,
 } from '../../../components/selector-dialog/AttachmentSelectorDialog';
+import ContactSelectorDialog, {
+	ContactSelectorHandle,
+} from '../../../components/selector-dialog/ContactSelectorDialog';
 import Each from '../../../components/utils/Each';
 import AddMedia, { AddMediaHandle } from './add-media';
 import ChatMessage from './chat-message';
@@ -40,7 +43,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 	const {
 		messageList,
 		uiDetails: { messagesLoading },
-		message: { attachment, contactCard, textMessage },
+		message: { textMessage },
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
 
 	const timeStamp = selected_recipient.expiration_timestamp
@@ -108,7 +111,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 						onChange={(e) => dispatch(setTextMessage(e.target.value))}
 						placeholder='Type a message'
 					/>
-					<Button colorScheme='green' px={'1rem'}>
+					<Button colorScheme='green' px={'1rem'} onClick={() => console.log(textMessage)}>
 						<Icon as={BiSend} />
 					</Button>
 				</HStack>
@@ -120,9 +123,10 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 	const attachmentSelectorHandle = useRef<AttachmentDialogHandle>(null);
 	const addMediaHandle = useRef<AddMediaHandle>(null);
-	const dispatch = useDispatch();
+
+	const contactDialogHandle = useRef<ContactSelectorHandle>(null);
 	const {
-		message: { attachment_id },
+		message: { attachment_id, contactCard },
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
 
 	return (
@@ -184,7 +188,12 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 							<Text>Audio</Text>
 						</Flex>
 					</MenuItem>
-					<MenuItem rounded={'none'} width={'full'} justifyContent={'flex-start'}>
+					<MenuItem
+						rounded={'none'}
+						width={'full'}
+						justifyContent={'flex-start'}
+						onClick={() => contactDialogHandle.current?.open(contactCard)}
+					>
 						<Flex gap={2} alignItems={'center'}>
 							<Icon as={MdContacts} />
 							<Text>Contact Card</Text>
@@ -206,9 +215,13 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 
 			<AttachmentSelectorDialog
 				ref={attachmentSelectorHandle}
-				onConfirm={(attachment) => dispatch(setAttachmentId(attachment))}
+				onConfirm={(attachment) => console.log(attachment)}
 			/>
-			<AddMedia ref={addMediaHandle} onConfirm={() => {}} />
+			<AddMedia ref={addMediaHandle} />
+			<ContactSelectorDialog
+				ref={contactDialogHandle}
+				onConfirm={(contact) => console.log(contact)}
+			/>
 		</>
 	);
 };

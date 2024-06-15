@@ -1,5 +1,5 @@
 import { BiConversation } from 'react-icons/bi';
-import { MdOutlineDashboard, MdOutlinePermMedia } from 'react-icons/md';
+import { MdContacts, MdOutlineDashboard, MdOutlinePermMedia } from 'react-icons/md';
 import { RiContactsBook2Line } from 'react-icons/ri';
 import { TbMessage2Plus, TbTemplate } from 'react-icons/tb';
 
@@ -21,6 +21,7 @@ export const NAVIGATION = {
 	DASHBOARD: 'dashboard',
 	ADD_DEVICE: 'add-device',
 	INBOX: 'inbox',
+	CONTACT:'contact',
 
 	BROADCAST: 'broadcast',
 	PHONEBOOK: 'phonebook',
@@ -68,6 +69,11 @@ export const MenuItems = [
 		icon: MdOutlinePermMedia,
 		route: NAVIGATION.MEDIA,
 		title: 'Media',
+	},
+	{
+		icon: MdContacts,
+		route: NAVIGATION.CONTACT,
+		title: 'Contacts',
 	},
 ];
 

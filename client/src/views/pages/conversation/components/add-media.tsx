@@ -24,22 +24,21 @@ import {
 	setAttachmentFile,
 	setAttachmentName,
 	setAttachmentSize,
+	setAttachmentType,
 	setAttachmentUploading,
+	setAttachmentUrl,
 	setErrorMessage,
 	setMetaAttachmentId,
 } from '../../../../store/reducers/MessagesReducers';
 import ProgressBar, { ProgressBarHandle } from '../../../components/progress-bar';
+import Preview from '../../media/preview.component';
 
 export type AddMediaHandle = {
 	open: () => void;
 	close: () => void;
 };
 
-type AddMediaProps = {
-	onConfirm: (ids: string[]) => void;
-};
-
-const AddMedia = forwardRef<AddMediaHandle, AddMediaProps>(({ onConfirm }: AddMediaProps, ref) => {
+const AddMedia = forwardRef<AddMediaHandle>((_, ref) => {
 	const dispatch = useDispatch();
 	const toast = useToast();
 	const progressRef = useRef<ProgressBarHandle>(null);
@@ -57,7 +56,7 @@ const AddMedia = forwardRef<AddMediaHandle, AddMediaProps>(({ onConfirm }: AddMe
 
 	const {
 		message: {
-			attachment: { file, name, size },
+			attachment: { file, name, size, type, url, id },
 		},
 		uiDetails: { errorMessage, attachmentUploading },
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
@@ -79,6 +78,18 @@ const AddMedia = forwardRef<AddMediaHandle, AddMediaProps>(({ onConfirm }: AddMe
 		const fileSizeKB = fileSizeBytes / 1024; // Convert bytes to kilobytes
 		const fileSizeMB = fileSizeKB / 1024;
 
+		let type = '';
+
+		if (file.type.includes('image')) {
+			type = 'image';
+		} else if (file.type.includes('video')) {
+			type = 'video';
+		} else if (file.type.includes('pdf')) {
+			type = 'PDF';
+		} else if (file.type.includes('audio')) {
+			type = file.type;
+		}
+
 		dispatch(setAttachmentFile(file));
 		dispatch(
 			setAttachmentSize(
@@ -86,6 +97,9 @@ const AddMedia = forwardRef<AddMediaHandle, AddMediaProps>(({ onConfirm }: AddMe
 			)
 		);
 		dispatch(setAttachmentName(file.name));
+		dispatch(setAttachmentType(type));
+		const url = window.URL.createObjectURL(file);
+		dispatch(setAttachmentUrl(url));
 	};
 
 	const onUploadProgress = (progressEvent: number) => {
@@ -103,27 +117,30 @@ const AddMedia = forwardRef<AddMediaHandle, AddMediaProps>(({ onConfirm }: AddMe
 			return;
 		}
 		dispatch(setAttachmentUploading(true));
-        UploadService.generateMetaMediaId(selected_device_id, file, onUploadProgress).then((res) => {
-            dispatch(setMetaAttachmentId(res));
-            dispatch(setAttachmentUploading(false));
-            handleClose();
-            toast({
-                title: 'Uploaded',
-                description: 'Media uploaded successfully',
-                status: 'success',
-                duration: 5000,
-                isClosable: true,
-            });
-        }).catch(() => {
-            dispatch(setAttachmentUploading(false));
-            toast({
-                title: 'Error',
-                description: 'Error while uploading media',
-                status: 'error',
-                duration: 5000,
-                isClosable: true,
-            });
-        });
+		UploadService.generateMetaMediaId(selected_device_id, file, onUploadProgress)
+			.then((res) => {
+				console.log(res);
+				dispatch(setMetaAttachmentId(res));
+				dispatch(setAttachmentUploading(false));
+				handleClose();
+				toast({
+					title: 'Uploaded',
+					description: 'Media uploaded successfully',
+					status: 'success',
+					duration: 5000,
+					isClosable: true,
+				});
+			})
+			.catch(() => {
+				dispatch(setAttachmentUploading(false));
+				toast({
+					title: 'Error',
+					description: 'Error while uploading media',
+					status: 'error',
+					duration: 5000,
+					isClosable: true,
+				});
+			});
 	};
 
 	return (
@@ -161,9 +178,15 @@ const AddMedia = forwardRef<AddMediaHandle, AddMediaProps>(({ onConfirm }: AddMe
 										Remove
 									</Text>
 								</Flex>
+								<Preview data={{ type, url }} progress={-1} />
 							</VStack>
 						)}
 					</Box>
+					{errorMessage && (
+						<Text textAlign={'center'} color={'red.500'} fontSize={'sm'} mt={'0.5rem'}>
+							{errorMessage}
+						</Text>
+					)}
 					<ProgressBar ref={progressRef} />
 				</ModalBody>
 

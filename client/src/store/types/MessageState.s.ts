@@ -12,6 +12,8 @@ export type MessageState = {
 			name: string;
 			size: string;
 			id:string;
+			type: string;
+			url:string;
 		};
 		attachment_id: string[];
 		contactCard: {
@@ -51,7 +53,7 @@ export type MessageState = {
 				url: string;
 				type: string;
 			}[];
-		};
+		}[];
 	};
 };
 
