@@ -27,19 +27,19 @@ import SearchBar from '../searchBar';
 import Each from '../utils/Each';
 
 export type ContactSelectorHandle = {
-	open: (contact: Omit<Contact, 'id'>[]) => void;
+	open: (contact: Omit<Contact, 'id' | 'formatted_name'>[]) => void;
 	close: () => void;
 };
 
 type Props = {
-	onConfirm: (contact: Omit<Contact, 'id'>[]) => void;
+	onConfirm: (contact: Omit<Contact, 'id' | 'formatted_name'>[]) => void;
 };
 
 const ContactSelectorDialog = forwardRef<ContactSelectorHandle, Props>(
 	({ onConfirm }: Props, ref) => {
 		const addContactHandle = useRef<ContactHandle>(null);
 
-		const [selected, setSelected] = useState<Omit<Contact, 'id'>[]>([]);
+		const [selected, setSelected] = useState<Omit<Contact, 'id' | 'formatted_name'>[]>([]);
 		const { list } = useSelector((state: StoreState) => state[StoreNames.CONTACT]);
 		const [isOpen, setOpen] = useState(false);
 		const onClose = () => {
@@ -54,7 +54,7 @@ const ContactSelectorDialog = forwardRef<ContactSelectorHandle, Props>(
 		};
 
 		useImperativeHandle(ref, () => ({
-			open: (contact: Omit<Contact, 'id'>[]) => {
+			open: (contact: Omit<Contact, 'id' | 'formatted_name'>[]) => {
 				setSelected(contact);
 				setOpen(true);
 			},

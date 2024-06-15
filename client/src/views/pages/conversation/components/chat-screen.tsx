@@ -14,14 +14,19 @@ import {
 	Text,
 	Textarea,
 } from '@chakra-ui/react';
-import { ReactNode, useRef } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { BiArrowBack, BiSend } from 'react-icons/bi';
 import { FaFile, FaHeadphones, FaUpload, FaVideo } from 'react-icons/fa';
 import { FaPhotoFilm } from 'react-icons/fa6';
 import { MdContacts } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
+import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
-import { setTextMessage } from '../../../../store/reducers/MessagesReducers';
+import {
+	setMessageList,
+	setMessagesLoading,
+	setTextMessage,
+} from '../../../../store/reducers/MessagesReducers';
 import AttachmentSelectorDialog, {
 	AttachmentDialogHandle,
 } from '../../../components/selector-dialog/AttachmentSelectorDialog';
@@ -121,13 +126,28 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 };
 
 const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
+	const dispatch = useDispatch();
 	const attachmentSelectorHandle = useRef<AttachmentDialogHandle>(null);
 	const addMediaHandle = useRef<AddMediaHandle>(null);
 
 	const contactDialogHandle = useRef<ContactSelectorHandle>(null);
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const {
 		message: { attachment_id, contactCard },
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
+	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
+
+	useEffect(() => {
+		dispatch(setMessagesLoading(true));
+		if (!selected_device_id) return;
+		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id).then(
+			(data) => {
+				console.log(data);
+				dispatch(setMessageList(data));
+				dispatch(setMessagesLoading(false));
+			}
+		);
+	}, [dispatch, selected_device_id, selected_recipient]);
 
 	return (
 		<>

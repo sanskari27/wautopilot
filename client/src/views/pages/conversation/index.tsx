@@ -2,13 +2,8 @@ import { Box, Flex, HStack, Skeleton, Stack, Text, useBoolean } from '@chakra-ui
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import useFilteredList from '../../../hooks/useFilteredList';
-import MessagesService from '../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../store';
-import {
-	reset,
-	setMessageList,
-	setMessagesLoading,
-} from '../../../store/reducers/MessagesReducers';
+import { reset } from '../../../store/reducers/MessagesReducers';
 import { setSelectedRecipient } from '../../../store/reducers/RecipientReducer';
 import { Recipient } from '../../../store/types/RecipientsState';
 import LabelFilter from '../../components/labelFilter';
@@ -21,7 +16,6 @@ const Conversation = () => {
 	const dispatch = useDispatch();
 	const [listExpanded, setListExpanded] = useBoolean(true);
 
-	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const {
 		list,
 		uiDetails: { loading },
@@ -42,14 +36,7 @@ const Conversation = () => {
 	const handleRecipientClick = (item: Recipient) => {
 		setListExpanded.off();
 		if (selected_recipient._id === item._id) return;
-		dispatch(setMessagesLoading(true));
 		dispatch(setSelectedRecipient(item));
-		if (!selected_device_id) return;
-		MessagesService.fetchConversationMessages(selected_device_id, item._id).then((data) => {
-			console.log(data);
-			dispatch(setMessageList(data));
-			dispatch(setMessagesLoading(false));
-		});
 	};
 
 	useEffect(() => {
