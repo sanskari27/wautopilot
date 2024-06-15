@@ -83,6 +83,7 @@ const ContactPage = () => {
 						title: 'Contact added successfully',
 						status: 'success',
 					});
+					return;
 				}
 				toast({
 					title: 'Failed to add contact',
@@ -97,6 +98,7 @@ const ContactPage = () => {
 						title: 'Contact updated successfully',
 						status: 'success',
 					});
+					return;
 				}
 				toast({
 					title: 'Failed to update contact',
