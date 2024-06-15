@@ -1,6 +1,7 @@
 export { default as AccountDB } from './Account';
 export { default as BroadcastDB } from './Broadcast';
 export { default as BroadcastMessageDB } from './BroadcastMessage';
+export { default as ContactDB } from './Contact';
 export { default as ConversationDB } from './Conversation';
 export { default as ConversationMessageDB } from './ConversationMessage';
 export { default as MediaDB } from './Media';

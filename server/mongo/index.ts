@@ -3,6 +3,7 @@ export {
 	AccountDB,
 	BroadcastDB,
 	BroadcastMessageDB,
+	ContactDB,
 	ConversationDB,
 	ConversationMessageDB,
 	MediaDB,
