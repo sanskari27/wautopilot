@@ -13,6 +13,7 @@ import {
 	HStack,
 	IconButton,
 	Input,
+	Select,
 	Text,
 	VStack,
 	useDisclosure,
@@ -39,16 +40,21 @@ import {
 	setAddressPostalCode,
 	setAddressState,
 	setAddressStreet,
+	setAddressType,
 	setContact,
 	setCurrentCompany,
+	setDepartment,
 	setEmail,
 	setEmailType,
 	setFirstName,
+	setFormattedName,
 	setJobTitle,
 	setLastName,
 	setMiddleName,
 	setPhone,
 	setPhoneType,
+	setPrefix,
+	setSuffix,
 	setUrl,
 	setUrlType,
 } from '../../../store/reducers/ContactReducer';
@@ -108,17 +114,39 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 
 					<DrawerBody>
 						<VStack width={'full'} alignItems={'stretch'} gap={4}>
-							<FormControl>
-								<FormLabel>First name</FormLabel>
+							<FormControl width={'full'}>
+								<FormLabel>Formatted Name</FormLabel>
 								<Input
-									placeholder='First name'
-									name='first_name'
+									placeholder='Formatted name'
 									type='text'
-									value={contact.name.first_name}
 									readOnly={!isNewContact}
-									onChange={(e) => dispatch(setFirstName(e.target.value))}
+									onChange={(e) => dispatch(setFormattedName(e.target.value))}
+									value={contact.name.formatted_name}
 								/>
 							</FormControl>
+							<HStack>
+								<FormControl>
+									<FormLabel>Prefix</FormLabel>
+									<Input
+										placeholder='Prefix'
+										type='text'
+										value={contact.name.prefix}
+										readOnly={!isNewContact}
+										onChange={(e) => dispatch(setPrefix(e.target.value))}
+									/>
+								</FormControl>
+								<FormControl>
+									<FormLabel>First name</FormLabel>
+									<Input
+										placeholder='First name'
+										name='first_name'
+										type='text'
+										value={contact.name.first_name}
+										readOnly={!isNewContact}
+										onChange={(e) => dispatch(setFirstName(e.target.value))}
+									/>
+								</FormControl>
+							</HStack>
 							<HStack>
 								<FormControl width={'full'}>
 									<FormLabel>Middle name</FormLabel>
@@ -141,7 +169,29 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 									/>
 								</FormControl>
 							</HStack>
+							<HStack>
+								<FormControl width={'full'}>
+									<FormLabel>Suffix</FormLabel>
+									<Input
+										placeholder='Suffix'
+										type='text'
+										readOnly={!isNewContact}
+										onChange={(e) => dispatch(setSuffix(e.target.value))}
+										value={contact.name.suffix}
+									/>
+								</FormControl>
+							</HStack>
 							<Text>Job Description</Text>
+							<FormControl width={'full'}>
+								<FormLabel>Company</FormLabel>
+								<Input
+									placeholder='Company'
+									type='text'
+									readOnly={!isNewContact}
+									onChange={(e) => dispatch(setCurrentCompany(e.target.value))}
+									value={contact.org.company}
+								/>
+							</FormControl>
 							<HStack>
 								<FormControl width={'full'}>
 									<FormLabel>Title</FormLabel>
@@ -154,28 +204,30 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 									/>
 								</FormControl>
 								<FormControl width={'full'}>
-									<FormLabel>Organization</FormLabel>
+									<FormLabel>Department</FormLabel>
 									<Input
-										placeholder='Organization'
+										placeholder='Department'
 										type='text'
 										readOnly={!isNewContact}
-										onChange={(e) => dispatch(setCurrentCompany(e.target.value))}
-										value={contact.org.company}
+										onChange={(e) => dispatch(setDepartment(e.target.value))}
+										value={contact.org.department}
 									/>
 								</FormControl>
 							</HStack>
 							<FormControl>
 								<HStack alignItems={'center'} justifyContent={'space-between'} pb={2}>
 									<Text fontWeight={'medium'}>Email</Text>
-									<IconButton
-										size={'sm'}
-										icon={<IoAdd fontSize={'1.5rem'} />}
-										aria-label='Add Email'
-										onClick={() => {
-											dispatch(addEmptyEmail());
-										}}
-										colorScheme='green'
-									/>
+									{isNewContact && (
+										<IconButton
+											size={'sm'}
+											icon={<IoAdd fontSize={'1.5rem'} />}
+											aria-label='Add Email'
+											onClick={() => {
+												dispatch(addEmptyEmail());
+											}}
+											colorScheme='green'
+										/>
+									)}
 								</HStack>
 
 								<Each
@@ -212,15 +264,17 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 												}
 												value={email.email}
 											/>
-											<IconButton
-												aria-label='Delete Email'
-												size={'sm'}
-												icon={<FaTrash />}
-												onClick={() => {
-													dispatch(removeEmail(index));
-												}}
-												colorScheme={'red'}
-											/>
+											{isNewContact && (
+												<IconButton
+													aria-label='Delete Email'
+													size={'sm'}
+													icon={<FaTrash />}
+													onClick={() => {
+														dispatch(removeEmail(index));
+													}}
+													colorScheme={'red'}
+												/>
+											)}
 										</HStack>
 									)}
 								/>
@@ -229,15 +283,17 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 							<FormControl>
 								<HStack alignItems={'center'} justifyContent={'space-between'} pb={2}>
 									<Text fontWeight={'medium'}>Phone</Text>
-									<IconButton
-										size={'sm'}
-										icon={<IoAdd fontSize={'1.5rem'} />}
-										aria-label='Add Email'
-										onClick={() => {
-											dispatch(addEmptyPhone());
-										}}
-										colorScheme='green'
-									/>
+									{isNewContact && (
+										<IconButton
+											size={'sm'}
+											icon={<IoAdd fontSize={'1.5rem'} />}
+											aria-label='Add Email'
+											onClick={() => {
+												dispatch(addEmptyPhone());
+											}}
+											colorScheme='green'
+										/>
+									)}
 								</HStack>
 
 								<Each
@@ -261,7 +317,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 											/>
 											<Input
 												flex={2}
-												placeholder='Email'
+												placeholder='Phone Number'
 												type='email'
 												readOnly={!isNewContact}
 												onChange={(e) =>
@@ -274,15 +330,17 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 												}
 												value={phone.phone}
 											/>
-											<IconButton
-												aria-label='Delete Email'
-												size={'sm'}
-												icon={<FaTrash />}
-												onClick={() => {
-													dispatch(removePhone(index));
-												}}
-												colorScheme={'red'}
-											/>
+											{isNewContact && (
+												<IconButton
+													aria-label='Delete Email'
+													size={'sm'}
+													icon={<FaTrash />}
+													onClick={() => {
+														dispatch(removePhone(index));
+													}}
+													colorScheme={'red'}
+												/>
+											)}
 										</HStack>
 									)}
 								/>
@@ -291,39 +349,40 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 							<FormControl>
 								<HStack alignItems={'center'} justifyContent={'space-between'} pb={2}>
 									<Text fontWeight={'medium'}>Websites</Text>
-									<IconButton
-										size={'sm'}
-										icon={<IoAdd fontSize={'1.5rem'} />}
-										aria-label='Add Email'
-										onClick={() => {
-											dispatch(addEmptyUrl());
-										}}
-										colorScheme='green'
-									/>
+									{isNewContact && (
+										<IconButton
+											size={'sm'}
+											icon={<IoAdd fontSize={'1.5rem'} />}
+											aria-label='Add Website'
+											onClick={() => {
+												dispatch(addEmptyUrl());
+											}}
+											colorScheme='green'
+										/>
+									)}
 								</HStack>
 
 								<Each
 									items={contact.urls ?? []}
 									render={(url, index) => (
 										<HStack pb={2}>
-											<Input
+											<Select
 												flex={1}
-												placeholder='Type'
-												type='text'
-												readOnly={!isNewContact}
-												onChange={(e) =>
+												onChange={(e) => {
 													dispatch(
 														setUrlType({
 															index,
 															type: e.target.value,
 														})
-													)
-												}
-												value={url.type}
-											/>
+													);
+												}}
+											>
+												<option value='Work'>Work</option>
+												<option value='Others'>Others</option>
+											</Select>
 											<Input
 												flex={2}
-												placeholder='Email'
+												placeholder='URL'
 												type='email'
 												readOnly={!isNewContact}
 												onChange={(e) =>
@@ -353,15 +412,17 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 							<FormControl>
 								<HStack alignItems={'center'} justifyContent={'space-between'} pb={2}>
 									<Text fontWeight={'medium'}>Address</Text>
-									<IconButton
-										size={'sm'}
-										icon={<IoAdd fontSize={'1.5rem'} />}
-										aria-label='Add Address'
-										onClick={() => {
-											dispatch(addEmptyAddress());
-										}}
-										colorScheme='green'
-									/>
+									{isNewContact && (
+										<IconButton
+											size={'sm'}
+											icon={<IoAdd fontSize={'1.5rem'} />}
+											aria-label='Add Address'
+											onClick={() => {
+												dispatch(addEmptyAddress());
+											}}
+											colorScheme='green'
+										/>
+									)}
 								</HStack>
 
 								<Each
@@ -369,6 +430,21 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 									render={(address, index) => (
 										<HStack pb={4} width={'full'} alignItems={'flex-end'}>
 											<Flex direction={'column'} gap={2} flex={1} width={'full'}>
+												<Input
+													placeholder='Type'
+													type='text'
+													readOnly={!isNewContact}
+													onChange={(e) =>
+														dispatch(
+															setAddressType({
+																index,
+																type: e.target.value,
+															})
+														)
+													}
+													value={address.type}
+												/>
+
 												<HStack>
 													<Input
 														placeholder='Street'
@@ -460,15 +536,17 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 													/>
 												</HStack>
 											</Flex>
-											<IconButton
-												aria-label='Delete Email'
-												size={'sm'}
-												icon={<FaTrash />}
-												onClick={() => {
-													dispatch(removeAddress(index));
-												}}
-												colorScheme={'red'}
-											/>
+											{isNewContact && (
+												<IconButton
+													aria-label='Delete Email'
+													size={'sm'}
+													icon={<FaTrash />}
+													onClick={() => {
+														dispatch(removeAddress(index));
+													}}
+													colorScheme={'red'}
+												/>
+											)}
 										</HStack>
 									)}
 								/>

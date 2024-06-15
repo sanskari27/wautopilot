@@ -46,6 +46,7 @@ const Conversation = () => {
 		dispatch(setSelectedRecipient(item));
 		if (!selected_device_id) return;
 		MessagesService.fetchConversationMessages(selected_device_id, item._id).then((data) => {
+			console.log(data);
 			dispatch(setMessageList(data));
 			dispatch(setMessagesLoading(false));
 		});

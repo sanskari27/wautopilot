@@ -14,6 +14,7 @@ import {
 	Th,
 	Thead,
 	Tr,
+	useToast,
 } from '@chakra-ui/react';
 import { useEffect, useRef } from 'react';
 import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
@@ -38,6 +39,7 @@ import Each from '../../components/utils/Each';
 
 const ContactPage = () => {
 	const dispatch = useDispatch();
+	const toast = useToast();
 	const deleteDialog = useRef<DeleteAlertHandle>(null);
 	const contactDrawerRef = useRef<ContactHandle>(null);
 	const {
@@ -48,8 +50,7 @@ const ContactPage = () => {
 	} = useSelector((state: StoreState) => state[StoreNames.CONTACT]);
 
 	const { filtered, setSearchText } = useFilteredList(list, {
-		name: 1,
-		phones: 1,
+		formatted_name: 1,
 	});
 
 	useEffect(() => {
@@ -78,13 +79,29 @@ const ContactPage = () => {
 			ContactService.addContact(contact).then((res) => {
 				if (res) {
 					dispatch(setContactList([contact, ...list]));
+					toast({
+						title: 'Contact added successfully',
+						status: 'success',
+					});
 				}
+				toast({
+					title: 'Failed to add contact',
+					status: 'error',
+				});
 			});
 		} else {
 			ContactService.updateContact(contact).then((res) => {
 				if (res) {
 					dispatch(setContactList(list.map((c) => (c.id === contact.id ? contact : c))));
+					toast({
+						title: 'Contact updated successfully',
+						status: 'success',
+					});
 				}
+				toast({
+					title: 'Failed to update contact',
+					status: 'error',
+				});
 			});
 		}
 	};

@@ -6,6 +6,7 @@ const initialState: ContactState = {
 	list: [],
 	contact: {
 		id: '',
+		formatted_name: '',
 		addresses: [],
 		birthday: '',
 		emails: [],
@@ -56,6 +57,9 @@ const Slice = createSlice({
 		resetContactDetails: (state) => {
 			state.contact = initialState.contact;
 		},
+		setPrefix: (state, action: PayloadAction<string>) => {
+			state.contact.name.prefix = action.payload;
+		},
 		setFirstName: (state, action: PayloadAction<string>) => {
 			state.contact.name.first_name = action.payload;
 		},
@@ -64,6 +68,15 @@ const Slice = createSlice({
 		},
 		setLastName: (state, action: PayloadAction<string>) => {
 			state.contact.name.last_name = action.payload;
+		},
+		setFormattedName: (state, action: PayloadAction<string>) => {
+			state.contact.name.formatted_name = action.payload;
+		},
+		setSuffix: (state, action: PayloadAction<string>) => {
+			state.contact.name.suffix = action.payload;
+		},
+		setDepartment: (state, action: PayloadAction<string>) => {
+			state.contact.org.department = action.payload;
 		},
 		setJobTitle: (state, action: PayloadAction<string>) => {
 			state.contact.org.title = action.payload;
@@ -112,6 +125,9 @@ const Slice = createSlice({
 		},
 		removeAddress: (state, action: PayloadAction<number>) => {
 			state.contact.addresses.splice(action.payload, 1);
+		},
+		setAddressType: (state, action: PayloadAction<{ index: number; type: string }>) => {
+			state.contact.addresses[action.payload.index].type = action.payload.type;
 		},
 		setAddressCity: (state, action: PayloadAction<{ index: number; city: string }>) => {
 			state.contact.addresses[action.payload.index].city = action.payload.city;
@@ -177,6 +193,11 @@ const Slice = createSlice({
 });
 
 export const {
+	setAddressType,
+	setDepartment,
+	setFormattedName,
+	setSuffix,
+	setPrefix,
 	setFirstName,
 	setMiddleName,
 	addSelectedContact,

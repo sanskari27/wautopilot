@@ -1,4 +1,4 @@
-import { Message } from '../../../../store/types/MessageState.s';
+import { Message } from '../../../../store/types/MessageState';
 import {
 	ContactMessage,
 	LocationMessage,

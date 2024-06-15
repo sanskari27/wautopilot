@@ -5,6 +5,7 @@ import { Contact } from '../store/types/ContactState';
 const formatContact = (contact: any) => {
 	return {
 		id: contact.id ?? '',
+		formatted_name: contact.formatted_name ?? '',
 		name: {
 			formatted_name: contact.formatted_name ?? '',
 			first_name: contact.first_name ?? '',
@@ -61,25 +62,17 @@ const formatContact = (contact: any) => {
 };
 
 export default class ContactService {
-	static async getContacts() {
-		try {
-			const { data } = await APIInstance.get(`/contacts`);
-			return formatContact(data.contacts);
-		} catch (error) {
-			//ignore
-		}
-	}
 	static async addContact(contact: Omit<Contact, 'id'>) {
 		try {
 			const { data } = await APIInstance.post(`/contacts`, contact);
 			return formatContact(data.contact);
 		} catch (error) {
-			//ignore
+			return null;
 		}
 	}
-	static async deleteContact(id: string) {
+	static async deleteContact(ids: string[]) {
 		try {
-			await APIInstance.delete(`/contacts/${id}`);
+			await APIInstance.delete(`/contacts`, { data: { ids } });
 			return true;
 		} catch (error) {
 			return false;
@@ -90,7 +83,7 @@ export default class ContactService {
 			const { data } = await APIInstance.put(`/contacts/${contact.id}`, contact);
 			return formatContact(data.contact);
 		} catch (error) {
-			//ignore
+			return null;
 		}
 	}
 }

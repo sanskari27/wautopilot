@@ -1,7 +1,7 @@
 import { Flex, Icon, Text } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 import { BiCheckDouble } from 'react-icons/bi';
-import { Message } from '../../../../store/types/MessageState.s';
+import { Message } from '../../../../store/types/MessageState';
 
 const ChatMessageWrapper = ({ message, children }: { message: Message; children: ReactNode }) => {
 	const isMe = !!message.received_at;

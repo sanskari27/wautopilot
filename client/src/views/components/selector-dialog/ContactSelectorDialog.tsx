@@ -64,8 +64,7 @@ const ContactSelectorDialog = forwardRef<ContactSelectorHandle, Props>(
 		}));
 
 		const { filtered, setSearchText } = useFilteredList(list, {
-			name: 1,
-			phones: 1,
+			formatted_name: 1,
 		});
 		return (
 			<>

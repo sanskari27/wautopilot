@@ -15,6 +15,7 @@ export type ContactState = {
 
 export type Contact = {
 	id: string;
+	formatted_name: string;
 	addresses: {
 		type: string;
 		street: string;
