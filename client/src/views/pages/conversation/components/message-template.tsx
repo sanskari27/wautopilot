@@ -18,6 +18,7 @@ import { MdOutlinePermMedia } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
+import { Contact } from '../../../../store/types/ContactState';
 import { Message } from '../../../../store/types/MessageState';
 import { getFileSize } from '../../../../utils/file-utils';
 import ContactDrawer, { ContactHandle } from '../../../components/contact-drawer';
