@@ -64,7 +64,7 @@ const ContactPage = () => {
 			signal: cancelToken.signal,
 		})
 			.then(({ data }) => {
-				dispatch(setContactList(data.records as Contact[]));
+				dispatch(setContactList(data.contacts as Contact[]));
 				dispatch(setMaxPage(Math.ceil(data.totalRecords / 20)));
 			})
 			.finally(() => dispatch(setFetchingContact(false)));

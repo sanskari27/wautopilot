@@ -13,7 +13,6 @@ import {
 	HStack,
 	IconButton,
 	Input,
-	Select,
 	Text,
 	VStack,
 	useDisclosure,
@@ -40,23 +39,19 @@ import {
 	setAddressPostalCode,
 	setAddressState,
 	setAddressStreet,
-	setAddressType,
 	setContact,
 	setCurrentCompany,
 	setDepartment,
 	setEmail,
-	setEmailType,
 	setFirstName,
 	setFormattedName,
 	setJobTitle,
 	setLastName,
 	setMiddleName,
 	setPhone,
-	setPhoneType,
 	setPrefix,
 	setSuffix,
 	setUrl,
-	setUrlType,
 } from '../../../store/reducers/ContactReducer';
 import { Contact } from '../../../store/types/ContactState';
 import Each from '../utils/Each';
@@ -235,21 +230,6 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 									render={(email, index) => (
 										<HStack pb={2}>
 											<Input
-												flex={1}
-												placeholder='Type'
-												type='text'
-												readOnly={!isNewContact}
-												onChange={(e) =>
-													dispatch(
-														setEmailType({
-															index,
-															type: e.target.value,
-														})
-													)
-												}
-												value={email.type}
-											/>
-											<Input
 												flex={2}
 												placeholder='Email'
 												type='email'
@@ -301,24 +281,9 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 									render={(phone, index) => (
 										<HStack pb={2}>
 											<Input
-												flex={1}
-												placeholder='Type'
-												type='text'
-												readOnly={!isNewContact}
-												onChange={(e) =>
-													dispatch(
-														setPhoneType({
-															index,
-															type: e.target.value,
-														})
-													)
-												}
-												value={phone.type}
-											/>
-											<Input
 												flex={2}
 												placeholder='Phone Number'
-												type='email'
+												type='tel'
 												readOnly={!isNewContact}
 												onChange={(e) =>
 													dispatch(
@@ -332,7 +297,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 											/>
 											{isNewContact && (
 												<IconButton
-													aria-label='Delete Email'
+													aria-label='Delete Phone'
 													size={'sm'}
 													icon={<FaTrash />}
 													onClick={() => {
@@ -366,20 +331,6 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 									items={contact.urls ?? []}
 									render={(url, index) => (
 										<HStack pb={2}>
-											<Select
-												flex={1}
-												onChange={(e) => {
-													dispatch(
-														setUrlType({
-															index,
-															type: e.target.value,
-														})
-													);
-												}}
-											>
-												<option value='Work'>Work</option>
-												<option value='Others'>Others</option>
-											</Select>
 											<Input
 												flex={2}
 												placeholder='URL'
@@ -430,21 +381,6 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 									render={(address, index) => (
 										<HStack pb={4} width={'full'} alignItems={'flex-end'}>
 											<Flex direction={'column'} gap={2} flex={1} width={'full'}>
-												<Input
-													placeholder='Type'
-													type='text'
-													readOnly={!isNewContact}
-													onChange={(e) =>
-														dispatch(
-															setAddressType({
-																index,
-																type: e.target.value,
-															})
-														)
-													}
-													value={address.type}
-												/>
-
 												<HStack>
 													<Input
 														placeholder='Street'

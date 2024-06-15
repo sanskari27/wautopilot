@@ -103,7 +103,11 @@ const Slice = createSlice({
 			state.contact.phones.splice(action.payload, 1);
 		},
 		setPhone: (state, action: PayloadAction<{ index: number; phone: string }>) => {
-			state.contact.phones[action.payload.index].phone = action.payload.phone;
+			//also allow + in phone
+			state.contact.phones[action.payload.index].phone = action.payload.phone.replace(
+				/[^0-9+]/g,
+				''
+			);
 			state.contact.phones[action.payload.index].wa_id = action.payload.phone.replace(
 				/[^0-9]/g,
 				''
