@@ -7,4 +7,5 @@ export enum StoreNames {
 	DEVICES = 'devices',
 	RECIPIENT = 'recipient',
 	MESSAGES = 'messages',
+	CONTACT = 'contact',
 }

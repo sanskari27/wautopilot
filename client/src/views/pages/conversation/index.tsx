@@ -9,11 +9,7 @@ import {
 	setMessageList,
 	setMessagesLoading,
 } from '../../../store/reducers/MessagesReducers';
-import {
-	setRecipientsList,
-	setRecipientsLoading,
-	setSelectedRecipient,
-} from '../../../store/reducers/RecipientReducer';
+import { setSelectedRecipient } from '../../../store/reducers/RecipientReducer';
 import { Recipient } from '../../../store/types/RecipientsState';
 import LabelFilter from '../../components/labelFilter';
 import SearchBar from '../../components/searchBar';
@@ -41,12 +37,14 @@ const Conversation = () => {
 		return () => {
 			dispatch(setSelectedRecipient({} as Recipient));
 		};
-	}, []);
+	}, [dispatch]);
 
 	const handleRecipientClick = (item: Recipient) => {
 		setListExpanded.off();
+		if (selected_recipient._id === item._id) return;
 		dispatch(setMessagesLoading(true));
 		dispatch(setSelectedRecipient(item));
+		if (!selected_device_id) return;
 		MessagesService.fetchConversationMessages(selected_device_id, item._id).then((data) => {
 			dispatch(setMessageList(data));
 			dispatch(setMessagesLoading(false));
@@ -55,12 +53,7 @@ const Conversation = () => {
 
 	useEffect(() => {
 		dispatch(reset());
-		dispatch(setRecipientsLoading(true));
-		MessagesService.fetchAllConversation(selected_device_id).then((data) => {
-			dispatch(setRecipientsLoading(false));
-			dispatch(setRecipientsList(data));
-		});
-	}, [dispatch, selected_device_id]);
+	}, [dispatch]);
 
 	return (
 		<Box className='' height={'full'}>

@@ -36,12 +36,12 @@ import APIInstance from '../../../config/APIInstance';
 import { NAVIGATION, SERVER_URL } from '../../../config/const';
 import MediaService from '../../../services/media.service';
 import { StoreNames, StoreState } from '../../../store';
-import { deleteMedia, setFetching, setList } from '../../../store/reducers/MediaReducer';
+import { deleteMedia } from '../../../store/reducers/MediaReducer';
 import { Media } from '../../../store/types/MediaState';
+import { getFileSize } from '../../../utils/file-utils';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import Each from '../../components/utils/Each';
 import Preview from './preview.component';
-import { getFileSize } from '../../../utils/file-utils';
 
 const MediaPage = () => {
 	const dispatch = useDispatch();
@@ -54,18 +54,6 @@ const MediaPage = () => {
 		uiDetails: { isFetching },
 	} = useSelector((state: StoreState) => state[StoreNames.MEDIA]);
 	const [previewEnabled, setPreviewEnabled] = useBoolean(false);
-
-	useEffect(() => {
-		if (!selected_device_id) return;
-		dispatch(setFetching(true));
-		MediaService.getMedias(selected_device_id)
-			.then((data) => {
-				dispatch(setList(data));
-			})
-			.finally(() => {
-				dispatch(setFetching(false));
-			});
-	}, [dispatch, selected_device_id]);
 
 	const handleDelete = async (id: string) => {
 		toast.promise(MediaService.deleteMedia(selected_device_id, id), {
@@ -354,5 +342,3 @@ function PreviewElement({ media, onRemove }: { media: Media; onRemove: () => voi
 		</Card>
 	);
 }
-
-

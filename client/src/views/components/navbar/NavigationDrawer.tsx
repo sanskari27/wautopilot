@@ -1,11 +1,13 @@
 import { Box, Flex, Icon, IconButton, Text, VStack } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { FaMobileAlt } from 'react-icons/fa';
+import { BiUser } from 'react-icons/bi';
 import { IconType } from 'react-icons/lib';
 import { TbLogout2 } from 'react-icons/tb';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { MenuItems } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
+import { StoreNames, StoreState } from '../../../store';
 import DevicesDialog, { DevicesHandle } from '../devices';
 import Each from '../utils/Each';
 
@@ -30,6 +32,9 @@ export default function NavigationDrawer({
 	const handleDevicesDialog = () => {
 		DevicesRef.current?.open();
 	};
+
+	const { list: deviceList } = useSelector((state: StoreState) => state[StoreNames.DEVICES]);
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const handleLogout = async () => {
 		AuthService.logout();
@@ -76,20 +81,28 @@ export default function NavigationDrawer({
 							/>
 						</Flex>
 					</Box>
-					<VStack alignItems={'flex-start'} pl={4}>
-						<IconButton
-							aria-label='Devices'
-							color={theme === 'light' ? 'black' : 'white'}
-							icon={<FaMobileAlt />}
+					<VStack
+						alignItems={'flex-start'}
+						justifyContent={'flex-start'}
+						flexDirection={'column'}
+						paddingY={'0.5rem'}
+						paddingX={'0.85rem'}
+						gap={'0.25rem'}
+					>
+						<Flex
+							className={`cursor-pointer overflow-hidden
+										transition-all duration-300 ease-in-out`}
+							padding={'0.6rem'}
+							rounded={'lg'}
+							gap={'1.1rem'}
 							onClick={handleDevicesDialog}
-							className='focus:outline-none focus:border-none'
-							backgroundColor={'transparent'}
-							_hover={{
-								backgroundColor: 'transparent',
-								border: 'none',
-								outline: 'none',
-							}}
-						/>
+							width={'full'}
+						>
+							<Icon as={BiUser} width={5} height={5} />
+							<Text fontSize={'sm'}  whiteSpace={'nowrap'}>
+								{deviceList.find((device) => device.id === selected_device_id)?.verifiedName}
+							</Text>
+						</Flex>
 						<IconButton
 							aria-label='Logout'
 							color={theme === 'light' ? 'black' : 'white'}

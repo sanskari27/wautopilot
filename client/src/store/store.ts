@@ -2,13 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import { StoreNames } from './config';
 import { default as BroadcastReducer } from './reducers/BroadcastReducer';
-import { default as MediaReducer } from './reducers/MediaReducer';
+import ContactReducer from './reducers/ContactReducer';
 import DevicesReducers from './reducers/DevicesReducers';
+import { default as MediaReducer } from './reducers/MediaReducer';
+import MessagesReducers from './reducers/MessagesReducers';
 import { default as PhonebookReducer } from './reducers/PhonebookReducer';
+import RecipientReducer from './reducers/RecipientReducer';
 import { default as TemplateReducer } from './reducers/TemplateReducer';
 import UserReducers from './reducers/UserReducers';
-import RecipientReducer from './reducers/RecipientReducer';
-import MessagesReducers from './reducers/MessagesReducers';
 
 const store = configureStore({
 	reducer: {
@@ -20,6 +21,7 @@ const store = configureStore({
 		[StoreNames.DEVICES]: DevicesReducers,
 		[StoreNames.RECIPIENT]: RecipientReducer,
 		[StoreNames.MESSAGES]: MessagesReducers,
+		[StoreNames.CONTACT]: ContactReducer,
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({

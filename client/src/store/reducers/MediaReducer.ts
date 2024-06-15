@@ -36,10 +36,12 @@ const Slice = createSlice({
 			state.url = initialState.url;
 			state.type = initialState.type;
 		},
-		setList: (state, action: PayloadAction<Media[]>) => {
+		setMediaList: (state, action: PayloadAction<Media[]>) => {
+			console.count('setMediaList');
 			state.list = action.payload;
 		},
 		setDetails: (state, action: PayloadAction<Media>) => {
+			console.count('setMediaList');
 			state.details = action.payload;
 		},
 		setFile: (
@@ -68,7 +70,7 @@ const Slice = createSlice({
 		setSaving: (state, action: PayloadAction<boolean>) => {
 			state.uiDetails.isSaving = action.payload;
 		},
-		setFetching: (state, action: PayloadAction<boolean>) => {
+		setMediaFetching: (state, action: PayloadAction<boolean>) => {
 			state.uiDetails.isFetching = action.payload;
 		},
 		deleteMedia: (state, action: PayloadAction<string>) => {
@@ -82,11 +84,11 @@ const Slice = createSlice({
 
 export const {
 	reset,
-	setList,
+	setMediaList,
 	setDetails,
 	setFile,
 	setSaving,
-	setFetching,
+	setMediaFetching,
 	deleteMedia,
 	setError,
 	removeFile,
