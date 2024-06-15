@@ -118,7 +118,6 @@ export default class MessagesService {
 				};
 			});
 		} catch (err) {
-			console.log(err);
 			return [];
 		}
 	}

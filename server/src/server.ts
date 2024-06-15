@@ -8,6 +8,7 @@ import configServer from './server-config';
 import Logger from 'n23-logger';
 import connectDB from '../mongo';
 import { DATABASE_URL, PORT } from './config/const';
+import SocketServer from './socket';
 
 //  ------------------------- Setup Variables
 const app = express();
@@ -23,6 +24,7 @@ connectDB(DATABASE_URL)
 	});
 
 const server = app.listen(PORT, async () => {
+	SocketServer.getInstance(server);
 	Logger.info('Running Status', `Server started on port ${PORT}`);
 });
 

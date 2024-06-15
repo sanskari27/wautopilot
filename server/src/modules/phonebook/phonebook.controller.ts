@@ -251,8 +251,6 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 			},
 		});
 	} catch (err: unknown) {
-		console.log(err);
-
 		if (err instanceof CustomError) {
 			return next(err);
 		}

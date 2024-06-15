@@ -50,7 +50,6 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 		const handleAdd = () => {
 			onConfirm(selected);
 			onClose();
-			console.log('clicked')
 		};
 
 		useImperativeHandle(ref, () => ({

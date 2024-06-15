@@ -8,7 +8,11 @@ export default class SocketServer {
 	private conversationSockets: Map<string, Socket> = new Map();
 
 	private constructor(server: http.Server) {
-		this.io = new SocketIOServer(server);
+		this.io = new SocketIOServer(server, {
+			cors: {
+				origin: '*',
+			},
+		});
 		this.attachListeners();
 	}
 

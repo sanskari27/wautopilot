@@ -20,6 +20,8 @@ import { FaFile, FaHeadphones, FaUpload, FaVideo } from 'react-icons/fa';
 import { FaPhotoFilm } from 'react-icons/fa6';
 import { MdContacts } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
+import io from 'socket.io-client';
+import { SERVER_URL } from '../../../../config/const';
 import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
@@ -142,12 +144,32 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 		if (!selected_device_id) return;
 		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id).then(
 			(data) => {
-				console.log(data);
 				dispatch(setMessageList(data));
 				dispatch(setMessagesLoading(false));
 			}
 		);
 	}, [dispatch, selected_device_id, selected_recipient]);
+
+	useEffect(() => {
+		const socket = io(SERVER_URL + 'conversation');
+
+		socket.on('connect', () => {
+			socket.emit('join_conversation', selected_recipient._id);
+			console.log('Connected to the server');
+		});
+
+		socket.on('disconnect', () => {
+			console.log('Disconnected from the server');
+		});
+
+		socket.on('new_message', (msg) => {
+			console.log(msg);
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, [selected_recipient._id]);
 
 	return (
 		<>

@@ -25,8 +25,6 @@ async function addMedia(req: Request, res: Response, next: NextFunction) {
 		destination = __basedir + Path.Media + uploadedFile.filename;
 		FileUtils.moveFile(uploadedFile.path, destination);
 	} catch (err: unknown) {
-		console.log(err);
-
 		return next(new CustomError(COMMON_ERRORS.FILE_UPLOAD_ERROR));
 	}
 
@@ -84,8 +82,6 @@ async function downloadMedia(req: Request, res: Response, next: NextFunction) {
 			filepath: path,
 		});
 	} catch (err: unknown) {
-		console.log(err);
-
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
@@ -101,8 +97,6 @@ async function deleteMedia(req: Request, res: Response, next: NextFunction) {
 			},
 		});
 	} catch (err: unknown) {
-		console.log(err as any);
-
 		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 	}
 

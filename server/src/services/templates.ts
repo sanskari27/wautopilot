@@ -1,7 +1,6 @@
 import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import MetaAPI from '../config/MetaAPI';
-import { IS_PRODUCTION } from '../config/const';
 import {
 	BodyTemplate,
 	ButtonsTemplate,
@@ -95,8 +94,6 @@ export default class TemplateService extends WhatsappLinkService {
 				status: 'APPROVED' | 'PENDING' | 'REJECTED';
 			};
 		} catch (err) {
-			console.log((err as any).response.data);
-
 			return null;
 		}
 	}
@@ -129,8 +126,6 @@ export default class TemplateService extends WhatsappLinkService {
 				status: 'APPROVED' | 'PENDING' | 'REJECTED';
 			};
 		} catch (err) {
-			console.log((err as any).response.data);
-
 			return null;
 		}
 	}
@@ -203,9 +198,6 @@ export default class TemplateService extends WhatsappLinkService {
 
 				return true;
 			} catch (err) {
-				if (!IS_PRODUCTION) {
-					console.log((err as any).response.data);
-				}
 				return false;
 			}
 		});

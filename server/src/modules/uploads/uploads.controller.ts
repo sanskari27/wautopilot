@@ -96,8 +96,6 @@ async function uploadMetaMedia(req: Request, res: Response, next: NextFunction) 
 			},
 		});
 	} catch (e) {
-		console.log((e as any).response.data);
-
 		FileUtils.deleteFile(uploadedFile.path);
 		next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR, e));
 	}
@@ -121,8 +119,6 @@ async function fetchMetaMediaUrl(req: Request, res: Response, next: NextFunction
 			},
 		});
 	} catch (e) {
-		console.log((e as any).response.data);
-
 		next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
