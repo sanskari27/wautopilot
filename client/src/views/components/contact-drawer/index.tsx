@@ -31,6 +31,7 @@ import {
 	removeEmail,
 	removePhone,
 	removeUrl,
+	reset,
 	resetContactDetails,
 	setAddressCity,
 	setAddressCountry,
@@ -55,7 +56,7 @@ import { Contact } from '../../../store/types/ContactState';
 import Each from '../utils/Each';
 
 export type ContactHandle = {
-	open: ({ contact, newContact }: { contact?: Contact; newContact: boolean }) => void;
+	open: ({ contact, editable }: { contact?: Contact; editable: boolean }) => void;
 	onClose: () => void;
 };
 
@@ -71,12 +72,14 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 		const { contact } = useSelector((state: StoreState) => state[StoreNames.CONTACT]);
 		const [isNewContact, setIsNewContact] = useState(false);
 
-		const isUpdating = contact?.id !== '';
+		const isUpdating = contact.id !== '';
 
 		useImperativeHandle(ref, () => ({
-			open: ({ contact, newContact }) => {
+			open: ({ contact, editable: newContact }) => {
 				if (contact) {
 					dispatch(setContact(contact as Contact));
+				} else {
+					dispatch(resetContactDetails());
 				}
 				setIsNewContact(newContact);
 				onOpen();
@@ -87,11 +90,11 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 		}));
 
 		const handleClose = () => {
-			dispatch(resetContactDetails());
+			dispatch(reset());
 			closeDrawer();
 		};
 
-		const sendContact = () => {
+		const handleSubmit = () => {
 			onConfirm(contact as Contact);
 			handleClose();
 		};
@@ -111,7 +114,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 									placeholder='First name'
 									name='first_name'
 									type='text'
-									value={contact?.name?.first_name}
+									value={contact.name.first_name}
 									readOnly={!isNewContact}
 									onChange={(e) => dispatch(setFirstName(e.target.value))}
 								/>
@@ -124,7 +127,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 										type='text'
 										readOnly={!isNewContact}
 										onChange={(e) => dispatch(setMiddleName(e.target.value))}
-										value={contact?.name?.middle_name}
+										value={contact.name.middle_name}
 									/>
 								</FormControl>
 								<FormControl width={'full'}>
@@ -134,7 +137,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 										type='text'
 										readOnly={!isNewContact}
 										onChange={(e) => dispatch(setLastName(e.target.value))}
-										value={contact?.name?.last_name}
+										value={contact.name.last_name}
 									/>
 								</FormControl>
 							</HStack>
@@ -147,7 +150,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 										type='text'
 										readOnly={!isNewContact}
 										onChange={(e) => dispatch(setJobTitle(e.target.value))}
-										value={contact?.org?.title}
+										value={contact.org.title}
 									/>
 								</FormControl>
 								<FormControl width={'full'}>
@@ -157,7 +160,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 										type='text'
 										readOnly={!isNewContact}
 										onChange={(e) => dispatch(setCurrentCompany(e.target.value))}
-										value={contact?.org?.company}
+										value={contact.org.company}
 									/>
 								</FormControl>
 							</HStack>
@@ -176,7 +179,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 								</HStack>
 
 								<Each
-									items={contact?.emails ?? []}
+									items={contact.emails ?? []}
 									render={(email, index) => (
 										<HStack pb={2}>
 											<Input
@@ -238,7 +241,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 								</HStack>
 
 								<Each
-									items={contact?.phones ?? []}
+									items={contact.phones ?? []}
 									render={(phone, index) => (
 										<HStack pb={2}>
 											<Input
@@ -300,7 +303,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 								</HStack>
 
 								<Each
-									items={contact?.urls ?? []}
+									items={contact.urls ?? []}
 									render={(url, index) => (
 										<HStack pb={2}>
 											<Input
@@ -362,7 +365,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 								</HStack>
 
 								<Each
-									items={contact?.addresses ?? []}
+									items={contact.addresses ?? []}
 									render={(address, index) => (
 										<HStack pb={4} width={'full'} alignItems={'flex-end'}>
 											<Flex direction={'column'} gap={2} flex={1} width={'full'}>
@@ -479,7 +482,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 								Close
 							</Button>
 							{isNewContact && (
-								<Button colorScheme='green' onClick={sendContact}>
+								<Button colorScheme='green' onClick={handleSubmit}>
 									{isUpdating ? 'Update' : 'Create'}
 								</Button>
 							)}

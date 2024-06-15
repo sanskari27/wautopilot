@@ -150,7 +150,7 @@ const ContactSelectorDialog = forwardRef<ContactSelectorHandle, Props>(
 									colorScheme='teal'
 									mr={3}
 									onClick={() => {
-										addContactHandle.current?.open({ newContact: true });
+										addContactHandle.current?.open({ editable: true });
 									}}
 								>
 									Create new

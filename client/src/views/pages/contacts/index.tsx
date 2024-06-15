@@ -95,7 +95,7 @@ const ContactPage = () => {
 		<Box padding={'1rem'}>
 			<Flex justifyContent={'space-between'}>
 				<Text fontSize={'2xl'} fontWeight={'bold'}>
-					Phonebook
+					Contacts
 				</Text>
 				<Flex gap={3}>
 					<Button
@@ -111,7 +111,7 @@ const ContactPage = () => {
 						colorScheme='teal'
 						leftIcon={<AddIcon color='white' fontSize={'1rem'} />}
 						onClick={() => {
-							contactDrawerRef.current?.open({ newContact: true });
+							contactDrawerRef.current?.open({ editable: true });
 						}}
 					>
 						Add
@@ -166,80 +166,19 @@ const ContactPage = () => {
 								/>
 							</>
 						) : filtered.length === 0 ? (
-							<Tr cursor={'pointer'}>
-								<Td width={'5%'}>
-									<Checkbox
-										colorScheme='green'
-										mr={2}
-										isChecked={selected.includes('1')}
-										onChange={(e) => {
-											if (e.target.checked) {
-												dispatch(addSelected('1'));
-											} else {
-												dispatch(removeSelected('1'));
-											}
-										}}
-									/>
-									2
-								</Td>
-								<Td
-									onClick={() => {
-										contactDrawerRef.current?.open({
-											contact: {
-												id: '1',
-												name: {
-													first_name: 'Varshmaan',
-													last_name: 'Sonkar',
-												},
-												phones: [
-													{
-														phone: '1234567890',
-														type: 'Mobile',
-													},
-												],
-												emails: [
-													{
-														email: '123',
-													},
-												],
-												addresses: [
-													{
-														street: '123',
-														city: '123',
-														state: '123',
-														zip: '123',
-														country: '123',
-													},
-												],
-												org: {
-													company: '123',
-													department: '123',
-													title: '123',
-												},
-												birthday: '123',
-											},
-											newContact: true,
-										});
-									}}
-								>
-									Varshmaan Sonkar
+							<Tr>
+								<Td colSpan={2} textAlign={'center'}>
+									No records found
 								</Td>
 							</Tr>
 						) : (
-							// ) : filtered.length === 0 ? (
-							// 	<Tr>
-							// 		<Td colSpan={7} textAlign={'center'}>
-							// 			No records found
-							// 		</Td>
-							// 	</Tr>
-							// ) : (
 							<Each
 								items={filtered}
 								render={(record, index) => (
 									<Tr
 										cursor={'pointer'}
 										onClick={() =>
-											contactDrawerRef.current?.open({ contact: record, newContact: true })
+											contactDrawerRef.current?.open({ contact: record, editable: true })
 										}
 									>
 										<Td width={'5%'}>
@@ -257,7 +196,7 @@ const ContactPage = () => {
 											/>
 											{pagination.page === 1 ? index + 1 : (pagination.page - 1) * 20 + index + 1}
 										</Td>
-										<Td>{record.name?.first_name}</Td>
+										<Td>{record.name.formatted_name}</Td>
 									</Tr>
 								)}
 							/>

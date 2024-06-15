@@ -41,7 +41,7 @@ const Slice = createSlice({
 	name: StoreNames.CONTACT,
 	initialState,
 	reducers: {
-		resetContactDetails: (state) => {
+		reset: (state) => {
 			state.contact = initialState.contact;
 			state.selected = initialState.selected;
 			state.pagination = initialState.pagination;
@@ -53,134 +53,98 @@ const Slice = createSlice({
 		setContact: (state, action: PayloadAction<typeof initialState.contact>) => {
 			state.contact = action.payload;
 		},
-
+		resetContactDetails: (state) => {
+			state.contact = initialState.contact;
+		},
 		setFirstName: (state, action: PayloadAction<string>) => {
-			if (state.contact?.name) {
-				state.contact.name.first_name = action.payload;
-			}
+			state.contact.name.first_name = action.payload;
 		},
 		setMiddleName: (state, action: PayloadAction<string>) => {
-			if (state.contact?.name) {
-				state.contact.name.middle_name = action.payload;
-			}
+			state.contact.name.middle_name = action.payload;
 		},
 		setLastName: (state, action: PayloadAction<string>) => {
-			if (state.contact?.name) {
-				state.contact.name.last_name = action.payload;
-			}
+			state.contact.name.last_name = action.payload;
 		},
 		setJobTitle: (state, action: PayloadAction<string>) => {
-			if (state.contact?.org) {
-				state.contact.org.title = action.payload;
-			}
+			state.contact.org.title = action.payload;
 		},
 		setCurrentCompany: (state, action: PayloadAction<string>) => {
-			if (state.contact?.org) {
-				state.contact.org.company = action.payload;
-			}
+			state.contact.org.company = action.payload;
 		},
 		addEmptyEmail: (state) => {
-			if (state.contact?.emails) {
-				state.contact.emails.push({ email: '', type: '' });
-			}
+			state.contact.emails.push({ email: '', type: '' });
 		},
 		removeEmail: (state, action: PayloadAction<number>) => {
-			if (state.contact?.emails) {
-				state.contact.emails.splice(action.payload, 1);
-			}
+			state.contact.emails.splice(action.payload, 1);
 		},
 		setEmail: (state, action: PayloadAction<{ index: number; email: string }>) => {
-			if (state.contact?.emails) {
-				state.contact.emails[action.payload.index].email = action.payload.email;
-			}
+			state.contact.emails[action.payload.index].email = action.payload.email;
 		},
 		setEmailType: (state, action: PayloadAction<{ index: number; type: string }>) => {
-			if (state.contact?.emails) {
-				state.contact.emails[action.payload.index].type = action.payload.type;
-			}
+			state.contact.emails[action.payload.index].type = action.payload.type;
 		},
 		addEmptyPhone: (state) => {
-			if (state.contact?.phones) {
-				state.contact.phones.push({ phone: '', type: '' });
-			}
+			state.contact.phones.push({ phone: '', type: '', wa_id: '' });
 		},
 		removePhone: (state, action: PayloadAction<number>) => {
-			if (state.contact?.phones) {
-				state.contact.phones.splice(action.payload, 1);
-			}
+			state.contact.phones.splice(action.payload, 1);
 		},
 		setPhone: (state, action: PayloadAction<{ index: number; phone: string }>) => {
-			if (state.contact?.phones) {
-				state.contact.phones[action.payload.index].phone = action.payload.phone;
-			}
+			state.contact.phones[action.payload.index].phone = action.payload.phone;
+			state.contact.phones[action.payload.index].wa_id = action.payload.phone.replace(
+				/[^0-9]/g,
+				''
+			);
 		},
 		setPhoneType: (state, action: PayloadAction<{ index: number; type: string }>) => {
-			if (state.contact?.phones) {
-				state.contact.phones[action.payload.index].type = action.payload.type;
-			}
+			state.contact.phones[action.payload.index].type = action.payload.type;
 		},
 		addEmptyAddress: (state) => {
-			if (state.contact?.addresses) {
-				state.contact.addresses.push({ city: '', country: '', state: '', street: '', zip: '' });
-			}
+			state.contact.addresses.push({
+				city: '',
+				country: '',
+				state: '',
+				street: '',
+				zip: '',
+				country_code: '',
+				type: '',
+			});
 		},
 		removeAddress: (state, action: PayloadAction<number>) => {
-			if (state.contact?.addresses) {
-				state.contact.addresses.splice(action.payload, 1);
-			}
+			state.contact.addresses.splice(action.payload, 1);
 		},
 		setAddressCity: (state, action: PayloadAction<{ index: number; city: string }>) => {
-			if (state.contact?.addresses) {
-				state.contact.addresses[action.payload.index].city = action.payload.city;
-			}
+			state.contact.addresses[action.payload.index].city = action.payload.city;
 		},
 		setAddressCountry: (state, action: PayloadAction<{ index: number; country: string }>) => {
-			if (state.contact?.addresses) {
-				state.contact.addresses[action.payload.index].country = action.payload.country;
-			}
+			state.contact.addresses[action.payload.index].country = action.payload.country;
 		},
 		setAddressPostalCode: (state, action: PayloadAction<{ index: number; postalCode: string }>) => {
-			if (state.contact?.addresses) {
-				state.contact.addresses[action.payload.index].zip = action.payload.postalCode;
-			}
+			state.contact.addresses[action.payload.index].zip = action.payload.postalCode;
 		},
 		setAddressState: (state, action: PayloadAction<{ index: number; state: string }>) => {
-			if (state.contact?.addresses) {
-				state.contact.addresses[action.payload.index].state = action.payload.state;
-			}
+			state.contact.addresses[action.payload.index].state = action.payload.state;
 		},
 		setAddressStreet: (state, action: PayloadAction<{ index: number; street: string }>) => {
-			if (state.contact?.addresses) {
-				state.contact.addresses[action.payload.index].street = action.payload.street;
-			}
+			state.contact.addresses[action.payload.index].street = action.payload.street;
 		},
 		setAddressCountryCode: (
 			state,
 			action: PayloadAction<{ index: number; countryCode: string }>
 		) => {
-			if (state.contact?.addresses) {
-				state.contact.addresses[action.payload.index].country_code = action.payload.countryCode;
-			}
+			state.contact.addresses[action.payload.index].country_code = action.payload.countryCode;
 		},
 		addEmptyUrl: (state) => {
-			if (state.contact?.urls) {
-				state.contact.urls.push({ url: '', type: '' });
-			}
+			state.contact.urls.push({ url: '', type: '' });
 		},
 		removeUrl: (state, action: PayloadAction<number>) => {
-			if (state.contact?.urls) {
-				state.contact.urls.splice(action.payload, 1);
-			}
+			state.contact.urls.splice(action.payload, 1);
 		},
 		setUrl: (state, action: PayloadAction<{ index: number; url: string }>) => {
-			if (state.contact?.urls) {
-				state.contact.urls[action.payload.index].url = action.payload.url;
-			}
+			state.contact.urls[action.payload.index].url = action.payload.url;
 		},
 		setUrlType: (state, action: PayloadAction<{ index: number; type: string }>) => {
-			if (state.contact?.urls) {
-				state.contact.urls[action.payload.index].type = action.payload.type;
-			}
+			state.contact.urls[action.payload.index].type = action.payload.type;
 		},
 
 		setSavingContact: (state, action: PayloadAction<boolean>) => {
@@ -217,7 +181,7 @@ export const {
 	setMiddleName,
 	addSelectedContact,
 	removeSelectedContact,
-	resetContactDetails,
+	reset,
 	setContactList,
 	setContact,
 	setSavingContact,
@@ -249,6 +213,7 @@ export const {
 	setUrlType,
 	setCurrentCompany,
 	setLastName,
+	resetContactDetails,
 } = Slice.actions;
 
 export default Slice.reducer;
