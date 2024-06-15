@@ -47,8 +47,6 @@ const ContactPage = () => {
 		selected,
 	} = useSelector((state: StoreState) => state[StoreNames.CONTACT]);
 
-	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
-
 	const { filtered, setSearchText } = useFilteredList(list, {
 		name: 1,
 		phones: 1,
@@ -77,13 +75,13 @@ const ContactPage = () => {
 
 	const handleContactInput = (contact: Contact) => {
 		if (!contact.id) {
-			ContactService.addContact(contact, selected_device_id).then((res) => {
+			ContactService.addContact(contact).then((res) => {
 				if (res) {
 					dispatch(setContactList([contact, ...list]));
 				}
 			});
 		} else {
-			ContactService.updateContact(contact, selected_device_id).then((res) => {
+			ContactService.updateContact(contact).then((res) => {
 				if (res) {
 					dispatch(setContactList(list.map((c) => (c.id === contact.id ? contact : c))));
 				}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import APIInstance from '../config/APIInstance';
 import { Contact } from '../store/types/ContactState';
 
@@ -60,33 +61,33 @@ const formatContact = (contact: any) => {
 };
 
 export default class ContactService {
-	static async getContacts(device_id: string) {
+	static async getContacts() {
 		try {
-			const { data } = APIInstance.get(`/contacts/${device_id}`);
+			const { data } = await APIInstance.get(`/contacts`);
 			return formatContact(data.contacts);
 		} catch (error) {
 			//ignore
 		}
 	}
-	static async addContact(contact: Omit<Contact, 'id'>, device_id: string) {
+	static async addContact(contact: Omit<Contact, 'id'>) {
 		try {
-			const { data } = await APIInstance.post(`/contacts/${device_id}`, contact);
+			const { data } = await APIInstance.post(`/contacts`, contact);
 			return formatContact(data.contact);
 		} catch (error) {
 			//ignore
 		}
 	}
-	static async deleteContact(id: string, device_id: string) {
+	static async deleteContact(id: string) {
 		try {
-			await APIInstance.delete(`/contacts/${device_id}/${id}`);
+			await APIInstance.delete(`/contacts/${id}`);
 			return true;
 		} catch (error) {
 			return false;
 		}
 	}
-	static async updateContact(contact: Contact, device_id: string) {
+	static async updateContact(contact: Contact) {
 		try {
-			const { data } = await APIInstance.put(`/contacts/${device_id}/${contact.id}`, contact);
+			const { data } = await APIInstance.put(`/contacts/${contact.id}`, contact);
 			return formatContact(data.contact);
 		} catch (error) {
 			//ignore
