@@ -1,6 +1,5 @@
-import { Box, Flex, Icon, IconButton, Text, VStack } from '@chakra-ui/react';
+import { Avatar, Box, Flex, Icon, Text, VStack } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { BiUser } from 'react-icons/bi';
 import { IconType } from 'react-icons/lib';
 import { TbLogout2 } from 'react-icons/tb';
 import { useSelector } from 'react-redux';
@@ -92,30 +91,36 @@ export default function NavigationDrawer({
 						<Flex
 							className={`cursor-pointer overflow-hidden
 										transition-all duration-300 ease-in-out`}
-							padding={'0.6rem'}
+							padding={'0.3rem'}
 							rounded={'lg'}
-							gap={'1.1rem'}
+							gap={'0.5rem'}
 							onClick={handleDevicesDialog}
 							width={'full'}
+							alignItems={'center'}
 						>
-							<Icon as={BiUser} width={5} height={5} />
-							<Text fontSize={'sm'}  whiteSpace={'nowrap'}>
+							<Avatar
+								size={'sm'}
+								name={deviceList.find((device) => device.id === selected_device_id)?.verifiedName}
+							/>
+							<Text fontSize={'sm'} whiteSpace={'nowrap'}>
 								{deviceList.find((device) => device.id === selected_device_id)?.verifiedName}
 							</Text>
 						</Flex>
-						<IconButton
-							aria-label='Logout'
-							color={theme === 'light' ? 'black' : 'white'}
-							icon={<TbLogout2 />}
+						<Flex
+							className={`cursor-pointer overflow-hidden
+										transition-all duration-300 ease-in-out`}
+							padding={'0.6rem'}
+							rounded={'lg'}
+							gap={'1.1rem'}
 							onClick={handleLogout}
-							className='focus:outline-none focus:border-none rotate-180'
-							backgroundColor={'transparent'}
-							_hover={{
-								backgroundColor: 'transparent',
-								border: 'none',
-								outline: 'none',
-							}}
-						/>
+							width={'full'}
+							alignItems={'center'}
+						>
+							<Icon as={TbLogout2} width={5} height={5} className='rotate-180' />
+							<Text fontSize={'sm'} whiteSpace={'nowrap'}>
+								Logout
+							</Text>
+						</Flex>
 					</VStack>
 				</Flex>
 			</Flex>
