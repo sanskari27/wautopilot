@@ -15,11 +15,14 @@ async function getContacts(req: Request, res: Response, next: NextFunction) {
 			limit,
 		});
 
+		const totalRecords = await contactService.totalRecords();
+
 		return Respond({
 			res,
 			status: 200,
 			data: {
 				contacts,
+				totalRecords,
 			},
 		});
 	} catch (err) {
