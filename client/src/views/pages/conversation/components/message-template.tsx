@@ -18,6 +18,7 @@ import { MdOutlinePermMedia } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
+import { Contact } from '../../../../store/types/ContactState';
 import { Message } from '../../../../store/types/MessageState.s';
 import { getFileSize } from '../../../../utils/file-utils';
 import ContactDrawer, { ContactHandle } from '../../../components/contact-drawer';
@@ -148,7 +149,12 @@ export const ContactMessage = ({ message }: { message: Message }) => {
 								textAlign={'center'}
 								color={'#009de2'}
 								_hover={{ cursor: 'pointer', textDecoration: 'underline' }}
-								onClick={() => contactDrawerRef.current?.open({ contact: { id: '', ...contact }, newContact: false})}
+								onClick={() =>
+									contactDrawerRef.current?.open({
+										contact: { id: '', ...contact } as Contact,
+										editable: false,
+									})
+								}
 							>
 								View Contact
 							</Text>

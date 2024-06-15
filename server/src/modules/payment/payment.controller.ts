@@ -7,6 +7,95 @@ import RazorpayProvider from '../../provider/razorpay';
 import { UserService } from '../../services';
 import { Respond, generateRandomID } from '../../utils/ExpressUtils';
 
+async function startSubscription(req: Request, res: Response, next: NextFunction) {
+	const { account } = req.locals;
+	try {
+		const contact = await RazorpayProvider.customers.createCustomer({
+			name: account.name,
+			phone_number: account.phone,
+			email: account.email,
+		});
+
+		if (!contact) {
+			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+		}
+
+		const reference_id = generateRandomID();
+
+		const order = await RazorpayProvider.emandate.createOrder({
+			customer_id: contact.id,
+			reference_id,
+		});
+
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				// transaction_id,
+				razorpay_options: {
+					description: 'Wautopilot Emandate Payment',
+					name: 'Wautopilot',
+					order_id: order.id,
+					customer_id: contact.id,
+					recurring: '1',
+					prefill: {
+						name: account.name,
+						contact: account.phone,
+						email: account.email,
+					},
+					key: RAZORPAY_API_KEY,
+					theme: {
+						color: '#4CB072',
+					},
+				},
+			},
+		});
+	} catch (err) {
+		console.log(err);
+
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
+async function verifyToken(req: Request, res: Response, next: NextFunction) {
+	const { account } = req.locals;
+	try {
+		const contact = await RazorpayProvider.customers.createCustomer({
+			name: account.name,
+			phone_number: account.phone,
+			email: account.email,
+		});
+
+		if (!contact) {
+			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+		}
+
+		const token = await RazorpayProvider.customers.fetchToken(contact.id);
+
+		if (!token) {
+			return next(new CustomError(PAYMENT_ERRORS.NOT_PAID));
+		}
+
+		const recurring = await RazorpayProvider.emandate.createSubsequentPayment({
+			amount: 50,
+			customer_id: contact.id,
+			reference_id: token.id,
+			token_id: token.id,
+		});
+		console.log(recurring);
+
+		return Respond({
+			res,
+			status: 200,
+			data: {},
+		});
+	} catch (err) {
+		console.log(err);
+
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 async function addMoney(req: Request, res: Response, next: NextFunction) {
 	const { account } = req.locals;
 	try {
@@ -99,6 +188,8 @@ async function confirmWalletTransaction(req: Request, res: Response, next: NextF
 const Controller = {
 	addMoney,
 	confirmWalletTransaction,
+	startSubscription,
+	verifyToken,
 };
 
 export default Controller;

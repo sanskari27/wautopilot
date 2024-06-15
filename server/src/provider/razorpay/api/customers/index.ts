@@ -91,8 +91,21 @@ async function fetchCustomer(id: string) {
 	};
 }
 
+async function fetchToken(customer_id: string) {
+	const tokens = await RazorpayAPI.customers.fetchTokens(customer_id);
+	if (tokens.items.length === 0) return null;
+	const token = tokens.items[0];
+
+	return {
+		id: token.id,
+		customer_id: token.customer_id,
+		token: token.token,
+	};
+}
+
 export default {
 	createCustomer,
 	fetchCustomer,
 	fetchCustomerByContact,
+	fetchToken,
 };

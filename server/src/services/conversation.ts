@@ -5,6 +5,7 @@ import IConversation from '../../mongo/types/conversation';
 import IConversationMessage from '../../mongo/types/conversationmessage';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import { MESSAGE_STATUS } from '../config/const';
+import SocketServer from '../socket';
 import DateUtils from '../utils/DateUtils';
 import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import WhatsappLinkService from './whatsappLink';
@@ -147,7 +148,10 @@ export default class ConversationService extends WhatsappLinkService {
 				}
 			);
 
-			return processConversationMessages([doc])[0];
+			const data = processConversationMessages([doc])[0];
+			SocketServer.getInstance().sendMessage(conversation_id.toString(), data);
+
+			return data;
 		} catch (err) {}
 	}
 

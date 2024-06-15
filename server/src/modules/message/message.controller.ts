@@ -5,7 +5,6 @@ import COMMON_ERRORS from '../../errors/common-errors';
 import BroadcastService from '../../services/broadcast';
 import ConversationService from '../../services/conversation';
 import PhoneBookService from '../../services/phonebook';
-import SocketServer from '../../socket';
 import { Respond } from '../../utils/ExpressUtils';
 import { CreateBroadcastValidationResult, SendMessageValidationResult } from './message.validator';
 
@@ -244,7 +243,7 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 			},
 		});
 
-		const msg = await conversationService.addMessageToConversation(id, {
+		await conversationService.addMessageToConversation(id, {
 			message_id: res.messages[0].id,
 			recipient: conversation.recipient,
 			body: {
@@ -267,8 +266,6 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 				id: data.context.message_id,
 			},
 		});
-
-		SocketServer.getInstance().sendMessage(id.toString(), msg);
 	} catch (err) {
 		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 	}
