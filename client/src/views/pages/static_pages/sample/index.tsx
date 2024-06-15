@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Box, Button } from '@chakra-ui/react';
 
 const SamplePage = () => {
@@ -5,16 +6,13 @@ const SamplePage = () => {
 		const rzp1 = new (window as any).Razorpay({
 			// ...result.razorpay_options,
 			handler: function (response: any) {
-				const order_id = response.razorpay_order_id;
-				const payment_id = response.razorpay_payment_id;
-				PaymentService.verifyPayment(bucket_id, order_id, payment_id).then(() => {
-					openPaymentComplete();
-				});
+				console.log(response);
+
+				// const order_id = response.razorpay_order_id;
+				// const payment_id = response.razorpay_payment_id;
 			},
 			modal: {
-				ondismiss: function () {
-					setLoading(false);
-				},
+				ondismiss: function () {},
 			},
 		});
 

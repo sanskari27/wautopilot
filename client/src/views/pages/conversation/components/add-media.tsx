@@ -56,7 +56,7 @@ const AddMedia = forwardRef<AddMediaHandle>((_, ref) => {
 
 	const {
 		message: {
-			attachment: { file, name, size, type, url, id },
+			attachment: { file, name, size, type, url },
 		},
 		uiDetails: { errorMessage, attachmentUploading },
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
