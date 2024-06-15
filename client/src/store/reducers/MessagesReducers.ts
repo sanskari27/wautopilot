@@ -34,6 +34,9 @@ const Slice = createSlice({
 		setMessageList: (state, action: PayloadAction<typeof initialState.messageList>) => {
 			state.messageList = action.payload;
 		},
+		addMessage: (state, action: PayloadAction<(typeof initialState.messageList)[0]>) => {
+			state.messageList = [action.payload, ...state.messageList];
+		},
 		setMessagesLoading: (state, action: PayloadAction<boolean>) => {
 			state.uiDetails.messagesLoading = action.payload;
 		},
@@ -97,6 +100,7 @@ export const {
 	setAttachmentUploading,
 	setAttachmentType,
 	setAttachmentUrl,
+	addMessage,
 } = Slice.actions;
 
 export default Slice.reducer;

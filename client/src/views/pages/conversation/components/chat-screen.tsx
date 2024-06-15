@@ -25,6 +25,7 @@ import { SERVER_URL } from '../../../../config/const';
 import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
+	addMessage,
 	setMessageList,
 	setMessagesLoading,
 	setTextMessage,
@@ -163,13 +164,13 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 		});
 
 		socket.on('new_message', (msg) => {
-			console.log(msg);
+			dispatch(addMessage(msg));
 		});
 
 		return () => {
 			socket.disconnect();
 		};
-	}, [selected_recipient._id]);
+	}, [selected_recipient._id, dispatch]);
 
 	return (
 		<>
