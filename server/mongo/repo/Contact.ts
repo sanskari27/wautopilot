@@ -12,7 +12,6 @@ const schema = new mongoose.Schema<IContact>(
 
 		addresses: [
 			{
-				type: String,
 				street: String,
 				city: String,
 				state: String,
@@ -25,7 +24,6 @@ const schema = new mongoose.Schema<IContact>(
 		emails: [
 			{
 				email: String,
-				type: String,
 			},
 		],
 		name: {
@@ -45,13 +43,11 @@ const schema = new mongoose.Schema<IContact>(
 			{
 				phone: String,
 				wa_id: String,
-				type: String,
 			},
 		],
 		urls: [
 			{
 				url: String,
-				type: String,
 			},
 		],
 	},

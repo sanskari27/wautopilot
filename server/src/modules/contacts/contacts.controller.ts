@@ -45,7 +45,7 @@ async function createContact(req: Request, res: Response, next: NextFunction) {
 			},
 		});
 	} catch (err) {
-		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 	}
 }
 
