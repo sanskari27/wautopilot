@@ -201,7 +201,7 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 		});
 
 		socket.on('message_updated', (msg) => {
-			dispatch(updateMessage({ messageId: msg._id, msg }));
+			dispatch(updateMessage({ messageId: msg._id, message: msg }));
 		});
 
 		return () => {
