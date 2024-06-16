@@ -142,9 +142,9 @@ export default class MessagesService {
 		deviceId: string,
 		recipientId: string,
 		message: {
-			type: 'TEXT' | 'MEDIA' | 'CONTACT' | 'LOCATION' | 'UNKNOWN';
+			type: 'text' | 'image' | 'video' | 'document' | 'audio' | 'location' | 'contacts';
 			text?: string;
-			media_id?: string[];
+			media_id?: string;
 			location?: {
 				latitude?: string;
 				longitude?: string;
@@ -157,16 +157,14 @@ export default class MessagesService {
 			};
 		}
 	) {
-		console.log('Sending message', message);
-		// try {
-		// 	const { data } = await APIInstance.post(
-		// 		`/message/${deviceId}/conversations/${recipientId}/send-messages`,
-
-		// 		{ ...message }
-		// 	);
-		// 	return data;
-		// } catch (err) {
-		// 	return {};
-		// }
+		try {
+			await APIInstance.post(
+				`/message/${deviceId}/conversations/${recipientId}/send-message`,
+				message
+			);
+			return true;
+		} catch (err) {
+			return false;
+		}
 	}
 }

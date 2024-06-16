@@ -243,14 +243,14 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 			},
 		});
 
-		await conversationService.addMessageToConversation(id, {
+		const doc = await conversationService.addMessageToConversation(id, {
 			message_id: res.messages[0].id,
 			recipient: conversation.recipient,
 			body: {
 				body_type:
 					data.type === 'text'
 						? 'TEXT'
-						: data.type === 'contact'
+						: data.type === 'contacts'
 						? 'CONTACT'
 						: data.type === 'location'
 						? 'LOCATION'
@@ -262,11 +262,17 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 				contacts: data.contacts,
 				location: data.location,
 			},
-			context: {
-				id: data.context.message_id,
-			},
+			...(data.context
+				? {
+						context: {
+							id: data.context.message_id,
+						},
+				  }
+				: {}),
 		});
 	} catch (err) {
+		console.log((err as any).response.data);
+
 		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 	}
 

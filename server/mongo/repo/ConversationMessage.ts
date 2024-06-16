@@ -57,20 +57,22 @@ const schema = new mongoose.Schema<IConversationMessage>(
 			caption: String,
 			contacts: [
 				{
-					addresses: {
-						type: String,
-						street: String,
-						city: String,
-						state: String,
-						zip: String,
-						country: String,
-						country_code: String,
-					},
+					addresses: [
+						{
+							street: String,
+							city: String,
+							state: String,
+							zip: String,
+							country: String,
+							country_code: String,
+						},
+					],
 					birthday: String,
-					emails: {
-						email: String,
-						type: String,
-					},
+					emails: [
+						{
+							email: String,
+						},
+					],
 					name: {
 						formatted_name: String,
 						first_name: String,
@@ -84,11 +86,12 @@ const schema = new mongoose.Schema<IConversationMessage>(
 						department: String,
 						title: String,
 					},
-					phones: {
-						phone: String,
-						wa_id: String,
-						type: String,
-					},
+					phones: [
+						{
+							phone: String,
+							wa_id: String,
+						},
+					],
 				},
 			],
 			location: {

@@ -152,7 +152,9 @@ export default class ConversationService extends WhatsappLinkService {
 			SocketServer.getInstance().sendMessage(conversation_id.toString(), data);
 
 			return data;
-		} catch (err) {}
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	public static async updateStatus(

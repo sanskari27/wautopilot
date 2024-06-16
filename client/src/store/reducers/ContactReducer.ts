@@ -85,7 +85,7 @@ const Slice = createSlice({
 			state.contact.org.company = action.payload;
 		},
 		addEmptyEmail: (state) => {
-			state.contact.emails.push({ email: '', type: '' });
+			state.contact.emails.push({ email: '', type: 'HOME' });
 		},
 		removeEmail: (state, action: PayloadAction<number>) => {
 			state.contact.emails.splice(action.payload, 1);
@@ -97,7 +97,7 @@ const Slice = createSlice({
 			state.contact.emails[action.payload.index].type = action.payload.type;
 		},
 		addEmptyPhone: (state) => {
-			state.contact.phones.push({ phone: '', type: '', wa_id: '' });
+			state.contact.phones.push({ phone: '', type: 'HOME', wa_id: '' });
 		},
 		removePhone: (state, action: PayloadAction<number>) => {
 			state.contact.phones.splice(action.payload, 1);
@@ -124,7 +124,7 @@ const Slice = createSlice({
 				street: '',
 				zip: '',
 				country_code: '',
-				type: '',
+				type: 'HOME',
 			});
 		},
 		removeAddress: (state, action: PayloadAction<number>) => {
@@ -155,7 +155,7 @@ const Slice = createSlice({
 			state.contact.addresses[action.payload.index].country_code = action.payload.countryCode;
 		},
 		addEmptyUrl: (state) => {
-			state.contact.urls.push({ url: '', type: '' });
+			state.contact.urls.push({ url: '', type: 'HOME' });
 		},
 		removeUrl: (state, action: PayloadAction<number>) => {
 			state.contact.urls.splice(action.payload, 1);

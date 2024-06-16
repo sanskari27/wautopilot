@@ -13,13 +13,16 @@ export default async function VerifyDevice(req: Request, res: Response, next: Ne
 	}
 
 	const whatsappLinkService = new WhatsappLinkService(req.locals.account);
+	try {
+		const device = await whatsappLinkService.fetchDeviceDoc(id);
 
-	const device = await whatsappLinkService.fetchDeviceDoc(id);
+		if (!device) {
+			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+		}
 
-	if (!device) {
+		req.locals.device = device;
+		next();
+	} catch (err) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
-
-	req.locals.device = device;
-	next();
 }

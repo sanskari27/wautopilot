@@ -13,6 +13,7 @@ import {
 	Tag,
 	Text,
 	Textarea,
+	useToast,
 } from '@chakra-ui/react';
 import { ReactNode, useEffect, useRef } from 'react';
 import { BiArrowBack, BiSend } from 'react-icons/bi';
@@ -48,6 +49,7 @@ type ChatScreenProps = {
 
 const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 	const dispatch = useDispatch();
+	const toast = useToast();
 	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
@@ -70,14 +72,21 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 	const sendTextMessage = () => {
 		if (!textMessage) return;
 		dispatch(setMessageSending(true));
-		MessagesService.sendConversationMessage(selected_recipient._id, selected_device_id, {
-			type: 'TEXT',
+		MessagesService.sendConversationMessage(selected_device_id, selected_recipient._id, {
+			type: 'text',
 			text: textMessage,
 		}).then((data) => {
-			console.log(data);
-			// dispatch(addMessage(data));
-			// dispatch(setTextMessage(''));
 			dispatch(setMessageSending(false));
+			if (!data) {
+				return toast({
+					title: 'Error',
+					description: 'Failed to send message',
+					status: 'error',
+					duration: 5000,
+					isClosable: true,
+				});
+			}
+			dispatch(setTextMessage(''));
 		});
 	};
 
@@ -152,6 +161,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 
 const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 	const dispatch = useDispatch();
+	const toast = useToast();
 	const attachmentSelectorHandle = useRef<AttachmentDialogHandle>(null);
 	const addMediaHandle = useRef<AddMediaHandle>(null);
 
@@ -194,27 +204,33 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 		};
 	}, [selected_recipient._id, dispatch]);
 
-	const sendAttachmentMessage = (attachment: string[]) => {
-		if (attachment.length === 0) return;
-		console.log(attachment);
-		// MessagesService.sendConversationMessage(selected_recipient._id, selected_device_id, {
-		// 	type: 'MEDIA',
-		// 	media_id: attachment,
-		// }).then((data) => {
-		// 	console.log(data);
-		// 	// dispatch(addMessage(data));
-		// });
+	const sendAttachmentMessage = (type: string, attachments: string[]) => {
+		if (attachments.length === 0) return;
+		for (let i = 0; i < attachments.length; i++) {
+			MessagesService.sendConversationMessage(selected_device_id, selected_recipient._id, {
+				type: type.toLowerCase() as 'image' | 'video' | 'document' | 'audio',
+				media_id: attachments[i],
+			});
+		}
 	};
 
 	const sendContactMessage = (contact: Omit<Contact, 'id' | 'formatted_name'>[]) => {
-		console.log(contact);
-		// MessagesService.sendConversationMessage(selected_recipient._id, selected_device_id, {
-		// 	type: 'CONTACT',
-		// 	contacts: contact,
-		// }).then((data) => {
-		// 	console.log(data);
-		// 	// dispatch(addMessage(data));
-		// });
+		dispatch(setMessageSending(true));
+		MessagesService.sendConversationMessage(selected_device_id, selected_recipient._id, {
+			type: 'contacts',
+			contacts: contact,
+		}).then((data) => {
+			dispatch(setMessageSending(false));
+			if (!data) {
+				return toast({
+					title: 'Error',
+					description: 'Failed to send message',
+					status: 'error',
+					duration: 5000,
+					isClosable: true,
+				});
+			}
+		});
 	};
 
 	return (
@@ -305,8 +321,7 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 			<AddMedia
 				ref={addMediaHandle}
 				onConfirm={(media_id) => {
-					console.log(media_id);
-					sendAttachmentMessage([media_id]);
+					sendAttachmentMessage('document', [media_id]);
 				}}
 			/>
 			<ContactSelectorDialog ref={contactDialogHandle} onConfirm={sendContactMessage} />

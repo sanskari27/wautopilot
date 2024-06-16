@@ -32,7 +32,7 @@ export type AttachmentDialogHandle = {
 };
 
 type Props = {
-	onConfirm: (ids: string[]) => void;
+	onConfirm: (type: string, ids: string[]) => void;
 };
 
 const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
@@ -48,7 +48,7 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 		};
 
 		const handleAdd = () => {
-			onConfirm(selected);
+			onConfirm(type, selected);
 			onClose();
 		};
 

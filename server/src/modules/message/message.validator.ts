@@ -35,7 +35,7 @@ export type CreateBroadcastValidationResult = {
 };
 
 export type SendMessageValidationResult = {
-	type: 'text' | 'image' | 'video' | 'document' | 'audio' | 'location' | 'contact';
+	type: 'text' | 'image' | 'video' | 'document' | 'audio' | 'location' | 'contacts';
 	media_id?: string | undefined;
 	text?: string | undefined;
 	location?:
@@ -151,7 +151,7 @@ export async function CreateBroadcastValidator(req: Request, res: Response, next
 
 export async function SendMessageValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		type: z.enum(['text', 'image', 'video', 'document', 'audio', 'location', 'contact']),
+		type: z.enum(['text', 'image', 'video', 'document', 'audio', 'location', 'contacts']),
 		text: z.string().optional(),
 		media_id: z.string().optional(),
 		location: z
@@ -181,14 +181,14 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 						zip: z.string(),
 						country: z.string(),
 						country_code: z.string(),
-						type: z.enum(['HOME', 'WORK']),
+						type: z.enum(['HOME', 'WORK']).default('HOME'),
 					})
 				),
 				birthday: z.string(),
 				emails: z.array(
 					z.object({
 						email: z.string(),
-						type: z.enum(['WORK', 'HOME']),
+						type: z.enum(['WORK', 'HOME']).default('HOME'),
 					})
 				),
 				org: z.object({
@@ -200,13 +200,13 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 					z.object({
 						phone: z.string(),
 						wa_id: z.string(),
-						type: z.enum(['HOME', 'WORK']),
+						type: z.enum(['HOME', 'WORK']).default('HOME'),
 					})
 				),
 				urls: z.array(
 					z.object({
 						url: z.string(),
-						type: z.enum(['HOME', 'WORK']),
+						type: z.enum(['HOME', 'WORK']).default('HOME'),
 					})
 				),
 			})
