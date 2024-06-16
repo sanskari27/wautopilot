@@ -20,9 +20,10 @@ import {
 	useToast,
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
+import { setUserDetails } from '../../../store/reducers/UserReducers';
 
 export type SettingsDrawerHandle = {
 	open: () => void;
@@ -31,6 +32,7 @@ export type SettingsDrawerHandle = {
 
 const SettingsDrawer = forwardRef<SettingsDrawerHandle>((_, ref) => {
 	const toast = useToast();
+	const dispatch = useDispatch();
 	const [isOpen, setIsOpen] = useState(false);
 	const [money, setMoney] = useState<{
 		amount: string;
@@ -79,6 +81,11 @@ const SettingsDrawer = forwardRef<SettingsDrawerHandle>((_, ref) => {
 						toast({
 							title: 'Payment successful',
 							status: 'success',
+						});
+						AuthService.userDetails().then((res) => {
+							if (res) {
+								dispatch(setUserDetails(res));
+							}
 						});
 					} else {
 						toast({

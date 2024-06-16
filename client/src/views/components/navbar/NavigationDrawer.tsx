@@ -9,7 +9,7 @@ import { MenuItems } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
 import DevicesDialog, { DevicesHandle } from '../devices';
-import SettingsDrawer, { SettingsDrawerHandle } from '../settings-drawer';
+import SettingsDrawer, { SettingsDrawerHandle } from '../settings-dialog';
 import Each from '../utils/Each';
 
 function isActiveTab(tab: string, path: string): boolean {

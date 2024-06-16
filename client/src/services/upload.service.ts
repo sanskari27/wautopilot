@@ -42,8 +42,10 @@ export default class UploadService {
 				}
 			);
 			const data = response.data;
-
-			const filename = response.headers['content-disposition'].split('filename=')[1];
+			const filename = response.headers['content-disposition']
+				.split('filename=')[1]
+				.trim()
+				.replace(/^"|"$/g, '');
 			const url = window.URL.createObjectURL(new Blob([data]));
 			const link = document.createElement('a');
 			link.href = url;

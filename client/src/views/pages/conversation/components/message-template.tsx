@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import { BiErrorCircle } from 'react-icons/bi';
+import { HiLocationMarker } from 'react-icons/hi';
 import { MdOutlinePermMedia } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import MessagesService from '../../../../services/messages.service';
@@ -44,6 +45,16 @@ export const LocationMessage = ({ message }: { message: Message }) => {
 				}`}
 				isExternal
 			>
+				<Text color={'green'}>
+					<Icon
+						as={HiLocationMarker}
+						fontSize={'1.25rem'}
+						my={'auto'}
+						display={'inline-block'}
+						mr={1}
+					/>
+					Location
+				</Text>
 				{message.body?.location?.name ? (
 					<Text fontWeight={'medium'}>{message.body.location?.name}</Text>
 				) : null}
