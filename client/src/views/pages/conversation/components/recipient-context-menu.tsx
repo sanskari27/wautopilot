@@ -52,7 +52,7 @@ export default function ContextMenu({ recipient }: { recipient: Recipient }) {
 					_expanded={{ bgColor: 'transparent' }}
 					_focus={{ bgColor: 'transparent' }}
 					ml={'auto'}
-					className={!isMenuClicked ? 'group-hover:!block !hidden' : 'bloxk'}
+					className={!isMenuClicked ? 'group-hover:!block !hidden' : 'block'}
 					// position={'absolute'}
 					right={0}
 				>
