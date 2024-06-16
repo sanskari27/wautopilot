@@ -29,9 +29,9 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 			<Flex gap={1} alignItems={'center'} justifyContent={isMe ? 'flex-start' : 'flex-end'}>
 				{message.delivered_at && <FormatTime time={message.delivered_at} />}
 				{message.received_at && <FormatTime time={message.received_at} />}
-				{message.read_at ? (
+				{message.delivered_at ? (
 					<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={BiCheckDouble} color='gray.500' />
-				) : message.delivered_at ? (
+				) : message.read_at ? (
 					<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={BiCheckDouble} color='blue.500' />
 				) : null}
 			</Flex>
