@@ -2,7 +2,7 @@ import { ChevronDownIcon } from '@chakra-ui/icons';
 import { Button, Icon, Menu, MenuButton, MenuItem, MenuList, useBoolean } from '@chakra-ui/react';
 import { useRef } from 'react';
 import { BiLabel } from 'react-icons/bi';
-import { TiPinOutline } from 'react-icons/ti';
+import { LuPin, LuPinOff } from 'react-icons/lu';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
 import { setRecipientsList } from '../../../../store/reducers/RecipientReducer';
@@ -73,7 +73,15 @@ export default function ContextMenu({ recipient }: { recipient: Recipient }) {
 						<Icon as={BiLabel} mr={2} /> Assign label
 					</MenuItem>
 					<MenuItem onClick={handleConversationPin}>
-						<Icon as={TiPinOutline} mr={2} /> Pin/Unpin
+						{localStorage.getItem('pinned')?.includes(recipient._id) ? (
+							<>
+								<Icon as={LuPinOff} mr={2} /> Unpin
+							</>
+						) : (
+							<>
+								<Icon as={LuPin} mr={2} /> pin
+							</>
+						)}
 					</MenuItem>
 				</MenuList>
 			</Menu>

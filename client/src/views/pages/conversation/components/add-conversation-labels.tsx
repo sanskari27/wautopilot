@@ -76,12 +76,24 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 		},
 	}));
 
-	const handleLabelsChange = (labels: string[]) =>
-		setSelectedRecipient((prev) => {
-			return { ...prev, labels };
+	const handleLabelsChange = (labels: string[]) => {
+		const selectedLabels = [] as string[];
+		labels.forEach((label) => {
+			if (!selected_recipient.labels.includes(label)) {
+				selectedLabels.push(label);
+			}
 		});
+		setSelectedRecipient((prev) => {
+			return {
+				...prev,
+				labels: [...prev.labels, ...selectedLabels],
+			};
+		});
+	};
 
 	const handleSave = async () => {
+		setIsSaving.on();
+
 		MessagesService.ConversationLabels(
 			selected_device_id,
 			selected_recipient._id,
@@ -108,6 +120,9 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 					duration: 3000,
 					isClosable: true,
 				});
+			})
+			.finally(() => {
+				setIsSaving.off();
 			});
 	};
 
@@ -122,7 +137,7 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 					<FormControl pt={'1rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel>Tags</FormLabel>
-							<LabelFilter onClose={handleLabelsChange} />
+							<LabelFilter onChange={handleLabelsChange} />
 						</HStack>
 						<Textarea
 							placeholder={`Enter tags here separated by comma`}

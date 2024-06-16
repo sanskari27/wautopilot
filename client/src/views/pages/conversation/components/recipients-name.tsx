@@ -1,4 +1,5 @@
-import { Avatar, Box, Flex, Text } from '@chakra-ui/react';
+import { Avatar, Box, Flex, Icon, Text } from '@chakra-ui/react';
+import { TiPinOutline } from 'react-icons/ti';
 import { useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
 import ContextMenu from './recipient-context-menu';
@@ -40,14 +41,18 @@ const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
 			rounded={'lg'}
 			className='group'
 		>
-			<Avatar name={item.profile_name} />
+			<Box position={'relative'}>
+				<Avatar name={item.profile_name} />
+				{localStorage.getItem('pinned')?.includes(item._id) && (
+					<Icon as={TiPinOutline} mr={2} position={'absolute'} right={'-15px'} />
+				)}
+			</Box>
 			<Box>
 				<Text fontWeight={'medium'} className='line-clamp-1 w-[250px] md:w-[150px]'>
 					{item.profile_name}
 				</Text>
 				<Text fontSize={'sm'}>{item.recipient}</Text>
 			</Box>
-
 			<ContextMenu recipient={item} />
 		</Flex>
 	);
