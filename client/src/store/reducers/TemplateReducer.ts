@@ -40,6 +40,9 @@ const Slice = createSlice({
 		) => {
 			state.details = action.payload;
 		},
+		resetDetails: (state) => {
+			state.details = initialState.details;
+		},
 		setFile: (state, action: PayloadAction<File | null>) => {
 			state.file = action.payload;
 		},
@@ -217,6 +220,7 @@ export const {
 	addPhoneNumberButton,
 	setBodyExample,
 	addURLButton,
+	resetDetails,
 } = Slice.actions;
 
 export default Slice.reducer;

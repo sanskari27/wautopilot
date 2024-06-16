@@ -26,7 +26,7 @@ import UploadService from '../../../../services/upload.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
 	removeButtonComponent,
-	reset,
+	resetDetails,
 	setBodyExample,
 	setBodyText,
 	setDetails,
@@ -72,7 +72,7 @@ export default function EditTemplate() {
 		components.filter((component) => component.type === 'BUTTONS')?.[0]?.buttons ?? [];
 
 	useEffect(() => {
-		dispatch(reset());
+		dispatch(resetDetails());
 		if (!id) {
 			return;
 		}

@@ -21,7 +21,7 @@ function processConversationDocs(docs: IConversation[]) {
 	}));
 }
 
-function processConversationMessages(docs: IConversationMessage[]) {
+function processConversationMessages(docs: Partial<IConversationMessage>[]) {
 	return docs.map((doc) => ({
 		_id: doc._id,
 		recipient: doc.recipient,
@@ -157,7 +157,7 @@ export default class ConversationService extends WhatsappLinkService {
 						messages: doc._id,
 					},
 					$set: {
-						last_message_at: details.received_at,
+						last_message_at: DateUtils.getMomentNow().toDate(),
 					},
 				}
 			);
@@ -257,6 +257,12 @@ export default class ConversationService extends WhatsappLinkService {
 			conversation_id,
 		}).sort({ createdAt: -1 });
 
-		return processConversationMessages(docs);
+		const _docs = docs.sort(
+			(a, b) =>
+				(b.received_at ?? b.sent_at ?? b.createdAt).getTime() -
+				(a.received_at ?? a.sent_at ?? a.createdAt).getTime()
+		);
+
+		return processConversationMessages(_docs);
 	}
 }
