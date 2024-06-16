@@ -4,7 +4,7 @@ import { BroadcastDB, BroadcastMessageDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import MetaAPI from '../config/MetaAPI';
-import { MESSAGE_STATUS } from '../config/const';
+import { BROADCAST_STATUS, MESSAGE_STATUS } from '../config/const';
 import DateUtils from '../utils/DateUtils';
 import { extractBody, extractButtons, extractFooter, extractHeader } from '../utils/MessageHelper';
 import TimeGenerator from '../utils/TimeGenerator';
@@ -42,6 +42,90 @@ export default class BroadcastService extends WhatsappLinkService {
 	public constructor(account: IAccount, whatsappLink: IWhatsappLink) {
 		super(account);
 		this.whatsappLink = whatsappLink;
+	}
+
+	public async fetchReports() {
+		const campaigns = await BroadcastDB.aggregate([
+			{ $match: { linked_to: this.account._id, device_id: this.whatsappLink._id } },
+			{
+				$lookup: {
+					from: BroadcastMessageDB.collection.name, // Name of the OtherModel collection
+					localField: 'messages',
+					foreignField: '_id',
+					as: 'messagesInfo',
+				},
+			},
+			{
+				$unwind: '$messagesInfo', // If messages is an array, unwind it to separate documents
+			},
+			{
+				$group: {
+					_id: '$_id', // Group by the campaign ID
+					name: { $first: '$name' },
+					description: { $first: '$description' },
+					status: { $first: '$status' },
+					startTime: { $first: '$startTime' },
+					endTime: { $first: '$endTime' },
+					daily_messages_count: { $first: '$daily_messages_count' },
+					createdAt: { $first: '$createdAt' },
+					sent: {
+						$sum: {
+							$cond: {
+								if: {
+									$and: [
+										{ $ne: ['$messagesInfo.status', MESSAGE_STATUS.PROCESSING] },
+										{ $ne: ['$messagesInfo.status', MESSAGE_STATUS.FAILED] },
+										{ $ne: ['$messagesInfo.status', MESSAGE_STATUS.PENDING] },
+									],
+								},
+								then: 1,
+								else: 0,
+							},
+						},
+					},
+					failed: {
+						$sum: { $cond: [{ $eq: ['$messagesInfo.status', MESSAGE_STATUS.FAILED] }, 1, 0] },
+					},
+					pending: {
+						$sum: {
+							$cond: [{ $in: ['$messagesInfo.status', [MESSAGE_STATUS.PENDING]] }, 1, 0],
+						},
+					},
+				},
+			},
+			{
+				$project: {
+					broadcast_id: '$_id',
+					_id: 0,
+					name: 1,
+					description: 1,
+					status: 1,
+					sent: 1,
+					failed: 1,
+					pending: 1,
+					createdAt: 1,
+					startTime: 1,
+					endTime: 1,
+					isPaused: { $eq: ['$status', BROADCAST_STATUS.PAUSED] },
+				},
+			},
+		]);
+
+		return campaigns
+			.sort((a, b) =>
+				DateUtils.getMoment(a.createdAt).isAfter(DateUtils.getMoment(b.createdAt)) ? -1 : 1
+			)
+			.map((message: { [key: string]: any }) => ({
+				broadcast_id: message.broadcast_id as string,
+				name: message.name as string,
+				description: message.description as string,
+				status: message.status as string,
+				sent: message.sent as number,
+				failed: message.failed as number,
+				pending: message.pending as number,
+				createdAt: DateUtils.format(message.createdAt, 'DD-MM-YYYY HH:mm') as string,
+				isPaused: message.isPaused as boolean,
+			}));
 	}
 
 	public async startBroadcast(

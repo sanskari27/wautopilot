@@ -18,6 +18,24 @@ const bodyParametersList = [
 	'anniversary',
 ];
 
+async function broadcastReport(req: Request, res: Response, next: NextFunction) {
+	try {
+		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+
+		const reports = await broadcastService.fetchReports();
+
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				reports,
+			},
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+	}
+}
+
 async function sendTemplateMessage(req: Request, res: Response, next: NextFunction) {
 	const {
 		body,
@@ -282,6 +300,7 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 
 const Controller = {
 	sendTemplateMessage,
+	broadcastReport,
 	fetchConversations,
 	fetchConversationMessages,
 	markRead,

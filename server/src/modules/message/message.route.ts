@@ -5,7 +5,9 @@ import { CreateBroadcastValidator, SendMessageValidator } from './message.valida
 
 const router = express.Router();
 
-router.route('/send-broadcast').all(CreateBroadcastValidator).post(Controller.sendTemplateMessage);
+router.route('/broadcast/report').get(Controller.broadcastReport);
+router.route('/broadcast/send-broadcast').all(CreateBroadcastValidator).post(Controller.sendTemplateMessage);
+
 router.route('/conversations').get(Controller.fetchConversations);
 router
 	.route('/conversations/:id/messages')
@@ -14,7 +16,7 @@ router
 
 router
 	.route('/conversations/:id/send-message')
-	.all(IDValidator,SendMessageValidator)
+	.all(IDValidator, SendMessageValidator)
 	.post(Controller.sendMessageToConversation);
 
 router.route('/mark-read/:message_id').post(Controller.markRead);
