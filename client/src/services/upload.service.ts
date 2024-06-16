@@ -32,5 +32,26 @@ export default class UploadService {
 
 		return data.media_id as string;
 	}
-	
+
+	static async downloadMetaMedia(deviceId: string, media_id: string) {
+		try {
+			const response = await APIInstance.get(
+				`/uploads/${deviceId}/download-meta-media/${media_id}`,
+				{
+					responseType: 'blob',
+				}
+			);
+			const data = response.data;
+
+			const filename = response.headers['content-disposition'].split('filename=')[1];
+			const url = window.URL.createObjectURL(new Blob([data]));
+			const link = document.createElement('a');
+			link.href = url;
+			link.setAttribute('download', filename);
+			document.body.appendChild(link);
+			link.click();
+		} catch (err) {
+			console.log(err);
+		}
+	}
 }

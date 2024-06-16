@@ -123,7 +123,6 @@ const AddMedia = forwardRef<AddMediaHandle, AddMediaProps>(({ onConfirm }: AddMe
 		UploadService.generateMetaMediaId(selected_device_id, file, onUploadProgress)
 			.then((res) => {
 				dispatch(setMetaAttachmentId(res));
-				console.log(res);
 				onConfirm(res);
 				handleClose();
 			})

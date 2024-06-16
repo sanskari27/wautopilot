@@ -73,7 +73,6 @@ const SettingsDrawer = forwardRef<SettingsDrawerHandle>((_, ref) => {
 		const rzp1 = new (window as any).Razorpay({
 			...razorpay_options,
 			handler: function (response: any) {
-				console.log(response);
 				AuthService.confirmPayment(transaction_id).then((res) => {
 					if (res) {
 						toast({

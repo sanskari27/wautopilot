@@ -11,12 +11,14 @@ import {
 	Image,
 	Link,
 	Text,
+	useToast,
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import { BiErrorCircle } from 'react-icons/bi';
 import { MdOutlinePermMedia } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import MessagesService from '../../../../services/messages.service';
+import UploadService from '../../../../services/upload.service';
 import { StoreNames, StoreState } from '../../../../store';
 import { Contact } from '../../../../store/types/ContactState';
 import { Message } from '../../../../store/types/MessageState';
@@ -60,6 +62,7 @@ const initialState = {
 	size: 0,
 };
 export const MediaMessage = ({ message }: { message: Message }) => {
+	const toast = useToast();
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const [media, setMedia] = useState(initialState);
 	useEffect(() => {
@@ -75,6 +78,17 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 			});
 		});
 	}, [message.body?.media_id, selected_device_id]);
+
+	const handleDownload = () => {
+		if (!selected_device_id || !message.body?.media_id) {
+			return;
+		}
+		toast.promise(UploadService.downloadMetaMedia(selected_device_id, message.body?.media_id), {
+			loading: { title: 'Downloading...' },
+			success: { title: 'Downloaded!' },
+			error: { title: 'Failed to download' },
+		});
+	};
 
 	return (
 		<ChatMessageWrapper message={message}>
@@ -115,7 +129,7 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 							alignItems={'center'}
 							justifyContent={'center'}
 							height={'full'}
-							onClick={() => setMedia((prev) => ({ ...prev, showPreview: true }))}
+							onClick={handleDownload}
 						>
 							<Icon as={DownloadIcon} color={'white'} />
 							<Text color={'white'}>{getFileSize(media.size)}</Text>

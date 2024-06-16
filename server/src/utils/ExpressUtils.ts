@@ -37,6 +37,7 @@ export const RespondCSV = ({ res, filename, data }: CSVResponseData) => {
 export const RespondFile = ({ res, filename, filepath }: FileResponseData) => {
 	const stat = fs.statSync(filepath);
 	res.set('content-length', stat.size.toString());
+	res.set('content-disposition', `attachment; filename="${filename}"`);
 	res.status(200).sendFile(filepath);
 };
 

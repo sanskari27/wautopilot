@@ -127,12 +127,18 @@ async function fetchMetaMediaUrl(req: Request, res: Response, next: NextFunction
 }
 
 async function downloadMetaMedia(req: Request, res: Response, next: NextFunction) {
-	const url = req.body.url;
-	if (!url) {
+	const id = req.params.id;
+	if (!id || typeof id !== 'string') {
 		return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
 	}
 	try {
-		const response = await axios.get(url, {
+		const { data } = await MetaAPI.get(`/${id}`, {
+			headers: {
+				Authorization: `Bearer ${req.locals.device.accessToken}`,
+			},
+		});
+
+		const response = await axios.get(data.url, {
 			responseType: 'arraybuffer',
 			headers: {
 				Authorization: `Bearer ${req.locals.device.accessToken}`,
@@ -142,12 +148,16 @@ async function downloadMetaMedia(req: Request, res: Response, next: NextFunction
 		const fileExtension = contentType.split('/')[1];
 		const fileData = Buffer.from(response.data, 'binary');
 		const name = generateRandomID() + '.' + fileExtension;
+
 		fs.writeFile(__basedir + Path.Misc + name, fileData, () => {
-			return RespondFile({
+			RespondFile({
 				res,
 				filename: name,
 				filepath: __basedir + Path.Misc + name,
 			});
+			setTimeout(() => {
+				FileUtils.deleteFile(__basedir + Path.Misc + name);
+			}, 30 * 60 * 1000);
 		});
 	} catch (err) {
 		next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR, err));

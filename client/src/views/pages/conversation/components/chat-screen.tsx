@@ -189,12 +189,9 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 
 		socket.on('connect', () => {
 			socket.emit('join_conversation', selected_recipient._id);
-			console.log('Connected to the server');
 		});
 
-		socket.on('disconnect', () => {
-			console.log('Disconnected from the server');
-		});
+		socket.on('disconnect', () => {});
 
 		socket.on('message_new', (msg) => {
 			dispatch(addMessage(msg));
