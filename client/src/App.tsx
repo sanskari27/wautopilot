@@ -8,14 +8,6 @@ import { useDispatch } from 'react-redux';
 import { useGeoLocation } from './hooks/useGeolocation';
 import AuthService from './services/auth.service';
 import { setIsAuthenticated } from './store/reducers/UserReducers';
-import LoginPopup from './views/components/loginPopup';
-import Broadcast from './views/pages/broadcast';
-import Dashboard from './views/pages/dashboard';
-import MediaPage from './views/pages/media';
-import AddMedia from './views/pages/media/add-media';
-import Phonebook from './views/pages/phonebook';
-import Templates from './views/pages/templates';
-import EditTemplate from './views/pages/templates/edit-template';
 const Home = lazy(() => import('./views/pages/_'));
 const Terms = lazy(() => import('./views/pages/static_pages/terms'));
 const Privacy = lazy(() => import('./views/pages/static_pages/privacy'));
@@ -25,6 +17,14 @@ const AppPage = lazy(() => import('./views/pages/app'));
 const Conversation = lazy(() => import('./views/pages/conversation'));
 const SamplePage = lazy(() => import('./views/pages/static_pages/sample'));
 const ContactPage = lazy(() => import('./views/pages/contacts'));
+const Broadcast = lazy(() => import('./views/pages/broadcast'));
+const LoginPopup = lazy(() => import('./views/components/loginPopup'));
+// const Dashboard = lazy(() => import('./views/pages/dashboard'));
+const Templates = lazy(() => import('./views/pages/templates'));
+const EditTemplate = lazy(() => import('./views/pages/templates/edit-template'));
+const Phonebook = lazy(() => import('./views/pages/phonebook'));
+const MediaPage = lazy(() => import('./views/pages/media'));
+const AddMedia = lazy(() => import('./views/pages/media/add-media'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -51,7 +51,6 @@ function App() {
 						<Route path={NAVIGATION.SAMPLE} element={<SamplePage />} />
 
 						<Route path={NAVIGATION.APP} element={<AppPage />}>
-							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
 							<Route path={NAVIGATION.PHONEBOOK} element={<Phonebook />} />
 							<Route
 								path={NAVIGATION.TEMPLATES + '/' + NAVIGATION.ADD_TEMPLATE}
@@ -68,6 +67,7 @@ function App() {
 							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
 							<Route path={NAVIGATION.CONTACT} element={<ContactPage />} />
 							<Route path={NAVIGATION.INBOX} element={<Conversation />} />
+							{/* <Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} /> */}
 						</Route>
 						{/* <Route path='*' element={<Home />} /> */}
 					</Routes>

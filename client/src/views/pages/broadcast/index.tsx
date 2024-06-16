@@ -77,7 +77,7 @@ export default function Broadcast() {
 	function sendBroadcast(header_media: { link?: string; media_id?: string } = {}) {
 		const template = templateListFiltered.find((t) => t.id === template_id)!;
 		const header = template.components.find((c) => c.type === 'HEADER');
-		const promise = APIInstance.post(`/message/${selected_device_id}/send-broadcast`, {
+		const promise = APIInstance.post(`/message/${selected_device_id}/broadcast/send-broadcast`, {
 			name: name,
 			description: description,
 			template_id: template_id,

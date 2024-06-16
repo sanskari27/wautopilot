@@ -106,7 +106,8 @@ export default function NavigationDrawer({
 								name={deviceList.find((device) => device.id === selected_device_id)?.verifiedName}
 							/>
 							<Text fontSize={'sm'} whiteSpace={'nowrap'}>
-								{deviceList.find((device) => device.id === selected_device_id)?.verifiedName}
+								{deviceList.find((device) => device.id === selected_device_id)?.verifiedName ??
+									'No Devices'}
 							</Text>
 						</Flex>
 						<Flex

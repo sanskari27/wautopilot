@@ -95,7 +95,7 @@ const AppPage = () => {
 
 	if (!isAuthenticated) return <Navigate to={`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`} />;
 
-	if (!outlet) return <Navigate to={`${NAVIGATION.APP}/${NAVIGATION.DASHBOARD}`} />;
+	if (!outlet) return <Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />;
 
 	return (
 		<Box width={'full'}>

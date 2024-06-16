@@ -81,7 +81,7 @@ const AddDevice = forwardRef<AddDeviceHandle>((_, ref) => {
 	}, [details, toast, setLoading]);
 
 	const onClose = () => {
-		navigate(`${NAVIGATION.APP}/${NAVIGATION.DASHBOARD}`);
+		navigate(`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`);
 		setIsOpen.off();
 	};
 

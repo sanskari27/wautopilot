@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import useFilteredList from '../../../hooks/useFilteredList';
 import { StoreNames, StoreState } from '../../../store';
 import { reset } from '../../../store/reducers/MessagesReducers';
+import { setLabels } from '../../../store/reducers/PhonebookReducer';
 import { setSelectedRecipient } from '../../../store/reducers/RecipientReducer';
 import { Recipient } from '../../../store/types/RecipientsState';
 import LabelFilter from '../../components/labelFilter';
@@ -57,11 +58,9 @@ const Conversation = () => {
 					</Text>
 					<HStack mb={'0.5rem'} marginRight={'0.5rem'} className='pr-2 md:!px-0'>
 						<SearchBar onSearchTextChanged={setSearchText} />
-						<LabelFilter
-						//  onChange={(labels) => dispatch(setLabels(labels))}
-						/>
+						<LabelFilter onChange={(labels) => dispatch(setLabels(labels))} />
 					</HStack>
-					<Flex direction={'column'} overflowY={'auto'}>
+					<Flex direction={'column'} overflowY={'auto'} overflowX={'hidden'}>
 						{loading ? (
 							<Stack>
 								<Skeleton height='50px' />

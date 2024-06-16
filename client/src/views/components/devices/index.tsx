@@ -43,7 +43,10 @@ const DevicesDialog = forwardRef<DevicesHandle>((_, ref) => {
 		uiDetails: { loadingDevices },
 	} = useSelector((state: StoreState) => state[StoreNames.DEVICES]);
 
-	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
+	const {
+		selected_device_id,
+		user_details: { no_of_devices },
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	useImperativeHandle(ref, () => ({
 		open: () => {
@@ -95,41 +98,49 @@ const DevicesDialog = forwardRef<DevicesHandle>((_, ref) => {
 								<Tbody>
 									{loadingDevices && (
 										<Tr>
-											<Td colSpan={4} textAlign={'center'}>
+											<Td colSpan={5} textAlign={'center'}>
 												Loading...
 											</Td>
 										</Tr>
 									)}
-									<Each
-										items={list}
-										render={(device, index) => (
-											<Tr key={index}>
-												<Td>
-													<Checkbox
-														colorScheme='green'
-														mr={'5px'}
-														isChecked={selected_device_id === device.id}
-														onChange={() => {
-															handleChangeSelectedDeviceId(device.id);
-														}}
-													/>
-													{device.verifiedName}
-												</Td>
-												<Td>{device.phoneNumber}</Td>
-												<Td>{device.phoneNumberId}</Td>
-												<Td>{device.waid}</Td>
-												<Td>
-													<IconButton
-														aria-label='Remove Device'
-														colorScheme='red'
-														size={'sm'}
-														icon={<DeleteIcon color='white' fontSize={'0.75rem'} />}
-														onClick={() => confirmationAlertDialogRef.current?.open(device.id)}
-													/>
-												</Td>
-											</Tr>
-										)}
-									/>
+									{list.length > 0 ? (
+										<Each
+											items={list}
+											render={(device, index) => (
+												<Tr key={index}>
+													<Td>
+														<Checkbox
+															colorScheme='green'
+															mr={'5px'}
+															isChecked={selected_device_id === device.id}
+															onChange={() => {
+																handleChangeSelectedDeviceId(device.id);
+															}}
+														/>
+														{device.verifiedName}
+													</Td>
+													<Td>{device.phoneNumber}</Td>
+													<Td>{device.phoneNumberId}</Td>
+													<Td>{device.waid}</Td>
+													<Td>
+														<IconButton
+															aria-label='Remove Device'
+															colorScheme='red'
+															size={'sm'}
+															icon={<DeleteIcon color='white' fontSize={'0.75rem'} />}
+															onClick={() => confirmationAlertDialogRef.current?.open(device.id)}
+														/>
+													</Td>
+												</Tr>
+											)}
+										/>
+									) : (
+										<Tr>
+											<Td colSpan={4} textAlign={'center'}>
+												No Devices Found
+											</Td>
+										</Tr>
+									)}
 								</Tbody>
 							</Table>
 						</TableContainer>
@@ -139,7 +150,12 @@ const DevicesDialog = forwardRef<DevicesHandle>((_, ref) => {
 						<Button colorScheme='blue' mr={3} onClick={setIsOpen.off}>
 							Close
 						</Button>
-						<Button colorScheme='green' onClick={addDeviceDialogRef.current?.open}>
+
+						<Button
+							hidden={no_of_devices <= list.length}
+							colorScheme='green'
+							onClick={addDeviceDialogRef.current?.open}
+						>
 							Add Device
 						</Button>
 					</ModalFooter>

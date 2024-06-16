@@ -1,6 +1,7 @@
 import { Avatar, Box, Flex, Text } from '@chakra-ui/react';
 import { useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
+import ContextMenu from './recipient-context-menu';
 
 type Item = {
 	_id: string;
@@ -36,12 +37,17 @@ const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
 			onClick={handleRecipientClick}
 			bg={selected_recipient._id === item._id ? 'gray.100' : 'white'}
 			rounded={'lg'}
+			className='group'
+			
+
 		>
-			<Avatar name={item.profile_name} />
+			<Avatar name={item.profile_name}  />
 			<Box>
-				<Text fontWeight={'medium'}>{item.profile_name}</Text>
+				<Text fontWeight={'medium'} className='line-clamp-1 w-[250px] md:w-[150px]'>{item.profile_name}</Text>
 				<Text fontSize={'sm'}>{item.recipient}</Text>
 			</Box>
+
+			<ContextMenu />
 		</Flex>
 	);
 };
