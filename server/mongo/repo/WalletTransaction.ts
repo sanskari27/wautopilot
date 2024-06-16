@@ -16,6 +16,7 @@ const schema = new mongoose.Schema<IWalletTransaction>({
 	},
 	reference_id: {
 		type: String,
+		unique: true,
 		required: true,
 	},
 	order_id: String,
@@ -26,8 +27,6 @@ const schema = new mongoose.Schema<IWalletTransaction>({
 		default: 'PENDING',
 	},
 });
-
-schema.index({ linked_to: 1, phoneNumberId: 1, waid: 1 }, { unique: true });
 
 const WalletTransactionDB = mongoose.model<IWalletTransaction>(WalletTransactionDB_name, schema);
 
