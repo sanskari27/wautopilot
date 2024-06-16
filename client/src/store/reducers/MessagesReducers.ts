@@ -42,6 +42,17 @@ const Slice = createSlice({
 		addMessage: (state, action: PayloadAction<(typeof initialState.messageList)[0]>) => {
 			state.messageList = [action.payload, ...state.messageList];
 		},
+		updateMessage: (
+			state,
+			action: PayloadAction<{
+				messageId: string;
+				message: (typeof initialState.messageList)[0];
+			}>
+		) => {
+			state.messageList = state.messageList.map((msg) =>
+				msg._id === action.payload.messageId ? action.payload.message : msg
+			);
+		},
 		setMessagesLoading: (state, action: PayloadAction<boolean>) => {
 			state.uiDetails.messagesLoading = action.payload;
 		},
@@ -110,6 +121,7 @@ export const {
 	setAttachmentType,
 	setAttachmentUrl,
 	addMessage,
+	updateMessage,
 } = Slice.actions;
 
 export default Slice.reducer;

@@ -243,7 +243,7 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 			},
 		});
 
-		const doc = await conversationService.addMessageToConversation(id, {
+		await conversationService.addMessageToConversation(id, {
 			message_id: res.messages[0].id,
 			recipient: conversation.recipient,
 			body: {
@@ -271,8 +271,6 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 				: {}),
 		});
 	} catch (err) {
-		console.log((err as any).response.data);
-
 		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 	}
 

@@ -185,6 +185,13 @@ export default class ConversationService extends WhatsappLinkService {
 			},
 			details
 		);
+		const doc = await ConversationMessageDB.findOne({
+			message_id: msgID,
+		});
+		if (!doc) return;
+
+		const data = processConversationMessages([doc])[0];
+		SocketServer.getInstance().sendMessageUpdated(doc.conversation_id.toString(), data);
 	}
 
 	public static async updateConversationDetails(

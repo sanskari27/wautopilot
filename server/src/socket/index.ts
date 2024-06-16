@@ -42,6 +42,10 @@ export default class SocketServer {
 	}
 
 	public sendMessage(conversation_id: string, message: any) {
-		this.io.of('/conversation').to(conversation_id).emit('new_message', message);
+		this.io.of('/conversation').to(conversation_id).emit('message_new', message);
+	}
+
+	public sendMessageUpdated(conversation_id: string, message: any) {
+		this.io.of('/conversation').to(conversation_id).emit('message_updated', message);
 	}
 }

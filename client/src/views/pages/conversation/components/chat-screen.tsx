@@ -31,6 +31,7 @@ import {
 	setMessageSending,
 	setMessagesLoading,
 	setTextMessage,
+	updateMessage,
 } from '../../../../store/reducers/MessagesReducers';
 import { Contact } from '../../../../store/types/ContactState';
 import AttachmentSelectorDialog, {
@@ -195,8 +196,12 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 			console.log('Disconnected from the server');
 		});
 
-		socket.on('new_message', (msg) => {
+		socket.on('message_new', (msg) => {
 			dispatch(addMessage(msg));
+		});
+
+		socket.on('message_updated', (msg) => {
+			dispatch(updateMessage({ messageId: msg._id, msg }));
 		});
 
 		return () => {
