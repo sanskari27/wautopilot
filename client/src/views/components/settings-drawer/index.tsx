@@ -1,6 +1,7 @@
 import {
 	Box,
 	Button,
+	Divider,
 	Flex,
 	FormControl,
 	FormLabel,
@@ -14,9 +15,12 @@ import {
 	ModalHeader,
 	ModalOverlay,
 	Text,
+	useBoolean,
+	useToast,
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useSelector } from 'react-redux';
+import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
 
 export type SettingsDrawerHandle = {
@@ -25,7 +29,16 @@ export type SettingsDrawerHandle = {
 };
 
 const SettingsDrawer = forwardRef<SettingsDrawerHandle>((_, ref) => {
+	const toast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
+	const [money, setMoney] = useState<{
+		amount: string;
+		isPaymentProcessing: boolean;
+	}>({
+		amount: '',
+		isPaymentProcessing: false,
+	});
+	const [addMoneySection, setAddMoneySection] = useBoolean(false);
 
 	const { user_details } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
@@ -37,6 +50,74 @@ const SettingsDrawer = forwardRef<SettingsDrawerHandle>((_, ref) => {
 	}));
 
 	const onClose = () => setIsOpen(false);
+
+	const handlePayment = (
+		razorpay_options: {
+			description: string;
+			currency: string;
+			amount: number;
+			name: string;
+			order_id: string;
+			prefill: {
+				name: string;
+				email: string;
+				contact: string;
+			};
+			key: string;
+			theme: {
+				color: string;
+			};
+		},
+		transaction_id: string
+	) => {
+		const rzp1 = new (window as any).Razorpay({
+			...razorpay_options,
+			handler: function (response: any) {
+				console.log(response);
+				AuthService.confirmPayment(transaction_id).then((res) => {
+					if (res) {
+						toast({
+							title: 'Payment successful',
+							status: 'success',
+						});
+					} else {
+						toast({
+							title: 'Payment failed',
+							status: 'error',
+						});
+					}
+					setMoney((prev) => ({ ...prev, isPaymentProcessing: false }));
+				});
+			},
+			modal: {
+				ondismiss: function () {
+					setMoney((prev) => ({ ...prev, isPaymentProcessing: false }));
+				},
+			},
+		});
+
+		rzp1.open();
+	};
+
+	const addWalletMoney = async () => {
+		if (!money.amount) return;
+		setMoney((prev) => ({ ...prev, isPaymentProcessing: true }));
+		const amount = parseInt(money.amount.toString());
+		AuthService.addMoney(amount)
+			.then((res) => {
+				if (res) {
+					handlePayment(res.razorpay_options, res.transaction_id);
+					setMoney((prev) => ({ ...prev, amount: '' }));
+					setAddMoneySection.off();
+				}
+			})
+			.catch((err) => {
+				toast({
+					title: err.message,
+					status: 'error',
+				});
+			});
+	};
 
 	return (
 		<>
@@ -84,10 +165,35 @@ const SettingsDrawer = forwardRef<SettingsDrawerHandle>((_, ref) => {
 								<Input value={user_details.phone} />
 							</FormControl>
 						</Flex>
+						{addMoneySection && (
+							<>
+								<Divider orientation='horizontal' my={'1rem'} />
+								<Flex direction={'row'} alignItems={'flex-end'} gap={'0.5rem'}>
+									<FormControl>
+										<FormLabel mb={0}>Amount</FormLabel>
+										<Input
+											type='number'
+											value={money.amount}
+											onChange={(e) => setMoney((prev) => ({ ...prev, amount: e.target.value }))}
+											placeContent={'1000'}
+										/>
+									</FormControl>
+									<Button
+										colorScheme='green'
+										onClick={addWalletMoney}
+										isLoading={money.isPaymentProcessing}
+									>
+										Add
+									</Button>
+								</Flex>
+							</>
+						)}
 					</ModalBody>
 
 					<ModalFooter>
-						<Button colorScheme='teal'>Add Money</Button>
+						<Button colorScheme='teal' onClick={setAddMoneySection.toggle}>
+							{addMoneySection ? 'Cancel' : 'Add Money'}
+						</Button>
 					</ModalFooter>
 				</ModalContent>
 			</Modal>

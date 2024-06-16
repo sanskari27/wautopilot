@@ -90,7 +90,6 @@ export default class AuthService {
 	static async userDetails() {
 		try {
 			const { data } = await APIInstance.get(`/sessions/details`);
-			console.log(data);
 			return {
 				name: data.account.name ?? '',
 				email: data.account.email ?? '',
@@ -110,6 +109,61 @@ export default class AuthService {
 			};
 		} catch (err) {
 			return null;
+		}
+	}
+
+	static async addMoney(amount: number) {
+		try {
+			const { data } = await APIInstance.post(`/payment/add-money`, {
+				amount,
+			});
+			return {
+				transaction_id: data.transaction_id ?? '',
+				razorpay_options: {
+					description: data.razorpay_options.description ?? '',
+					currency: data.razorpay_options.currency ?? '',
+					amount: data.razorpay_options.amount ?? 0,
+					name: data.razorpay_options.name ?? '',
+					order_id: data.razorpay_options.order_id ?? '',
+					prefill: {
+						name: data.razorpay_options.prefill.name ?? '',
+						email: data.razorpay_options.prefill.email ?? '',
+						contact: data.razorpay_options.prefill.contact ?? '',
+					},
+					key: data.razorpay_options.key ?? '',
+					theme: {
+						color: data.razorpay_options.theme.color ?? '',
+					},
+				},
+			} as {
+				transaction_id: string;
+				razorpay_options: {
+					description: string;
+					currency: string;
+					amount: number;
+					name: string;
+					order_id: string;
+					prefill: {
+						name: string;
+						email: string;
+						contact: string;
+					};
+					key: string;
+					theme: {
+						color: string;
+					};
+				};
+			};
+		} catch (err) {
+			return null;
+		}
+	}
+	static async confirmPayment(transaction_id: string) {
+		try {
+			await APIInstance.post(`/payment/confirm-transaction/${transaction_id}`);
+			return true;
+		} catch (err) {
+			return false;
 		}
 	}
 }
