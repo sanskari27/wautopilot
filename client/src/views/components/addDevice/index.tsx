@@ -282,7 +282,9 @@ const AddDevice = forwardRef<AddDeviceHandle>((_, ref) => {
 						</Button>
 
 						<Center>
-							<Link to={NAVIGATION.WEBHOOK_SETUP_DOCS}>Need help setting webhook? Click Here</Link>
+							<Link to={NAVIGATION.WEBHOOK_SETUP_DOCS} target='_blank'>
+								Need help setting webhook? Click Here
+							</Link>
 						</Center>
 					</Stack>
 				</ModalBody>

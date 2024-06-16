@@ -1,11 +1,13 @@
+import axios from 'axios';
 import { NextFunction, Request, Response } from 'express';
 import FormData from 'form-data';
 import fs from 'fs';
 import FileUpload, { ResolvedFile } from '../../config/FileUpload';
 import MetaAPI from '../../config/MetaAPI';
+import { Path } from '../../config/const';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
-import { Respond } from '../../utils/ExpressUtils';
+import { Respond, RespondFile, generateRandomID } from '../../utils/ExpressUtils';
 import FileUtils from '../../utils/FileUtils';
 
 async function uploadMetaHandle(req: Request, res: Response, next: NextFunction) {
@@ -109,6 +111,7 @@ async function fetchMetaMediaUrl(req: Request, res: Response, next: NextFunction
 				Authorization: `Bearer ${req.locals.device.accessToken}`,
 			},
 		});
+
 		return Respond({
 			res,
 			status: 200,
@@ -123,10 +126,39 @@ async function fetchMetaMediaUrl(req: Request, res: Response, next: NextFunction
 	}
 }
 
+async function downloadMetaMedia(req: Request, res: Response, next: NextFunction) {
+	const url = req.body.url;
+	if (!url) {
+		return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
+	}
+	try {
+		const response = await axios.get(url, {
+			responseType: 'arraybuffer',
+			headers: {
+				Authorization: `Bearer ${req.locals.device.accessToken}`,
+			},
+		});
+		const contentType = response.headers['content-type'];
+		const fileExtension = contentType.split('/')[1];
+		const fileData = Buffer.from(response.data, 'binary');
+		const name = generateRandomID() + '.' + fileExtension;
+		fs.writeFile(__basedir + Path.Misc + name, fileData, () => {
+			return RespondFile({
+				res,
+				filename: name,
+				filepath: __basedir + Path.Misc + name,
+			});
+		});
+	} catch (err) {
+		next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR, err));
+	}
+}
+
 const Controller = {
 	uploadMetaHandle,
 	uploadMetaMedia,
 	fetchMetaMediaUrl,
+	downloadMetaMedia,
 };
 
 export default Controller;
