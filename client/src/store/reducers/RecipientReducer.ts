@@ -23,7 +23,6 @@ const Slice = createSlice({
 	initialState,
 	reducers: {
 		setRecipientsList: (state, action: PayloadAction<typeof initialState.list>) => {
-			//add pinned conversation at the top from localstorage
 			const pinned = JSON.parse(localStorage.getItem('pinned') || '[]');
 			const pinnedIds = pinned.map((item: Recipient) => item._id);
 			const pinnedConversations = action.payload.filter((item) => pinnedIds.includes(item._id));

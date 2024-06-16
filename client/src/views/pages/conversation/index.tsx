@@ -44,18 +44,6 @@ const Conversation = () => {
 		dispatch(reset());
 	}, [dispatch]);
 
-	const pinned = JSON.parse(localStorage.getItem('pinned') || '[]');
-	const pinnedIds = pinned.map((item: Recipient) => item._id);
-	const pinnedConversations = filtered.filter((item) => pinnedIds.includes(item._id));
-	const unpinnedConversations = filtered.filter((item) => !pinnedIds.includes(item._id));
-	const formatted_list = [...pinnedConversations, ...unpinnedConversations];
-
-	console.log({
-		pinnedConversations,
-		unpinnedConversations,
-		filtered,
-	});
-
 	return (
 		<Box className='' height={'full'}>
 			<Flex width={'full'} height={'calc(100vh - 60px)'}>
@@ -85,7 +73,7 @@ const Conversation = () => {
 							</Stack>
 						) : (
 							<Each
-								items={formatted_list}
+								items={filtered}
 								render={(item) => <RecipientsName onClick={handleRecipientClick} item={item} />}
 							/>
 						)}
