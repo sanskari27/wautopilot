@@ -12,6 +12,10 @@ const router = express.Router();
 
 router.route('/all-labels').get(Controller.getAllLabels);
 
+router
+	.route('/set-labels/phone/:phone_number')
+	.all(LabelValidator)
+	.post(Controller.setLabelsByPhone);
 router.route('/set-labels').all(LabelValidator).post(Controller.setLabels);
 router.route('/add-labels').all(LabelValidator).post(Controller.addLabels);
 router.route('/remove-labels').all(LabelValidator).post(Controller.removeLabels);

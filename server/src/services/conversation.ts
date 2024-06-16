@@ -8,6 +8,7 @@ import { MESSAGE_STATUS } from '../config/const';
 import SocketServer from '../socket';
 import DateUtils from '../utils/DateUtils';
 import { filterUndefinedKeys } from '../utils/ExpressUtils';
+import PhoneBookService from './phonebook';
 import WhatsappLinkService from './whatsappLink';
 
 function processConversationDocs(docs: IConversation[]) {
@@ -50,13 +51,26 @@ export default class ConversationService extends WhatsappLinkService {
 		this.whatsappLink = whatsappLink;
 	}
 
-	public async createConversation(recipient: string) {
+	public async createConversation(recipient: string, name?: string) {
 		try {
 			const doc = await ConversationDB.create({
 				linked_to: this.userId,
 				device_id: this.whatsappLink._id,
 				recipient,
 			});
+
+			const phoneBookService = new PhoneBookService(this.account);
+			const contact = await phoneBookService.findFieldsByPhone(recipient);
+			if (!contact) {
+				phoneBookService.addRecords([
+					{
+						phone_number: recipient,
+						first_name: name,
+						labels: ['UNSAVED'],
+					},
+				]);
+			}
+
 			return doc._id;
 		} catch (err) {
 			const doc = await ConversationDB.findOne({

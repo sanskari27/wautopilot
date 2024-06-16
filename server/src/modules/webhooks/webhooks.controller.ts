@@ -41,6 +41,12 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		return res.status(400);
 	}
 	const conversationService = new ConversationService(user, link);
+	const contact = data.contacts?.[0] ?? {
+		wa_id: '',
+		profile: {
+			name: '',
+		},
+	};
 
 	if (data.statuses) {
 		//Handle outgoing messages status
@@ -72,7 +78,10 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 			});
 		}
 
-		const conversation_id = await conversationService.createConversation(recipient);
+		const conversation_id = await conversationService.createConversation(
+			recipient,
+			contact.profile.name
+		);
 
 		if (message.type === 'text') {
 			conversationService.addMessageToConversation(conversation_id, {

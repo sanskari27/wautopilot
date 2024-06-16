@@ -162,6 +162,35 @@ async function deleteMultiple(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function setLabelsByPhone(req: Request, res: Response, next: NextFunction) {
+	const phone_number = req.params.phone_number;
+	const labels = Array.isArray(req.body.labels) ? [...new Set(req.body.labels as string[])] : [];
+
+	if (!phone_number) {
+		return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
+	}
+
+	try {
+		const phoneBookService = new PhoneBookService(req.locals.account);
+		const doc = await phoneBookService.findFieldsByPhone(phone_number);
+		if (!doc) {
+			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+		}
+
+		await phoneBookService.setLabels([idValidator(doc.id)[1]!], labels);
+
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				message: 'Labels added',
+			},
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 async function setLabels(req: Request, res: Response, next: NextFunction) {
 	const { labels, ids } = req.locals.data as SetLabelValidationResult;
 
@@ -269,6 +298,7 @@ const Controller = {
 	addLabels,
 	removeLabels,
 	getAllLabels,
+	setLabelsByPhone,
 	bulkUpload,
 };
 
