@@ -193,11 +193,15 @@ const Slice = createSlice({
 		removeSelectedContact: (state, action: PayloadAction<string>) => {
 			state.selected = state.selected.filter((id) => id !== action.payload);
 		},
+		resetSelectedContacts: (state) => {
+			state.selected = [];
+		},
 	},
 });
 
 export const {
 	setAddressType,
+	resetSelectedContacts,
 	setDepartment,
 	setFormattedName,
 	setSuffix,

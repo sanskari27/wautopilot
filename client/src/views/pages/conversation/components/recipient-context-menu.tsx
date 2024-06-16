@@ -1,18 +1,43 @@
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import { Box, Button, Icon, Menu, MenuButton, MenuItem, MenuList, useBoolean } from '@chakra-ui/react';
+import { Button, Icon, Menu, MenuButton, MenuItem, MenuList, useBoolean } from '@chakra-ui/react';
+import { useRef } from 'react';
 import { BiLabel } from 'react-icons/bi';
-import { TiPinOutline } from 'react-icons/ti';
-import { useDispatch } from 'react-redux';
-import { setLabels } from '../../../../store/reducers/PhonebookReducer';
-import LabelFilter from '../../../components/labelFilter';
+import { LuPin, LuPinOff } from 'react-icons/lu';
+import { useDispatch, useSelector } from 'react-redux';
+import { StoreNames, StoreState } from '../../../../store';
+import { setRecipientsList } from '../../../../store/reducers/RecipientReducer';
+import { Recipient } from '../../../../store/types/RecipientsState';
+import AssignConversationLabelDialog, {
+	AssignConversationLabelDialogHandle,
+} from './add-conversation-labels';
 
-export default function ContextMenu() {
+export default function ContextMenu({ recipient }: { recipient: Recipient }) {
+	const dispatch = useDispatch();
+	const assignConversationLabelRef = useRef<AssignConversationLabelDialogHandle>(null);
+
+	const { list } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
+
 	const handleClick = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		setIsMenuClicked.toggle();
 	};
 
-	const dispatch = useDispatch();
+	const handleConversationPin = () => {
+		if (localStorage.getItem('pinned') === null) {
+			localStorage.setItem('pinned', JSON.stringify([recipient]));
+		} else {
+			const pinned = JSON.parse(localStorage.getItem('pinned') as string);
+			const index = pinned.findIndex((item: Recipient) => item._id === recipient._id);
+			if (index === -1) {
+				pinned.push(recipient);
+				localStorage.setItem('pinned', JSON.stringify(pinned));
+			} else {
+				pinned.splice(index, 1);
+				localStorage.setItem('pinned', JSON.stringify(pinned));
+			}
+		}
+		dispatch(setRecipientsList(list));
+	};
 
 	const [isMenuClicked, setIsMenuClicked] = useBoolean(false);
 
@@ -40,21 +65,27 @@ export default function ContextMenu() {
 					/>
 				</MenuButton>
 				<MenuList>
-					<MenuItem>
-						<LabelFilter
-							onChange={(labels) => dispatch(setLabels(labels))}
-							buttonComponent={
-								<Box>
-									<Icon as={BiLabel} mr={2} /> Assign label
-								</Box>
-							}
-						/>
+					<MenuItem
+						onClick={() => {
+							assignConversationLabelRef.current?.open(recipient);
+						}}
+					>
+						<Icon as={BiLabel} mr={2} /> Assign label
 					</MenuItem>
-					<MenuItem>
-						<Icon as={TiPinOutline} mr={2} /> Pin
+					<MenuItem onClick={handleConversationPin}>
+						{localStorage.getItem('pinned')?.includes(recipient._id) ? (
+							<>
+								<Icon as={LuPinOff} mr={2} /> Unpin
+							</>
+						) : (
+							<>
+								<Icon as={LuPin} mr={2} /> pin
+							</>
+						)}
 					</MenuItem>
 				</MenuList>
 			</Menu>
+			<AssignConversationLabelDialog ref={assignConversationLabelRef} />
 		</>
 	);
 }

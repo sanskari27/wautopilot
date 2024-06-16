@@ -24,13 +24,15 @@ import useFilteredList from '../../../hooks/useFilteredList';
 import ContactService from '../../../services/contact.service';
 import { StoreNames, StoreState } from '../../../store';
 import {
+	addSelectedContact,
 	nextPage,
 	prevPage,
+	removeSelectedContact,
+	resetSelectedContacts,
 	setContactList,
 	setFetchingContact,
 	setMaxPage,
 } from '../../../store/reducers/ContactReducer';
-import { addSelected, removeSelected } from '../../../store/reducers/PhonebookReducer';
 import { Contact } from '../../../store/types/ContactState';
 import ContactDrawer, { ContactHandle } from '../../components/contact-drawer';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
@@ -108,6 +110,24 @@ const ContactPage = () => {
 		}
 	};
 
+	const handleDeleteContact = () => {
+		ContactService.deleteContact(selected).then((res) => {
+			if (res) {
+				dispatch(setContactList(list.filter((c) => !selected.includes(c.id))));
+				dispatch(resetSelectedContacts());
+				toast({
+					title: 'Contact deleted successfully',
+					status: 'success',
+				});
+				return;
+			}
+			toast({
+				title: 'Failed to delete contact',
+				status: 'error',
+			});
+		});
+	};
+
 	return (
 		<Box padding={'1rem'}>
 			<Flex justifyContent={'space-between'}>
@@ -115,15 +135,17 @@ const ContactPage = () => {
 					Contacts
 				</Text>
 				<Flex gap={3}>
-					<Button
-						colorScheme='red'
-						leftIcon={<DeleteIcon color='white' fontSize={'1rem'} />}
-						onClick={() => {
-							deleteDialog.current?.open();
-						}}
-					>
-						Delete
-					</Button>
+					{selected.length > 0 && (
+						<Button
+							colorScheme='red'
+							leftIcon={<DeleteIcon color='white' fontSize={'1rem'} />}
+							onClick={() => {
+								deleteDialog.current?.open();
+							}}
+						>
+							Delete
+						</Button>
+					)}
 					<Button
 						colorScheme='teal'
 						leftIcon={<AddIcon color='white' fontSize={'1rem'} />}
@@ -192,12 +214,7 @@ const ContactPage = () => {
 							<Each
 								items={filtered}
 								render={(record, index) => (
-									<Tr
-										cursor={'pointer'}
-										onClick={() =>
-											contactDrawerRef.current?.open({ contact: record, editable: true })
-										}
-									>
+									<Tr cursor={'pointer'}>
 										<Td width={'5%'}>
 											<Checkbox
 												colorScheme='green'
@@ -205,15 +222,21 @@ const ContactPage = () => {
 												isChecked={selected.includes(record.id)}
 												onChange={(e) => {
 													if (e.target.checked) {
-														dispatch(addSelected(record.id));
+														dispatch(addSelectedContact(record.id));
 													} else {
-														dispatch(removeSelected(record.id));
+														dispatch(removeSelectedContact(record.id));
 													}
 												}}
 											/>
 											{pagination.page === 1 ? index + 1 : (pagination.page - 1) * 20 + index + 1}
 										</Td>
-										<Td>{record.name.formatted_name}</Td>
+										<Td
+											onClick={() =>
+												contactDrawerRef.current?.open({ contact: record, editable: true })
+											}
+										>
+											{record.name.formatted_name}
+										</Td>
 									</Tr>
 								)}
 							/>
@@ -222,7 +245,7 @@ const ContactPage = () => {
 				</Table>
 			</TableContainer>
 			{/* <AssignLabelDialog ref={assignLabelDialog} /> */}
-			<DeleteAlert ref={deleteDialog} onConfirm={() => {}} type='Records' />
+			<DeleteAlert ref={deleteDialog} onConfirm={handleDeleteContact} type='Records' />
 			<ContactDrawer onConfirm={handleContactInput} ref={contactDrawerRef} />
 			{/* <ContactInputDialog ref={drawerRef} /> */}
 		</Box>

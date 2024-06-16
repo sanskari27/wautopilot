@@ -161,15 +161,15 @@ const SettingsDrawer = forwardRef<SettingsDrawerHandle>((_, ref) => {
 						<Flex direction={'column'} gap={'0.5rem'}>
 							<FormControl>
 								<FormLabel mb={0}>Name</FormLabel>
-								<Input value={user_details.name} />
+								<Input value={user_details.name} readOnly />
 							</FormControl>
 							<FormControl>
 								<FormLabel mb={0}>Email</FormLabel>
-								<Input value={user_details.email} />
+								<Input value={user_details.email} readOnly />
 							</FormControl>
 							<FormControl>
 								<FormLabel mb={0}>Phone Number</FormLabel>
-								<Input value={user_details.phone} />
+								<Input value={user_details.phone} readOnly />
 							</FormControl>
 						</Flex>
 						{addMoneySection && (
