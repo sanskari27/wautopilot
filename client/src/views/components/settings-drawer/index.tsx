@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
 	Box,
 	Button,
@@ -72,7 +73,7 @@ const SettingsDrawer = forwardRef<SettingsDrawerHandle>((_, ref) => {
 	) => {
 		const rzp1 = new (window as any).Razorpay({
 			...razorpay_options,
-			handler: function (response: any) {
+			handler: function () {
 				AuthService.confirmPayment(transaction_id).then((res) => {
 					if (res) {
 						toast({
