@@ -6,18 +6,16 @@ export default class MessagesService {
 	static async fetchAllConversation(deviceId: string) {
 		try {
 			const { data } = await APIInstance.get(`/message/${deviceId}/conversations`);
-			return (
-				data.conversations ??
-				[].map((conversation: any) => {
-					return {
-						_id: conversation._id ?? '',
-						recipient: conversation.recipient ?? '',
-						profile_name: conversation.profile_name ?? '',
-						origin: conversation.origin ?? '',
-						expiration_timestamp: conversation.expiration_timestamp ?? '',
-					};
-				})
-			);
+			return (data.conversations ?? []).map((conversation: any) => {
+				return {
+					_id: conversation._id ?? '',
+					recipient: conversation.recipient ?? '',
+					profile_name: conversation.profile_name ?? '',
+					origin: conversation.origin ?? '',
+					expiration_timestamp: conversation.expiration_timestamp ?? '',
+					labels: conversation.labels ?? [],
+				};
+			});
 		} catch (err) {
 			return [];
 		}
@@ -165,6 +163,17 @@ export default class MessagesService {
 			return true;
 		} catch (err) {
 			return false;
+		}
+	}
+
+	static async ConversationLabels(deviceId: string, recipientId: string, labels: string[]) {
+		try {
+			await APIInstance.post(`/message/${deviceId}/conversations/${recipientId}/labels`, {
+				labels,
+			});
+			return true;
+		} catch (err) {
+			return true;
 		}
 	}
 }

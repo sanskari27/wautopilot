@@ -3,8 +3,8 @@ export type RecipientsState = {
 	uiDetails: {
 		loading: boolean;
 	};
-	selected_recipient_id: string;
 	selected_recipient: Recipient;
+	label_filter: string[];
 };
 
 export type Recipient = {
@@ -13,4 +13,5 @@ export type Recipient = {
 	profile_name: string;
 	origin: string;
 	expiration_timestamp: string;
+	labels: string[];
 };

@@ -52,7 +52,6 @@ const AppPage = () => {
 			];
 
 			const results = await Promise.all(promises);
-
 			dispatch(setRecipientsList(results[0]));
 			dispatch(setMediaList(results[1]));
 			dispatch(setTemplatesList(results[2]));

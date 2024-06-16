@@ -30,7 +30,7 @@ export default function LabelFilter({
 	clearOnClose?: boolean;
 }) {
 	const [searchText, setSearchText] = useState<string>('');
-	const [labels, setLabels] = useState<string[]>([]);
+	const [labels, setLabels] = useState<string[]>( []);
 	const [filterLabels, dispatch] = useReducer(
 		(
 			state: string[],
@@ -67,6 +67,10 @@ export default function LabelFilter({
 			dispatch({ type: 'remove', label });
 		}
 	}
+
+	useEffect(()=>{
+		
+	},[])
 
 	return (
 		<Popover

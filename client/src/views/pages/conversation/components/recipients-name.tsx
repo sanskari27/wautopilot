@@ -9,6 +9,7 @@ type Item = {
 	profile_name: string;
 	origin: string;
 	expiration_timestamp: string;
+	labels: string[];
 };
 
 type RecipientsNameProps = {
@@ -38,16 +39,16 @@ const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
 			bg={selected_recipient._id === item._id ? 'gray.100' : 'white'}
 			rounded={'lg'}
 			className='group'
-			
-
 		>
-			<Avatar name={item.profile_name}  />
+			<Avatar name={item.profile_name} />
 			<Box>
-				<Text fontWeight={'medium'} className='line-clamp-1 w-[250px] md:w-[150px]'>{item.profile_name}</Text>
+				<Text fontWeight={'medium'} className='line-clamp-1 w-[250px] md:w-[150px]'>
+					{item.profile_name}
+				</Text>
 				<Text fontSize={'sm'}>{item.recipient}</Text>
 			</Box>
 
-			<ContextMenu />
+			<ContextMenu recipient={item} />
 		</Flex>
 	);
 };
