@@ -8,6 +8,7 @@ const initialState: MessageState = {
 		messagesLoading: false,
 		errorMessage: '',
 		attachmentUploading: false,
+		isMessageSending: false,
 	},
 	message: {
 		attachment_id: [],
@@ -30,6 +31,10 @@ const Slice = createSlice({
 	reducers: {
 		reset: (state) => {
 			state.messageList = [];
+		},
+		resetMessage: (state) => {
+			state.message = initialState.message;
+			state.uiDetails = initialState.uiDetails;
 		},
 		setMessageList: (state, action: PayloadAction<typeof initialState.messageList>) => {
 			state.messageList = action.payload;
@@ -81,6 +86,9 @@ const Slice = createSlice({
 		setAttachmentUploading: (state, action: PayloadAction<boolean>) => {
 			state.uiDetails.attachmentUploading = action.payload;
 		},
+		setMessageSending: (state, action: PayloadAction<boolean>) => {
+			state.uiDetails.isMessageSending = action.payload;
+		},
 	},
 });
 
@@ -92,6 +100,7 @@ export const {
 	setAttachmentId,
 	removeAttachmentId,
 	setErrorMessage,
+	setMessageSending,
 	setAttachmentFile,
 	setAttachmentName,
 	setAttachmentSize,

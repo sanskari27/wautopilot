@@ -86,4 +86,30 @@ export default class AuthService {
 			return false;
 		}
 	}
+
+	static async userDetails() {
+		try {
+			const { data } = await APIInstance.get(`/sessions/details`);
+			console.log(data);
+			return {
+				name: data.account.name ?? '',
+				email: data.account.email ?? '',
+				phone: data.account.phone ?? '',
+				isSubscribed: data.account.isSubscribed ?? false,
+				subscription_expiry: data.account.subscription_expiry ?? '',
+				walletBalance: data.account.walletBalance ?? 0,
+				no_of_devices: data.account.no_of_devices ?? 0,
+			} as {
+				name: string;
+				email: string;
+				phone: string;
+				isSubscribed: boolean;
+				subscription_expiry: string;
+				walletBalance: number;
+				no_of_devices: number;
+			};
+		} catch (err) {
+			return null;
+		}
+	}
 }

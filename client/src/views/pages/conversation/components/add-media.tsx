@@ -12,13 +12,13 @@ import {
 	Text,
 	VStack,
 	useDisclosure,
-	useToast,
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import Dropzone from 'react-dropzone';
 import { useDispatch, useSelector } from 'react-redux';
 import UploadService from '../../../../services/upload.service';
 import { StoreNames, StoreState } from '../../../../store';
+import { setSaving } from '../../../../store/reducers/MediaReducer';
 import {
 	removeFile,
 	setAttachmentFile,
@@ -38,9 +38,12 @@ export type AddMediaHandle = {
 	close: () => void;
 };
 
-const AddMedia = forwardRef<AddMediaHandle>((_, ref) => {
+type AddMediaProps = {
+	onConfirm: (mediaId: string) => void;
+};
+
+const AddMedia = forwardRef<AddMediaHandle, AddMediaProps>(({ onConfirm }: AddMediaProps, ref) => {
 	const dispatch = useDispatch();
-	const toast = useToast();
 	const progressRef = useRef<ProgressBarHandle>(null);
 
 	const { isOpen, onClose, onOpen } = useDisclosure();
@@ -65,7 +68,7 @@ const AddMedia = forwardRef<AddMediaHandle>((_, ref) => {
 
 	const handleClose = () => {
 		dispatch(removeFile());
-		// dispatch(setSaving(false));
+		dispatch(setSaving(false));
 		onClose();
 	};
 
@@ -119,28 +122,12 @@ const AddMedia = forwardRef<AddMediaHandle>((_, ref) => {
 		dispatch(setAttachmentUploading(true));
 		UploadService.generateMetaMediaId(selected_device_id, file, onUploadProgress)
 			.then((res) => {
-				console.log(res);
 				dispatch(setMetaAttachmentId(res));
-				dispatch(setAttachmentUploading(false));
+				console.log(res);
+				onConfirm(res);
 				handleClose();
-				toast({
-					title: 'Uploaded',
-					description: 'Media uploaded successfully',
-					status: 'success',
-					duration: 5000,
-					isClosable: true,
-				});
 			})
-			.catch(() => {
-				dispatch(setAttachmentUploading(false));
-				toast({
-					title: 'Error',
-					description: 'Error while uploading media',
-					status: 'error',
-					duration: 5000,
-					isClosable: true,
-				});
-			});
+			.finally(() => dispatch(setAttachmentUploading(false)));
 	};
 
 	return (

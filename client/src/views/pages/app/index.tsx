@@ -17,7 +17,11 @@ import {
 import { setMediaFetching, setMediaList } from '../../../store/reducers/MediaReducer';
 import { setRecipientsList, setRecipientsLoading } from '../../../store/reducers/RecipientReducer';
 import { setTemplateFetching, setTemplatesList } from '../../../store/reducers/TemplateReducer';
-import { setIsAuthenticated, setSelectedDeviceId } from '../../../store/reducers/UserReducers';
+import {
+	setIsAuthenticated,
+	setSelectedDeviceId,
+	setUserDetails,
+} from '../../../store/reducers/UserReducers';
 import AppNavbar from '../../components/navbar/AppNavbar';
 import NavigationDrawer from '../../components/navbar/NavigationDrawer';
 
@@ -44,6 +48,7 @@ const AppPage = () => {
 				MessagesService.fetchAllConversation(selected_device_id),
 				MediaService.getMedias(selected_device_id),
 				TemplateService.listTemplates(selected_device_id),
+				AuthService.userDetails(),
 			];
 
 			const results = await Promise.all(promises);
@@ -51,6 +56,7 @@ const AppPage = () => {
 			dispatch(setRecipientsList(results[0]));
 			dispatch(setMediaList(results[1]));
 			dispatch(setTemplatesList(results[2]));
+			dispatch(setUserDetails(results[3]));
 		} catch (e) {
 			return;
 		}

@@ -27,9 +27,11 @@ import { StoreNames, StoreState } from '../../../../store';
 import {
 	addMessage,
 	setMessageList,
+	setMessageSending,
 	setMessagesLoading,
 	setTextMessage,
 } from '../../../../store/reducers/MessagesReducers';
+import { Contact } from '../../../../store/types/ContactState';
 import AttachmentSelectorDialog, {
 	AttachmentDialogHandle,
 } from '../../../components/selector-dialog/AttachmentSelectorDialog';
@@ -45,12 +47,13 @@ type ChatScreenProps = {
 };
 
 const ChatScreen = ({ closeChat }: ChatScreenProps) => {
-	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 	const dispatch = useDispatch();
+	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const {
 		messageList,
-		uiDetails: { messagesLoading },
+		uiDetails: { messagesLoading, isMessageSending },
 		message: { textMessage },
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
 
@@ -62,6 +65,20 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 	const handleMessageInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		e.target.style.height = '5px';
 		e.target.style.height = e.target.scrollHeight + 'px';
+	};
+
+	const sendTextMessage = () => {
+		if (!textMessage) return;
+		dispatch(setMessageSending(true));
+		MessagesService.sendConversationMessage(selected_recipient._id, selected_device_id, {
+			type: 'TEXT',
+			text: textMessage,
+		}).then((data) => {
+			console.log(data);
+			// dispatch(addMessage(data));
+			// dispatch(setTextMessage(''));
+			dispatch(setMessageSending(false));
+		});
 	};
 
 	return (
@@ -119,7 +136,12 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 						onChange={(e) => dispatch(setTextMessage(e.target.value))}
 						placeholder='Type a message'
 					/>
-					<Button colorScheme='green' px={'1rem'} onClick={() => console.log(textMessage)}>
+					<Button
+						colorScheme='green'
+						px={'1rem'}
+						onClick={sendTextMessage}
+						isLoading={isMessageSending}
+					>
 						<Icon as={BiSend} />
 					</Button>
 				</HStack>
@@ -171,6 +193,29 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 			socket.disconnect();
 		};
 	}, [selected_recipient._id, dispatch]);
+
+	const sendAttachmentMessage = (attachment: string[]) => {
+		if (attachment.length === 0) return;
+		console.log(attachment);
+		// MessagesService.sendConversationMessage(selected_recipient._id, selected_device_id, {
+		// 	type: 'MEDIA',
+		// 	media_id: attachment,
+		// }).then((data) => {
+		// 	console.log(data);
+		// 	// dispatch(addMessage(data));
+		// });
+	};
+
+	const sendContactMessage = (contact: Omit<Contact, 'id' | 'formatted_name'>[]) => {
+		console.log(contact);
+		// MessagesService.sendConversationMessage(selected_recipient._id, selected_device_id, {
+		// 	type: 'CONTACT',
+		// 	contacts: contact,
+		// }).then((data) => {
+		// 	console.log(data);
+		// 	// dispatch(addMessage(data));
+		// });
+	};
 
 	return (
 		<>
@@ -256,15 +301,15 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 				</MenuList>
 			</Menu>
 
-			<AttachmentSelectorDialog
-				ref={attachmentSelectorHandle}
-				onConfirm={(attachment) => console.log(attachment)}
+			<AttachmentSelectorDialog ref={attachmentSelectorHandle} onConfirm={sendAttachmentMessage} />
+			<AddMedia
+				ref={addMediaHandle}
+				onConfirm={(media_id) => {
+					console.log(media_id);
+					sendAttachmentMessage([media_id]);
+				}}
 			/>
-			<AddMedia ref={addMediaHandle} />
-			<ContactSelectorDialog
-				ref={contactDialogHandle}
-				onConfirm={(contact) => console.log(contact)}
-			/>
+			<ContactSelectorDialog ref={contactDialogHandle} onConfirm={sendContactMessage} />
 		</>
 	);
 };

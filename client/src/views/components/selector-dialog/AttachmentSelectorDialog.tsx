@@ -170,7 +170,7 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 								Cancel
 							</Button>
 							<Button isDisabled={selected.length === 0} colorScheme='green' onClick={handleAdd}>
-								Select
+								Send
 							</Button>
 						</Flex>
 					</ModalFooter>

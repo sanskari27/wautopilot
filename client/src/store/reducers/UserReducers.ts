@@ -20,6 +20,15 @@ const initialState: UserState = {
 		type: '',
 	},
 	selected_device_id: '',
+	user_details: {
+		name: '',
+		email: '',
+		phone: '',
+		isSubscribed: false,
+		subscription_expiry: '',
+		walletBalance: 0,
+		no_of_devices: 0,
+	},
 };
 
 const Slice = createSlice({
@@ -77,6 +86,10 @@ const Slice = createSlice({
 			state.error = action.payload;
 		},
 
+		setUserDetails: (state, action: PayloadAction<UserState['user_details']>) => {
+			state.user_details = action.payload;
+		},
+
 		setSelectedDeviceId: (state, action: PayloadAction<string>) => {
 			state.selected_device_id = action.payload;
 		},
@@ -97,6 +110,7 @@ export const {
 	startResettingPassword,
 	stopResettingPassword,
 	setSelectedDeviceId,
+	setUserDetails,
 } = Slice.actions;
 
 export default Slice.reducer;

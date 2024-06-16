@@ -1,6 +1,7 @@
 import { Avatar, Box, Flex, Icon, Text, VStack } from '@chakra-ui/react';
 import { useRef } from 'react';
 import { IconType } from 'react-icons/lib';
+import { MdSettings } from 'react-icons/md';
 import { TbLogout2 } from 'react-icons/tb';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +9,7 @@ import { MenuItems } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
 import DevicesDialog, { DevicesHandle } from '../devices';
+import SettingsDrawer, { SettingsDrawerHandle } from '../settings-drawer';
 import Each from '../utils/Each';
 
 function isActiveTab(tab: string, path: string): boolean {
@@ -27,6 +29,7 @@ export default function NavigationDrawer({
 	};
 }) {
 	const DevicesRef = useRef<DevicesHandle>(null);
+	const settingsDrawer = useRef<SettingsDrawerHandle>(null);
 
 	const handleDevicesDialog = () => {
 		DevicesRef.current?.open();
@@ -121,10 +124,26 @@ export default function NavigationDrawer({
 								Logout
 							</Text>
 						</Flex>
+						<Flex
+							className={`cursor-pointer overflow-hidden
+										transition-all duration-300 ease-in-out`}
+							padding={'0.6rem'}
+							rounded={'lg'}
+							gap={'1.1rem'}
+							onClick={() => settingsDrawer.current?.open()}
+							width={'full'}
+							alignItems={'center'}
+						>
+							<Icon as={MdSettings} width={5} height={5} className='rotate-180' />
+							<Text fontSize={'sm'} whiteSpace={'nowrap'}>
+								Settings
+							</Text>
+						</Flex>
 					</VStack>
 				</Flex>
 			</Flex>
 			<DevicesDialog ref={DevicesRef} />
+			<SettingsDrawer ref={settingsDrawer} />
 		</Box>
 	);
 }

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import APIInstance from '../config/APIInstance';
+import { Contact } from '../store/types/ContactState';
 
 export default class MessagesService {
 	static async fetchAllConversation(deviceId: string) {
@@ -98,10 +99,10 @@ export default class MessagesService {
 							};
 						}),
 						location: {
-							latitude: message.body.location?.latitude ?? '',
-							longitude: message.body.location?.longitude ?? '',
-							name: message.body.location?.name ?? '',
-							address: message.body.location?.address ?? '',
+							latitude: message.body?.location?.latitude ?? '',
+							longitude: message.body?.location?.longitude ?? '',
+							name: message.body?.location?.name ?? '',
+							address: message.body?.location?.address ?? '',
 						},
 					},
 					footer_content: message.footer_content ?? '',
@@ -136,5 +137,36 @@ export default class MessagesService {
 				size: 0,
 			};
 		}
+	}
+	static async sendConversationMessage(
+		deviceId: string,
+		recipientId: string,
+		message: {
+			type: 'TEXT' | 'MEDIA' | 'CONTACT' | 'LOCATION' | 'UNKNOWN';
+			text?: string;
+			media_id?: string[];
+			location?: {
+				latitude?: string;
+				longitude?: string;
+				name?: string;
+				address?: string;
+			};
+			contacts?: Omit<Contact, 'id' | 'formatted_name'>[];
+			context?: {
+				message_id?: string;
+			};
+		}
+	) {
+		console.log('Sending message', message);
+		// try {
+		// 	const { data } = await APIInstance.post(
+		// 		`/message/${deviceId}/conversations/${recipientId}/send-messages`,
+
+		// 		{ ...message }
+		// 	);
+		// 	return data;
+		// } catch (err) {
+		// 	return {};
+		// }
 	}
 }

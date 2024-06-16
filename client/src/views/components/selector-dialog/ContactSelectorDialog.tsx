@@ -52,6 +52,11 @@ const ContactSelectorDialog = forwardRef<ContactSelectorHandle, Props>(
 			onClose();
 		};
 
+		const sendCreatedContact = (contact: Omit<Contact, 'id' | 'formatted_name'>) => {
+			onConfirm([contact]);
+			onClose();
+		};
+
 		useImperativeHandle(ref, () => ({
 			open: (contact: Omit<Contact, 'id' | 'formatted_name'>[]) => {
 				setSelected(contact);
@@ -154,17 +159,12 @@ const ContactSelectorDialog = forwardRef<ContactSelectorHandle, Props>(
 									Create new
 								</Button>
 								<Button isDisabled={selected.length === 0} colorScheme='green' onClick={handleAdd}>
-									Select
+									Send
 								</Button>
 							</Flex>
 						</ModalFooter>
 					</ModalContent>
-					<ContactDrawer
-						ref={addContactHandle}
-						onConfirm={(contact) => {
-							console.log(contact);
-						}}
-					/>
+					<ContactDrawer ref={addContactHandle} onConfirm={sendCreatedContact} />
 				</Modal>
 			</>
 		);
