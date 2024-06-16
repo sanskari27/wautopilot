@@ -17,6 +17,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BiErrorCircle } from 'react-icons/bi';
 import { HiLocationMarker } from 'react-icons/hi';
 import { MdOutlinePermMedia } from 'react-icons/md';
+import { useInView } from 'react-intersection-observer';
 import { useSelector } from 'react-redux';
 import MessagesService from '../../../../services/messages.service';
 import UploadService from '../../../../services/upload.service';
@@ -76,10 +77,12 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 	const toast = useToast();
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const [media, setMedia] = useState(initialState);
+	const { ref, inView } = useInView({ triggerOnce: true });
 	useEffect(() => {
 		if (!message.body?.media_id || !selected_device_id) {
 			return;
 		}
+		if (!inView) return;
 		MessagesService.getMedia(selected_device_id, message.body?.media_id).then((data) => {
 			setMedia({
 				...initialState,
@@ -88,7 +91,7 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 				size: data.size,
 			});
 		});
-	}, [message.body?.media_id, selected_device_id]);
+	}, [message.body?.media_id, selected_device_id, inView]);
 
 	const handleDownload = () => {
 		if (!selected_device_id || !message.body?.media_id) {
@@ -104,7 +107,7 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 	return (
 		<ChatMessageWrapper message={message}>
 			{!media.loaded ? (
-				<Box width={'100%'}>
+				<Box width={'100%'} ref={ref}>
 					<Center
 						alignItems={'center'}
 						bgColor={'lightgray'}
