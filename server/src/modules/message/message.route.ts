@@ -5,8 +5,11 @@ import { CreateBroadcastValidator, SendMessageValidator } from './message.valida
 
 const router = express.Router();
 
-router.route('/broadcast/report').get(Controller.broadcastReport);
-router.route('/broadcast/send-broadcast').all(CreateBroadcastValidator).post(Controller.sendTemplateMessage);
+router.route('/broadcast/reports').get(Controller.broadcastReport);
+router
+	.route('/broadcast/send-broadcast')
+	.all(CreateBroadcastValidator)
+	.post(Controller.sendTemplateMessage);
 
 router.route('/conversations').get(Controller.fetchConversations);
 router

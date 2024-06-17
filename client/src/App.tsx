@@ -8,14 +8,16 @@ import { useDispatch } from 'react-redux';
 import { useGeoLocation } from './hooks/useGeolocation';
 import AuthService from './services/auth.service';
 import { setIsAuthenticated } from './store/reducers/UserReducers';
+
+const BroadcastReport = lazy(() => import('./views/pages/broadcast-report'));
 const Home = lazy(() => import('./views/pages/_'));
-const Terms = lazy(() => import('./views/pages/static_pages/terms'));
-const Privacy = lazy(() => import('./views/pages/static_pages/privacy'));
-const Disclaimer = lazy(() => import('./views/pages/static_pages/disclaimer'));
+const Terms = lazy(() => import('./views/pages/static-pages/terms'));
+const Privacy = lazy(() => import('./views/pages/static-pages/privacy'));
+const Disclaimer = lazy(() => import('./views/pages/static-pages/disclaimer'));
 const ResetPassword = lazy(() => import('./views/pages/reset-password'));
 const AppPage = lazy(() => import('./views/pages/app'));
 const Conversation = lazy(() => import('./views/pages/conversation'));
-const SamplePage = lazy(() => import('./views/pages/static_pages/sample'));
+const SamplePage = lazy(() => import('./views/pages/static-pages/sample'));
 const ContactPage = lazy(() => import('./views/pages/contacts'));
 const Broadcast = lazy(() => import('./views/pages/broadcast'));
 const LoginPopup = lazy(() => import('./views/components/loginPopup'));
@@ -65,6 +67,7 @@ function App() {
 							</Route>
 							<Route path={NAVIGATION.TEMPLATES} element={<Templates />} />
 							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
+							<Route path={NAVIGATION.BROADCAST_REPORT} element={<BroadcastReport />} />
 							<Route path={NAVIGATION.CONTACT} element={<ContactPage />} />
 							<Route path={NAVIGATION.INBOX} element={<Conversation />} />
 							{/* <Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} /> */}

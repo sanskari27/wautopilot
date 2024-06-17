@@ -1,7 +1,7 @@
 import { BiConversation } from 'react-icons/bi';
 import { MdContacts, MdOutlinePermMedia } from 'react-icons/md';
 import { RiContactsBook2Line } from 'react-icons/ri';
-import { TbMessage2Plus, TbTemplate } from 'react-icons/tb';
+import { TbMessage2Plus, TbReportSearch, TbTemplate } from 'react-icons/tb';
 
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 export const WEBPAGE_URL = import.meta.env.VITE_WEBPAGE_URL;
@@ -24,6 +24,7 @@ export const NAVIGATION = {
 	CONTACT: 'contact',
 
 	BROADCAST: 'broadcast',
+	BROADCAST_REPORT: 'campaign-report',
 	PHONEBOOK: 'phonebook',
 
 	TEMPLATES: 'templates',
@@ -59,6 +60,11 @@ export const MenuItems = [
 		icon: TbMessage2Plus,
 		route: NAVIGATION.BROADCAST,
 		title: 'Broadcast',
+	},
+	{
+		icon: TbReportSearch,
+		route: NAVIGATION.BROADCAST_REPORT,
+		title: 'Report',
 	},
 	{
 		icon: BiConversation,

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import APIInstance from '../config/APIInstance';
 import { Contact } from '../store/types/ContactState';
+import { ScheduledBroadcast } from '../views/pages/broadcast-report';
 
 export default class MessagesService {
 	static async fetchAllConversation(deviceId: string) {
@@ -174,6 +175,15 @@ export default class MessagesService {
 			return true;
 		} catch (err) {
 			return true;
+		}
+	}
+
+	static async broadcastReport(deviceId: string) {
+		try {
+			const { data } = await APIInstance.get(`/message/${deviceId}/broadcast/reports`);
+			return data.reports as ScheduledBroadcast[];
+		} catch (err) {
+			return [];
 		}
 	}
 }

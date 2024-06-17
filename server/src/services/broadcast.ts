@@ -48,6 +48,11 @@ export default class BroadcastService extends WhatsappLinkService {
 		const campaigns = await BroadcastDB.aggregate([
 			{ $match: { linked_to: this.account._id, device_id: this.whatsappLink._id } },
 			{
+				$sort: {
+					createdAt: -1,
+				},
+			},
+			{
 				$lookup: {
 					from: BroadcastMessageDB.collection.name, // Name of the OtherModel collection
 					localField: 'messages',
