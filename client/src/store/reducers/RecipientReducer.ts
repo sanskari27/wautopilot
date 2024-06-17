@@ -42,7 +42,6 @@ const Slice = createSlice({
 		},
 		setRecipientLabels: (state, action: PayloadAction<{ labels: string[]; id: string }>) => {
 			const { labels, id } = action.payload;
-			console.log(labels, id);
 			state.list = state.list.map((item) => {
 				if (item._id === id) {
 					return { ...item, labels };

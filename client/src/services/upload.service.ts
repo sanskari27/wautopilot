@@ -52,8 +52,6 @@ export default class UploadService {
 			link.setAttribute('download', filename);
 			document.body.appendChild(link);
 			link.click();
-		} catch (err) {
-			console.log(err);
-		}
+		} catch (err) {}
 	}
 }

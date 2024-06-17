@@ -230,14 +230,14 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 	const data = req.locals.data as SendMessageValidationResult;
 
 	const conversationService = new ConversationService(account, device);
-	const conversation = await conversationService.findConversationByID(id);
-	if (!conversation) {
+	const recipient = await conversationService.findRecipientByConversation(id);
+	if (!recipient) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 
 	const msgObj = {
 		messaging_product: 'whatsapp',
-		to: conversation.recipient,
+		to: recipient,
 		type: data.type,
 		[data.type]:
 			data.type === 'text'
@@ -263,7 +263,7 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 
 		await conversationService.addMessageToConversation(id, {
 			message_id: res.messages[0].id,
-			recipient: conversation.recipient,
+			recipient: recipient,
 			body: {
 				body_type:
 					data.type === 'text'

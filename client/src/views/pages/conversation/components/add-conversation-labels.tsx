@@ -9,7 +9,11 @@ import {
 	ModalFooter,
 	ModalHeader,
 	ModalOverlay,
-	Textarea,
+	Tag,
+	TagCloseButton,
+	TagLabel,
+	Wrap,
+	WrapItem,
 	useBoolean,
 	useToast,
 } from '@chakra-ui/react';
@@ -20,6 +24,7 @@ import { StoreNames, StoreState } from '../../../../store';
 import { setRecipientLabels } from '../../../../store/reducers/RecipientReducer';
 import { Recipient } from '../../../../store/types/RecipientsState';
 import LabelFilter from '../../../components/labelFilter';
+import Each from '../../../components/utils/Each';
 
 export type AssignConversationLabelDialogHandle = {
 	close: () => void;
@@ -60,7 +65,6 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 			onClose();
 		},
 		open: (recipient: Recipient) => {
-			console.log(recipient);
 			setSelectedRecipient((prev) => {
 				return {
 					...prev,
@@ -87,6 +91,15 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 			return {
 				...prev,
 				labels: [...prev.labels, ...selectedLabels],
+			};
+		});
+	};
+
+	const removeLabel = (label: string) => {
+		setSelectedRecipient((prev) => {
+			return {
+				...prev,
+				labels: prev.labels.filter((item) => item !== label),
 			};
 		});
 	};
@@ -130,20 +143,32 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 		<Modal isOpen={isOpen} onClose={onClose} size={'2xl'} closeOnOverlayClick={false}>
 			<ModalOverlay />
 			<ModalContent>
-				<ModalHeader onClick={() => console.log(selected_recipient)}>
-					Bulk Assign Labels
-				</ModalHeader>
+				<ModalHeader>Assign Labels</ModalHeader>
 				<ModalBody pb={6}>
 					<FormControl pt={'1rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel>Tags</FormLabel>
 							<LabelFilter onChange={handleLabelsChange} />
 						</HStack>
-						<Textarea
-							placeholder={`Enter tags here separated by comma`}
-							value={selected_recipient.labels.join(', ') ?? ''}
-							readOnly
-						/>
+						<Wrap
+							borderWidth={'1px'}
+							borderColor={'gray.300'}
+							p={'0.5rem'}
+							rounded={'md'}
+							height={'150px'}
+						>
+							<Each
+								items={selected_recipient.labels}
+								render={(label) => (
+									<WrapItem>
+										<Tag borderRadius='full' variant='solid' colorScheme='green'>
+											<TagLabel>{label}</TagLabel>
+											<TagCloseButton onClick={() => removeLabel(label)} />
+										</Tag>
+									</WrapItem>
+								)}
+							/>
+						</Wrap>
 					</FormControl>
 				</ModalBody>
 

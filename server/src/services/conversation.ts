@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { ConversationDB, ConversationMessageDB } from '../../mongo';
+import { ConversationDB, ConversationMessageDB, PhoneBookDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import IConversation from '../../mongo/types/conversation';
 import IConversationMessage from '../../mongo/types/conversationmessage';
@@ -11,13 +11,18 @@ import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import PhoneBookService from './phonebook';
 import WhatsappLinkService from './whatsappLink';
 
-function processConversationDocs(docs: IConversation[]) {
+function processConversationDocs(
+	docs: (IConversation & {
+		labels: string[];
+	})[]
+) {
 	return docs.map((doc) => ({
 		_id: doc._id,
 		recipient: doc.recipient,
 		profile_name: doc.profile_name ?? '',
 		expiration_timestamp: doc.expiration_timestamp,
 		origin: doc.origin ?? '',
+		labels: doc.labels ?? [],
 	}));
 }
 
@@ -102,22 +107,13 @@ export default class ConversationService extends WhatsappLinkService {
 		);
 	}
 
-	public async findConversation(recipient: string) {
-		const doc = await ConversationDB.findOne({
-			linked_to: this.userId,
-			recipient,
-		});
-		if (!doc) return null;
-		return processConversationDocs([doc])[0];
-	}
-
-	public async findConversationByID(id: Types.ObjectId) {
+	public async findRecipientByConversation(id: Types.ObjectId) {
 		const doc = await ConversationDB.findOne({
 			linked_to: this.userId,
 			_id: id,
 		});
 		if (!doc) return null;
-		return processConversationDocs([doc])[0];
+		return doc.recipient;
 	}
 
 	public async addMessageToConversation(
@@ -242,10 +238,56 @@ export default class ConversationService extends WhatsappLinkService {
 	}
 
 	public async fetchConversations() {
-		const docs = await ConversationDB.find({
-			linked_to: this.userId,
-			device_id: this.whatsappLink._id,
-		}).sort({ last_message_at: -1 });
+		const docs = await ConversationDB.aggregate([
+			{
+				$match: {
+					linked_to: this.userId,
+					device_id: this.whatsappLink._id,
+				},
+			},
+			{
+				$lookup: {
+					from: PhoneBookDB.collection.name,
+					localField: 'recipient',
+					foreignField: 'phone_number',
+					as: 'recipientDetails',
+				},
+			},
+			{
+				$unwind: {
+					path: '$recipientDetails',
+					preserveNullAndEmptyArrays: true,
+				},
+			},
+			// if recipientDetails is not empty array,  get labels from first element of recipientDetails or set it to empty array
+			{
+				$addFields: {
+					recipientDetails: {
+						$cond: {
+							if: { $ne: ['$recipientDetails', []] },
+							then: '$recipientDetails',
+							else: [],
+						},
+					},
+				},
+			},
+			{
+				$addFields: {
+					labels: {
+						$cond: {
+							if: { $ne: ['$recipientDetails', []] },
+							then: '$recipientDetails.labels',
+							else: [],
+						},
+					},
+				},
+			},
+			{
+				$sort: {
+					last_message_at: -1,
+				},
+			},
+		]);
 
 		return processConversationDocs(docs);
 	}
