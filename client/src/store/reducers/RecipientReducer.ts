@@ -63,6 +63,9 @@ const Slice = createSlice({
 			state.pinnedConversations = state.list.filter((item) => newPinnedIds.includes(item._id));
 			state.unpinnedConversations = state.list.filter((item) => !newPinnedIds.includes(item._id));
 		},
+		setLabelFilter: (state, action: PayloadAction<string[]>) => {
+			state.label_filter = action.payload;
+		},
 	},
 });
 
@@ -73,6 +76,7 @@ export const {
 	setRecipientLabels,
 	addToPin,
 	removeFromPin,
+	setLabelFilter,
 } = Slice.actions;
 
 export default Slice.reducer;

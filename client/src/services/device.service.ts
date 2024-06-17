@@ -41,4 +41,13 @@ export default class DeviceService {
 			return false;
 		}
 	}
+
+	static async fetchMessageHealth(id: string) {
+		try {
+			const { data } = await APIInstance.get(`/whatsapp-link/message-health/${id}`);
+			return data.health as 'RED' | 'YELLOW' | 'GREEN';
+		} catch (err) {
+			return 'RED';
+		}
+	}
 }

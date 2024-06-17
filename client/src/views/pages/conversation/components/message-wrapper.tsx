@@ -1,6 +1,7 @@
 import { Flex, Icon, Text } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 import { BiCheckDouble } from 'react-icons/bi';
+import { CgTimer } from 'react-icons/cg';
 import { Message } from '../../../../store/types/MessageState';
 
 const ChatMessageWrapper = ({ message, children }: { message: Message; children: ReactNode }) => {
@@ -33,7 +34,9 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 					<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={BiCheckDouble} color='gray.500' />
 				) : message.read_at ? (
 					<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={BiCheckDouble} color='blue.500' />
-				) : null}
+				) : (
+					<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={CgTimer} color='gray.500' />
+				)}
 			</Flex>
 		</Flex>
 	);

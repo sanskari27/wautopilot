@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { WhatsappLinkDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
+import IWhatsappLink from '../../mongo/types/whatsapplink';
 import MetaAPI from '../config/MetaAPI';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
@@ -108,5 +109,34 @@ export default class WhatsappLinkService extends UserService {
 		}
 
 		return record;
+	}
+
+	public static async fetchMessageHealth(record: IWhatsappLink) {
+		try {
+			const {
+				data: { data },
+			} = await MetaAPI.get(`/${record.waid}/phone_numbers`, {
+				headers: {
+					Authorization: `Bearer ${record.accessToken}`,
+				},
+			});
+
+			if (!data) {
+				return 'RED';
+			}
+
+			const phoneNumberDoc = data.find(
+				(phone: { id: string; display_phone_number: string; verified_name: string }) =>
+					phone.id === record.phoneNumberId
+			);
+
+			if (!phoneNumberDoc) {
+				return 'RED';
+			}
+
+			return phoneNumberDoc.quality_rating.toUpperCase() as 'GREEN' | 'YELLOW' | 'RED';
+		} catch (err) {
+			return 'RED';
+		}
 	}
 }

@@ -229,10 +229,11 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 }
 
 async function fetchConversations(req: Request, res: Response, next: NextFunction) {
+	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];
 	const { account, device } = req.locals;
 
 	const conversationService = new ConversationService(account, device);
-	const conversations = await conversationService.fetchConversations();
+	const conversations = await conversationService.fetchConversations(labels);
 
 	return Respond({
 		res,
@@ -366,7 +367,9 @@ const Controller = {
 	sendTemplateMessage,
 	broadcastReport,
 	pauseBroadcast,
-	resumeBroadcast,deleteBroadcast,resendBroadcast,
+	resumeBroadcast,
+	deleteBroadcast,
+	resendBroadcast,
 	fetchConversations,
 	fetchConversationMessages,
 	markRead,

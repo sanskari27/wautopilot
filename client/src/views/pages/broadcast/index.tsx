@@ -18,6 +18,7 @@ import { useEffect } from 'react';
 import { BiSend } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import APIInstance from '../../../config/APIInstance';
+import DeviceService from '../../../services/device.service';
 import UploadService from '../../../services/upload.service';
 import { StoreNames, StoreState } from '../../../store';
 import {
@@ -78,6 +79,20 @@ export default function Broadcast() {
 
 	const templateListFiltered = templateList.filter((t) => t.status === 'APPROVED');
 	const selectedTemplate = templateListFiltered.find((t) => t.id === template_id);
+
+	useEffect(() => {
+		DeviceService.fetchMessageHealth(selected_device_id).then((res) => {
+			if (res === 'RED') {
+				toast({
+					title: 'Your number health is RED',
+					description: 'Are you sure you want to send a broadcast?',
+					status: 'warning',
+					isClosable: true,
+					duration: null,
+				});
+			}
+		});
+	}, [selected_device_id, toast]);
 
 	function sendBroadcast(header_media: { link?: string; media_id?: string } = {}) {
 		const template = templateListFiltered.find((t) => t.id === template_id)!;

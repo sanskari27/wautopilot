@@ -237,12 +237,22 @@ export default class ConversationService extends WhatsappLinkService {
 		);
 	}
 
-	public async fetchConversations() {
+	public async fetchConversations(labels: string[] = []) {
+		const phoneBookService = new PhoneBookService(this.account);
+		const _recipients = await phoneBookService.fetchRecords({
+			page: 1,
+			limit: 99999999,
+			labels,
+		});
+
+		const recipients = _recipients.map((recipient) => recipient.phone_number);
+
 		const docs = await ConversationDB.aggregate([
 			{
 				$match: {
 					linked_to: this.userId,
 					device_id: this.whatsappLink._id,
+					...(labels.length > 0 ? { recipient: { $in: recipients } } : {}),
 				},
 			},
 			{

@@ -4,9 +4,13 @@ import { Contact } from '../store/types/ContactState';
 import { ScheduledBroadcast } from '../views/pages/broadcast-report';
 
 export default class MessagesService {
-	static async fetchAllConversation(deviceId: string) {
+	static async fetchAllConversation(deviceId: string, label_filter: string[]) {
 		try {
-			const { data } = await APIInstance.get(`/message/${deviceId}/conversations`);
+			const { data } = await APIInstance.get(`/message/${deviceId}/conversations`, {
+				params: {
+					labels: label_filter.join(','),
+				},
+			});
 			return (data.conversations ?? []).map((conversation: any) => {
 				return {
 					_id: conversation._id ?? '',

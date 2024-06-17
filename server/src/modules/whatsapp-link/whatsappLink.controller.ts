@@ -99,11 +99,27 @@ async function removeDevice(req: Request, res: Response, next: NextFunction) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
+async function fetchMessageHealth(req: Request, res: Response, next: NextFunction) {
+	const { device } = req.locals;
+
+	try {
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				health: await WhatsappLinkService.fetchMessageHealth(device),
+			},
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
 
 const Controller = {
 	linkDevice,
 	getAllLinkedDevices,
 	removeDevice,
+	fetchMessageHealth,
 };
 
 export default Controller;

@@ -2,10 +2,14 @@ import { Box, Flex, HStack, Skeleton, Stack, Text, useBoolean } from '@chakra-ui
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import useFilteredList from '../../../hooks/useFilteredList';
+import MessagesService from '../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../store';
 import { reset } from '../../../store/reducers/MessagesReducers';
-import { setLabels } from '../../../store/reducers/PhonebookReducer';
-import { setSelectedRecipient } from '../../../store/reducers/RecipientReducer';
+import {
+	setLabelFilter,
+	setRecipientsList,
+	setSelectedRecipient,
+} from '../../../store/reducers/RecipientReducer';
 import { Recipient } from '../../../store/types/RecipientsState';
 import LabelFilter from '../../components/labelFilter';
 import SearchBar from '../../components/searchBar';
@@ -17,11 +21,13 @@ const Conversation = () => {
 	const dispatch = useDispatch();
 	const [listExpanded, setListExpanded] = useBoolean(true);
 
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const {
 		pinnedConversations,
 		unpinnedConversations,
 		uiDetails: { loading },
 		selected_recipient,
+		label_filter,
 	} = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 
 	const { filtered: filteredPinned, setSearchText: setSearchTextPinned } = useFilteredList(
@@ -53,6 +59,12 @@ const Conversation = () => {
 	};
 
 	useEffect(() => {
+		MessagesService.fetchAllConversation(selected_device_id,label_filter).then((data) =>
+			dispatch(setRecipientsList(data))
+		);
+	}, [dispatch, label_filter, selected_device_id]);
+
+	useEffect(() => {
 		dispatch(reset());
 	}, [dispatch]);
 
@@ -75,7 +87,7 @@ const Conversation = () => {
 								setSearchTextUnpinned(text);
 							}}
 						/>
-						<LabelFilter onChange={(labels) => dispatch(setLabels(labels))} />
+						<LabelFilter onClose={(labels) => dispatch(setLabelFilter(labels))} />
 					</HStack>
 					<Flex direction={'column'} overflowY={'auto'} overflowX={'hidden'}>
 						{loading ? (
