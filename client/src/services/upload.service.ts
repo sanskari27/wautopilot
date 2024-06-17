@@ -42,10 +42,8 @@ export default class UploadService {
 				}
 			);
 			const data = response.data;
-			const filename = response.headers['content-disposition']
-				.split('filename=')[1]
-				.trim()
-				.replace(/^"|"$/g, '');
+			const extension = response.headers['content-type']?.split('/')[1];
+			const filename = 'download.' + extension ?? 'file';
 			const url = window.URL.createObjectURL(new Blob([data]));
 			const link = document.createElement('a');
 			link.href = url;
@@ -53,6 +51,8 @@ export default class UploadService {
 			document.body.appendChild(link);
 			link.click();
 		} catch (err) {
+			console.log(err);
+
 			//ignore
 		}
 	}

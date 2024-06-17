@@ -4,10 +4,9 @@ import FormData from 'form-data';
 import fs from 'fs';
 import FileUpload, { ResolvedFile } from '../../config/FileUpload';
 import MetaAPI from '../../config/MetaAPI';
-import { Path } from '../../config/const';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
-import { Respond, RespondFile, generateRandomID } from '../../utils/ExpressUtils';
+import { Respond } from '../../utils/ExpressUtils';
 import FileUtils from '../../utils/FileUtils';
 
 async function uploadMetaHandle(req: Request, res: Response, next: NextFunction) {
@@ -139,27 +138,18 @@ async function downloadMetaMedia(req: Request, res: Response, next: NextFunction
 		});
 
 		const response = await axios.get(data.url, {
-			responseType: 'arraybuffer',
+			responseType: 'stream',
 			headers: {
 				Authorization: `Bearer ${req.locals.device.accessToken}`,
 			},
 		});
-		const contentType = response.headers['content-type'];
-		const fileExtension = contentType.split('/')[1];
-		const fileData = Buffer.from(response.data, 'binary');
-		const name = generateRandomID() + '.' + fileExtension;
 
-		fs.writeFile(__basedir + Path.Misc + name, fileData, () => {
-			RespondFile({
-				res,
-				filename: name,
-				filepath: __basedir + Path.Misc + name,
-			});
-			setTimeout(() => {
-				FileUtils.deleteFile(__basedir + Path.Misc + name);
-			}, 30 * 60 * 1000);
-		});
+		res.setHeader('Content-Type', response.headers['content-type']);
+		res.setHeader('Content-Disposition', 'inline');
+		return response.data.pipe(res);
 	} catch (err) {
+		console.log(err);
+
 		next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR, err));
 	}
 }

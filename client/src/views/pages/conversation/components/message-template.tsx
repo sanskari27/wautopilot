@@ -8,7 +8,6 @@ import {
 	Flex,
 	HStack,
 	Icon,
-	Image,
 	Link,
 	Text,
 	useToast,
@@ -19,14 +18,16 @@ import { HiLocationMarker } from 'react-icons/hi';
 import { MdOutlinePermMedia } from 'react-icons/md';
 import { useInView } from 'react-intersection-observer';
 import { useSelector } from 'react-redux';
+import { SERVER_URL } from '../../../../config/const';
 import MessagesService from '../../../../services/messages.service';
 import UploadService from '../../../../services/upload.service';
 import { StoreNames, StoreState } from '../../../../store';
 import { Contact } from '../../../../store/types/ContactState';
 import { Message } from '../../../../store/types/MessageState';
-import { getFileSize } from '../../../../utils/file-utils';
+import { getFileSize, getFileType } from '../../../../utils/file-utils';
 import ContactDrawer, { ContactHandle } from '../../../components/contact-drawer';
 import Each from '../../../components/utils/Each';
+import Preview from '../../media/preview.component';
 import ChatMessageWrapper from './message-wrapper';
 
 export const TextMessage = ({ message }: { message: Message }) => {
@@ -69,6 +70,7 @@ export const LocationMessage = ({ message }: { message: Message }) => {
 };
 const initialState = {
 	url: '',
+	mimeType: '',
 	showPreview: false,
 	loaded: false,
 	size: 0,
@@ -87,6 +89,7 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 			setMedia({
 				...initialState,
 				loaded: true,
+				mimeType: data.mime_type,
 				url: data.url,
 				size: data.size,
 			});
@@ -102,6 +105,10 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 			success: { title: 'Downloaded!' },
 			error: { title: 'Failed to download' },
 		});
+	};
+
+	const handlePreview = () => {
+		setMedia((prev) => ({ ...prev, showPreview: true }));
 	};
 
 	return (
@@ -143,7 +150,7 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 							alignItems={'center'}
 							justifyContent={'center'}
 							height={'full'}
-							onClick={handleDownload}
+							onClick={handlePreview}
 						>
 							<Icon as={DownloadIcon} color={'white'} />
 							<Text color={'white'}>{getFileSize(media.size)}</Text>
@@ -151,7 +158,25 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 					</AbsoluteCenter>
 				</Box>
 			) : (
-				<Image src={media.url} width={'260px'} aspectRatio={16 / 9} rounded={'lg'} />
+				// <Image src={media.url} width={'260px'} aspectRatio={16 / 9} rounded={'lg'} />
+				<Box width={'400px'} height={'420px'} position={'relative'}>
+					<Preview
+						data={{
+							url: `${SERVER_URL}uploads/${selected_device_id}/download-meta-media/${message.body?.media_id}`,
+							type: getFileType(media.mimeType),
+						}}
+						progress={-1}
+					/>
+					<Text
+						mb='1rem'
+						textAlign={'center'}
+						cursor={'pointer'}
+						onClick={handleDownload}
+						textDecoration={'underline'}
+					>
+						Download
+					</Text>
+				</Box>
 			)}
 		</ChatMessageWrapper>
 	);
