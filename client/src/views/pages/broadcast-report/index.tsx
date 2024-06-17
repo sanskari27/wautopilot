@@ -227,7 +227,7 @@ export default function BroadcastReport() {
 											>
 												Pause
 											</Button>
-										) : broadcast.failed >= 0 ? (
+										) : broadcast.failed > 0 ? (
 											<Button
 												size={'sm'}
 												colorScheme='orange'
