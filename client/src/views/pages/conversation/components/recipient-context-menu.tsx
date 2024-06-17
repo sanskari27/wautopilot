@@ -5,7 +5,11 @@ import { BiLabel } from 'react-icons/bi';
 import { LuPin, LuPinOff } from 'react-icons/lu';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
-import { setRecipientsList } from '../../../../store/reducers/RecipientReducer';
+import {
+	addToPin,
+	removeFromPin,
+	setRecipientsList,
+} from '../../../../store/reducers/RecipientReducer';
 import { Recipient } from '../../../../store/types/RecipientsState';
 import AssignConversationLabelDialog, {
 	AssignConversationLabelDialogHandle,
@@ -22,19 +26,13 @@ export default function ContextMenu({ recipient }: { recipient: Recipient }) {
 		setIsMenuClicked.toggle();
 	};
 
+	const isPinned = localStorage.getItem('pinned')?.includes(recipient._id);
+
 	const handleConversationPin = () => {
-		if (localStorage.getItem('pinned') === null) {
-			localStorage.setItem('pinned', JSON.stringify([recipient]));
+		if (isPinned) {
+			dispatch(removeFromPin(recipient._id));
 		} else {
-			const pinned = JSON.parse(localStorage.getItem('pinned') as string);
-			const index = pinned.findIndex((item: Recipient) => item._id === recipient._id);
-			if (index === -1) {
-				pinned.push(recipient);
-				localStorage.setItem('pinned', JSON.stringify(pinned));
-			} else {
-				pinned.splice(index, 1);
-				localStorage.setItem('pinned', JSON.stringify(pinned));
-			}
+			dispatch(addToPin(recipient._id));
 		}
 		dispatch(setRecipientsList(list));
 	};
@@ -73,7 +71,7 @@ export default function ContextMenu({ recipient }: { recipient: Recipient }) {
 						<Icon as={BiLabel} mr={2} /> Assign label
 					</MenuItem>
 					<MenuItem onClick={handleConversationPin}>
-						{localStorage.getItem('pinned')?.includes(recipient._id) ? (
+						{isPinned ? (
 							<>
 								<Icon as={LuPinOff} mr={2} /> Unpin
 							</>

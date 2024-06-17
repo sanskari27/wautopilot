@@ -18,15 +18,27 @@ const Conversation = () => {
 	const [listExpanded, setListExpanded] = useBoolean(true);
 
 	const {
-		list,
+		pinnedConversations,
+		unpinnedConversations,
 		uiDetails: { loading },
 		selected_recipient,
 	} = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 
-	const { filtered, setSearchText } = useFilteredList(list, {
-		profile_name: 1,
-		recipient: 1,
-	});
+	const { filtered: filteredPinned, setSearchText: setSearchTextPinned } = useFilteredList(
+		pinnedConversations,
+		{
+			profile_name: 1,
+			recipient: 1,
+		}
+	);
+
+	const { filtered: filteredUnpinned, setSearchText: setSearchTextUnpinned } = useFilteredList(
+		unpinnedConversations,
+		{
+			profile_name: 1,
+			recipient: 1,
+		}
+	);
 
 	useEffect(() => {
 		return () => {
@@ -57,7 +69,12 @@ const Conversation = () => {
 						Chats
 					</Text>
 					<HStack mb={'0.5rem'} marginRight={'0.5rem'} className='pr-2 md:!px-0'>
-						<SearchBar onSearchTextChanged={setSearchText} />
+						<SearchBar
+							onSearchTextChanged={(text) => {
+								setSearchTextPinned(text);
+								setSearchTextUnpinned(text);
+							}}
+						/>
 						<LabelFilter onChange={(labels) => dispatch(setLabels(labels))} />
 					</HStack>
 					<Flex direction={'column'} overflowY={'auto'} overflowX={'hidden'}>
@@ -72,10 +89,16 @@ const Conversation = () => {
 								<Skeleton height='50px' />
 							</Stack>
 						) : (
-							<Each
-								items={filtered}
-								render={(item) => <RecipientsName onClick={handleRecipientClick} item={item} />}
-							/>
+							<>
+								<Each
+									items={filteredPinned}
+									render={(item) => <RecipientsName onClick={handleRecipientClick} item={item} />}
+								/>
+								<Each
+									items={filteredUnpinned}
+									render={(item) => <RecipientsName onClick={handleRecipientClick} item={item} />}
+								/>
+							</>
 						)}
 					</Flex>
 				</Flex>

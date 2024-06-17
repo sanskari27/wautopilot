@@ -1,5 +1,8 @@
 export type RecipientsState = {
 	list: Recipient[];
+	pinnedConversations: Recipient[];
+	unpinnedConversations: Recipient[];
+
 	uiDetails: {
 		loading: boolean;
 	};
