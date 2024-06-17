@@ -444,10 +444,7 @@ export default class BroadcastService extends WhatsappLinkService {
 					recipient: msg.to,
 					message_id: msg.message_id,
 					...(header ? { ...header } : {}),
-					body: {
-						body_type: 'TEXT',
-						text: body!,
-					},
+					...(body ? { body: { body_type: 'TEXT', text: body } } : {}),
 					...(footer ? { footer_content: footer } : {}),
 					...(buttons ? { buttons } : {}),
 				});
