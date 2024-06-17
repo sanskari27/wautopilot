@@ -94,7 +94,16 @@ export default class BroadcastService extends WhatsappLinkService {
 					},
 					pending: {
 						$sum: {
-							$cond: [{ $in: ['$messagesInfo.status', [MESSAGE_STATUS.PENDING]] }, 1, 0],
+							$cond: {
+								if: {
+									$and: [
+										{ $eq: ['$messagesInfo.status', MESSAGE_STATUS.PROCESSING] },
+										{ $eq: ['$messagesInfo.status', MESSAGE_STATUS.PENDING] },
+									],
+								},
+								then: 1,
+								else: 0,
+							},
 						},
 					},
 				},
