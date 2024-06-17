@@ -1,8 +1,10 @@
 import {
 	Button,
+	Flex,
 	FormControl,
 	FormLabel,
 	HStack,
+	Input,
 	Modal,
 	ModalBody,
 	ModalContent,
@@ -18,9 +20,8 @@ import {
 	useToast,
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import MessagesService from '../../../../services/messages.service';
-import { StoreNames, StoreState } from '../../../../store';
 import { setRecipientLabels } from '../../../../store/reducers/RecipientReducer';
 import { Recipient } from '../../../../store/types/RecipientsState';
 import LabelFilter from '../../../components/labelFilter';
@@ -35,6 +36,7 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 	const dispatch = useDispatch();
 	const toast = useToast();
 	const [isOpen, setOpen] = useBoolean();
+	const [newLabel, setNewLabel] = useState('');
 
 	const [isSaving, setIsSaving] = useBoolean();
 	const [selected_recipient, setSelectedRecipient] = useState<Recipient>({
@@ -45,8 +47,6 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 		expiration_timestamp: '',
 		labels: [],
 	});
-
-	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const onClose = () => {
 		setSelectedRecipient({
@@ -107,11 +107,26 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 	const handleSave = async () => {
 		setIsSaving.on();
 
-		MessagesService.ConversationLabels(
-			selected_device_id,
-			selected_recipient._id,
-			selected_recipient.labels
-		)
+		if (newLabel !== '') {
+			newLabel.split(',').forEach((label) => {
+				if (!selected_recipient.labels.includes(label.trim())) {
+					selected_recipient.labels.push(label.trim());
+				}
+			});
+		}
+
+		// if (selected_recipient.labels.length === 0) {
+		// 	toast({
+		// 		title: 'Please add at least one label',
+		// 		status: 'error',
+		// 		duration: 3000,
+		// 		isClosable: true,
+		// 	});
+		// 	setIsSaving.off();
+		// 	return;
+		// }
+
+		MessagesService.ConversationLabels(selected_recipient.recipient, selected_recipient.labels)
 			.then((res) => {
 				if (res) {
 					toast({
@@ -120,11 +135,19 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 						duration: 3000,
 						isClosable: true,
 					});
+					console.log(selected_recipient.labels, selected_recipient._id);
 					dispatch(
 						setRecipientLabels({ labels: selected_recipient.labels, id: selected_recipient._id })
 					);
 					onClose();
+					return;
 				}
+				toast({
+					title: 'Failed to assign labels',
+					status: 'error',
+					duration: 3000,
+					isClosable: true,
+				});
 			})
 			.catch(() => {
 				toast({
@@ -148,27 +171,33 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 					<FormControl pt={'1rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel>Tags</FormLabel>
-							<LabelFilter onChange={handleLabelsChange} />
 						</HStack>
-						<Wrap
-							borderWidth={'1px'}
-							borderColor={'gray.300'}
-							p={'0.5rem'}
-							rounded={'md'}
-							height={'150px'}
-						>
+						<Wrap borderWidth={'1px'} borderColor={'gray.300'} p={'0.5rem'} rounded={'md'}>
 							<Each
 								items={selected_recipient.labels}
 								render={(label) => (
 									<WrapItem>
 										<Tag borderRadius='full' variant='solid' colorScheme='green'>
 											<TagLabel>{label}</TagLabel>
-											<TagCloseButton onClick={() => removeLabel(label)} />
+											<TagCloseButton
+												onClick={() => {
+													removeLabel(label);
+												}}
+											/>
 										</Tag>
 									</WrapItem>
 								)}
 							/>
 						</Wrap>
+						<Flex>
+							<Input
+								type='text'
+								placeholder='Add new label'
+								value={newLabel}
+								onChange={(e) => setNewLabel(e.target.value)}
+							/>
+							<LabelFilter clearOnClose onChange={handleLabelsChange} />
+						</Flex>
 					</FormControl>
 				</ModalBody>
 

@@ -146,7 +146,7 @@ export default function BroadcastReport() {
 				</Flex>
 			</Flex>
 			<TableContainer marginTop={'1rem'}>
-				<Table variant={'unstyled'}>
+				<Table variant={'striped'}>
 					<Thead>
 						<Tr color={'black'}>
 							<Th width={'5%'}>Select</Th>

@@ -63,3 +63,21 @@ body {
 		left: -13px;
 	}
 }
+
+::-webkit-scrollbar {
+    width: 5px;
+	height: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: ypx;
+    border-radius: ypx;
+    background: rgba(216, 205, 205, 0.336); 
+}

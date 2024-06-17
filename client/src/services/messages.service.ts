@@ -171,14 +171,14 @@ export default class MessagesService {
 		}
 	}
 
-	static async ConversationLabels(deviceId: string, recipientId: string, labels: string[]) {
+	static async ConversationLabels( phone_number: string, labels: string[]) {
 		try {
-			await APIInstance.post(`/message/${deviceId}/conversations/${recipientId}/labels`, {
+			await APIInstance.post(`/phonebook/set-labels/phone/${phone_number}`, {
 				labels,
 			});
 			return true;
 		} catch (err) {
-			return true;
+			return false;
 		}
 	}
 

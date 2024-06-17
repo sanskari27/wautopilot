@@ -78,6 +78,8 @@ export default function LabelFilter({
 				onClose(filterLabels);
 				clearOnClose && dispatch({ type: 'clear' });
 			}}
+			isLazy={true}
+			lazyBehavior='keepMounted'
 		>
 			<PopoverTrigger>
 				{buttonComponent || <IconButton aria-label='filter-button' icon={<BiFilter />} />}

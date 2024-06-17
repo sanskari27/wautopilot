@@ -48,6 +48,9 @@ const Slice = createSlice({
 				}
 				return item;
 			});
+			const pinnedIds = JSON.parse(localStorage.getItem('pinned') || '[]') as string[];
+			state.pinnedConversations = state.list.filter((item) => pinnedIds.includes(item._id));
+			state.unpinnedConversations = state.list.filter((item) => !pinnedIds.includes(item._id));
 		},
 		addToPin: (state, action: PayloadAction<string>) => {
 			const pinnedIds = JSON.parse(localStorage.getItem('pinned') || '[]') as string[];

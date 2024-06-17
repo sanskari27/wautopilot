@@ -28,7 +28,8 @@ export default function ContextMenu({ recipient }: { recipient: Recipient }) {
 
 	const isPinned = localStorage.getItem('pinned')?.includes(recipient._id);
 
-	const handleConversationPin = () => {
+	const handleConversationPin = (e: React.MouseEvent) => {
+		e.stopPropagation();
 		if (isPinned) {
 			dispatch(removeFromPin(recipient._id));
 		} else {
@@ -38,6 +39,11 @@ export default function ContextMenu({ recipient }: { recipient: Recipient }) {
 	};
 
 	const [isMenuClicked, setIsMenuClicked] = useBoolean(false);
+
+	function assignLabelDialog(e: React.MouseEvent) {
+		e.stopPropagation();
+		assignConversationLabelRef.current?.open(recipient);
+	}
 
 	return (
 		<>
@@ -63,11 +69,7 @@ export default function ContextMenu({ recipient }: { recipient: Recipient }) {
 					/>
 				</MenuButton>
 				<MenuList>
-					<MenuItem
-						onClick={() => {
-							assignConversationLabelRef.current?.open(recipient);
-						}}
-					>
+					<MenuItem onClick={assignLabelDialog}>
 						<Icon as={BiLabel} mr={2} /> Assign label
 					</MenuItem>
 					<MenuItem onClick={handleConversationPin}>
