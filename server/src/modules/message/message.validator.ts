@@ -111,14 +111,16 @@ export async function CreateBroadcastValidator(req: Request, res: Response, next
 			}),
 		to: z.string().array().default([]),
 		labels: z.string().array().default([]),
-		body: z.array(
-			z.object({
-				custom_text: z.string(),
-				phonebook_data: z.string(),
-				variable_from: z.enum(['custom_text', 'phonebook_data']),
-				fallback_value: z.string(),
-			})
-		),
+		body: z
+			.array(
+				z.object({
+					custom_text: z.string(),
+					phonebook_data: z.string(),
+					variable_from: z.enum(['custom_text', 'phonebook_data']),
+					fallback_value: z.string(),
+				})
+			)
+			.default([]),
 		header: z
 			.object({
 				type: z.enum(['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT']),
