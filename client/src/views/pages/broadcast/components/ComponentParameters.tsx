@@ -4,6 +4,8 @@ import {
 	Box,
 	Divider,
 	Flex,
+	FormControl,
+	FormLabel,
 	Input,
 	InputGroup,
 	InputLeftAddon,
@@ -39,7 +41,7 @@ export default function ComponentParameters({ components }: Props) {
 	const dispatch = useDispatch();
 	const header = components.find((component) => component.type === 'HEADER');
 
-	const { body } = useSelector((state: StoreState) => state[StoreNames.BROADCAST]);
+	const { body, error } = useSelector((state: StoreState) => state[StoreNames.BROADCAST]);
 
 	return (
 		<Flex
@@ -52,8 +54,12 @@ export default function ComponentParameters({ components }: Props) {
 				<Text fontSize={'2xl'} fontWeight={'medium'}>
 					Template details
 				</Text>
-				<Box hidden={!header || header.format === 'TEXT'} mt={'1rem'}>
-					<Text>Header media link</Text>
+				<FormControl
+					hidden={!header || header.format === 'TEXT'}
+					mt={'1rem'}
+					isInvalid={error.type === 'MEDIA'}
+				>
+					<FormLabel>Header media link</FormLabel>
 					<Input
 						placeholder='Media file link'
 						type='url'
@@ -66,15 +72,15 @@ export default function ComponentParameters({ components }: Props) {
 						</AbsoluteCenter>
 					</Box>
 					<Box marginTop={'0.5rem'}>
-						<Text mb={'0.5rem'}>Upload header media</Text>
+						<FormLabel mb={'0.5rem'}>Upload header media</FormLabel>
 						<Input
 							type='file'
 							onChange={(e) => dispatch(setHeaderFile(e.target.files?.[0] ?? null))}
 						/>
 					</Box>
-				</Box>
-				<Box gap={3} mt={'1rem'} hidden={body.length === 0}>
-					<Text>Template body details</Text>
+				</FormControl>
+				<FormControl isInvalid={error.type === ''} gap={3} mt={'1rem'} hidden={body.length === 0}>
+					<FormLabel>Template body details</FormLabel>
 					<Each
 						items={body}
 						render={(parameter, index) => (
@@ -187,7 +193,7 @@ export default function ComponentParameters({ components }: Props) {
 							</InputGroup>
 						)}
 					/>
-				</Box>
+				</FormControl>
 			</Flex>
 
 			<Box className='w-full md:w-[30%]'>

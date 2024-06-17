@@ -5,6 +5,9 @@ import {
 	Button,
 	Divider,
 	Flex,
+	FormControl,
+	FormErrorMessage,
+	FormLabel,
 	Input,
 	Select,
 	Text,
@@ -24,6 +27,7 @@ import {
 	setDailyMessagesCount,
 	setDescription,
 	setEndTime,
+	setError,
 	setLabels,
 	setName,
 	setRecipientsFrom,
@@ -54,6 +58,7 @@ export default function Broadcast() {
 		labels,
 		header_file,
 		header_link,
+		error,
 	} = useSelector((state: StoreState) => state[StoreNames.BROADCAST]);
 	const { list: templateList } = useSelector((state: StoreState) => state[StoreNames.TEMPLATES]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
@@ -116,6 +121,54 @@ export default function Broadcast() {
 	}
 
 	function onSend() {
+		if (!name) {
+			dispatch(setError({ type: 'NAME', message: 'Name is required' }));
+			return;
+		}
+
+		if (!template_id) {
+			dispatch(setError({ type: 'TEMPLATE', message: 'Template is required' }));
+			return;
+		}
+		if (recipients_from === 'numbers' && to.length === 0) {
+			dispatch(setError({ type: 'RECIPIENTS', message: 'Recipients are required' }));
+			return;
+		}
+
+		if (recipients_from === 'phonebook' && labels.length === 0) {
+			dispatch(setError({ type: 'RECIPIENTS', message: 'Labels are required' }));
+			return;
+		}
+
+		if (!description) {
+			dispatch(setError({ type: 'DESCRIPTION', message: 'Description is required' }));
+			return;
+		}
+
+		if (broadcast_options.broadcast_type === 'scheduled') {
+			if (!broadcast_options.startDate) {
+				dispatch(setError({ type: 'START_DATE', message: 'Start date is required' }));
+				return;
+			}
+
+			if (!broadcast_options.startTime) {
+				dispatch(setError({ type: 'START_TIME', message: 'Start time is required' }));
+				return;
+			}
+
+			if (!broadcast_options.endTime) {
+				dispatch(setError({ type: 'END_TIME', message: 'End time is required' }));
+				return;
+			}
+
+			if (!broadcast_options.daily_messages_count) {
+				dispatch(
+					setError({ type: 'DAILY_MESSAGES_COUNT', message: 'Daily messages count is required' })
+				);
+				return;
+			}
+		}
+
 		if (header_file) {
 			toast.promise(UploadService.generateMetaMediaId(selected_device_id, header_file), {
 				success: (media_id) => {
@@ -145,17 +198,18 @@ export default function Broadcast() {
 			</Text>
 
 			<Flex className='flex-col md:flex-row' columnGap={6} rowGap={3}>
-				<Box flexGrow={1}>
-					<Text>Broadcast Name</Text>
+				<FormControl isInvalid={error.type === 'NAME'} flexGrow={1}>
+					<FormLabel>Broadcast Name</FormLabel>
 					<Input
 						placeholder='Enter broadcast name'
 						type='text'
 						onChange={(e) => dispatch(setName(e.target.value))}
 						value={name ?? ''}
 					/>
-				</Box>
-				<Box flexGrow={1}>
-					<Text>Select Template</Text>
+					<FormErrorMessage>{error.type === 'NAME' && error.message}</FormErrorMessage>
+				</FormControl>
+				<FormControl isInvalid={error.type === 'TEMPLATE'} flexGrow={1}>
+					<FormLabel>Select Template</FormLabel>
 					<Select
 						placeholder='Select one!'
 						value={template_id}
@@ -166,11 +220,12 @@ export default function Broadcast() {
 							render={(t) => <option value={t.id}>{t.name}</option>}
 						/>
 					</Select>
-				</Box>
+					<FormErrorMessage>{error.type === 'TEMPLATE' && error.message}</FormErrorMessage>
+				</FormControl>
 
 				<Flex gap={3} className='flex-col md:flex-row'>
-					<Box>
-						<Text>Broadcast Type</Text>
+					<FormControl>
+						<FormLabel>Broadcast Type</FormLabel>
 						<RadioBoxGroup
 							options={[
 								{ key: 'instant', value: 'Instant' },
@@ -180,9 +235,9 @@ export default function Broadcast() {
 							defaultValue={'instant'}
 							onChange={(value) => dispatch(setBroadcastType(value as 'instant' | 'scheduled'))}
 						/>
-					</Box>
-					<Box>
-						<Text>Recipient From</Text>
+					</FormControl>
+					<FormControl>
+						<FormLabel>Recipient From</FormLabel>
 						<RadioBoxGroup
 							options={[
 								{ key: 'numbers', value: 'Numbers' },
@@ -192,13 +247,17 @@ export default function Broadcast() {
 							selectedValue={recipients_from}
 							onChange={(value) => dispatch(setRecipientsFrom(value as 'numbers' | 'phonebook'))}
 						/>
-					</Box>
+					</FormControl>
 					<Flex justifyContent={'flex-end'} direction={'column'} pb={'0.25rem'}>
-						<AddNumbers
-							hidden={recipients_from !== 'numbers'}
-							onComplete={(numbers) => dispatch(setTo(numbers))}
-						/>
-
+						<Box>
+							<AddNumbers
+								hidden={recipients_from !== 'numbers'}
+								onComplete={(numbers) => dispatch(setTo(numbers))}
+							/>
+							<Text textAlign={'center'} color={'tomato'}>
+								{error.type === 'RECIPIENTS' && error.message}
+							</Text>
+						</Box>
 						<Box hidden={recipients_from !== 'phonebook'}>
 							<LabelFilter
 								buttonComponent={
@@ -225,8 +284,8 @@ export default function Broadcast() {
 				mt={'0.5rem'}
 				className='flex-col md:flex-row'
 			>
-				<Box flexGrow={1}>
-					<Text>Start Date</Text>
+				<FormControl isInvalid={error.type === 'START_DATE'} flexGrow={1}>
+					<FormLabel>Start Date</FormLabel>
 					<Input
 						placeholder='Select Date'
 						size='md'
@@ -234,9 +293,10 @@ export default function Broadcast() {
 						value={broadcast_options.startDate}
 						onChange={(e) => dispatch(setStartDate(e.target.value))}
 					/>
-				</Box>
-				<Box flexGrow={1}>
-					<Text>Start Time</Text>
+					<FormErrorMessage>{error.type === 'START_DATE' && error.message}</FormErrorMessage>
+				</FormControl>
+				<FormControl isInvalid={error.type === 'START_TIME'} flexGrow={1}>
+					<FormLabel>Start Time</FormLabel>
 					<Input
 						placeholder='Select Time'
 						size='md'
@@ -244,9 +304,10 @@ export default function Broadcast() {
 						value={broadcast_options.startTime}
 						onChange={(e) => dispatch(setStartTime(e.target.value))}
 					/>
-				</Box>
-				<Box flexGrow={1}>
-					<Text>End Time</Text>
+					<FormErrorMessage>{error.type === 'START_DATE' && error.message}</FormErrorMessage>
+				</FormControl>
+				<FormControl isInvalid={error.type === 'END_TIME'} flexGrow={1}>
+					<FormLabel>End Time</FormLabel>
 					<Input
 						placeholder='End Time'
 						size='md'
@@ -254,9 +315,10 @@ export default function Broadcast() {
 						value={broadcast_options.endTime}
 						onChange={(e) => dispatch(setEndTime(e.target.value))}
 					/>
-				</Box>
-				<Box flexGrow={1}>
-					<Text>No of messages daily</Text>
+					<FormErrorMessage>{error.type === 'START_DATE' && error.message}</FormErrorMessage>
+				</FormControl>
+				<FormControl isInvalid={error.type === 'DAILY_MESSAGES_COUNT'} flexGrow={1}>
+					<FormLabel>No of messages daily</FormLabel>
 					<Input
 						placeholder='100'
 						size='md'
@@ -264,7 +326,8 @@ export default function Broadcast() {
 						value={broadcast_options.daily_messages_count.toString()}
 						onChange={(e) => dispatch(setDailyMessagesCount(parseInt(e.target.value, 10) || 100))}
 					/>
-				</Box>
+					<FormErrorMessage>{error.type === 'START_DATE' && error.message}</FormErrorMessage>
+				</FormControl>
 			</Flex>
 
 			<Divider
@@ -273,7 +336,7 @@ export default function Broadcast() {
 				hidden={broadcast_options.broadcast_type !== 'scheduled'}
 			/>
 
-			<Box flexGrow={1}>
+			<FormControl isInvalid={error.type === 'DESCRIPTION'} flexGrow={1}>
 				<Text>Broadcast Description</Text>
 				<Textarea
 					placeholder='Enter template description'
@@ -281,7 +344,8 @@ export default function Broadcast() {
 					onChange={(e) => dispatch(setDescription(e.target.value))}
 					value={description ?? ''}
 				/>
-			</Box>
+				<FormErrorMessage>{error.type === 'DESCRIPTION' && error.message}</FormErrorMessage>
+			</FormControl>
 			<Divider borderColor={'gray.400'} my={'1rem'} />
 
 			<Flex gap={3} mt={'0.5rem'} direction={'column'}>

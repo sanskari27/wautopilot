@@ -22,6 +22,11 @@ const initialState: BroadcastState = {
 	body: [],
 	header_file: null,
 	header_link: '',
+
+	error: {
+		type: '',
+		message: '',
+	},
 };
 
 const Slice = createSlice({
@@ -105,6 +110,9 @@ const Slice = createSlice({
 				state.body[action.payload.index][action.payload.key] = action.payload.value;
 			}
 		},
+		setError: (state, action: PayloadAction<typeof initialState.error>) => {
+			state.error = action.payload;
+		},
 	},
 });
 
@@ -125,6 +133,7 @@ export const {
 	setLabels,
 	setHeaderFile,
 	setHeaderLink,
+	setError,
 } = Slice.actions;
 
 export default Slice.reducer;

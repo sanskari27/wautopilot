@@ -24,4 +24,23 @@ export type BroadcastState = {
 
 	header_file: File | null;
 	header_link: string;
+
+	error: {
+		type:
+			| ''
+			| 'NAME'
+			| 'TEMPLATE'
+			| 'START_DATE'
+			| 'START_TIME'
+			| 'END_TIME'
+			| 'DAILY_MESSAGES_COUNT'
+			| 'RECIPIENTS'
+			| 'TAGS'
+			| 'FILE'
+			| 'LINK'
+			| 'MEDIA'
+			| 'BODY'
+			| 'DESCRIPTION';
+		message: string;
+	};
 };
