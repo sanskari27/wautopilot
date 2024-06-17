@@ -4,7 +4,7 @@ import { Contact } from '../store/types/ContactState';
 import { ScheduledBroadcast } from '../views/pages/broadcast-report';
 
 export default class MessagesService {
-	static async fetchAllConversation(deviceId: string, label_filter: string[]) {
+	static async fetchAllConversation(deviceId: string, label_filter: string[] = []) {
 		try {
 			const { data } = await APIInstance.get(`/message/${deviceId}/conversations`, {
 				params: {
