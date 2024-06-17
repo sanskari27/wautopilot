@@ -68,6 +68,22 @@ async function resumeBroadcast(req: Request, res: Response, next: NextFunction) 
 	}
 }
 
+async function resendBroadcast(req: Request, res: Response, next: NextFunction) {
+	const { id } = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+		await broadcastService.resendBroadcast(id);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 async function deleteBroadcast(req: Request, res: Response, next: NextFunction) {
 	const { id } = req.locals;
 
@@ -350,7 +366,7 @@ const Controller = {
 	sendTemplateMessage,
 	broadcastReport,
 	pauseBroadcast,
-	resumeBroadcast,deleteBroadcast,
+	resumeBroadcast,deleteBroadcast,resendBroadcast,
 	fetchConversations,
 	fetchConversationMessages,
 	markRead,

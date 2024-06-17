@@ -9,6 +9,7 @@ router.route('/broadcast/reports').get(Controller.broadcastReport);
 router.route('/broadcast/:id/pause').all(IDValidator).post(Controller.pauseBroadcast);
 router.route('/broadcast/:id/resume').all(IDValidator).post(Controller.resumeBroadcast);
 router.route('/broadcast/:id/delete').all(IDValidator).post(Controller.deleteBroadcast);
+router.route('/broadcast/:id/resend').all(IDValidator).post(Controller.resendBroadcast);
 
 router
 	.route('/broadcast/send-broadcast')

@@ -246,6 +246,43 @@ export default class BroadcastService extends WhatsappLinkService {
 		} catch (err) {}
 	}
 
+	async resendBroadcast(campaign_id: Types.ObjectId) {
+		try {
+			const campaign = await BroadcastDB.findById(campaign_id);
+			if (!campaign) {
+				return;
+			}
+
+			const timeGenerator = new TimeGenerator({
+				startDate:
+					campaign.broadcast_type === 'scheduled'
+						? campaign.startDate
+						: DateUtils.getDate('YYYY-MM-DD'),
+				startTime: campaign.broadcast_type === 'scheduled' ? campaign.startTime : '00:01',
+				endTime: campaign.broadcast_type === 'scheduled' ? campaign.endTime : '23:59',
+				daily_count:
+					campaign.broadcast_type === 'scheduled'
+						? campaign.daily_messages_count
+						: campaign.messages.length,
+			});
+
+			const messages = await BroadcastMessageDB.find({
+				_id: campaign.messages,
+				status: MESSAGE_STATUS.FAILED,
+			});
+
+			messages.forEach(async (msg) => {
+				msg.sendAt = timeGenerator.next(
+					campaign.broadcast_type === 'scheduled' ? undefined : 5
+				).value;
+				msg.status = MESSAGE_STATUS.PENDING;
+				await msg.save();
+			});
+			campaign.status = BROADCAST_STATUS.ACTIVE;
+			await campaign.save();
+		} catch (err) {}
+	}
+
 	async deleteBroadcast(campaign_id: Types.ObjectId) {
 		try {
 			const campaign = await BroadcastDB.findById(campaign_id);

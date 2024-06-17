@@ -145,7 +145,11 @@ export default function AddMedia() {
 						{!file ? (
 							<>
 								<DropzoneElement onFileInput={handleAttachmentInput} isInvalid={error === 'FILE'} />
-								<Text textAlign={'center'} fontSize={'xs'}>
+								<Text
+									textAlign={'center'}
+									fontSize={'xs'}
+									textColor={uiDetails.error ? 'red.500' : 'black'}
+								>
 									*File size should be less than 60MB
 								</Text>
 							</>

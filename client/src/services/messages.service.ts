@@ -213,4 +213,13 @@ export default class MessagesService {
 			return false;
 		}
 	}
+
+	static async resendFailedBroadcast(deviceId: string, broadcastId: string) {
+		try {
+			await APIInstance.post(`/message/${deviceId}/broadcast/${broadcastId}/resend`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
 }

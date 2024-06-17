@@ -227,6 +227,21 @@ export default function BroadcastReport() {
 											>
 												Pause
 											</Button>
+										) : broadcast.failed >= 0 ? (
+											<Button
+												size={'sm'}
+												colorScheme='orange'
+												onClick={() => {
+													MessagesService.resendFailedBroadcast(
+														selected_device_id,
+														broadcast.broadcast_id
+													).then(() => {
+														fetchBroadcast();
+													});
+												}}
+											>
+												Resend Failed
+											</Button>
 										) : (
 											'Completed'
 										)}

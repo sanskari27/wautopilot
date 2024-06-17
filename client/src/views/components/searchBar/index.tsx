@@ -5,7 +5,7 @@ import { MdClear } from 'react-icons/md';
 
 export default function SearchBar({
 	onSearchTextChanged,
-	timeout = 2000,
+	timeout = 1000,
 }: {
 	onSearchTextChanged: (text: string) => void;
 	timeout?: number;

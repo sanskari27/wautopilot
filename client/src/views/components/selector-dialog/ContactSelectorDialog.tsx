@@ -156,7 +156,7 @@ const ContactSelectorDialog = forwardRef<ContactSelectorHandle, Props>(
 										addContactHandle.current?.open({ editable: true });
 									}}
 								>
-									Create new
+									Send new
 								</Button>
 								<Button isDisabled={selected.length === 0} colorScheme='green' onClick={handleAdd}>
 									Send
