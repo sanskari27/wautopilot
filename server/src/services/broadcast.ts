@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Types } from 'mongoose';
 import Logger from 'n23-logger';
-import { BroadcastDB, BroadcastMessageDB } from '../../mongo';
+import { BroadcastDB, BroadcastMessageDB, ConversationMessageDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import MetaAPI from '../config/MetaAPI';
@@ -141,6 +141,72 @@ export default class BroadcastService extends WhatsappLinkService {
 				createdAt: DateUtils.format(message.createdAt, 'DD-MM-YYYY HH:mm') as string,
 				isPaused: message.isPaused as boolean,
 			}));
+	}
+
+	public async generateBroadcastReport(broadcast_id: Types.ObjectId) {
+		const broadcast = await BroadcastDB.findOne({
+			_id: broadcast_id,
+			linked_to: this.account._id,
+			device_id: this.whatsappLink._id,
+		});
+		if (!broadcast) {
+			return [];
+		}
+
+		const messages = await BroadcastMessageDB.aggregate([
+			{ $match: { broadcast_id: broadcast._id } },
+			{
+				$lookup: {
+					from: ConversationMessageDB.collection.name,
+					localField: 'message_id',
+					foreignField: 'message_id',
+					as: 'message',
+				},
+			},
+			// extract the first element if it exists
+			{ $unwind: { path: '$message', preserveNullAndEmptyArrays: true } },
+			{
+				$addFields: {
+					text: {
+						$cond: {
+							if: {
+								$eq: ['$message.body.body_type', 'TEXT'],
+							},
+							then: '$message.body.text',
+							else: '',
+						},
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					to: 1,
+					status: 1,
+					sendAt: 1,
+					text: 1,
+					template_name: '$messageObject.template_name',
+					sent_at: '$message.sent_at',
+					read_at: '$message.read_at',
+					delivered_at: '$message.delivered_at',
+					failed_at: '$message.failed_at',
+					failed_reason: '$message.failed_reason',
+				},
+			},
+		]);
+
+		return messages as {
+			to: string;
+			status: string;
+			sendAt: string;
+			text: string;
+			template_name: string;
+			sent_at: string;
+			read_at: string;
+			delivered_at: string;
+			failed_at: string;
+			failed_reason: string;
+		}[];
 	}
 
 	public async startBroadcast(

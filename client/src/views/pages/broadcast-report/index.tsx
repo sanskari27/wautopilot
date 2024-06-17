@@ -93,6 +93,26 @@ export default function BroadcastReport() {
 		setSelectedBroadcast((prev) => [...prev, id]);
 	};
 
+	const handleExport = () => {
+		if (selectedBroadcast.length === 0) {
+			toast({
+				title: 'No broadcast selected',
+				status: 'error',
+				duration: 3000,
+				isClosable: true,
+			});
+			return;
+		}
+		const promises = selectedBroadcast.map(async (id) =>
+			MessagesService.downloadBroadcast(selected_device_id, id)
+		);
+		toast.promise(Promise.all(promises), {
+			success: { title: 'Downloaded successfully' },
+			error: { title: 'Failed to download broadcast report' },
+			loading: { title: 'Downloading...' },
+		});
+	};
+
 	const { filtered } = useFilteredList(list, { name: 1 });
 
 	return (
@@ -119,6 +139,9 @@ export default function BroadcastReport() {
 						}}
 					>
 						Delete
+					</Button>
+					<Button colorScheme='green' mr={2} onClick={handleExport}>
+						Export
 					</Button>
 				</Flex>
 			</Flex>

@@ -5,7 +5,8 @@ import COMMON_ERRORS from '../../errors/common-errors';
 import BroadcastService from '../../services/broadcast';
 import ConversationService from '../../services/conversation';
 import PhoneBookService from '../../services/phonebook';
-import { Respond } from '../../utils/ExpressUtils';
+import CSVHelper from '../../utils/CSVHelper';
+import { Respond, RespondCSV } from '../../utils/ExpressUtils';
 import { CreateBroadcastValidationResult, SendMessageValidationResult } from './message.validator';
 
 const bodyParametersList = [
@@ -80,6 +81,25 @@ async function resendBroadcast(req: Request, res: Response, next: NextFunction) 
 			status: 200,
 		});
 	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
+async function downloadBroadcast(req: Request, res: Response, next: NextFunction) {
+	const { id } = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+		const records = await broadcastService.generateBroadcastReport(id);
+
+		return RespondCSV({
+			res,
+			filename: `broadcast-${id}`,
+			data: CSVHelper.exportBroadcastReport(records),
+		});
+	} catch (err) {
+		console.log(err);
+
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
@@ -370,6 +390,7 @@ const Controller = {
 	resumeBroadcast,
 	deleteBroadcast,
 	resendBroadcast,
+	downloadBroadcast,
 	fetchConversations,
 	fetchConversationMessages,
 	markRead,

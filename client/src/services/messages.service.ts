@@ -226,4 +226,30 @@ export default class MessagesService {
 			return false;
 		}
 	}
+
+	static async downloadBroadcast(deviceId: string, broadcastId: string) {
+		const response = await APIInstance.get(
+			`/message/${deviceId}/broadcast/${broadcastId}/download`,
+			{
+				responseType: 'blob',
+			}
+		);
+		const blob = new Blob([response.data]);
+
+		const contentDisposition = response.headers['content-disposition'];
+		const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.*)"/);
+		const filename = filenameMatch ? filenameMatch[1] : 'Broadcast Report.csv';
+
+		// Create a temporary link element
+		const downloadLink = document.createElement('a');
+		downloadLink.href = window.URL.createObjectURL(blob);
+		downloadLink.download = filename; // Specify the filename
+
+		// Append the link to the body and trigger the download
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+
+		// Clean up - remove the link
+		document.body.removeChild(downloadLink);
+	}
 }
