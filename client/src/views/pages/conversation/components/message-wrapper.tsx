@@ -34,9 +34,9 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 					<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={BiCheckDouble} color='gray.500' />
 				) : message.read_at ? (
 					<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={BiCheckDouble} color='blue.500' />
-				) : (
+				) : isMe ? (
 					<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={CgTimer} color='gray.500' />
-				)}
+				) : null}
 			</Flex>
 		</Flex>
 	);
