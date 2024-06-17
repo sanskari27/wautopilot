@@ -115,19 +115,11 @@ export default function BroadcastReport() {
 								});
 								return;
 							}
-							deleteAlertRef.current?.onOpen();
+							deleteAlertRef.current?.open();
 						}}
 					>
 						Delete
 					</Button>
-					{/* <Button
-						colorScheme='green'
-						onClick={() => {
-							exportCampaign(selectedCampaign);
-						}}
-					>
-						Export
-					</Button> */}
 				</Flex>
 			</Flex>
 			<TableContainer marginTop={'1rem'}>
