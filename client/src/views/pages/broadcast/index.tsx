@@ -6,7 +6,6 @@ import {
 	Divider,
 	Flex,
 	FormControl,
-	FormErrorMessage,
 	FormLabel,
 	Input,
 	Select,
@@ -138,41 +137,81 @@ export default function Broadcast() {
 	function onSend() {
 		if (!name) {
 			dispatch(setError({ type: 'NAME', message: 'Name is required' }));
+			toast({
+				title: 'Name is required',
+				status: 'error',
+				isClosable: true,
+			});
 			return;
 		}
 
 		if (!template_id) {
 			dispatch(setError({ type: 'TEMPLATE', message: 'Template is required' }));
+			toast({
+				title: 'Template is required',
+				status: 'error',
+				isClosable: true,
+			});
 			return;
 		}
 		if (recipients_from === 'numbers' && to.length === 0) {
 			dispatch(setError({ type: 'RECIPIENTS', message: 'Recipients are required' }));
+			toast({
+				title: 'Recipients are required',
+				status: 'error',
+				isClosable: true,
+			});
 			return;
 		}
 
 		if (recipients_from === 'phonebook' && labels.length === 0) {
 			dispatch(setError({ type: 'RECIPIENTS', message: 'Labels are required' }));
+			toast({
+				title: 'Labels are required',
+				status: 'error',
+				isClosable: true,
+			});
 			return;
 		}
 
 		if (!description) {
 			dispatch(setError({ type: 'DESCRIPTION', message: 'Description is required' }));
+			toast({
+				title: 'Description is required',
+				status: 'error',
+				isClosable: true,
+			});
 			return;
 		}
 
 		if (broadcast_options.broadcast_type === 'scheduled') {
 			if (!broadcast_options.startDate) {
 				dispatch(setError({ type: 'START_DATE', message: 'Start date is required' }));
+				toast({
+					title: 'Start date is required',
+					status: 'error',
+					isClosable: true,
+				});
 				return;
 			}
 
 			if (!broadcast_options.startTime) {
 				dispatch(setError({ type: 'START_TIME', message: 'Start time is required' }));
+				toast({
+					title: 'Start time is required',
+					status: 'error',
+					isClosable: true,
+				});
 				return;
 			}
 
 			if (!broadcast_options.endTime) {
 				dispatch(setError({ type: 'END_TIME', message: 'End time is required' }));
+				toast({
+					title: 'End time is required',
+					status: 'error',
+					isClosable: true,
+				});
 				return;
 			}
 
@@ -180,6 +219,11 @@ export default function Broadcast() {
 				dispatch(
 					setError({ type: 'DAILY_MESSAGES_COUNT', message: 'Daily messages count is required' })
 				);
+				toast({
+					title: 'Daily messages count is required',
+					status: 'error',
+					isClosable: true,
+				});
 				return;
 			}
 		}
@@ -221,7 +265,6 @@ export default function Broadcast() {
 						onChange={(e) => dispatch(setName(e.target.value))}
 						value={name ?? ''}
 					/>
-					<FormErrorMessage>{error.type === 'NAME' && error.message}</FormErrorMessage>
 				</FormControl>
 				<FormControl isInvalid={error.type === 'TEMPLATE'} flexGrow={1}>
 					<FormLabel>Select Template</FormLabel>
@@ -235,7 +278,6 @@ export default function Broadcast() {
 							render={(t) => <option value={t.id}>{t.name}</option>}
 						/>
 					</Select>
-					<FormErrorMessage>{error.type === 'TEMPLATE' && error.message}</FormErrorMessage>
 				</FormControl>
 
 				<Flex gap={3} className='flex-col md:flex-row'>
@@ -264,15 +306,10 @@ export default function Broadcast() {
 						/>
 					</FormControl>
 					<Flex justifyContent={'flex-end'} direction={'column'} pb={'0.25rem'}>
-						<Box>
-							<AddNumbers
-								hidden={recipients_from !== 'numbers'}
-								onComplete={(numbers) => dispatch(setTo(numbers))}
-							/>
-							<Text textAlign={'center'} color={'tomato'}>
-								{error.type === 'RECIPIENTS' && error.message}
-							</Text>
-						</Box>
+						<AddNumbers
+							hidden={recipients_from !== 'numbers'}
+							onComplete={(numbers) => dispatch(setTo(numbers))}
+						/>
 						<Box hidden={recipients_from !== 'phonebook'}>
 							<LabelFilter
 								buttonComponent={
@@ -308,7 +345,6 @@ export default function Broadcast() {
 						value={broadcast_options.startDate}
 						onChange={(e) => dispatch(setStartDate(e.target.value))}
 					/>
-					<FormErrorMessage>{error.type === 'START_DATE' && error.message}</FormErrorMessage>
 				</FormControl>
 				<FormControl isInvalid={error.type === 'START_TIME'} flexGrow={1}>
 					<FormLabel>Start Time</FormLabel>
@@ -319,7 +355,6 @@ export default function Broadcast() {
 						value={broadcast_options.startTime}
 						onChange={(e) => dispatch(setStartTime(e.target.value))}
 					/>
-					<FormErrorMessage>{error.type === 'START_DATE' && error.message}</FormErrorMessage>
 				</FormControl>
 				<FormControl isInvalid={error.type === 'END_TIME'} flexGrow={1}>
 					<FormLabel>End Time</FormLabel>
@@ -330,7 +365,6 @@ export default function Broadcast() {
 						value={broadcast_options.endTime}
 						onChange={(e) => dispatch(setEndTime(e.target.value))}
 					/>
-					<FormErrorMessage>{error.type === 'START_DATE' && error.message}</FormErrorMessage>
 				</FormControl>
 				<FormControl isInvalid={error.type === 'DAILY_MESSAGES_COUNT'} flexGrow={1}>
 					<FormLabel>No of messages daily</FormLabel>
@@ -341,7 +375,6 @@ export default function Broadcast() {
 						value={broadcast_options.daily_messages_count.toString()}
 						onChange={(e) => dispatch(setDailyMessagesCount(parseInt(e.target.value, 10) || 100))}
 					/>
-					<FormErrorMessage>{error.type === 'START_DATE' && error.message}</FormErrorMessage>
 				</FormControl>
 			</Flex>
 
@@ -359,7 +392,6 @@ export default function Broadcast() {
 					onChange={(e) => dispatch(setDescription(e.target.value))}
 					value={description ?? ''}
 				/>
-				<FormErrorMessage>{error.type === 'DESCRIPTION' && error.message}</FormErrorMessage>
 			</FormControl>
 			<Divider borderColor={'gray.400'} my={'1rem'} />
 

@@ -41,7 +41,7 @@ export default function ComponentParameters({ components }: Props) {
 	const dispatch = useDispatch();
 	const header = components.find((component) => component.type === 'HEADER');
 
-	const { body, error } = useSelector((state: StoreState) => state[StoreNames.BROADCAST]);
+	const { body } = useSelector((state: StoreState) => state[StoreNames.BROADCAST]);
 
 	return (
 		<Flex
@@ -54,11 +54,7 @@ export default function ComponentParameters({ components }: Props) {
 				<Text fontSize={'2xl'} fontWeight={'medium'}>
 					Template details
 				</Text>
-				<FormControl
-					hidden={!header || header.format === 'TEXT'}
-					mt={'1rem'}
-					isInvalid={error.type === 'MEDIA'}
-				>
+				<FormControl hidden={!header || header.format === 'TEXT'} mt={'1rem'}>
 					<FormLabel>Header media link</FormLabel>
 					<Input
 						placeholder='Media file link'
@@ -79,7 +75,7 @@ export default function ComponentParameters({ components }: Props) {
 						/>
 					</Box>
 				</FormControl>
-				<FormControl isInvalid={error.type === ''} gap={3} mt={'1rem'} hidden={body.length === 0}>
+				<FormControl gap={3} mt={'1rem'} hidden={body.length === 0}>
 					<FormLabel>Template body details</FormLabel>
 					<Each
 						items={body}
