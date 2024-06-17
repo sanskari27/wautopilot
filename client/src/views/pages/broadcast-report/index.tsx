@@ -13,6 +13,7 @@ import {
 	Thead,
 	Tr,
 	useBoolean,
+	useToast,
 } from '@chakra-ui/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -36,6 +37,7 @@ export default function BroadcastReport() {
 	const [list, setList] = useState<ScheduledBroadcast[]>([]);
 	const [campaignLoading, setCampaignLoading] = useBoolean(true);
 	const deleteAlertRef = useRef<DeleteAlertHandle>(null);
+	const toast = useToast();
 
 	const [selectedBroadcast, setSelectedBroadcast] = useState<string[]>([]);
 
@@ -50,7 +52,7 @@ export default function BroadcastReport() {
 	// 	});
 	// }, []);
 
-	const fetchCampaigns = useCallback(() => {
+	const fetchBroadcast = useCallback(() => {
 		MessagesService.broadcastReport(selected_device_id)
 			.then(setList)
 			.finally(() => {
@@ -59,19 +61,28 @@ export default function BroadcastReport() {
 	}, [setCampaignLoading, selected_device_id]);
 
 	useEffect(() => {
-		fetchCampaigns();
-	}, [fetchCampaigns]);
+		fetchBroadcast();
+	}, [fetchBroadcast]);
 
 	const deleteCampaign = async () => {
-		// dispatch(setDeletingCampaign(true));
-		// const promises = selectedCampaign.map(async (campaign) => {
-		// 	await ReportsService.deleteCampaign(campaign);
-		// });
-		// await Promise.all(promises).then(() => {
-		// 	dispatch(setDeletingCampaign(false));
-		// 	setSelectedCampaign([]);
-		// 	fetchCampaigns();
-		// });
+		const promises = selectedBroadcast.map(async (campaign) => {
+			await MessagesService.deleteBroadcast(selected_device_id, campaign);
+		});
+		toast.promise(Promise.all(promises), {
+			success: () => {
+				toast({
+					title: 'Campaign deleted successfully',
+					status: 'success',
+					duration: 3000,
+					isClosable: true,
+				});
+				setSelectedBroadcast([]);
+				fetchBroadcast();
+				return { title: 'Campaign deleted successfully' };
+			},
+			error: { title: 'Failed to delete campaign' },
+			loading: { title: 'Deleting campaign...' },
+		});
 	};
 
 	const removeCampaignList = (campaign_id: string) => {
@@ -86,10 +97,40 @@ export default function BroadcastReport() {
 
 	return (
 		<Flex direction={'column'} padding={'1rem'} justifyContent={'start'}>
-			<Text fontSize={'2xl'} fontWeight={'bold'}>
-				Broadcast Report
-			</Text>
-			<TableContainer>
+			<Flex>
+				<Text fontSize={'2xl'} fontWeight={'bold'}>
+					Broadcast Report
+				</Text>
+				<Flex ml={'auto'}>
+					<Button
+						colorScheme='red'
+						mr={2}
+						onClick={() => {
+							if (selectedBroadcast.length === 0) {
+								toast({
+									title: 'No campaign selected',
+									status: 'error',
+									duration: 3000,
+									isClosable: true,
+								});
+								return;
+							}
+							deleteAlertRef.current?.onOpen();
+						}}
+					>
+						Delete
+					</Button>
+					{/* <Button
+						colorScheme='green'
+						onClick={() => {
+							exportCampaign(selectedCampaign);
+						}}
+					>
+						Export
+					</Button> */}
+				</Flex>
+			</Flex>
+			<TableContainer marginTop={'1rem'}>
 				<Table variant={'unstyled'}>
 					<Thead>
 						<Tr color={'black'}>
@@ -169,9 +210,12 @@ export default function BroadcastReport() {
 												size={'sm'}
 												colorScheme='green'
 												onClick={() => {
-													// ReportsService.resumeCampaign(broadcast.campaign_id).then(() => {
-													// 	fetchCampaigns();
-													// });
+													MessagesService.resumeBroadcast(
+														selected_device_id,
+														broadcast.broadcast_id
+													).then(() => {
+														fetchBroadcast();
+													});
 												}}
 											>
 												Resume
@@ -181,9 +225,12 @@ export default function BroadcastReport() {
 												size={'sm'}
 												colorScheme='red'
 												onClick={() => {
-													// ReportsService.pauseCampaign(broadcast.campaign_id).then(() => {
-													// 	fetchCampaigns();
-													// });
+													MessagesService.pauseBroadcast(
+														selected_device_id,
+														broadcast.broadcast_id
+													).then(() => {
+														fetchBroadcast();
+													});
 												}}
 											>
 												Pause

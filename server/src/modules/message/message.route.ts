@@ -6,6 +6,10 @@ import { CreateBroadcastValidator, SendMessageValidator } from './message.valida
 const router = express.Router();
 
 router.route('/broadcast/reports').get(Controller.broadcastReport);
+router.route('/broadcast/:id/pause').all(IDValidator).post(Controller.pauseBroadcast);
+router.route('/broadcast/:id/resume').all(IDValidator).post(Controller.resumeBroadcast);
+router.route('/broadcast/:id/delete').all(IDValidator).post(Controller.deleteBroadcast);
+
 router
 	.route('/broadcast/send-broadcast')
 	.all(CreateBroadcastValidator)

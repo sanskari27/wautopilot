@@ -16,6 +16,7 @@ export default interface IBroadcast extends Document {
 
 	createdAt: Date;
 
+	broadcast_type: 'instant' | 'scheduled';
 	startDate: string;
 	startTime: string;
 	endTime: string;

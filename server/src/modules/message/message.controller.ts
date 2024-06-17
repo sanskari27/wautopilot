@@ -36,6 +36,54 @@ async function broadcastReport(req: Request, res: Response, next: NextFunction) 
 	}
 }
 
+async function pauseBroadcast(req: Request, res: Response, next: NextFunction) {
+	const { id } = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+		await broadcastService.pauseBroadcast(id);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
+async function resumeBroadcast(req: Request, res: Response, next: NextFunction) {
+	const { id } = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+		await broadcastService.resumeBroadcast(id);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
+async function deleteBroadcast(req: Request, res: Response, next: NextFunction) {
+	const { id } = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+		await broadcastService.deleteBroadcast(id);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 async function sendTemplateMessage(req: Request, res: Response, next: NextFunction) {
 	const {
 		body,
@@ -301,6 +349,8 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 const Controller = {
 	sendTemplateMessage,
 	broadcastReport,
+	pauseBroadcast,
+	resumeBroadcast,deleteBroadcast,
 	fetchConversations,
 	fetchConversationMessages,
 	markRead,

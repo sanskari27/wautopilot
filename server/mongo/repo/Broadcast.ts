@@ -41,7 +41,10 @@ const schema = new mongoose.Schema<IBroadcast>(
 				ref: BroadcastMessageDB_name,
 			},
 		],
-
+		broadcast_type: {
+			type: String,
+			enum: ['instant', 'scheduled'],
+		},
 		startDate: String,
 		startTime: String,
 		endTime: String,

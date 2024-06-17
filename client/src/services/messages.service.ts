@@ -186,4 +186,31 @@ export default class MessagesService {
 			return [];
 		}
 	}
+
+	static async pauseBroadcast(deviceId: string, broadcastId: string) {
+		try {
+			await APIInstance.post(`/message/${deviceId}/broadcast/${broadcastId}/pause`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	static async resumeBroadcast(deviceId: string, broadcastId: string) {
+		try {
+			await APIInstance.post(`/message/${deviceId}/broadcast/${broadcastId}/resume`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	static async deleteBroadcast(deviceId: string, broadcastId: string) {
+		try {
+			await APIInstance.post(`/message/${deviceId}/broadcast/${broadcastId}/delete`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
 }

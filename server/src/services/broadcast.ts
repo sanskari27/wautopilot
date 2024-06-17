@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Types } from 'mongoose';
 import Logger from 'n23-logger';
 import { BroadcastDB, BroadcastMessageDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
@@ -144,6 +145,7 @@ export default class BroadcastService extends WhatsappLinkService {
 			template_name: broadcast.template_name,
 			name: broadcast.name,
 			description: broadcast.description,
+			broadcast_type: options.broadcast_type,
 			startDate: options.broadcast_type === 'scheduled' ? options.startDate : undefined,
 			startTime: options.broadcast_type === 'scheduled' ? options.startTime : undefined,
 			endTime: options.broadcast_type === 'scheduled' ? options.endTime : undefined,
@@ -186,6 +188,76 @@ export default class BroadcastService extends WhatsappLinkService {
 		const message_ids = await Promise.all(messages);
 
 		await BroadcastDB.updateOne({ _id: broadcastDoc._id }, { messages: message_ids });
+	}
+
+	public async pauseBroadcast(broadcast_id: Types.ObjectId) {
+		try {
+			const campaign = await BroadcastDB.findById(broadcast_id);
+			if (!campaign) {
+				return;
+			}
+			await BroadcastMessageDB.updateMany(
+				{ _id: campaign.messages, status: MESSAGE_STATUS.PENDING },
+				{
+					$set: {
+						status: MESSAGE_STATUS.PAUSED,
+					},
+				}
+			);
+			campaign.status = BROADCAST_STATUS.PAUSED;
+			await campaign.save();
+		} catch (err) {}
+	}
+
+	async resumeBroadcast(campaign_id: Types.ObjectId) {
+		try {
+			const campaign = await BroadcastDB.findById(campaign_id);
+			if (!campaign) {
+				return;
+			}
+
+			const timeGenerator = new TimeGenerator({
+				startDate:
+					campaign.broadcast_type === 'scheduled'
+						? campaign.startDate
+						: DateUtils.getDate('YYYY-MM-DD'),
+				startTime: campaign.broadcast_type === 'scheduled' ? campaign.startTime : '00:01',
+				endTime: campaign.broadcast_type === 'scheduled' ? campaign.endTime : '23:59',
+				daily_count:
+					campaign.broadcast_type === 'scheduled'
+						? campaign.daily_messages_count
+						: campaign.messages.length,
+			});
+
+			const messages = await BroadcastMessageDB.find({
+				_id: campaign.messages,
+				status: MESSAGE_STATUS.PAUSED,
+			});
+
+			messages.forEach(async (msg) => {
+				msg.sendAt = timeGenerator.next(
+					campaign.broadcast_type === 'scheduled' ? undefined : 5
+				).value;
+				msg.status = MESSAGE_STATUS.PENDING;
+				await msg.save();
+			});
+			campaign.status = BROADCAST_STATUS.ACTIVE;
+			await campaign.save();
+		} catch (err) {}
+	}
+
+	async deleteBroadcast(campaign_id: Types.ObjectId) {
+		try {
+			const campaign = await BroadcastDB.findById(campaign_id);
+			if (!campaign) {
+				return;
+			}
+
+			await BroadcastMessageDB.deleteMany({ _id: campaign.messages });
+			await campaign.delete();
+		} catch (err) {
+			return;
+		}
 	}
 
 	public static async sendScheduledBroadcastMessage() {
