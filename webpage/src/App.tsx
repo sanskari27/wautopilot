@@ -1,0 +1,115 @@
+import { Suspense, lazy, useEffect } from 'react';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import './App.css';
+import { NAVIGATION } from './config/const';
+
+import { Flex, Progress } from '@chakra-ui/react';
+import { useDispatch } from 'react-redux';
+import { useGeoLocation } from './hooks/useGeolocation';
+import AuthService from './services/auth.service';
+import { setIsAuthenticated } from './store/reducers/UserReducers';
+
+const BroadcastReport = lazy(() => import('./views/pages/broadcast-report'));
+const Home = lazy(() => import('./views/pages/_'));
+const Terms = lazy(() => import('./views/pages/static-pages/terms'));
+const Privacy = lazy(() => import('./views/pages/static-pages/privacy'));
+const Disclaimer = lazy(() => import('./views/pages/static-pages/disclaimer'));
+const ResetPassword = lazy(() => import('./views/pages/reset-password'));
+const AppPage = lazy(() => import('./views/pages/app'));
+const Conversation = lazy(() => import('./views/pages/conversation'));
+const SamplePage = lazy(() => import('./views/pages/static-pages/sample'));
+const ContactPage = lazy(() => import('./views/pages/contacts'));
+const Broadcast = lazy(() => import('./views/pages/broadcast'));
+const LoginPopup = lazy(() => import('./views/components/loginPopup'));
+// const Dashboard = lazy(() => import('./views/pages/dashboard'));
+const Templates = lazy(() => import('./views/pages/templates'));
+const EditTemplate = lazy(() => import('./views/pages/templates/edit-template'));
+const Phonebook = lazy(() => import('./views/pages/phonebook'));
+const MediaPage = lazy(() => import('./views/pages/media'));
+const AddMedia = lazy(() => import('./views/pages/media/add-media'));
+
+function App() {
+	const dispatch = useDispatch();
+	useGeoLocation();
+
+	useEffect(() => {
+		AuthService.isAuthenticated().then((res) => {
+			dispatch(setIsAuthenticated(res));
+		});
+	}, [dispatch]);
+
+	return (
+		<Flex minHeight={'100vh'} width={'100vw'} className='bg-background '>
+			<Router>
+				<Suspense fallback={<Loading />}>
+					<Routes>
+						<Route path={NAVIGATION.HOME} element={<Home />}>
+							<Route path={`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`} element={<LoginPopup />} />
+							<Route path={`${NAVIGATION.AUTH}/${NAVIGATION.RESET}`} element={<ResetPassword />} />
+						</Route>
+						<Route path={NAVIGATION.TERMS} element={<Terms />} />
+						<Route path={NAVIGATION.PRIVACY} element={<Privacy />} />
+						<Route path={NAVIGATION.DISCLAIMER} element={<Disclaimer />} />
+						<Route path={NAVIGATION.SAMPLE} element={<SamplePage />} />
+
+						<Route path={NAVIGATION.APP} element={<AppPage />}>
+							<Route path={NAVIGATION.PHONEBOOK} element={<Phonebook />} />
+							<Route
+								path={NAVIGATION.TEMPLATES + '/' + NAVIGATION.ADD_TEMPLATE}
+								element={<EditTemplate />}
+							/>
+							<Route
+								path={NAVIGATION.TEMPLATES + '/' + NAVIGATION.EDIT_TEMPLATE + '/:id'}
+								element={<EditTemplate />}
+							/>
+							<Route path={NAVIGATION.MEDIA} element={<MediaPage />}>
+								<Route path={'new'} element={<AddMedia />} />
+							</Route>
+							<Route path={NAVIGATION.TEMPLATES} element={<Templates />} />
+							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
+							<Route path={NAVIGATION.BROADCAST_REPORT} element={<BroadcastReport />} />
+							<Route path={NAVIGATION.CONTACT} element={<ContactPage />} />
+							<Route path={NAVIGATION.INBOX} element={<Conversation />} />
+							{/* <Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} /> */}
+						</Route>
+						{/* <Route path='*' element={<Home />} /> */}
+					</Routes>
+				</Suspense>
+			</Router>
+		</Flex>
+	);
+}
+
+const Loading = () => {
+	return (
+		<Flex
+			direction={'column'}
+			justifyContent={'center'}
+			alignItems={'center'}
+			flexDirection='column'
+			width={'100vw'}
+			height={'100vh'}
+		>
+			<Flex
+				direction={'column'}
+				justifyContent={'center'}
+				alignItems={'center'}
+				flexDirection='column'
+				padding={'3rem'}
+				rounded={'lg'}
+				width={'500px'}
+				height={'550px'}
+				className='border shadow-xl drop-shadow-xl '
+			>
+				<Flex justifyContent={'center'} alignItems={'center'} direction={'column'}>
+					<Flex justifyContent={'center'} alignItems={'center'} width={'full'}>
+						{/* <Image src={LOGO} width={'280px'} className='shadow-lg rounded-full animate-pulse' /> */}
+					</Flex>
+					<Progress size='xs' isIndeterminate width={'150%'} rounded={'lg'} marginTop={'-3rem'} />
+				</Flex>
+			</Flex>
+		</Flex>
+	);
+};
+
+export default App;
