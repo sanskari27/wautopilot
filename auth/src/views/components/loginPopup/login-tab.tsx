@@ -14,6 +14,7 @@ import {
 	stopUserAuthenticating,
 } from '../../../store/reducers/UserReducers';
 import PasswordInput from './password-input';
+import { AUTH_URL } from '../../../config/const';
 
 function LoginTab() {
 	const { location } = useGeoLocation();
@@ -34,7 +35,7 @@ function LoginTab() {
 		}
 		const valid = await AuthService.forgotPassword(
 			email,
-			'http://localhost:5173/auth/reset-password'
+			`${AUTH_URL}auth/reset-password`
 		);
 		if (valid) {
 			return toast({

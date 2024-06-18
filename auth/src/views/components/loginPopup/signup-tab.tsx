@@ -38,6 +38,7 @@ export default function SignupTab() {
 		dispatch(startUserAuthenticating());
 
 		const success = await AuthService.registerUser(name, phone, email, 20);
+		dispatch(stopUserAuthenticating());
 		if (!success) {
 			toast({
 				title: 'Account creation failed.',
@@ -46,7 +47,6 @@ export default function SignupTab() {
 				duration: 5000,
 			});
 			dispatch(setError({ message: 'Account creation failed.', type: 'server' }));
-			dispatch(stopUserAuthenticating());
 			return;
 		}
 

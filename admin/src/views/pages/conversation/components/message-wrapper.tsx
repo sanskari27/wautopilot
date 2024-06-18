@@ -38,7 +38,6 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 					fontSize={'1rem'}
 					cursor={'pointer'}
 					className='group-hover:!block !hidden'
-					onClick={() => console.log('clicked')}
 				/>
 				{children}
 				{message.buttons.length > 0 && (

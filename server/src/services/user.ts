@@ -104,10 +104,17 @@ export default class UserService {
 				name: opts.name,
 				phone: opts.phone,
 				userLevel: opts.level,
+				subscription: {
+					plan_id: '6671deb40994d39d3f22a34e',
+					start_date: DateUtils.getMomentNow().toDate(),
+					end_date: DateUtils.getMomentNow().add(7, 'days').toDate(),
+				},
 			});
 
 			sendLoginCredentialsEmail(email, email, password);
 		} catch (err) {
+			console.log(err);
+
 			throw new CustomError(AUTH_ERRORS.USER_ALREADY_EXISTS);
 		}
 	}

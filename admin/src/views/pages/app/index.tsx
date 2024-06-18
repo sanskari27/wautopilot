@@ -45,31 +45,33 @@ const AppPage = () => {
 		});
 	}, [dispatch, setAuthLoaded]);
 
-	const fetchUserDetails = useCallback(async () => {
-		try {
-			dispatch(setRecipientsLoading(false));
+	const fetchUserDetails = useCallback(
+		async (selected_device_id: string) => {
+			try {
+				dispatch(setRecipientsLoading(false));
+				dispatch(setMediaFetching(false));
+				dispatch(setTemplateFetching(false));
+				AuthService.userDetails().then((user) => user && dispatch(setUserDetails(user)));
+
+				const promises = [
+					MessagesService.fetchAllConversation(selected_device_id),
+					MediaService.getMedias(selected_device_id),
+					TemplateService.listTemplates(selected_device_id),
+				];
+
+				const results = await Promise.all(promises);
+				dispatch(setRecipientsList(results[0]));
+				dispatch(setMediaList(results[1]));
+				dispatch(setTemplatesList(results[2]));
+			} catch (e) {
+				return;
+			}
 			dispatch(setMediaFetching(false));
 			dispatch(setTemplateFetching(false));
-
-			const promises = [
-				MessagesService.fetchAllConversation(selected_device_id),
-				MediaService.getMedias(selected_device_id),
-				TemplateService.listTemplates(selected_device_id),
-				AuthService.userDetails(),
-			];
-
-			const results = await Promise.all(promises);
-			dispatch(setRecipientsList(results[0]));
-			dispatch(setMediaList(results[1]));
-			dispatch(setTemplatesList(results[2]));
-			dispatch(setUserDetails(results[3]));
-		} catch (e) {
-			return;
-		}
-		dispatch(setMediaFetching(false));
-		dispatch(setTemplateFetching(false));
-		dispatch(setRecipientsLoading(false));
-	}, [dispatch, selected_device_id]);
+			dispatch(setRecipientsLoading(false));
+		},
+		[dispatch]
+	);
 
 	useEffect(() => {
 		dispatch(startDeviceLoading());
@@ -83,11 +85,8 @@ const AppPage = () => {
 				}
 			})
 			.finally(() => dispatch(stopDeviceLoading()));
-		if (!selected_device_id) {
-			return;
-		}
 
-		fetchUserDetails();
+		fetchUserDetails(selected_device_id);
 	}, [dispatch, fetchUserDetails, selected_device_id]);
 
 	if (!authLoaded) return null;
