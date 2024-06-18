@@ -84,13 +84,12 @@ const Loading = () => {
 				rounded={'lg'}
 				width={'500px'}
 				height={'550px'}
-				className='border shadow-xl drop-shadow-xl '
 			>
 				<Flex justifyContent={'center'} alignItems={'center'} direction={'column'}>
 					<Flex justifyContent={'center'} alignItems={'center'} width={'full'}>
-						{/* <Image src={LOGO} width={'280px'} className='shadow-lg rounded-full animate-pulse' /> */}
+						{/* <Image src={LOGO_PRIMARY} aspectRatio={1 / 1} className='' /> */}
 					</Flex>
-					<Progress size='xs' isIndeterminate width={'150%'} rounded={'lg'} marginTop={'-3rem'} />
+					<Progress size='xs' isIndeterminate width={'350px'} rounded={'lg'} />
 				</Flex>
 			</Flex>
 		</Flex>

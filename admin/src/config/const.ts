@@ -12,7 +12,6 @@ export const LOGO_PRIMARY = '/images/logo-primary.svg';
 export const WHO = '/images/who.svg';
 
 export const NAVIGATION = {
-
 	APP: '/app',
 	DASHBOARD: 'dashboard',
 	ADD_DEVICE: 'add-device',
@@ -26,7 +25,7 @@ export const NAVIGATION = {
 	TEMPLATES: 'templates',
 	ADD_TEMPLATE: 'add-template',
 	EDIT_TEMPLATE: 'edit-template',
-	
+
 	MEDIA: 'media',
 };
 
