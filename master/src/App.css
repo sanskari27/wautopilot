@@ -1,42 +1,83 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+	transition-property: all;
+	transition-duration: 300ms;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+body {
+	border-radius: 10px;
+	margin: 0;
+	font-family: 'Poppins', Arial, Helvetica, sans-serif !important;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+@layer utilities {
+	.center {
+		@apply flex flex-col justify-center items-center;
+	}
+	.centered-axis-xy {
+		@apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2;
+	}
+	.centered-axis-x {
+		@apply absolute left-1/2 -translate-x-1/2;
+	}
+	.centered-axis-y {
+		@apply absolute top-1/2 -translate-y-1/2;
+	}
+	.searchBox {
+		@apply placeholder:!text-[#252525] dark:placeholder:!text-[#A6A6A6];
+	}
+	.navbar {
+		@apply w-full absolute md:fixed  top-0 bg-primary-dark  z-50;
+	}
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.end_dot li {
+	text-align: right;
+	position: relative;
+	padding: 0 10px 0 0;
 }
 
-.card {
-  padding: 2em;
+.end_dot li::after {
+	content: '';
+	position: absolute;
+	right: -10px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 10px;
+	height: 10px;
+	background-color: #0b826f;
+	border-radius: 50%;
 }
 
-.read-the-docs {
-  color: #888;
+@media (max-width: 768px) {
+	.end_dot li {
+		text-align: left;
+	}
+	.end_dot li::after {
+		right: auto;
+		left: -13px;
+	}
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+	height: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: ypx;
+    border-radius: ypx;
+    background: rgba(216, 205, 205, 0.336); 
 }
