@@ -1,7 +1,6 @@
 import { Box, Flex, Icon, Text, VStack } from '@chakra-ui/react';
 import { useRef } from 'react';
 import { IconType } from 'react-icons/lib';
-import { MdSettings } from 'react-icons/md';
 import { TbLogout2 } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 import { MenuItems, WEBPAGE_URL } from '../../../config/const';
@@ -101,7 +100,7 @@ export default function NavigationDrawer({
 									'No Devices'}
 							</Text>
 						</Flex> */}
-						<Flex
+						{/* <Flex
 							className={`cursor-pointer overflow-hidden
 										transition-all duration-300 ease-in-out`}
 							padding={'0.6rem'}
@@ -115,7 +114,7 @@ export default function NavigationDrawer({
 							<Text fontSize={'sm'} whiteSpace={'nowrap'}>
 								Settings
 							</Text>
-						</Flex>
+						</Flex> */}
 						<Flex
 							className={`cursor-pointer overflow-hidden
 										transition-all duration-300 ease-in-out`}

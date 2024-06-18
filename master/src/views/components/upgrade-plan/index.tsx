@@ -1,18 +1,18 @@
 import {
-	Button,
-	FormControl,
-	FormLabel,
-	Input,
-	Modal,
-	ModalBody,
-	ModalCloseButton,
-	ModalContent,
-	ModalFooter,
-	ModalHeader,
-	ModalOverlay,
-	Select,
-	useDisclosure,
-	useToast,
+    Button,
+    FormControl,
+    FormLabel,
+    Input,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
+    Select,
+    useDisclosure,
+    useToast,
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -74,21 +74,22 @@ const UpgradePlanDialog = forwardRef<UpgradePlanDialogHandle>((_, ref) => {
 	};
 
 	const handleUpgradePlan = () => {
-		AdminsService.upgradePlan(admin.id, { plan_id: plan, date }).then((res) => {
-			if (res) {
+		AdminsService.upgradePlan(admin.id, { plan_id: plan, date })
+			.then((res) => {
+				if (res) {
+					toast({
+						title: 'Plan upgraded successfully',
+						status: 'success',
+					});
+					handleClose();
+					dispatch(setAdminExpiry({ id: admin.id, date }));
+					return;
+				}
 				toast({
-					title: 'Plan upgraded successfully',
-					status: 'success',
+					title: 'Failed to upgrade plan',
+					status: 'error',
 				});
-				handleClose();
-				dispatch(setAdminExpiry({ id: admin.id, date }));
-				return;
-			}
-			toast({
-				title: 'Failed to upgrade plan',
-				status: 'error',
-			});
-		});
+			})
 	};
 
 	return (
