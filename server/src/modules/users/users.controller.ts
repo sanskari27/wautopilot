@@ -11,7 +11,7 @@ async function getAdmins(req: Request, res: Response, next: NextFunction) {
 		return Respond({
 			res,
 			status: 200,
-			data: users,
+			data: { users },
 		});
 	} catch (err) {
 		if (err instanceof CustomError) return next(err);
