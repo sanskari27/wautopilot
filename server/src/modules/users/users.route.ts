@@ -7,6 +7,11 @@ import { UpgradePlanValidator } from './users.validator';
 const router = express.Router();
 
 router
+	.route('/admins/:id/markup-price')
+	.all(VerifyMinLevel(UserLevel.Master), IDValidator)
+	.post(Controller.setMarkupPrice);
+
+router
 	.route('/admins/:id/upgrade-plan')
 	.all(VerifyMinLevel(UserLevel.Master), IDValidator, UpgradePlanValidator)
 	.post(Controller.upgradePlan);

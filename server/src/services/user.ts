@@ -175,6 +175,22 @@ export default class UserService {
 		return this._account.walletBalance;
 	}
 
+	public async setMarkupPrice(rate: number) {
+		if (rate < 0) {
+			throw new CustomError(COMMON_ERRORS.INVALID_FIELDS);
+		}
+		await AccountDB.updateOne(
+			{
+				_id: this._user_id,
+			},
+			{
+				$set: {
+					markupPrice: rate,
+				},
+			}
+		);
+	}
+
 	public async addWalletBalance(amount: number) {
 		if (amount < 0) {
 			throw new CustomError(PAYMENT_ERRORS.INVALID_AMOUNT);
