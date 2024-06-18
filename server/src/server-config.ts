@@ -14,6 +14,10 @@ import { RespondFile } from './utils/ExpressUtils';
 
 const allowlist = [
 	'http://localhost:5173',
+	'http://localhost:5273',
+	'http://localhost:5274',
+	'http://localhost:5275',
+	'http://localhost:5276',
 	'https://wautopilot.com',
 	'https://admin.wautopilot.com',
 ];
