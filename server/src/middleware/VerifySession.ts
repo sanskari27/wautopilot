@@ -58,7 +58,7 @@ export function VerifyMinLevel(level: number) {
 			return next();
 		}
 
-		return next(new CustomError(AUTH_ERRORS.SESSION_INVALIDATED));
+		return next(new CustomError(AUTH_ERRORS.PERMISSION_DENIED));
 	}
 	return validator;
 }

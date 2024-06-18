@@ -7,6 +7,7 @@ import PaymentRoute from './payment/payment.route';
 import PhonebookRoute from './phonebook/phonebook.route';
 import TemplateRoute from './template/template.route';
 import UploadsRoute from './uploads/uploads.route';
+import UsersRoute from './users/users.route';
 import WebhooksRoute from './webhooks/webhooks.route';
 import WhatsappLinkRoute from './whatsapp-link/whatsappLink.route';
 
@@ -29,6 +30,7 @@ router.use('/template/:device_id', VerifySession, VerifyDevice, TemplateRoute);
 router.use('/message/:device_id', VerifySession, VerifyDevice, MessageRoute);
 router.use('/media/:device_id', VerifySession, VerifyDevice, MediaRoute);
 router.use('/uploads/:device_id', VerifySession, VerifyDevice, UploadsRoute);
+router.use('/users', VerifySession, UsersRoute);
 router.use('/webhooks', WebhooksRoute);
 
 router.post('/upload-media', async function (req, res, next) {

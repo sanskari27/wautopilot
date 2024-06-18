@@ -182,4 +182,27 @@ export default class UserService {
 			}
 		);
 	}
+
+	public async getUsers() {
+		if (this._level !== UserLevel.Master) {
+			throw new CustomError(AUTH_ERRORS.PERMISSION_DENIED);
+		}
+
+		const users = await AccountDB.find({
+			userLevel: UserLevel.Admin,
+		});
+
+		return users.map((user) => {
+			return {
+				name: user.name,
+				email: user.email,
+				phone: user.phone,
+				isSubscribed:
+					user.subscription &&
+					DateUtils.getMoment(user.subscription.end_date).isAfter(DateUtils.getMomentNow()),
+
+				subscription_expiry: user.subscription?.end_date ?? '',
+			};
+		});
+	}
 }

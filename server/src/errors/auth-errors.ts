@@ -21,6 +21,11 @@ const AUTH_ERRORS = {
 		TITLE: 'USER_ALREADY_EXISTS',
 		MESSAGE: 'The user already exists with given email or phone.',
 	},
+	PERMISSION_DENIED: {
+		STATUS: 400,
+		TITLE: 'PERMISSION_DENIED',
+		MESSAGE: 'The user does not have permission to perform this action.',
+	},
 } satisfies {
 	[error: string]: ServerError;
 };
