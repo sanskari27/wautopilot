@@ -44,7 +44,11 @@ async function upgradePlan(req: Request, res: Response, next: NextFunction) {
 
 	try {
 		const userService = await UserService.findById(req.locals.id);
-		await userService.upgradePlan(plan_id, date);
+		if (plan_id) {
+			await userService.upgradePlan(plan_id, date);
+		} else {
+			await userService.removePlan();
+		}
 		return Respond({
 			res,
 			status: 200,

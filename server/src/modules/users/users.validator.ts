@@ -5,7 +5,7 @@ import { CustomError } from '../../errors';
 
 export type UpgradePlanValidationResult = {
 	date: string;
-	plan_id: Types.ObjectId;
+	plan_id?: Types.ObjectId;
 };
 
 export async function UpgradePlanValidator(req: Request, res: Response, next: NextFunction) {
@@ -14,7 +14,8 @@ export async function UpgradePlanValidator(req: Request, res: Response, next: Ne
 		plan_id: z
 			.string()
 			.refine((value) => Types.ObjectId.isValid(value))
-			.transform((value) => new Types.ObjectId(value)),
+			.transform((value) => new Types.ObjectId(value))
+			.optional(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

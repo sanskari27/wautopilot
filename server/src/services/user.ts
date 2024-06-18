@@ -267,6 +267,19 @@ export default class UserService {
 		);
 	}
 
+	public async removePlan() {
+		await AccountDB.updateOne(
+			{
+				_id: this._user_id,
+			},
+			{
+				$set: {
+					subscription: undefined,
+				},
+			}
+		);
+	}
+
 	public async getUsers() {
 		if (this._level !== UserLevel.Master) {
 			throw new CustomError(AUTH_ERRORS.PERMISSION_DENIED);
