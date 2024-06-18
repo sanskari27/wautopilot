@@ -192,6 +192,23 @@ export default class UserService {
 		);
 	}
 
+	public async deductCredit(numberOfMessages: number) {
+		if (numberOfMessages <= 0) {
+			return;
+		}
+		this._account.walletBalance -= this._account.markupPrice * numberOfMessages;
+		await AccountDB.updateOne(
+			{
+				_id: this._user_id,
+			},
+			{
+				$inc: {
+					walletBalance: -(this._account.markupPrice * numberOfMessages),
+				},
+			}
+		);
+	}
+
 	public async extendSubscription(date: string) {
 		const details = await this.getDetails();
 

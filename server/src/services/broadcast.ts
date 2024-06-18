@@ -11,6 +11,7 @@ import { extractBody, extractButtons, extractFooter, extractHeader } from '../ut
 import TimeGenerator from '../utils/TimeGenerator';
 import ConversationService from './conversation';
 import TemplateService from './templates';
+import UserService from './user';
 import WhatsappLinkService from './whatsappLink';
 
 type Broadcast = {
@@ -397,6 +398,7 @@ export default class BroadcastService extends WhatsappLinkService {
 		);
 
 		docs.forEach(async (msg) => {
+			const userService = new UserService(msg.linked_to);
 			try {
 				const { data } = await MetaAPI.post(
 					`${msg.device_id.phoneNumberId}/messages`,
@@ -430,6 +432,7 @@ export default class BroadcastService extends WhatsappLinkService {
 				msg.save();
 				return;
 			}
+			userService.deductCredit(1);
 
 			const conversationService = new ConversationService(msg.linked_to, msg.device_id);
 			const templateService = new TemplateService(msg.linked_to, msg.device_id);

@@ -203,7 +203,7 @@ export default class TemplateService extends WhatsappLinkService {
 		});
 
 		const success = await Promise.all(promises);
-
+		this.deductCredit(success.length);
 		return success.every((s) => s);
 	}
 }
