@@ -11,6 +11,11 @@ const PAYMENT_ERRORS = {
 		TITLE: 'INVALID_AMOUNT',
 		MESSAGE: 'Invalid amount.',
 	},
+	NOT_SUBSCRIBED: {
+		STATUS: 400,
+		TITLE: 'NOT_SUBSCRIBED',
+		MESSAGE: 'User is not subscribed.',
+	},
 } satisfies {
 	[error: string]: ServerError;
 };

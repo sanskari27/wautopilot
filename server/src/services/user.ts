@@ -1,8 +1,10 @@
 import { randomBytes } from 'crypto';
+import { Types } from 'mongoose';
 import { AccountDB, PlanDB, SessionDB, StorageDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import { UserLevel } from '../config/const';
 import { AUTH_ERRORS, CustomError, PAYMENT_ERRORS } from '../errors';
+import COMMON_ERRORS from '../errors/common-errors';
 import { sendLoginCredentialsEmail } from '../provider/email';
 import { IDType } from '../types';
 import DateUtils from '../utils/DateUtils';
@@ -190,6 +192,48 @@ export default class UserService {
 		);
 	}
 
+	public async extendSubscription(date: string) {
+		const details = await this.getDetails();
+
+		if (!details.isSubscribed) {
+			throw new CustomError(PAYMENT_ERRORS.NOT_SUBSCRIBED);
+		}
+
+		const _date = DateUtils.getMoment(date, 'YYYY-MM-DD').toDate();
+
+		await AccountDB.updateOne(
+			{
+				_id: this._user_id,
+			},
+			{
+				$set: {
+					'subscription.end_date': _date,
+				},
+			}
+		);
+	}
+
+	public async upgradePlan(plan_id: Types.ObjectId, date: string) {
+		const plan = await PlanDB.findById(plan_id);
+		if (!plan) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+
+		const _date = DateUtils.getMoment(date, 'YYYY-MM-DD').toDate();
+
+		await AccountDB.updateOne(
+			{
+				_id: this._user_id,
+			},
+			{
+				$set: {
+					'subscription.plan_id': plan_id,
+					'subscription.end_date': _date,
+				},
+			}
+		);
+	}
+
 	public async getUsers() {
 		if (this._level !== UserLevel.Master) {
 			throw new CustomError(AUTH_ERRORS.PERMISSION_DENIED);
@@ -201,6 +245,7 @@ export default class UserService {
 
 		return users.map((user) => {
 			return {
+				id: user._id,
 				name: user.name ?? '',
 				email: user.email ?? '',
 				phone: user.phone ?? '',
