@@ -60,7 +60,7 @@ schema.methods.verifyPassword = async function (password: string) {
 	return await matchPassword(password, this.password);
 };
 
-schema.index({ email: 1, userLevel: 1 }, { unique: true });
+schema.index({ email: 1 }, { unique: true });
 
 const AccountDB = mongoose.model<IAccount>(AccountDB_name, schema);
 

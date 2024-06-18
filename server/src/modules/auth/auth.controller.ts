@@ -17,12 +17,10 @@ export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
 export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
 async function login(req: Request, res: Response, next: NextFunction) {
-	const { email, password, accessLevel, latitude, longitude } = req.locals
-		.data as LoginValidationResult;
+	const { email, password, latitude, longitude } = req.locals.data as LoginValidationResult;
 
 	try {
 		const { authToken, refreshToken } = await UserService.login(email, password, {
-			level: accessLevel,
 			latitude: latitude ?? 0,
 			longitude: longitude ?? 0,
 			platform: req.useragent?.platform || '',

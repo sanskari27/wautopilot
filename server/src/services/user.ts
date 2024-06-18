@@ -37,8 +37,8 @@ export default class UserService {
 		return new UserService(account);
 	}
 
-	static async login(email: string, password: string, opts: SessionDetails & { level: UserLevel }) {
-		const user = await AccountDB.findOne({ email, userLevel: opts.level }).select('+password');
+	static async login(email: string, password: string, opts: SessionDetails) {
+		const user = await AccountDB.findOne({ email }).select('+password');
 		if (user === null) {
 			throw new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR);
 		}

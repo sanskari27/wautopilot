@@ -6,7 +6,6 @@ import { CustomError } from '../../errors';
 export type LoginValidationResult = {
 	email: string;
 	password: string;
-	accessLevel: UserLevel;
 	latitude?: number;
 	longitude?: number;
 };
@@ -35,7 +34,6 @@ export async function LoginAccountValidator(req: Request, res: Response, next: N
 	const reqValidator = z.object({
 		email: z.string().email(),
 		password: z.string(),
-		accessLevel: z.nativeEnum(UserLevel).default(UserLevel.Admin),
 		latitude: z.number().default(0),
 		longitude: z.number().default(0),
 	});
