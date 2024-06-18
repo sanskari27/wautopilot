@@ -269,6 +269,7 @@ export default class UserService {
 				isSubscribed:
 					user.subscription &&
 					DateUtils.getMoment(user.subscription.end_date).isAfter(DateUtils.getMomentNow()),
+				plan_id: user.subscription?.plan_id ?? '',
 
 				subscription_expiry: user.subscription?.end_date ?? '',
 			};
