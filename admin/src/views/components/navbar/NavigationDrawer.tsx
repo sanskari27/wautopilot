@@ -5,7 +5,7 @@ import { MdSettings } from 'react-icons/md';
 import { TbLogout2 } from 'react-icons/tb';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { MenuItems } from '../../../config/const';
+import { MenuItems, WEBPAGE_URL } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
 import DevicesDialog, { DevicesHandle } from '../devices';
@@ -39,7 +39,8 @@ export default function NavigationDrawer({
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const handleLogout = async () => {
-		AuthService.logout();
+		await AuthService.logout();
+		window.location.replace(WEBPAGE_URL);
 	};
 
 	const theme = 'light';

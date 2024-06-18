@@ -32,7 +32,7 @@ APIInstance.interceptors.response.use(
 			if (isAuthenticated) {
 				return APIInstance(originalRequest);
 			} else {
-				window.location.replace(`${AUTH_URL}/auth/login?callback_url=${window.location.href}`);
+				window.location.replace(`${AUTH_URL}auth/login?callback_url=${window.location.href}`);
 			}
 		}
 

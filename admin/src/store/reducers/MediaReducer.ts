@@ -37,11 +37,9 @@ const Slice = createSlice({
 			state.type = initialState.type;
 		},
 		setMediaList: (state, action: PayloadAction<Media[]>) => {
-			console.count('setMediaList');
 			state.list = action.payload;
 		},
 		setDetails: (state, action: PayloadAction<Media>) => {
-			console.count('setMediaList');
 			state.details = action.payload;
 		},
 		setFile: (
