@@ -1,8 +1,7 @@
-import { Box, useBoolean } from '@chakra-ui/react';
+import { Box, Text, useBoolean } from '@chakra-ui/react';
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Navigate, useOutlet } from 'react-router-dom';
-import { NAVIGATION } from '../../../config/const';
+import { useOutlet } from 'react-router-dom';
 import AuthService from '../../../services/auth.service';
 import DeviceService from '../../../services/device.service';
 import MediaService from '../../../services/media.service';
@@ -38,6 +37,13 @@ const AppPage = () => {
 		(state: StoreState) => state[StoreNames.USER]
 	);
 
+	useEffect(() => {
+		AuthService.isAuthenticated().then((res) => {
+			dispatch(setIsAuthenticated(res));
+			setAuthLoaded.on();
+		});
+	}, [dispatch, setAuthLoaded]);
+
 	const fetchUserDetails = useCallback(async () => {
 		try {
 			dispatch(setRecipientsLoading(false));
@@ -65,13 +71,6 @@ const AppPage = () => {
 	}, [dispatch, selected_device_id]);
 
 	useEffect(() => {
-		AuthService.isAuthenticated().then((res) => {
-			dispatch(setIsAuthenticated(res));
-			setAuthLoaded.on();
-		});
-	}, [dispatch, setAuthLoaded]);
-
-	useEffect(() => {
 		dispatch(startDeviceLoading());
 		DeviceService.listDevices()
 			.then((devices) => {
@@ -92,9 +91,9 @@ const AppPage = () => {
 
 	if (!authLoaded) return null;
 
-	if (!isAuthenticated) return <Navigate to={`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`} />;
+	if (!isAuthenticated) return <Text>Logout</Text>;
 
-	if (!outlet) return <Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />;
+	// if (!outlet) return <Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />;
 
 	return (
 		<Box width={'full'}>

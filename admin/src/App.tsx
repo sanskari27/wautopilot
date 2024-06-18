@@ -1,26 +1,18 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import { NAVIGATION } from './config/const';
 
 import { Flex, Progress } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
-import { useGeoLocation } from './hooks/useGeolocation';
 import AuthService from './services/auth.service';
 import { setIsAuthenticated } from './store/reducers/UserReducers';
 
 const BroadcastReport = lazy(() => import('./views/pages/broadcast-report'));
-const Home = lazy(() => import('./views/pages/_'));
-const Terms = lazy(() => import('./views/pages/static-pages/terms'));
-const Privacy = lazy(() => import('./views/pages/static-pages/privacy'));
-const Disclaimer = lazy(() => import('./views/pages/static-pages/disclaimer'));
-const ResetPassword = lazy(() => import('./views/pages/reset-password'));
 const AppPage = lazy(() => import('./views/pages/app'));
 const Conversation = lazy(() => import('./views/pages/conversation'));
-const SamplePage = lazy(() => import('./views/pages/static-pages/sample'));
 const ContactPage = lazy(() => import('./views/pages/contacts'));
 const Broadcast = lazy(() => import('./views/pages/broadcast'));
-const LoginPopup = lazy(() => import('./views/components/loginPopup'));
 // const Dashboard = lazy(() => import('./views/pages/dashboard'));
 const Templates = lazy(() => import('./views/pages/templates'));
 const EditTemplate = lazy(() => import('./views/pages/templates/edit-template'));
@@ -30,7 +22,6 @@ const AddMedia = lazy(() => import('./views/pages/media/add-media'));
 
 function App() {
 	const dispatch = useDispatch();
-	useGeoLocation();
 
 	useEffect(() => {
 		AuthService.isAuthenticated().then((res) => {
@@ -43,15 +34,6 @@ function App() {
 			<Router>
 				<Suspense fallback={<Loading />}>
 					<Routes>
-						<Route path={NAVIGATION.HOME} element={<Home />}>
-							<Route path={`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`} element={<LoginPopup />} />
-							<Route path={`${NAVIGATION.AUTH}/${NAVIGATION.RESET}`} element={<ResetPassword />} />
-						</Route>
-						<Route path={NAVIGATION.TERMS} element={<Terms />} />
-						<Route path={NAVIGATION.PRIVACY} element={<Privacy />} />
-						<Route path={NAVIGATION.DISCLAIMER} element={<Disclaimer />} />
-						<Route path={NAVIGATION.SAMPLE} element={<SamplePage />} />
-
 						<Route path={NAVIGATION.APP} element={<AppPage />}>
 							<Route path={NAVIGATION.PHONEBOOK} element={<Phonebook />} />
 							<Route
@@ -70,9 +52,12 @@ function App() {
 							<Route path={NAVIGATION.BROADCAST_REPORT} element={<BroadcastReport />} />
 							<Route path={NAVIGATION.CONTACT} element={<ContactPage />} />
 							<Route path={NAVIGATION.INBOX} element={<Conversation />} />
-							{/* <Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} /> */}
+							<Route
+								path={NAVIGATION.DASHBOARD}
+								element={<Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />}
+							/>
 						</Route>
-						{/* <Route path='*' element={<Home />} /> */}
+						<Route path='*' element={<Navigate to={NAVIGATION.APP} />} />
 					</Routes>
 				</Suspense>
 			</Router>

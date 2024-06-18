@@ -40,7 +40,6 @@ export default function NavigationDrawer({
 
 	const handleLogout = async () => {
 		AuthService.logout();
-		window.location.reload();
 	};
 
 	const theme = 'light';

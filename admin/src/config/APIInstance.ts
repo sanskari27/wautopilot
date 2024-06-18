@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { recheckNetwork } from '../hooks/useNetwork';
 import AuthService from '../services/auth.service';
-import { NAVIGATION, SERVER_URL } from './const';
+import { AUTH_URL, SERVER_URL } from './const';
 
 const APIInstance = axios.create({
 	baseURL: SERVER_URL,
@@ -32,7 +32,7 @@ APIInstance.interceptors.response.use(
 			if (isAuthenticated) {
 				return APIInstance(originalRequest);
 			} else {
-				window.location.assign(NAVIGATION.LOGIN);
+				window.location.replace(`https://auth.wautopilot.com/auth/login?callback_url=${AUTH_URL}`);
 			}
 		}
 
