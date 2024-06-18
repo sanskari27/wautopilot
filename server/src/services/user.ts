@@ -194,9 +194,9 @@ export default class UserService {
 
 		return users.map((user) => {
 			return {
-				name: user.name,
-				email: user.email,
-				phone: user.phone,
+				name: user.name ?? '',
+				email: user.email ?? '',
+				phone: user.phone ?? '',
 				isSubscribed:
 					user.subscription &&
 					DateUtils.getMoment(user.subscription.end_date).isAfter(DateUtils.getMomentNow()),
