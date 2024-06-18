@@ -30,6 +30,7 @@ function processConversationMessages(docs: Partial<IConversationMessage>[]) {
 	return docs.map((doc) => ({
 		_id: doc._id,
 		recipient: doc.recipient,
+		conversation_id: doc.conversation_id,
 		message_id: doc.message_id,
 		header_type: doc.header_type,
 		header_content_source: doc.header_content_source,
@@ -46,6 +47,7 @@ function processConversationMessages(docs: Partial<IConversationMessage>[]) {
 		seen_at: doc.seen_at,
 		status: doc.status,
 		context: doc.context,
+		labels: doc.labels,
 	}));
 }
 
@@ -316,5 +318,40 @@ export default class ConversationService extends WhatsappLinkService {
 		);
 
 		return processConversationMessages(_docs);
+	}
+
+	public async fetchMessagesLabels() {
+		const records = await ConversationMessageDB.find({
+			linked_to: this.userId,
+		});
+
+		const labels = records.reduce<Set<string>>((acc, record) => {
+			record.labels.forEach((label) => acc.add(label));
+			return acc;
+		}, new Set<string>());
+
+		return Array.from(labels);
+	}
+
+	public async fetchMessagesByLabel(label: string) {
+		const records = await ConversationMessageDB.find({
+			linked_to: this.userId,
+			labels: label,
+		});
+
+		return processConversationMessages(records);
+	}
+
+	public async assignLabelToMessage(id: Types.ObjectId, labels: string[]) {
+		await ConversationMessageDB.updateOne(
+			{
+				_id: id,
+			},
+			{
+				$set: {
+					labels,
+				},
+			}
+		);
 	}
 }

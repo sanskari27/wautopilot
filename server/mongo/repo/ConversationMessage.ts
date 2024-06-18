@@ -27,6 +27,7 @@ const schema = new mongoose.Schema<IConversationMessage>(
 			type: String,
 			required: true,
 		},
+		labels: [String],
 
 		status: {
 			type: String,

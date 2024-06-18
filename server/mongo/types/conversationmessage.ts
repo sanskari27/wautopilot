@@ -10,6 +10,7 @@ export default interface IConversationMessage extends Document {
 	recipient: string;
 
 	status: MESSAGE_STATUS;
+	labels: string[];
 
 	message_id: string;
 	delivered_at: Date;

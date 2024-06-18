@@ -310,6 +310,22 @@ async function markRead(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function assignLabelToMessage(req: Request, res: Response, next: NextFunction) {
+	const { account, device, id } = req.locals;
+
+	try {
+		const conversationService = new ConversationService(account, device);
+		await conversationService.assignLabelToMessage(id, req.locals.data as string[]);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 async function sendMessageToConversation(req: Request, res: Response, next: NextFunction) {
 	const { account, id, device } = req.locals;
 	const data = req.locals.data as SendMessageValidationResult;
@@ -394,6 +410,7 @@ const Controller = {
 	fetchConversations,
 	fetchConversationMessages,
 	markRead,
+	assignLabelToMessage,
 	sendMessageToConversation,
 };
 
