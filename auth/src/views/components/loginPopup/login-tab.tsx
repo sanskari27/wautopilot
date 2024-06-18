@@ -1,8 +1,6 @@
 import { Button, FormControl, FormLabel, Input, Stack, Text, useToast } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
-import { NAVIGATION } from '../../../config/const';
 import { useGeoLocation } from '../../../hooks/useGeolocation';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
@@ -19,11 +17,8 @@ import PasswordInput from './password-input';
 
 function LoginTab() {
 	const { location } = useGeoLocation();
-	const navigate = useNavigate();
 	const toast = useToast();
 	const dispatch = useDispatch();
-
-	const [params, setParams] = useSearchParams();
 
 	const {
 		uiDetails: { isAuthenticating },
@@ -73,10 +68,6 @@ function LoginTab() {
 		dispatch(stopUserAuthenticating());
 		if (valid) {
 			dispatch(setIsAuthenticated(true));
-			if (params.get('callback_url') === null) {
-				return <Navigate to={'https://wautopilot.com/'} />;
-			}
-			return navigate(NAVIGATION.APP);
 		}
 		dispatch(setError({ message: 'Invalid credentials', type: 'server' }));
 		setTimeout(() => {

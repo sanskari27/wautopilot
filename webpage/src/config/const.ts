@@ -5,6 +5,7 @@ import { TbMessage2Plus, TbReportSearch, TbTemplate } from 'react-icons/tb';
 
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 export const WEBPAGE_URL = import.meta.env.VITE_WEBPAGE_URL;
+export const ADMIN_URL = import.meta.env.VITE_ADMIN_URL;
 export const DATA_LOADED_DELAY = import.meta.env.VITE_DATA_LOADED_DELAY;
 
 export const LOGO_WHITE = '/images/logo-white.svg';

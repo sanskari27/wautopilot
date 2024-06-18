@@ -10,11 +10,49 @@ import {
 	Tabs,
 	Text,
 } from '@chakra-ui/react';
-import { Color, LOGO_PRIMARY } from '../../../config/const';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
+import { Color, LOGO_PRIMARY, WEBPAGE_URL } from '../../../config/const';
+import { useGeoLocation } from '../../../hooks/useGeolocation';
+import AuthService from '../../../services/auth.service';
+import { StoreNames, StoreState } from '../../../store';
+import { setIsAuthenticated, stopUserLoading } from '../../../store/reducers/UserReducers';
 import LoginTab from './login-tab';
 import SignupTab from './signup-tab';
 
 export default function LoginPopup() {
+	useGeoLocation();
+
+	const dispatch = useDispatch();
+
+	const [params] = useSearchParams();
+	const callback_url = params.get('callback_url');
+
+	const {
+		uiDetails: { isLoading, isAuthenticated },
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
+
+	useEffect(() => {
+		AuthService.isAuthenticated().then((res) => {
+			dispatch(setIsAuthenticated(res));
+			dispatch(stopUserLoading());
+		});
+	}, [dispatch]);
+
+	if (isLoading) {
+		return <></>;
+	}
+
+	if (isAuthenticated) {
+		if (callback_url) {
+			window.location.href = callback_url;
+			return;
+		}
+		window.location.href = WEBPAGE_URL;
+		return;
+	}
+
 	return (
 		<Flex justifyContent={'center'} width={'100vw'} minHeight={'100vh'}>
 			<Center>

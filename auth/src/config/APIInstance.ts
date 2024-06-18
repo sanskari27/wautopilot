@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { recheckNetwork } from '../hooks/useNetwork';
 import AuthService from '../services/auth.service';
 import { NAVIGATION, SERVER_URL } from './const';
 
@@ -18,12 +17,8 @@ APIInstance.interceptors.response.use(
 		const originalRequest = error.config;
 
 		if (error.code === 'ERR_NETWORK') {
-			if (await recheckNetwork()) {
-				originalRequest._retry = true;
-				return APIInstance(originalRequest);
-			} else {
-				return Promise.reject(error);
-			}
+			originalRequest._retry = true;
+			return APIInstance(originalRequest);
 		}
 
 		if (error.response?.data?.title === 'SESSION_INVALIDATED' && !originalRequest._retry) {

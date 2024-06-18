@@ -1,5 +1,4 @@
 export type UserState = {
-	isAuthenticated: boolean;
 	uiDetails: UserUIDetails;
 	email: string;
 	password: string;
@@ -11,8 +10,6 @@ export type UserState = {
 		message: string;
 		type: 'password' | 'email' | 'confirm password' | 'server' | 'name' | 'phone' | '';
 	};
-	selected_device_id: string;
-	user_details: UserDetails;
 };
 
 export enum UserLevel {
@@ -23,17 +20,8 @@ export enum UserLevel {
 }
 
 export type UserUIDetails = {
+	isLoading: boolean;
 	isAuthenticated: boolean;
 	isAuthenticating: boolean;
 	resettingPassword: boolean;
-};
-
-export type UserDetails = {
-	name: string;
-	email: string;
-	phone: string;
-	isSubscribed: boolean;
-	subscription_expiry: string;
-	walletBalance: number;
-	no_of_devices: number;
 };

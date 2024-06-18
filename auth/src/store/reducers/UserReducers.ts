@@ -3,9 +3,9 @@ import { StoreNames } from '../config';
 import { UserState } from '../types/UserState';
 
 const initialState: UserState = {
-	isAuthenticated: false,
 	uiDetails: {
 		isAuthenticated: false,
+		isLoading: true,
 		isAuthenticating: false,
 		resettingPassword: false,
 	},
@@ -19,16 +19,6 @@ const initialState: UserState = {
 		message: '',
 		type: '',
 	},
-	selected_device_id: '',
-	user_details: {
-		name: '',
-		email: '',
-		phone: '',
-		isSubscribed: false,
-		subscription_expiry: '',
-		walletBalance: 0,
-		no_of_devices: 0,
-	},
 };
 
 const Slice = createSlice({
@@ -37,14 +27,13 @@ const Slice = createSlice({
 	reducers: {
 		reset: (state) => {
 			state.email = initialState.email;
-			state.isAuthenticated = initialState.isAuthenticated;
-			state.uiDetails = initialState.uiDetails;
 			state.password = initialState.password;
 			state.confirmPassword = initialState.confirmPassword;
 			state.error = initialState.error;
 			state.accessLevel = initialState.accessLevel;
 			state.name = initialState.name;
 			state.phone = initialState.phone;
+			console.log('reset');
 		},
 
 		startUserAuthenticating(state) {
@@ -53,6 +42,9 @@ const Slice = createSlice({
 		stopUserAuthenticating(state) {
 			state.uiDetails.isAuthenticating = false;
 		},
+		stopUserLoading(state) {
+			state.uiDetails.isLoading = false;
+		},
 		startResettingPassword(state) {
 			state.uiDetails.resettingPassword = true;
 		},
@@ -60,7 +52,7 @@ const Slice = createSlice({
 			state.uiDetails.resettingPassword = false;
 		},
 		setIsAuthenticated: (state, action: PayloadAction<boolean>) => {
-			state.isAuthenticated = action.payload;
+			state.uiDetails.isAuthenticated = action.payload;
 		},
 		setEmail: (state, action: PayloadAction<string>) => {
 			state.error = initialState.error;
@@ -85,14 +77,6 @@ const Slice = createSlice({
 		setError: (state, action: PayloadAction<typeof initialState.error>) => {
 			state.error = action.payload;
 		},
-
-		setUserDetails: (state, action: PayloadAction<UserState['user_details']>) => {
-			state.user_details = action.payload;
-		},
-
-		setSelectedDeviceId: (state, action: PayloadAction<string>) => {
-			state.selected_device_id = action.payload;
-		},
 	},
 });
 
@@ -109,8 +93,7 @@ export const {
 	setPhone,
 	startResettingPassword,
 	stopResettingPassword,
-	setSelectedDeviceId,
-	setUserDetails,
+	stopUserLoading,
 } = Slice.actions;
 
 export default Slice.reducer;

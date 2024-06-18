@@ -20,11 +20,9 @@ import { MdContactMail } from 'react-icons/md';
 import { PiBroadcastFill } from 'react-icons/pi';
 import { RiInbox2Line } from 'react-icons/ri';
 import { TbMessageCheck } from 'react-icons/tb';
-import { useSelector } from 'react-redux';
-import { useNavigate, useOutlet } from 'react-router-dom';
+import { useOutlet } from 'react-router-dom';
 import { HERO_IMG } from '../../../assets/Images';
-import { NAVIGATION, WHO } from '../../../config/const';
-import { StoreNames, StoreState } from '../../../store';
+import { ADMIN_URL, WHO } from '../../../config/const';
 import Footer from '../../components/footer';
 import HomeNavbar from '../../components/navbar/HomeNavbar';
 import Each from '../../components/utils/Each';
@@ -62,16 +60,10 @@ const FAQs = [
 ];
 
 export default function Home() {
-	const navigate = useNavigate();
 	const outlet = useOutlet();
 
-	const { isAuthenticated } = useSelector((state: StoreState) => state[StoreNames.USER]);
-
 	const handleLoginButton = () => {
-		if (isAuthenticated) {
-			return navigate(NAVIGATION.APP);
-		}
-		navigate(`${NAVIGATION.AUTH}/${NAVIGATION.LOGIN}`);
+		window.location.href = ADMIN_URL;
 	};
 
 	return (
