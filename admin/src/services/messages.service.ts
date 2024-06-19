@@ -270,4 +270,12 @@ export default class MessagesService {
 			return false;
 		}
 	}
+	static async markRead(deviceId: string, message_id: string) {
+		try {
+			await APIInstance.post(`/message/${deviceId}/mark-read/${message_id}`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
 }
