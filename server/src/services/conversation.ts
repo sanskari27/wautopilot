@@ -320,9 +320,10 @@ export default class ConversationService extends WhatsappLinkService {
 		return processConversationMessages(_docs);
 	}
 
-	public async fetchMessagesLabels() {
+	public async fetchMessagesLabels(id: Types.ObjectId) {
 		const records = await ConversationMessageDB.find({
 			linked_to: this.userId,
+			conversation_id: id,
 		});
 
 		const labels = records.reduce<Set<string>>((acc, record) => {

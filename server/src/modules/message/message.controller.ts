@@ -267,11 +267,12 @@ async function fetchConversationMessages(req: Request, res: Response, next: Next
 
 	const conversationService = new ConversationService(account, device);
 	const messages = await conversationService.fetchConversationMessages(id);
+	const labels = await conversationService.fetchMessagesLabels(id);
 
 	return Respond({
 		res,
 		status: 200,
-		data: { messages },
+		data: { messages, labels },
 	});
 }
 
