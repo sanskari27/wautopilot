@@ -8,6 +8,7 @@ export type RecipientsState = {
 	};
 	selected_recipient: Recipient;
 	label_filter: string[];
+	unReadConversations: string[];
 };
 
 export type Recipient = {

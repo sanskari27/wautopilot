@@ -24,7 +24,11 @@ const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
 		onClick?.(item);
 	};
 
-	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
+	const { selected_recipient, unReadConversations } = useSelector(
+		(state: StoreState) => state[StoreNames.RECIPIENT]
+	);
+
+	const hasUnreadConversation = unReadConversations.includes(item._id);
 
 	return (
 		<Box
@@ -44,7 +48,7 @@ const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
 				className='group'
 				direction={'column'}
 			>
-				<Flex width={'full'} gap={'0.5rem'}>
+				<Flex width={'full'} gap={'0.5rem'} position={'relative'}>
 					<Box position={'relative'}>
 						<Avatar name={item.profile_name} />
 						{localStorage.getItem('pinned')?.includes(item._id) && (
@@ -58,6 +62,17 @@ const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
 						<Text fontSize={'sm'}>{item.recipient}</Text>
 					</Box>
 					<ContextMenu recipient={item} />
+					{hasUnreadConversation ? (
+						<Box
+							width={'0.75rem'}
+							height={'0.75rem'}
+							position={'absolute'}
+							bgColor={'green'}
+							rounded={'full'}
+							right={0}
+							top={'calc(50% - 0.375rem)'}
+						/>
+					) : null}
 				</Flex>
 			</Flex>
 			{/* <HStack justifyContent={'flex-start'} width={'full'} overflowX={'auto'}>

@@ -9,6 +9,7 @@ import MessagesService from '../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../store';
 import { addMessage, reset, updateMessage } from '../../../store/reducers/MessagesReducers';
 import {
+	addUnreadConversation,
 	setLabelFilter,
 	setRecipientsList,
 	setSelectedRecipient,
@@ -88,9 +89,7 @@ const Conversation = () => {
 		});
 
 		socket.on('new_message_notification', (conversation_id) => {
-			console.log(conversation_id);
-
-			// dispatch(updateMessage({ messageId: msg._id, message: msg }));
+			dispatch(addUnreadConversation(conversation_id));
 		});
 
 		return () => {

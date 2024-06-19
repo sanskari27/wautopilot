@@ -3,6 +3,8 @@ import { StoreNames } from '../config';
 import { RecipientsState } from '../types/RecipientsState';
 
 const initialState: RecipientsState = {
+	unReadConversations: [],
+
 	list: [],
 	pinnedConversations: [],
 	unpinnedConversations: [],
@@ -69,6 +71,22 @@ const Slice = createSlice({
 		setLabelFilter: (state, action: PayloadAction<string[]>) => {
 			state.label_filter = action.payload;
 		},
+		addUnreadConversation: (state, action: PayloadAction<string>) => {
+			if (state.selected_recipient._id === action.payload) return;
+			state.unReadConversations = [action.payload, ...state.unReadConversations];
+
+			const others = state.list.filter((item) => item._id !== action.payload);
+			const convo = state.list.filter((item) => item._id === action.payload);
+			state.list = [...convo, ...others];
+			const pinnedIds = JSON.parse(localStorage.getItem('pinned') || '[]') as string[];
+			state.pinnedConversations = state.list.filter((item) => pinnedIds.includes(item._id));
+			state.unpinnedConversations = state.list.filter((item) => !pinnedIds.includes(item._id));
+		},
+		removeUnreadConversation: (state, action: PayloadAction<string>) => {
+			state.unReadConversations = state.unReadConversations.filter(
+				(item) => item !== action.payload
+			);
+		},
 	},
 });
 
@@ -79,6 +97,8 @@ export const {
 	setRecipientLabels,
 	addToPin,
 	removeFromPin,
+	addUnreadConversation,
+	removeUnreadConversation,
 	setLabelFilter,
 } = Slice.actions;
 

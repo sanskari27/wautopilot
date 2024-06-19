@@ -29,6 +29,7 @@ import {
 	setMessagesLoading,
 	setTextMessage,
 } from '../../../../store/reducers/MessagesReducers';
+import { removeUnreadConversation } from '../../../../store/reducers/RecipientReducer';
 import { Contact } from '../../../../store/types/ContactState';
 import AttachmentSelectorDialog, {
 	AttachmentDialogHandle,
@@ -65,6 +66,18 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 		e.target.style.height = '5px';
 		e.target.style.height = e.target.scrollHeight + 'px';
 	};
+
+	useEffect(() => {
+		dispatch(setMessagesLoading(true));
+		if (!selected_device_id) return;
+		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id).then(
+			(data) => {
+				dispatch(removeUnreadConversation(selected_recipient._id));
+				dispatch(setMessageList(data));
+				dispatch(setMessagesLoading(false));
+			}
+		);
+	}, [dispatch, selected_device_id, selected_recipient]);
 
 	const sendTextMessage = () => {
 		if (!textMessage) return;
@@ -168,17 +181,6 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 		message: { attachment_id, contactCard },
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
 	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
-
-	useEffect(() => {
-		dispatch(setMessagesLoading(true));
-		if (!selected_device_id) return;
-		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id).then(
-			(data) => {
-				dispatch(setMessageList(data));
-				dispatch(setMessagesLoading(false));
-			}
-		);
-	}, [dispatch, selected_device_id, selected_recipient]);
 
 	const sendAttachmentMessage = (type: string, attachments: string[]) => {
 		if (attachments.length === 0) return;
