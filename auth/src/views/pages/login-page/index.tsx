@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { Color, LOGO_PRIMARY, WEBPAGE_URL } from '../../../config/const';
 import { useGeoLocation } from '../../../hooks/useGeolocation';
 import AuthService from '../../../services/auth.service';
@@ -46,11 +46,9 @@ export default function LoginPopup() {
 
 	if (isAuthenticated) {
 		if (callback_url) {
-			window.location.href = callback_url;
-			return;
+			return <Navigate to={callback_url} />;
 		}
-		window.location.href = WEBPAGE_URL;
-		return;
+		return <Navigate to={WEBPAGE_URL} />;
 	}
 
 	return (
