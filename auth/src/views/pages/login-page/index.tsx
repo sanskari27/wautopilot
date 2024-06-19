@@ -47,10 +47,10 @@ export default function LoginPopup() {
 	if (isAuthenticated) {
 		if (callback_url) {
 			window.location.href = callback_url;
-			return;
+			return <></>;
 		}
 		window.location.href = WEBPAGE_URL;
-		return;
+		return <></>;
 	}
 
 	return (

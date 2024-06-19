@@ -16,7 +16,7 @@ APIInstance.interceptors.response.use(
 	async (error) => {
 		const originalRequest = error.config;
 
-		if (error.code === 'ERR_NETWORK') {
+		if (error.code === 'ERR_NETWORK' && !originalRequest._retry) {
 			originalRequest._retry = true;
 			return APIInstance(originalRequest);
 		}

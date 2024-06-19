@@ -48,11 +48,11 @@ export default function AdminPage() {
 		});
 	}, [dispatch, setAuthLoaded]);
 
-	if (!authLoaded) return null;
+	if (!authLoaded) return <></>;
 
 	if (!isAuthenticated) {
 		window.location.href = `${AUTH_URL}auth/login?callback_url=${window.location.href}`;
-		return;
+		return <></>;
 	}
 
 	// if (!outlet) return <Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />;
