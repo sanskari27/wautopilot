@@ -51,7 +51,8 @@ export default function AdminPage() {
 	if (!authLoaded) return null;
 
 	if (!isAuthenticated) {
-		return (window.location.href = `${AUTH_URL}auth/login?callback_url=${window.location.href}`);
+		window.location.href = `${AUTH_URL}auth/login?callback_url=${window.location.href}`;
+		return;
 	}
 
 	// if (!outlet) return <Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />;
