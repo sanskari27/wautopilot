@@ -33,7 +33,6 @@ const Slice = createSlice({
 			state.accessLevel = initialState.accessLevel;
 			state.name = initialState.name;
 			state.phone = initialState.phone;
-			console.log('reset');
 		},
 
 		startUserAuthenticating(state) {

@@ -138,7 +138,6 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 						duration: 3000,
 						isClosable: true,
 					});
-					console.log(selected_recipient.labels, selected_recipient._id);
 					dispatch(
 						setRecipientLabels({ labels: selected_recipient.labels, id: selected_recipient._id })
 					);

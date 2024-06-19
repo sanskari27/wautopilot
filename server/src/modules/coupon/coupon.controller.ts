@@ -38,8 +38,6 @@ async function updateCoupon(req: Request, res: Response, next: NextFunction) {
 			},
 		});
 	} catch (e) {
-		console.log(e);
-
 		if (e instanceof CustomError) {
 			return next(e);
 		}

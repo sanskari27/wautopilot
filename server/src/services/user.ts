@@ -115,8 +115,6 @@ export default class UserService {
 
 			sendLoginCredentialsEmail(email, email, password);
 		} catch (err) {
-			console.log(err);
-
 			throw new CustomError(AUTH_ERRORS.USER_ALREADY_EXISTS);
 		}
 	}

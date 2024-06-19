@@ -148,8 +148,6 @@ async function downloadMetaMedia(req: Request, res: Response, next: NextFunction
 		res.setHeader('Content-Disposition', 'inline');
 		return response.data.pipe(res);
 	} catch (err) {
-		console.log(err);
-
 		next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR, err));
 	}
 }

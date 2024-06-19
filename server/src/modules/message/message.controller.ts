@@ -98,8 +98,6 @@ async function downloadBroadcast(req: Request, res: Response, next: NextFunction
 			data: CSVHelper.exportBroadcastReport(records),
 		});
 	} catch (err) {
-		console.log(err);
-
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
@@ -295,8 +293,6 @@ async function markRead(req: Request, res: Response, next: NextFunction) {
 			}
 		);
 	} catch (err) {
-		console.log((err as any).response.data);
-
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 
@@ -316,7 +312,6 @@ async function markRead(req: Request, res: Response, next: NextFunction) {
 async function assignLabelToMessage(req: Request, res: Response, next: NextFunction) {
 	const { account, device, id } = req.locals;
 
-
 	try {
 		const conversationService = new ConversationService(account, device);
 		await conversationService.assignLabelToMessage(id, req.locals.data.labels as string[]);
@@ -326,7 +321,6 @@ async function assignLabelToMessage(req: Request, res: Response, next: NextFunct
 			status: 200,
 		});
 	} catch (err) {
-		console.log(err);
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
