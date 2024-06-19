@@ -22,7 +22,7 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } fro
 import { FaFacebook } from 'react-icons/fa';
 import { MdDataSaverOff } from 'react-icons/md';
 import { Link, useNavigate } from 'react-router-dom';
-import { NAVIGATION } from '../../../config/const';
+import { NAVIGATION, WEBPAGE_URL } from '../../../config/const';
 import DeviceService from '../../../services/device.service';
 
 export type AddDeviceHandle = {
@@ -282,7 +282,7 @@ const AddDevice = forwardRef<AddDeviceHandle>((_, ref) => {
 						</Button>
 
 						<Center>
-							<Link to={NAVIGATION.WEBHOOK_SETUP_DOCS} target='_blank'>
+							<Link to={WEBPAGE_URL + 'docs/webhook-setup'} target='_blank'>
 								Need help setting webhook? Click Here
 							</Link>
 						</Center>
