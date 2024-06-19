@@ -15,7 +15,8 @@ import WhatsappLinkRoute from './whatsapp-link/whatsappLink.route';
 import FileUpload, { ONLY_MEDIA_ALLOWED, SingleFileUploadOptions } from '../config/FileUpload';
 import { CustomError, ERRORS } from '../errors';
 import { VerifyDevice, VerifySession } from '../middleware';
-import { Respond, RespondFile } from '../utils/ExpressUtils';
+import SocketServer from '../socket';
+import { Respond, RespondFile, generateRandomID } from '../utils/ExpressUtils';
 
 const router = express.Router();
 
@@ -34,6 +35,22 @@ router.use('/media/:device_id', VerifySession, VerifyDevice, MediaRoute);
 router.use('/uploads/:device_id', VerifySession, VerifyDevice, UploadsRoute);
 router.use('/users', VerifySession, UsersRoute);
 router.use('/webhooks', WebhooksRoute);
+
+router
+	.route('/conversation-message-key')
+	.all(VerifySession)
+	.post(async function (req, res, next) {
+		const key = generateRandomID();
+
+		SocketServer.getInstance().addConversationKey(key, req.locals.user.userId.toString());
+		Respond({
+			res,
+			status: 200,
+			data: {
+				key,
+			},
+		});
+	});
 
 router.post('/upload-media', async function (req, res, next) {
 	const fileUploadOptions: SingleFileUploadOptions = {

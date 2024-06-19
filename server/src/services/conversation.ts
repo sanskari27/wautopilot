@@ -162,6 +162,10 @@ export default class ConversationService extends WhatsappLinkService {
 
 			const data = processConversationMessages([doc])[0];
 			SocketServer.getInstance().sendMessage(conversation_id.toString(), data);
+			SocketServer.getInstance().sendNewMessageNotification(
+				this.userId.toString(),
+				conversation_id.toString()
+			);
 
 			return data;
 		} catch (err) {}

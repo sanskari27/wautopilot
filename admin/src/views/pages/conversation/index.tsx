@@ -1,10 +1,13 @@
 import { Box, Flex, HStack, Skeleton, Stack, Text, useBoolean } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { io } from 'socket.io-client';
+import { SERVER_URL } from '../../../config/const';
 import useFilteredList from '../../../hooks/useFilteredList';
+import AuthService from '../../../services/auth.service';
 import MessagesService from '../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../store';
-import { reset } from '../../../store/reducers/MessagesReducers';
+import { addMessage, reset, updateMessage } from '../../../store/reducers/MessagesReducers';
 import {
 	setLabelFilter,
 	setRecipientsList,
@@ -59,10 +62,41 @@ const Conversation = () => {
 	};
 
 	useEffect(() => {
-		MessagesService.fetchAllConversation(selected_device_id,label_filter).then((data) =>
+		MessagesService.fetchAllConversation(selected_device_id, label_filter).then((data) =>
 			dispatch(setRecipientsList(data))
 		);
 	}, [dispatch, label_filter, selected_device_id]);
+
+	useEffect(() => {
+		const socket = io(SERVER_URL + 'conversation');
+
+		socket.on('connect', () => {
+			socket.emit('join_conversation', selected_recipient._id);
+			AuthService.generateConversationMessageKey().then((key) => {
+				socket.emit('listen_new_messages', key);
+			});
+		});
+
+		socket.on('disconnect', () => {});
+
+		socket.on('message_new', (msg) => {
+			dispatch(addMessage(msg));
+		});
+
+		socket.on('message_updated', (msg) => {
+			dispatch(updateMessage({ messageId: msg._id, message: msg }));
+		});
+
+		socket.on('new_message_notification', (conversation_id) => {
+			console.log(conversation_id);
+
+			// dispatch(updateMessage({ messageId: msg._id, message: msg }));
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, [selected_recipient._id, dispatch]);
 
 	useEffect(() => {
 		dispatch(reset());

@@ -8,9 +8,8 @@ import routes from './modules';
 
 import Logger from 'n23-logger';
 import { IS_PRODUCTION, IS_WINDOWS, Path } from './config/const';
-import { CustomError, ERRORS } from './errors';
+import { CustomError } from './errors';
 import BroadcastService from './services/broadcast';
-import { RespondFile } from './utils/ExpressUtils';
 
 const allowlist = [
 	'http://localhost:5173',
@@ -85,19 +84,6 @@ export default function (app: Express) {
 	});
 
 	app.use(routes);
-
-	app.route('/media/:path/:filename').get((req, res, next) => {
-		try {
-			const path = __basedir + '/static/' + req.params.path + '/' + req.params.filename;
-			return RespondFile({
-				res,
-				filename: req.params.filename,
-				filepath: path,
-			});
-		} catch (err: unknown) {
-			return next(new CustomError(ERRORS.NOT_FOUND));
-		}
-	});
 
 	app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 		if (err instanceof CustomError) {
