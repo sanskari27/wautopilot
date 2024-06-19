@@ -61,7 +61,6 @@ export default function Broadcast() {
 		recipients_from,
 		template_id,
 		to,
-		labels,
 		header_file,
 		header_link,
 		error,
@@ -108,7 +107,7 @@ export default function Broadcast() {
 			template_id: template_id,
 			template_name: template.name,
 			to: recipients_from === 'numbers' ? to : [],
-			labels: recipients_from === 'phonebook' ? labels : [],
+			labels: recipients_from === 'phonebook' ? selectedLabels : [],
 			broadcast_options,
 			body,
 			...(header
@@ -180,7 +179,7 @@ export default function Broadcast() {
 			return;
 		}
 
-		if (recipients_from === 'phonebook' && labels.length === 0) {
+		if (recipients_from === 'phonebook' && selectedLabels.length === 0) {
 			dispatch(setError({ type: 'RECIPIENTS', message: 'Labels are required' }));
 			toast({
 				title: 'Labels are required',

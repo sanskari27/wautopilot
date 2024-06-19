@@ -72,8 +72,9 @@ const Slice = createSlice({
 			state.label_filter = action.payload;
 		},
 		addUnreadConversation: (state, action: PayloadAction<string>) => {
-			if (state.selected_recipient._id === action.payload) return;
-			state.unReadConversations = [action.payload, ...state.unReadConversations];
+			if (state.selected_recipient._id !== action.payload) {
+				state.unReadConversations = [action.payload, ...state.unReadConversations];
+			}
 
 			const others = state.list.filter((item) => item._id !== action.payload);
 			const convo = state.list.filter((item) => item._id === action.payload);

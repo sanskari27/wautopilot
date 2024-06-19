@@ -123,6 +123,11 @@ export default function Phonebook() {
 		dispatch(setLabels(labels.filter((item) => item !== label)));
 	};
 
+	const handleClear = () => {
+		onClear();
+		dispatch(setLabels([]));
+	};
+
 	const handleDelete = () => {
 		toast.promise(PhoneBookService.deleteRecords(selected), {
 			success: () => {
@@ -222,7 +227,7 @@ export default function Phonebook() {
 						labels={all_labels}
 						onAddLabel={(label) => handleAddLabel(label)}
 						onRemoveLabel={(label) => handleRemoveLabel(label)}
-						onClear={onClear}
+						onClear={handleClear}
 						selectedLabels={selectedLabels}
 					/>
 				</Flex>
