@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { WEBPAGE_URL } from '../../../config/const';
+import { AUTH_URL } from '../../../config/const';
 import useFilteredList from '../../../hooks/useFilteredList';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
@@ -50,7 +50,9 @@ export default function AdminPage() {
 
 	if (!authLoaded) return null;
 
-	if (!isAuthenticated) return (window.location.href = WEBPAGE_URL);
+	if (!isAuthenticated) {
+		return (window.location.href = `${AUTH_URL}auth/login?callback_url=${window.location.href}`);
+	}
 
 	// if (!outlet) return <Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />;
 
