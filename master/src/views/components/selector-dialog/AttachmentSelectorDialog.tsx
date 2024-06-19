@@ -20,7 +20,6 @@ import {
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useSelector } from 'react-redux';
 import useFilteredList from '../../../hooks/useFilteredList';
-import MessagesService from '../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../store';
 import { getFileSize } from '../../../utils/file-utils';
 import SearchBar from '../searchBar';
@@ -39,7 +38,6 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 	({ onConfirm }: Props, ref) => {
 		const [selected, setSelected] = useState<string[]>([]);
 		const { list } = useSelector((state: StoreState) => state[StoreNames.MEDIA]);
-		const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 		const [isOpen, setOpen] = useState(false);
 		const [type, setType] = useState<'DOCUMENT' | 'PHOTOS' | 'VIDEO' | 'AUDIO'>('DOCUMENT');
 		const onClose = () => {
@@ -143,16 +141,7 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 												<Td>{getFileSize(item.file_length)}</Td>
 												<Td>{item.mime_type}</Td>
 												<Td>
-													<Button
-														variant={'link'}
-														onClick={() => {
-															MessagesService.getMedia(selected_device_id, item.media_id).then(
-																(res) => {
-																	window.open(res.url);
-																}
-															);
-														}}
-													>
+													<Button variant={'link'} onClick={() => {}}>
 														Open
 													</Button>
 												</Td>

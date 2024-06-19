@@ -1,12 +1,9 @@
 import { Box, Flex, Icon, Text, VStack } from '@chakra-ui/react';
-import { useRef } from 'react';
 import { IconType } from 'react-icons/lib';
 import { TbLogout2 } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 import { MenuItems, WEBPAGE_URL } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
-import DevicesDialog, { DevicesHandle } from '../devices';
-import SettingsDrawer, { SettingsDrawerHandle } from '../settings-dialog';
 import Each from '../utils/Each';
 
 function isActiveTab(tab: string, path: string): boolean {
@@ -25,9 +22,6 @@ export default function NavigationDrawer({
 		toggle: () => void;
 	};
 }) {
-	const DevicesRef = useRef<DevicesHandle>(null);
-	const settingsDrawer = useRef<SettingsDrawerHandle>(null);
-
 	const handleLogout = async () => {
 		AuthService.logout();
 		window.location.replace(WEBPAGE_URL);
@@ -133,8 +127,6 @@ export default function NavigationDrawer({
 					</VStack>
 				</Flex>
 			</Flex>
-			<DevicesDialog ref={DevicesRef} />
-			<SettingsDrawer ref={settingsDrawer} />
 		</Box>
 	);
 }
