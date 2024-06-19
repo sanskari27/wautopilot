@@ -172,6 +172,7 @@ type AssignMessageLabelsHandle = {
 const AssignMessageLabelsDialog = forwardRef<AssignMessageLabelsHandle>((_, ref) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { messageLabels } = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const [messageId, setMessageId] = useState<string>('');
 
 	const [labels, setLabels] = useState<string[]>([]);
@@ -220,7 +221,7 @@ const AssignMessageLabelsDialog = forwardRef<AssignMessageLabelsHandle>((_, ref)
 			});
 		} // TODO: add handle Text input for labels managed via array jut like phonebook
 
-		MessagesService.assignMessageLabels(messageId, labels).then((res) => {
+		MessagesService.assignMessageLabels(selected_device_id, messageId, labels).then((res) => {
 			if (res) {
 				console.log('Labels assigned successfully');
 			}

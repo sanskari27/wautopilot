@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
 import { SERVER_URL } from '../../../config/const';
+import { useFetchLabels } from '../../../hooks/useFetchLabels';
+import useFilterLabels from '../../../hooks/useFilterLabels';
 import useFilteredList from '../../../hooks/useFilteredList';
 import AuthService from '../../../services/auth.service';
 import MessagesService from '../../../services/messages.service';
@@ -34,6 +36,10 @@ const Conversation = () => {
 		label_filter,
 	} = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 
+	const { all_labels } = useFetchLabels();
+
+	const { onAddLabel, onRemoveLabel, selectedLabels, onClear } = useFilterLabels();
+
 	const { filtered: filteredPinned, setSearchText: setSearchTextPinned } = useFilteredList(
 		pinnedConversations,
 		{
@@ -60,6 +66,16 @@ const Conversation = () => {
 		setListExpanded.off();
 		if (selected_recipient._id === item._id) return;
 		dispatch(setSelectedRecipient(item));
+	};
+
+	const handleAddRecipientLabel = (label: string) => {
+		onAddLabel(label);
+		dispatch(setLabelFilter(selectedLabels));
+	};
+
+	const handleRemoveRecipientLabel = (label: string) => {
+		onRemoveLabel(label);
+		dispatch(setLabelFilter(selectedLabels));
 	};
 
 	useEffect(() => {
@@ -120,7 +136,13 @@ const Conversation = () => {
 								setSearchTextUnpinned(text);
 							}}
 						/>
-						<LabelFilter onClose={(labels) => dispatch(setLabelFilter(labels))} />
+						<LabelFilter
+							labels={all_labels}
+							onAddLabel={(label) => handleAddRecipientLabel(label)}
+							onRemoveLabel={(label) => handleRemoveRecipientLabel(label)}
+							selectedLabels={selectedLabels}
+							onClear={onClear}
+						/>
 					</HStack>
 					<Flex direction={'column'} overflowY={'auto'} overflowX={'hidden'}>
 						{loading ? (

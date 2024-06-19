@@ -37,7 +37,7 @@ export default class MessagesService {
 					return {
 						_id: message._id ?? '',
 						status: message.status ?? '',
-						labels: ['News', 'Edit', 'LABELS'],
+						labels: message.labels ?? [],
 						recipient: message.recipient ?? '',
 						received_at: message.received_at ?? '',
 						delivered_at: message.delivered_at ?? '',
@@ -260,9 +260,9 @@ export default class MessagesService {
 		document.body.removeChild(downloadLink);
 	}
 
-	static async assignMessageLabels(messageId: string, labels: string[]) {
+	static async assignMessageLabels(deviceId: string, messageId: string, labels: string[]) {
 		try {
-			await APIInstance.post(`/message/${messageId}/assign-labels`, {
+			await APIInstance.post(`/message/${deviceId}/message/${messageId}/assign-labels`, {
 				labels,
 			});
 			return true;
