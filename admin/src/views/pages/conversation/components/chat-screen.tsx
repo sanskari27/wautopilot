@@ -22,6 +22,8 @@ import { FaFile, FaHeadphones, FaUpload, FaVideo } from 'react-icons/fa';
 import { FaPhotoFilm } from 'react-icons/fa6';
 import { MdContacts } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
+import { io } from 'socket.io-client';
+import { SERVER_URL } from '../../../../config/const';
 import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
@@ -45,8 +47,6 @@ import Each from '../../../components/utils/Each';
 import AddMedia, { AddMediaHandle } from './add-media';
 import ChatMessage from './chat-message';
 import MessageTagsView, { MessageTagsViewHandle } from './message-tag-view';
-import { SERVER_URL } from '../../../../config/const';
-import { io } from 'socket.io-client';
 
 type ChatScreenProps = {
 	closeChat: () => void;
@@ -88,9 +88,9 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 				dispatch(setMessageLabels(data.messageLabels));
 				dispatch(setMessagesLoading(false));
 
-				for (const msg of data) {
+				for (const msg of data.messages) {
 					if (msg.received_at) {
-						MessagesService.markRead(selected_device_id, data[0].message_id);
+						MessagesService.markRead(selected_device_id, msg.message_id);
 						break;
 					}
 				}
