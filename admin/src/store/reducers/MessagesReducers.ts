@@ -41,7 +41,10 @@ const Slice = createSlice({
 			state.messageList = action.payload;
 		},
 		addMessage: (state, action: PayloadAction<(typeof initialState.messageList)[0]>) => {
-			state.messageList = [action.payload, ...state.messageList];
+			const includes = state.messageList.some((msg) => msg._id === action.payload._id);
+			if (!includes) {
+				state.messageList = [action.payload, ...state.messageList];
+			}
 		},
 		updateMessage: (
 			state,
