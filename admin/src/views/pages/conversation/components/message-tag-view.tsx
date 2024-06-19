@@ -48,7 +48,6 @@ const MessageTagsView = forwardRef<MessageTagsViewHandle>((_, ref) => {
 	}));
 
 	const scrollToMessage = (id: string) => {
-		console.log(messageRefs.current[id]?.scrollTo());
 		if (messageRefs.current[id]) {
 			messageRefs.current[id]?.scrollTo();
 		}
@@ -59,10 +58,8 @@ const MessageTagsView = forwardRef<MessageTagsViewHandle>((_, ref) => {
 	};
 
 	const filteredMessages = messages.filter((message) => {
-		console.log(message.labels);
 		return message.labels.some((tag) => selectedLabels.includes(tag));
 	});
-
 
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} size={'2xl'} scrollBehavior='inside'>

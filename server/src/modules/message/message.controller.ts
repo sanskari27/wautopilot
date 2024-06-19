@@ -319,7 +319,7 @@ async function assignLabelToMessage(req: Request, res: Response, next: NextFunct
 
 	try {
 		const conversationService = new ConversationService(account, device);
-		await conversationService.assignLabelToMessage(id, req.locals.data as string[]);
+		await conversationService.assignLabelToMessage(id, req.locals.data.labels as string[]);
 
 		return Respond({
 			res,

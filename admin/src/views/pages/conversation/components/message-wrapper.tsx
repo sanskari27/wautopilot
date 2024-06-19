@@ -23,6 +23,7 @@ import {
 	VStack,
 	Wrap,
 	useDisclosure,
+	useToast,
 } from '@chakra-ui/react';
 import { ReactNode, RefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { BiCheckDouble, BiLink } from 'react-icons/bi';
@@ -171,6 +172,7 @@ type AssignMessageLabelsHandle = {
 
 const AssignMessageLabelsDialog = forwardRef<AssignMessageLabelsHandle>((_, ref) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const toast = useToast();
 	const { messageLabels } = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const [messageId, setMessageId] = useState<string>('');
@@ -221,12 +223,17 @@ const AssignMessageLabelsDialog = forwardRef<AssignMessageLabelsHandle>((_, ref)
 			});
 		} // TODO: add handle Text input for labels managed via array jut like phonebook
 
-		MessagesService.assignMessageLabels(selected_device_id, messageId, labels).then((res) => {
-			if (res) {
-				console.log('Labels assigned successfully');
-			}
-			handleClose();
-			return;
+		toast.promise(MessagesService.assignMessageLabels(selected_device_id, messageId, labels), {
+			success: (res) => {
+				handleClose();
+				return {
+					title: res ? 'Labels assigned successfully' : 'Failed to assign labels',
+					description: res ? 'Please refresh the page to update tags' : 'Please try again later',
+					status: res ? 'success' : 'error',
+				};
+			},
+			loading: { title: 'Assigning labels...' },
+			error: { title: 'Failed to assign labels' },
 		});
 	};
 

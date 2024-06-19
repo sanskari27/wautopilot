@@ -183,16 +183,18 @@ export const MediaMessage = ({
 				</Box>
 			) : (
 				// <Image src={media.url} width={'260px'} aspectRatio={16 / 9} rounded={'lg'} />
-				<Box width={'400px'} height={'420px'} position={'relative'}>
-					<Preview
-						data={{
-							url: `${SERVER_URL}uploads/${selected_device_id}/download-meta-media/${message.body?.media_id}`,
-							type: getFileType(media.mimeType),
-						}}
-						progress={-1}
-					/>
+				<Box width={'400px'} height={'420px'} position={'relative'} marginLeft={'-1rem'}>
+					<Center width={'97%'} mx={'auto'}>
+						<Preview
+							data={{
+								url: `${SERVER_URL}uploads/${selected_device_id}/download-meta-media/${message.body?.media_id}`,
+								type: getFileType(media.mimeType),
+							}}
+							progress={-1}
+						/>
+					</Center>
 					<Text
-						mb='1rem'
+						mb='0.5rem'
 						textAlign={'center'}
 						cursor={'pointer'}
 						onClick={handleDownload}
