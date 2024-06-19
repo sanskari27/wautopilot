@@ -295,6 +295,8 @@ async function markRead(req: Request, res: Response, next: NextFunction) {
 			}
 		);
 	} catch (err) {
+		console.log((err as any).response.data);
+
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 

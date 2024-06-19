@@ -171,7 +171,7 @@ export default class MessagesService {
 		}
 	}
 
-	static async ConversationLabels( phone_number: string, labels: string[]) {
+	static async ConversationLabels(phone_number: string, labels: string[]) {
 		try {
 			await APIInstance.post(`/phonebook/set-labels/phone/${phone_number}`, {
 				labels,
@@ -251,5 +251,14 @@ export default class MessagesService {
 
 		// Clean up - remove the link
 		document.body.removeChild(downloadLink);
+	}
+
+	static async markRead(deviceId: string, message_id: string) {
+		try {
+			await APIInstance.post(`/message/${deviceId}/mark-read/${message_id}`);
+			return true;
+		} catch (err) {
+			return false;
+		}
 	}
 }
