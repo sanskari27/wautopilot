@@ -26,6 +26,11 @@ APIInstance.interceptors.response.use(
 			}
 		}
 
+		if (error.response?.data?.title === 'PERMISSION_DENIED') {
+			await AuthService.logout();
+			window.location.replace(`${AUTH_URL}auth/login?callback_url=${window.location.href}`);
+		}
+
 		if (error.response?.data?.title === 'SESSION_INVALIDATED' && !originalRequest._retry) {
 			originalRequest._retry = true;
 			const isAuthenticated = await AuthService.isAuthenticated();
