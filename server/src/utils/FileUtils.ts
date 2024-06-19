@@ -1,4 +1,5 @@
 import fs from 'fs';
+import mime from 'mime';
 
 const moveFile = (from: string, to: string) => {
 	try {
@@ -59,6 +60,13 @@ async function writeFile(path: string, data: string) {
 	});
 }
 
+function getMimeType(path: string) {
+	return mime.getType(path);
+}
+function getExt(mime_type: string) {
+	return mime.getExtension(mime_type);
+}
+
 export default {
 	moveFile,
 	deleteFile,
@@ -67,4 +75,6 @@ export default {
 	base64ToPDF,
 	readFile,
 	writeFile,
+	getMimeType,
+	getExt,
 };

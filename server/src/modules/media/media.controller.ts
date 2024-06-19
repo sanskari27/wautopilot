@@ -78,7 +78,7 @@ async function downloadMedia(req: Request, res: Response, next: NextFunction) {
 
 		return RespondFile({
 			res,
-			filename: 'Media File',
+			filename: 'Media File.' + FileUtils.getExt(FileUtils.getMimeType(path)!)!,
 			filepath: path,
 		});
 	} catch (err: unknown) {
