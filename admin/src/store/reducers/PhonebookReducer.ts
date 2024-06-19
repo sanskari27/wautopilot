@@ -56,6 +56,20 @@ const Slice = createSlice({
 			state.details =
 				state.list.find((record) => record.id === action.payload) || initialState.details;
 		},
+		updatePhonebookRecord: (
+			state,
+			action: PayloadAction<{
+				id: string;
+				details: PhonebookState['list'][0];
+			}>
+		) => {
+			state.list = state.list.map((record) =>
+				record.id === action.payload.id ? action.payload.details : record
+			);
+		},
+		addPhonebookRecord: (state, action: PayloadAction<PhonebookState['list'][0]>) => {
+			state.list = [action.payload, ...state.list];
+		},
 		clearDetails: (state) => {
 			state.details = initialState.details;
 		},
@@ -188,6 +202,8 @@ export const {
 	addDetailsLabel,
 	addLabelInput,
 	setLabels,
+	addPhonebookRecord,
+	updatePhonebookRecord,
 } = Slice.actions;
 
 export default Slice.reducer;

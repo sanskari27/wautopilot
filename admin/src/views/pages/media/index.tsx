@@ -29,7 +29,6 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import { IoMdCloudUpload } from 'react-icons/io';
-import { MdOutlinePreview } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useOutlet } from 'react-router-dom';
 import APIInstance from '../../../config/APIInstance';
@@ -161,13 +160,15 @@ const MediaPage = () => {
 														>
 															<IconButton
 																aria-label='Preview'
-																icon={<MdOutlinePreview />}
+																icon={<DownloadIcon />}
 																color={'blue'}
+																border={'1px blue solid'}
 															/>
 														</a>
 														<IconButton
 															aria-label='Preview'
 															icon={<DeleteIcon />}
+															border={'1px red solid'}
 															color={'red'}
 															onClick={() => deleteDialogRef.current?.open(record.id)}
 														/>

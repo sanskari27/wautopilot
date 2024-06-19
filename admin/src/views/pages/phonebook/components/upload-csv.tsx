@@ -66,6 +66,7 @@ const UploadPhonebookDialog = forwardRef<UploadPhonebookDialogHandle>((_, ref) =
 				onClose();
 				toast({
 					title: 'Records uploaded successfully',
+					description: 'Please refresh to update.',
 					status: 'success',
 					duration: 5000,
 					isClosable: true,

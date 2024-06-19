@@ -92,6 +92,7 @@ export default class PhoneBookService extends UserService {
 			linked_to: this.userId,
 			...(labels.length > 0 ? { labels: { $in: labels } } : {}),
 		})
+			.sort({ createdAt: -1 })
 			.skip((page - 1) * limit)
 			.limit(limit);
 		return processPhonebookDocs(records);

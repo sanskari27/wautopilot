@@ -33,6 +33,7 @@ import { StoreNames, StoreState } from '../../../../store';
 import {
 	addDetailsLabels,
 	addLabelInput,
+	addPhonebookRecord,
 	clearDetails,
 	removeDetailsLabel,
 	removeOtherKey,
@@ -48,6 +49,7 @@ import {
 	setPhoneNumber,
 	setSalutation,
 	setSaving,
+	updatePhonebookRecord,
 } from '../../../../store/reducers/PhonebookReducer';
 import LabelFilter from '../../../components/labelFilter';
 import Each from '../../../components/utils/Each';
@@ -109,7 +111,12 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 			: PhoneBookService.addRecord(details);
 
 		toast.promise(promise, {
-			success: () => {
+			success: (data) => {
+				if (id) {
+					dispatch(updatePhonebookRecord({ id, details: data }));
+				} else {
+					dispatch(addPhonebookRecord(data));
+				}
 				dispatch(setSaving(false));
 				handleClose();
 				return {
@@ -117,10 +124,11 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 					description: 'Please refresh the page to see the changes.',
 				};
 			},
-			error: () => {
+			error: (err) => {
 				dispatch(setSaving(false));
 				return {
 					title: 'Failed to save record.',
+					description: err.message,
 				};
 			},
 			loading: {

@@ -27,9 +27,6 @@ export default class PhoneBookService {
 	}
 
 	static async addRecord(record: Record<string, string | string[] | Record<string, string>>) {
-
-		
-
 		const { data } = await APIInstance.post(`/phonebook`, {
 			records: [record],
 		});
@@ -41,7 +38,7 @@ export default class PhoneBookService {
 		record: Record<string, string | string[] | Record<string, string>>
 	) {
 		const { data } = await APIInstance.put(`/phonebook/${id}`, record);
-		return data.record as PhonebookRecord;
+		return data.records as PhonebookRecord;
 	}
 
 	static async deleteRecords(ids: string[]) {
