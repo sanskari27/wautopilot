@@ -8,4 +8,5 @@ export enum StoreNames {
 	RECIPIENT = 'recipient',
 	MESSAGES = 'messages',
 	CONTACT = 'contact',
+	FILTER_LABELS = 'filterLabels',
 }

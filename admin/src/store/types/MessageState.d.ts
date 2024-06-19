@@ -1,5 +1,6 @@
 export type MessageState = {
 	messageList: Message[];
+	messageLabels: string[];
 	uiDetails: {
 		messagesLoading: boolean;
 		errorMessage: string;
@@ -60,6 +61,8 @@ export type MessageState = {
 
 export type Message = {
 	_id: string;
+	labels: string[];
+
 	status: string;
 	recipient: string;
 

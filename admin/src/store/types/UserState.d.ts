@@ -13,6 +13,7 @@ export type UserState = {
 	};
 	selected_device_id: string;
 	user_details: UserDetails;
+	all_labels: string[];
 };
 
 export enum UserLevel {

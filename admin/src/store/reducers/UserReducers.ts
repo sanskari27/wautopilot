@@ -29,6 +29,7 @@ const initialState: UserState = {
 		walletBalance: 0,
 		no_of_devices: 0,
 	},
+	all_labels: [],
 };
 
 const Slice = createSlice({

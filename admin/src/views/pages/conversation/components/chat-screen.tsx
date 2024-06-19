@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import { ReactNode, useEffect, useRef } from 'react';
 import { BiArrowBack, BiSend } from 'react-icons/bi';
+import { CiMenuKebab } from 'react-icons/ci';
 import { FaFile, FaHeadphones, FaUpload, FaVideo } from 'react-icons/fa';
 import { FaPhotoFilm } from 'react-icons/fa6';
 import { MdContacts } from 'react-icons/md';
@@ -24,10 +25,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
+	addMessage,
+	setMessageLabels,
 	setMessageList,
 	setMessageSending,
 	setMessagesLoading,
 	setTextMessage,
+	updateMessage,
 } from '../../../../store/reducers/MessagesReducers';
 import { removeUnreadConversation } from '../../../../store/reducers/RecipientReducer';
 import { Contact } from '../../../../store/types/ContactState';
@@ -40,6 +44,9 @@ import ContactSelectorDialog, {
 import Each from '../../../components/utils/Each';
 import AddMedia, { AddMediaHandle } from './add-media';
 import ChatMessage from './chat-message';
+import MessageTagsView, { MessageTagsViewHandle } from './message-tag-view';
+import { SERVER_URL } from '../../../../config/const';
+import { io } from 'socket.io-client';
 
 type ChatScreenProps = {
 	closeChat: () => void;
@@ -48,11 +55,15 @@ type ChatScreenProps = {
 const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 	const dispatch = useDispatch();
 	const toast = useToast();
+
+	const messageTaggingRef = useRef<MessageTagsViewHandle>(null);
+
 	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const {
 		messageList,
+		messageLabels,
 		uiDetails: { messagesLoading, isMessageSending },
 		message: { textMessage },
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
@@ -73,7 +84,8 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id).then(
 			(data) => {
 				dispatch(removeUnreadConversation(selected_recipient._id));
-				dispatch(setMessageList(data));
+				dispatch(setMessageList(data.messages));
+				dispatch(setMessageLabels(data.messageLabels));
 				dispatch(setMessagesLoading(false));
 			}
 		);
@@ -112,11 +124,36 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 					</Box>
 				</HStack>
 				<HStack>
-					{timeStamp && timeStamp < currentTime ? (
-						<Tag colorScheme='green'>Active</Tag>
-					) : (
-						<Tag colorScheme='red'>Expired</Tag>
-					)}
+					<Flex alignItems={'center'}>
+						{timeStamp && timeStamp < currentTime ? (
+							<Tag colorScheme='green'>Active</Tag>
+						) : (
+							<Tag colorScheme='red'>Expired</Tag>
+						)}
+						{messagesLoading ? null : (
+							<Menu>
+								<MenuButton m={0} p={0} as={Button} variant={'unstyled'}>
+									<Icon
+										mx={'1rem'}
+										_hover={{
+											cursor: 'pointer',
+										}}
+										as={CiMenuKebab}
+										color='black'
+									/>
+								</MenuButton>
+								<MenuList>
+									<MenuItem
+										onClick={() => {
+											messageTaggingRef.current?.open(messageList, messageLabels);
+										}}
+									>
+										View Messages Tags
+									</MenuItem>
+								</MenuList>
+							</Menu>
+						)}
+					</Flex>
 				</HStack>
 			</HStack>
 			<Flex
@@ -165,6 +202,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 					</Button>
 				</HStack>
 			</Flex>
+			<MessageTagsView ref={messageTaggingRef} />
 		</>
 	);
 };
@@ -181,6 +219,40 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 		message: { attachment_id, contactCard },
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
 	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
+
+	useEffect(() => {
+		dispatch(setMessagesLoading(true));
+		if (!selected_device_id) return;
+		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id).then(
+			(data) => {
+				dispatch(setMessageList(data.messages));
+				dispatch(setMessageLabels(data.messageLabels));
+				dispatch(setMessagesLoading(false));
+			}
+		);
+	}, [dispatch, selected_device_id, selected_recipient]);
+
+	useEffect(() => {
+		const socket = io(SERVER_URL + 'conversation');
+
+		socket.on('connect', () => {
+			socket.emit('join_conversation', selected_recipient._id);
+		});
+
+		socket.on('disconnect', () => {});
+
+		socket.on('message_new', (msg) => {
+			dispatch(addMessage(msg));
+		});
+
+		socket.on('message_updated', (msg) => {
+			dispatch(updateMessage({ messageId: msg._id, message: msg }));
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, [selected_recipient._id, dispatch]);
 
 	const sendAttachmentMessage = (type: string, attachments: string[]) => {
 		if (attachments.length === 0) return;

@@ -89,7 +89,7 @@ const AppPage = () => {
 		fetchUserDetails(selected_device_id);
 	}, [dispatch, fetchUserDetails, selected_device_id]);
 
-	if (!authLoaded) return null;
+	if (!authLoaded) return <></>;
 
 	if (!isAuthenticated) {
 		window.location.replace(`${AUTH_URL}auth/login?callback_url=${window.location.href}`);

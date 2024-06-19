@@ -4,6 +4,7 @@ import { MessageState } from '../types/MessageState';
 
 const initialState: MessageState = {
 	messageList: [],
+	messageLabels: [],
 	uiDetails: {
 		messagesLoading: false,
 		errorMessage: '',
@@ -100,6 +101,10 @@ const Slice = createSlice({
 		setMessageSending: (state, action: PayloadAction<boolean>) => {
 			state.uiDetails.isMessageSending = action.payload;
 		},
+
+		setMessageLabels: (state, action: PayloadAction<string[]>) => {
+			state.messageLabels = action.payload;
+		},
 	},
 });
 
@@ -122,6 +127,8 @@ export const {
 	setAttachmentUrl,
 	addMessage,
 	updateMessage,
+	resetMessage,
+	setMessageLabels,
 } = Slice.actions;
 
 export default Slice.reducer;

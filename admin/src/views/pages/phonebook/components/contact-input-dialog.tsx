@@ -28,10 +28,12 @@ import {
 import { forwardRef, useImperativeHandle } from 'react';
 import { MdAdd, MdRemove } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
+import { useFetchLabels } from '../../../../hooks/useFetchLabels';
+import useFilterLabels from '../../../../hooks/useFilterLabels';
 import PhoneBookService from '../../../../services/phonebook.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
-	addDetailsLabels,
+	addDetailsLabel,
 	addLabelInput,
 	addPhonebookRecord,
 	clearDetails,
@@ -91,6 +93,10 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 		labels,
 	} = details;
 
+	const { selectedLabels, onAddLabel, onClear, onRemoveLabel } = useFilterLabels();
+
+	const { all_labels } = useFetchLabels();
+
 	const { error, isSaving } = uiDetails;
 
 	const handleClose = () => {
@@ -100,6 +106,16 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 
 	const handleClearContactCard = () => {
 		dispatch(clearDetails());
+	};
+
+	const handleAddLabel = (label: string) => {
+		onAddLabel(label);
+		dispatch(addDetailsLabel(label));
+	};
+
+	const handleRemoveLabel = (label: string) => {
+		onRemoveLabel(label);
+		dispatch(removeDetailsLabel(label));
 	};
 
 	const handleSave = () => {
@@ -241,7 +257,7 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 										<WrapItem>
 											<Tag borderRadius='full' variant='solid' colorScheme='green'>
 												<TagLabel>{label}</TagLabel>
-												<TagCloseButton onClick={() => dispatch(removeDetailsLabel(label))} />
+												<TagCloseButton onClick={() => handleRemoveLabel(label)} />
 											</Tag>
 										</WrapItem>
 									)}
@@ -256,8 +272,11 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 								/>
 								<InputRightAddon px={0}>
 									<LabelFilter
-										onChange={(labels) => dispatch(addDetailsLabels(labels))}
-										clearOnClose
+										labels={all_labels}
+										onAddLabel={(label) => handleAddLabel(label)}
+										onRemoveLabel={(label) => handleRemoveLabel(label)}
+										onClear={onClear}
+										selectedLabels={selectedLabels}
 									/>
 								</InputRightAddon>
 							</InputGroup>

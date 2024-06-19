@@ -21,6 +21,8 @@ import {
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useFetchLabels } from '../../../../hooks/useFetchLabels';
+import useFilterLabels from '../../../../hooks/useFilterLabels';
 import MessagesService from '../../../../services/messages.service';
 import { setRecipientLabels } from '../../../../store/reducers/RecipientReducer';
 import { Recipient } from '../../../../store/types/RecipientsState';
@@ -47,6 +49,10 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 		expiration_timestamp: '',
 		labels: [],
 	});
+
+	const { onAddLabel, onClear, onRemoveLabel, selectedLabels } = useFilterLabels();
+
+	const { all_labels } = useFetchLabels();
 
 	const onClose = () => {
 		setSelectedRecipient({
@@ -80,19 +86,16 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 		},
 	}));
 
-	const handleLabelsChange = (labels: string[]) => {
-		const selectedLabels = [] as string[];
-		labels.forEach((label) => {
-			if (!selected_recipient.labels.includes(label)) {
-				selectedLabels.push(label);
-			}
-		});
-		setSelectedRecipient((prev) => {
-			return {
-				...prev,
-				labels: [...prev.labels, ...selectedLabels],
-			};
-		});
+	const handleLabelsChange = (labels: string) => {
+		onAddLabel(labels);
+		if (!selected_recipient.labels.includes(labels) && labels.trim().length !== 0) {
+			setSelectedRecipient((prev) => {
+				return {
+					...prev,
+					labels: [...prev.labels, labels],
+				};
+			});
+		}
 	};
 
 	const removeLabel = (label: string) => {
@@ -113,7 +116,7 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 					selected_recipient.labels.push(label.trim());
 				}
 			});
-		}
+		} // TODO: add handle Text input for labels managed via array jut like phonebook 
 
 		// if (selected_recipient.labels.length === 0) {
 		// 	toast({
@@ -196,7 +199,13 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 								value={newLabel}
 								onChange={(e) => setNewLabel(e.target.value)}
 							/>
-							<LabelFilter clearOnClose onChange={handleLabelsChange} />
+							<LabelFilter
+								labels={all_labels}
+								onAddLabel={(label) => handleLabelsChange(label)}
+								onRemoveLabel={(label) => onRemoveLabel(label)}
+								onClear={onClear}
+								selectedLabels={selectedLabels}
+							/>
 						</Flex>
 					</FormControl>
 				</ModalBody>

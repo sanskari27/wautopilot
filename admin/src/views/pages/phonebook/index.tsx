@@ -24,6 +24,8 @@ import { StoreNames, StoreState } from '../../../store';
 
 import { DeleteIcon } from '@chakra-ui/icons';
 import { HiUpload } from 'react-icons/hi';
+import { useFetchLabels } from '../../../hooks/useFetchLabels';
+import useFilterLabels from '../../../hooks/useFilterLabels';
 import PhoneBookService from '../../../services/phonebook.service';
 import {
 	addSelected,
@@ -52,6 +54,10 @@ export default function Phonebook() {
 	const uploadCSVDialog = useRef<UploadPhonebookDialogHandle>(null);
 	const assignLabelDialog = useRef<AssignLabelDialogHandle>(null);
 	const deleteDialog = useRef<DeleteAlertHandle>(null);
+
+	const { selectedLabels, onAddLabel, onClear, onRemoveLabel } = useFilterLabels();
+
+	const { all_labels } = useFetchLabels();
 
 	const {
 		list,
@@ -106,6 +112,16 @@ export default function Phonebook() {
 		dispatch(selectPhonebook(record.id));
 		drawerRef.current?.open();
 	}
+
+	const handleAddLabel = (label: string) => {
+		onAddLabel(label);
+		dispatch(setLabels([...labels, label]));
+	};
+
+	const handleRemoveLabel = (label: string) => {
+		onRemoveLabel(label);
+		dispatch(setLabels(labels.filter((item) => item !== label)));
+	};
 
 	const handleDelete = () => {
 		toast.promise(PhoneBookService.deleteRecords(selected), {
@@ -202,7 +218,13 @@ export default function Phonebook() {
 			>
 				<Flex flexGrow={1} gap={3} className='w-full md:w-fit'>
 					<SearchBar onSearchTextChanged={setSearchText} />
-					<LabelFilter onChange={(labels) => dispatch(setLabels(labels))} />
+					<LabelFilter
+						labels={all_labels}
+						onAddLabel={(label) => handleAddLabel(label)}
+						onRemoveLabel={(label) => handleRemoveLabel(label)}
+						onClear={onClear}
+						selectedLabels={selectedLabels}
+					/>
 				</Flex>
 				<Flex gap={3} padding={'1rem'}>
 					<IconButton

@@ -17,6 +17,8 @@ import { useEffect } from 'react';
 import { BiSend } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import APIInstance from '../../../config/APIInstance';
+import { useFetchLabels } from '../../../hooks/useFetchLabels';
+import useFilterLabels from '../../../hooks/useFilterLabels';
 import DeviceService from '../../../services/device.service';
 import UploadService from '../../../services/upload.service';
 import { StoreNames, StoreState } from '../../../store';
@@ -46,6 +48,10 @@ import ComponentParameters from './components/ComponentParameters';
 export default function Broadcast() {
 	const dispatch = useDispatch();
 	const toast = useToast();
+
+	const { selectedLabels, onAddLabel, onClear, onRemoveLabel } = useFilterLabels();
+
+	const { all_labels } = useFetchLabels();
 
 	const {
 		body,
@@ -133,6 +139,16 @@ export default function Broadcast() {
 			},
 		});
 	}
+
+	const handleLabelChange = (label: string) => {
+		onAddLabel(label);
+		dispatch(setLabels(selectedLabels));
+	};
+
+	const handleLabelRemove = (label: string) => {
+		onRemoveLabel(label);
+		dispatch(setLabels(selectedLabels));
+	};
 
 	function onSend() {
 		if (!name) {
@@ -321,7 +337,11 @@ export default function Broadcast() {
 										Select Tags
 									</Button>
 								}
-								onChange={(labels) => dispatch(setLabels(labels))}
+								labels={all_labels}
+								onAddLabel={(label) => handleLabelChange(label)}
+								onRemoveLabel={(label) => handleLabelRemove(label)}
+								onClear={onClear}
+								selectedLabels={selectedLabels}
 							/>
 						</Box>
 					</Flex>

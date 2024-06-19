@@ -13,7 +13,7 @@ import {
 import { Recipient } from '../../../../store/types/RecipientsState';
 import AssignConversationLabelDialog, {
 	AssignConversationLabelDialogHandle,
-} from './add-conversation-labels';
+} from './add-recipient-labels';
 
 export default function ContextMenu({ recipient }: { recipient: Recipient }) {
 	const dispatch = useDispatch();

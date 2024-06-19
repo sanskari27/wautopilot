@@ -5,8 +5,10 @@ import { NAVIGATION } from './config/const';
 
 import { Flex, Progress } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
+import useFilterLabels from './hooks/useFilterLabels';
 import AuthService from './services/auth.service';
 import { setIsAuthenticated } from './store/reducers/UserReducers';
+import { useFetchLabels } from './hooks/useFetchLabels';
 
 const BroadcastReport = lazy(() => import('./views/pages/broadcast-report'));
 const AppPage = lazy(() => import('./views/pages/app'));
@@ -22,6 +24,8 @@ const AddMedia = lazy(() => import('./views/pages/media/add-media'));
 
 function App() {
 	const dispatch = useDispatch();
+	useFilterLabels();
+	useFetchLabels();
 
 	useEffect(() => {
 		AuthService.isAuthenticated().then((res) => {

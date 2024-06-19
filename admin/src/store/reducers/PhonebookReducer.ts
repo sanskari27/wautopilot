@@ -122,7 +122,7 @@ const Slice = createSlice({
 			state.label_input = action.payload;
 			if (state.label_input.includes(' ')) {
 				const label = state.label_input.split(' ')[0];
-				if (!state.details.labels.includes(label)) {
+				if (!state.details.labels.includes(label) && label.trim().length !== 0) {
 					state.details.labels.push(label);
 				}
 				state.label_input = '';

@@ -12,7 +12,7 @@ import {
 	Text,
 	useToast,
 } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import { BiErrorCircle } from 'react-icons/bi';
 import { HiLocationMarker } from 'react-icons/hi';
 import { MdOutlinePermMedia } from 'react-icons/md';
@@ -30,17 +30,33 @@ import Each from '../../../components/utils/Each';
 import Preview from '../../media/preview.component';
 import ChatMessageWrapper from './message-wrapper';
 
-export const TextMessage = ({ message }: { message: Message }) => {
+export const TextMessage = ({
+	message,
+	ref,
+	id,
+}: {
+	message: Message;
+	ref: RefObject<HTMLDivElement>;
+	id: string;
+}) => {
 	return (
-		<ChatMessageWrapper message={message}>
+		<ChatMessageWrapper id={id} ref={ref} message={message}>
 			<Text whiteSpace={'pre-wrap'}>{message.body?.text}</Text>
 		</ChatMessageWrapper>
 	);
 };
 
-export const LocationMessage = ({ message }: { message: Message }) => {
+export const LocationMessage = ({
+	message,
+	ref,
+	id,
+}: {
+	message: Message;
+	ref: RefObject<HTMLDivElement>;
+	id: string;
+}) => {
 	return (
-		<ChatMessageWrapper message={message}>
+		<ChatMessageWrapper id={id} ref={ref} message={message}>
 			<Link
 				href={`https://www.google.com/maps/search/?q=${message.body?.location?.latitude ?? ''},${
 					message.body?.location?.longitude ?? ''
@@ -75,11 +91,19 @@ const initialState = {
 	loaded: false,
 	size: 0,
 };
-export const MediaMessage = ({ message }: { message: Message }) => {
+export const MediaMessage = ({
+	message,
+	ref,
+	id,
+}: {
+	message: Message;
+	ref: RefObject<HTMLDivElement>;
+	id: string;
+}) => {
 	const toast = useToast();
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const [media, setMedia] = useState(initialState);
-	const { ref, inView } = useInView({ triggerOnce: true });
+	const { ref: inViewRef, inView } = useInView({ triggerOnce: true });
 	useEffect(() => {
 		if (!message.body?.media_id || !selected_device_id) {
 			return;
@@ -112,9 +136,9 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 	};
 
 	return (
-		<ChatMessageWrapper message={message}>
+		<ChatMessageWrapper id={id} ref={ref} message={message}>
 			{!media.loaded ? (
-				<Box width={'100%'} ref={ref}>
+				<Box width={'100%'} ref={inViewRef}>
 					<Center
 						alignItems={'center'}
 						bgColor={'lightgray'}
@@ -182,14 +206,22 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 	);
 };
 
-export const ContactMessage = ({ message }: { message: Message }) => {
+export const ContactMessage = ({
+	message,
+	ref,
+	id,
+}: {
+	message: Message;
+	ref: RefObject<HTMLDivElement>;
+	id: string;
+}) => {
 	const contactDrawerRef = useRef<ContactHandle>(null);
 	return (
 		<Each
 			items={message.body?.contacts ?? []}
 			render={(contact, index) => (
 				<>
-					<ChatMessageWrapper message={message}>
+					<ChatMessageWrapper id={id} ref={ref} message={message}>
 						<Box>
 							<HStack key={index} direction={'column'} gap={2}>
 								<Avatar size={'sm'} name={contact.name?.formatted_name} />
@@ -220,9 +252,17 @@ export const ContactMessage = ({ message }: { message: Message }) => {
 	);
 };
 
-export const UnknownMessage = ({ message }: { message: Message }) => {
+export const UnknownMessage = ({
+	message,
+	ref,
+	id,
+}: {
+	message: Message;
+	ref: RefObject<HTMLDivElement>;
+	id: string;
+}) => {
 	return (
-		<ChatMessageWrapper message={message}>
+		<ChatMessageWrapper id={id} ref={ref} message={message}>
 			<HStack>
 				<Icon as={BiErrorCircle} color={'gray.500'} fontSize={'2rem'} />
 				<Box>
