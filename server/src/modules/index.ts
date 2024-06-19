@@ -1,6 +1,7 @@
 import express from 'express';
 import SessionRoute from './auth/auth.route';
 import ContactsRoute from './contacts/contacts.route';
+import CouponRoute from './coupon/coupon.route';
 import MediaRoute from './media/media.route';
 import MessageRoute from './message/message.route';
 import PaymentRoute from './payment/payment.route';
@@ -23,6 +24,7 @@ const router = express.Router();
 router.use('/sessions', SessionRoute);
 router.use('/contacts', VerifySession, ContactsRoute);
 router.use('/phonebook', VerifySession, PhonebookRoute);
+router.use('/coupon', VerifySession, CouponRoute);
 router.use('/whatsapp-link', VerifySession, WhatsappLinkRoute);
 router.use('/payment', VerifySession, PaymentRoute);
 
