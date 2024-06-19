@@ -1,5 +1,8 @@
 import { Button, FormControl, FormLabel, Input, Stack, Text, useToast } from '@chakra-ui/react';
+import { useRef } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { useDispatch, useSelector } from 'react-redux';
+import { CAPTCHA_KEY } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
 import {
@@ -13,6 +16,7 @@ import {
 } from '../../../store/reducers/UserReducers';
 
 export default function SignupTab() {
+	const recaptchaRef = useRef<ReCAPTCHA>(null);
 	const toast = useToast();
 	const dispatch = useDispatch();
 
@@ -34,7 +38,15 @@ export default function SignupTab() {
 		if (!name) {
 			return dispatch(setError({ message: 'Name is required', type: 'name' }));
 		}
-
+		const token = await recaptchaRef.current?.executeAsync();
+		if (!token) {
+			return toast({
+				title: 'Captcha failed',
+				description: 'Please refresh the page and try again',
+				status: 'error',
+				duration: 3000,
+			});
+		}
 		dispatch(startUserAuthenticating());
 
 		const success = await AuthService.registerUser(name, phone, email, 20);
@@ -143,6 +155,8 @@ export default function SignupTab() {
 						Sign Up
 					</Button>
 				</Stack>
+
+				<ReCAPTCHA ref={recaptchaRef} size='invisible' sitekey={CAPTCHA_KEY} badge='inline' />
 			</Stack>
 		</>
 	);

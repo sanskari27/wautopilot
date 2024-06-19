@@ -1,6 +1,8 @@
 import { Button, FormControl, FormLabel, Input, Stack, Text, useToast } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { useDispatch, useSelector } from 'react-redux';
+import { AUTH_URL, CAPTCHA_KEY } from '../../../config/const';
 import { useGeoLocation } from '../../../hooks/useGeolocation';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
@@ -14,9 +16,9 @@ import {
 	stopUserAuthenticating,
 } from '../../../store/reducers/UserReducers';
 import PasswordInput from './password-input';
-import { AUTH_URL } from '../../../config/const';
 
 function LoginTab() {
+	const recaptchaRef = useRef<ReCAPTCHA>(null);
 	const { location } = useGeoLocation();
 	const toast = useToast();
 	const dispatch = useDispatch();
@@ -33,10 +35,16 @@ function LoginTab() {
 		if (!email) {
 			return dispatch(setError({ message: 'Email is required', type: 'email' }));
 		}
-		const valid = await AuthService.forgotPassword(
-			email,
-			`${AUTH_URL}auth/reset-password`
-		);
+		const token = await recaptchaRef.current?.executeAsync();
+		if (!token) {
+			return toast({
+				title: 'Captcha failed',
+				description: 'Please refresh the page and try again',
+				status: 'error',
+				duration: 3000,
+			});
+		}
+		const valid = await AuthService.forgotPassword(email, `${AUTH_URL}auth/reset-password`);
 		if (valid) {
 			return toast({
 				title: 'Password reset link sent to your email',
@@ -57,6 +65,15 @@ function LoginTab() {
 		}
 		if (!password) {
 			return dispatch(setError({ message: 'Password is required', type: 'password' }));
+		}
+		const token = await recaptchaRef.current?.executeAsync();
+		if (!token) {
+			return toast({
+				title: 'Captcha failed',
+				description: 'Please refresh the page and try again',
+				status: 'error',
+				duration: 3000,
+			});
 		}
 		dispatch(startUserAuthenticating());
 		const valid = await AuthService.login(
@@ -135,6 +152,7 @@ function LoginTab() {
 						forgot password?
 					</Text>
 				</Stack>
+				<ReCAPTCHA ref={recaptchaRef} size='invisible' sitekey={CAPTCHA_KEY} badge='inline' />
 			</Stack>
 		</>
 	);

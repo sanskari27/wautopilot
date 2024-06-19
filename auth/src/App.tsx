@@ -6,7 +6,7 @@ import { NAVIGATION } from './config/const';
 import { Flex } from '@chakra-ui/react';
 
 const ResetPassword = lazy(() => import('./views/pages/reset-password'));
-const LoginPopup = lazy(() => import('./views/components/loginPopup'));
+const LoginPopup = lazy(() => import('./views/pages/login-page'));
 
 function App() {
 	return (

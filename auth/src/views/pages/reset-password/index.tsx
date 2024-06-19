@@ -25,7 +25,7 @@ import {
 	startResettingPassword,
 	stopResettingPassword,
 } from '../../../store/reducers/UserReducers';
-import PasswordInput from '../../components/loginPopup/password-input';
+import PasswordInput from '../login-page/password-input';
 
 const ResetPassword = () => {
 	const [isOpen, setIsOpen] = useBoolean(true);
