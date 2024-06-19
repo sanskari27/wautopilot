@@ -336,7 +336,6 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 	if (!recipient) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
-
 	const msgObj = {
 		messaging_product: 'whatsapp',
 		to: recipient,

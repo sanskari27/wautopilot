@@ -19,7 +19,7 @@ import {
 	useBoolean,
 	useToast,
 } from '@chakra-ui/react';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
@@ -125,6 +125,10 @@ const SettingsDrawer = forwardRef<SettingsDrawerHandle>((_, ref) => {
 				});
 			});
 	};
+
+	useEffect(() => {
+		AuthService.userDetails().then((user) => user && dispatch(setUserDetails(user)));
+	}, [dispatch]);
 
 	return (
 		<>

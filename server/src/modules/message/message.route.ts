@@ -33,7 +33,7 @@ router
 	.post(Controller.sendMessageToConversation);
 
 router
-	.route('/message/:id/assign_labels')
+	.route('/message/:id/assign-labels')
 	.all(IDValidator, LabelValidator)
 	.post(Controller.assignLabelToMessage);
 router.route('/mark-read/:message_id').post(Controller.markRead);

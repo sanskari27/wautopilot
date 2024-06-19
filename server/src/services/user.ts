@@ -212,6 +212,7 @@ export default class UserService {
 		if (numberOfMessages <= 0) {
 			return;
 		}
+
 		this._account.walletBalance -= this._account.markupPrice * numberOfMessages;
 		await AccountDB.updateOne(
 			{
@@ -219,7 +220,7 @@ export default class UserService {
 			},
 			{
 				$inc: {
-					walletBalance: -(this._account.markupPrice * numberOfMessages),
+					walletBalance: -1 * (this._account.markupPrice * numberOfMessages),
 				},
 			}
 		);
