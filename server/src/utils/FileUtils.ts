@@ -1,5 +1,5 @@
 import fs from 'fs';
-import mime from 'mime';
+import mime from 'mime-types';
 
 const moveFile = (from: string, to: string) => {
 	try {
@@ -61,10 +61,10 @@ async function writeFile(path: string, data: string) {
 }
 
 function getMimeType(path: string) {
-	return mime.getType(path);
+	return mime.lookup(path);
 }
 function getExt(mime_type: string) {
-	return mime.getExtension(mime_type);
+	return mime.extension(mime_type);
 }
 
 export default {
