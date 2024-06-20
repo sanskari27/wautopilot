@@ -83,12 +83,16 @@ const ChatMessageWrapper = ({
 							as={Button}
 							variant={'unstyled'}
 							height={'15px'}
-							leftIcon={<ChevronDownIcon />}
+							leftIcon={
+								<ChevronDownIcon
+									className={`${
+										isMe ? '!text-white' : '!text-[#dcf8c6]'
+									} group-hover:!text-black transition-none`}
+								/>
+							}
 							textAlign={'right'}
-							className='group-hover:!block group-focus:!block !hidden'
 							position={'absolute'}
 							right={'0'}
-							zIndex={10000}
 						/>
 						<MenuList>
 							<MenuItem
@@ -97,6 +101,7 @@ const ChatMessageWrapper = ({
 								Assign Labels
 							</MenuItem>
 						</MenuList>
+						<AssignMessageLabelsDialog ref={assignMessageLabelsRef} />
 					</Menu>
 					{children}
 					{message.buttons.length > 0 && (
@@ -150,7 +155,6 @@ const ChatMessageWrapper = ({
 					) : null}
 				</Flex>
 			</Flex>
-			<AssignMessageLabelsDialog ref={assignMessageLabelsRef} />
 		</>
 	);
 };
