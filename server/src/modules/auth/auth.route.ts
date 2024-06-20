@@ -1,5 +1,6 @@
 import express from 'express';
-import { VerifySession } from '../../middleware';
+import { UserLevel } from '../../config/const';
+import { IDValidator, VerifyMinLevel, VerifySession } from '../../middleware';
 import Controller from './auth.controller';
 import {
 	LoginAccountValidator,
@@ -12,6 +13,10 @@ const router = express.Router();
 
 router.route('/validate-auth').all(VerifySession).get(Controller.validateAuth);
 router.route('/details').all(VerifySession).get(Controller.details);
+router
+	.route('/service-account/:id')
+	.all(VerifySession, VerifyMinLevel(UserLevel.Master), IDValidator)
+	.post(Controller.switchAccount);
 
 router.route('/login').all(LoginAccountValidator).post(Controller.login);
 router.route('/register').all(RegisterAccountValidator).post(Controller.register);

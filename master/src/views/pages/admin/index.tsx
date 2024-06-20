@@ -15,10 +15,11 @@ import {
 	Thead,
 	Tr,
 	useBoolean,
+	useToast,
 } from '@chakra-ui/react';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AUTH_URL } from '../../../config/const';
+import { ADMIN_URL, AUTH_URL } from '../../../config/const';
 import useFilteredList from '../../../hooks/useFilteredList';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
@@ -132,8 +133,23 @@ type AdminContextMenuProps = {
 };
 
 const AdminContextMenu = ({ admin }: AdminContextMenuProps) => {
+	const toast = useToast();
 	const extendExpiryRef = useRef<ExtendExpiryModalHandle>(null);
 	const upgradePlanRef = useRef<UpgradePlanDialogHandle>(null);
+
+	const openServiceAccount = async () => {
+		const status = await AuthService.serviceAccount(admin.id);
+		if (status) {
+			window.location.href = ADMIN_URL;
+		} else {
+			toast({
+				title: 'Unable to switch account.',
+				description: 'Please try again later.',
+				status: 'error',
+			});
+		}
+	};
+
 	return (
 		<>
 			<Menu>
@@ -147,6 +163,7 @@ const AdminContextMenu = ({ admin }: AdminContextMenuProps) => {
 						</MenuItem>
 					)}
 					<MenuItem onClick={() => upgradePlanRef.current?.open(admin)}>Upgrade Plan</MenuItem>
+					<MenuItem onClick={openServiceAccount}>Service Account</MenuItem>
 				</MenuList>
 			</Menu>
 			<ExtendExpiryModal ref={extendExpiryRef} />

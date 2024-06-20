@@ -48,6 +48,33 @@ async function login(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function switchAccount(req: Request, res: Response, next: NextFunction) {
+	const { id } = req.locals;
+
+	try {
+		const { authToken, refreshToken } = await UserService.loginById(id);
+
+		setCookie(res, {
+			key: Cookie.Auth,
+			value: authToken,
+			expires: JWT_EXPIRE_TIME,
+		});
+
+		setCookie(res, {
+			key: Cookie.Refresh,
+			value: refreshToken,
+			expires: SESSION_EXPIRE_TIME,
+		});
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR));
+	}
+}
+
 async function forgotPassword(req: Request, res: Response, next: NextFunction) {
 	const { email, callbackURL } = req.locals.data as ResetPasswordValidationResult;
 
@@ -142,6 +169,7 @@ async function logout(req: Request, res: Response, next: NextFunction) {
 const Controller = {
 	validateAuth,
 	login,
+	switchAccount,
 	forgotPassword,
 	resetPassword,
 	register,

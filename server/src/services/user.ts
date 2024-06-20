@@ -59,6 +59,21 @@ export default class UserService {
 		};
 	}
 
+	static async loginById(id: Types.ObjectId) {
+		const user = await AccountDB.findById(id);
+		if (user === null) {
+			throw new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR);
+		}
+
+		const session = await SessionService.createSession(user._id, {});
+
+		return {
+			authToken: session.authToken,
+			refreshToken: session.refreshToken,
+			userService: new UserService(user),
+		};
+	}
+
 	getUser() {
 		return this._account;
 	}
