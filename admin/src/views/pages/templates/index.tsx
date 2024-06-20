@@ -13,6 +13,7 @@ import {
 	Th,
 	Thead,
 	Tr,
+	useToast,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
 import { BiPlus } from 'react-icons/bi';
@@ -21,7 +22,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
 import TemplateService from '../../../services/template.service';
 import { StoreNames, StoreState } from '../../../store';
-import { setTemplateFetching, setTemplatesList } from '../../../store/reducers/TemplateReducer';
+import { setTemplatesList } from '../../../store/reducers/TemplateReducer';
 import { Template } from '../../../store/types/TemplateState';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import Each from '../../components/utils/Each';
@@ -30,6 +31,7 @@ export default function Templates() {
 	const confirmationAlertDialogRef = useRef<DeleteAlertHandle>(null);
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const toast = useToast();
 
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const {
@@ -46,13 +48,15 @@ export default function Templates() {
 
 		if (!record) return;
 
-		TemplateService.removeTemplate(selected_device_id, record.id, record.name).then((res) => {
-			if (!res) return;
-			dispatch(setTemplateFetching(true));
-			TemplateService.listTemplates(selected_device_id).then((templates) => {
-				dispatch(setTemplateFetching(false));
-				dispatch(setTemplatesList(templates));
-			});
+		toast.promise(TemplateService.removeTemplate(selected_device_id, record.id, record.name), {
+			loading: { title: 'Removing Template' },
+			success: () => {
+				TemplateService.listTemplates(selected_device_id).then((templates) => {
+					dispatch(setTemplatesList(templates));
+				});
+				return { title: 'Template removed successfully.', description: 'Updating list...' };
+			},
+			error: { title: 'Failed to remove template' },
 		});
 	};
 

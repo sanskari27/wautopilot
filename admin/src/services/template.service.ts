@@ -35,15 +35,10 @@ export default class TemplateService {
 	}
 
 	static async removeTemplate(device_id: string, id: string, name: string) {
-		try {
-			await APIInstance.post(`/template/${device_id}/delete-template`, {
-				id,
-				name,
-			});
-			return true;
-		} catch (err) {
-			return false;
-		}
+		await APIInstance.post(`/template/${device_id}/delete-template`, {
+			id,
+			name,
+		});
 	}
 
 	static async addTemplate(device_id: string, template: Record<string, unknown>) {

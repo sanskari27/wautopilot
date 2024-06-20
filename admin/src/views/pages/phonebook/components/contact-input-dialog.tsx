@@ -170,9 +170,9 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 				<DrawerBody>
 					<VStack width={'full'} alignItems={'stretch'} gap={4}>
 						<Box>
-							<Text>Salutation</Text>
+							<Text>Prefix</Text>
 							<Input
-								placeholder='Salutation'
+								placeholder='Mr. Mrs. Dr. etc.'
 								type='text'
 								onChange={(e) => dispatch(setSalutation(e.target.value))}
 								value={salutation ?? ''}

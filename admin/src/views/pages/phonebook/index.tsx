@@ -183,7 +183,7 @@ export default function Phonebook() {
 									assignLabelDialog.current?.open();
 								}}
 							>
-								Assign Label
+								Assign Tags
 							</Button>
 						</>
 					) : (
@@ -252,7 +252,7 @@ export default function Phonebook() {
 					<Thead>
 						<Tr>
 							<Th>S.No.</Th>
-							<Th>Salutation</Th>
+							<Th>Prefix</Th>
 							<Th>Name</Th>
 							<Th>Email</Th>
 							<Th>Birthday</Th>

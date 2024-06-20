@@ -78,7 +78,7 @@ const AssignLabelDialog = forwardRef<AssignLabelDialogHandle>((_, ref) => {
 		<Modal isOpen={isOpen} onClose={onClose} size={'2xl'} scrollBehavior='inside'>
 			<ModalOverlay />
 			<ModalContent>
-				<ModalHeader>Bulk Assign Labels</ModalHeader>
+				<ModalHeader>Bulk Assign Tags</ModalHeader>
 				<ModalBody pb={6}>
 					<FormControl pt={'1rem'}>
 						<FormLabel>Tags</FormLabel>

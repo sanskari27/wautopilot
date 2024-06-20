@@ -267,7 +267,15 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 		}
 
 		const phoneBookService = new PhoneBookService(req.locals.account);
-		const created = await phoneBookService.addRecords(parsed_csv);
+		const data = parsed_csv.map((record) => {
+			const { prefix, tags, ...rest } = record;
+			return {
+				...rest,
+				salutation: prefix,
+				labels: tags.split(','),
+			};
+		});
+		const created = await phoneBookService.addRecords(data);
 
 		const ids = created.map((record) => idValidator(record.id)[1]!);
 		await phoneBookService.setLabels(ids, labels);

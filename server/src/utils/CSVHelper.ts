@@ -2,8 +2,12 @@ import { Parser } from 'json2csv';
 export default class CSVHelper {
 	static exportPhonebook(records: { [key: string]: string }[]) {
 		const allKeys = [...new Set(records.flatMap((record) => Object.keys(record)))];
-		const keysWithoutLabel = allKeys.filter((key) => key !== 'labels');
+		const keysWithoutLabel = allKeys.filter((key) => key !== 'labels' && key !== 'salutation');
 		const keysWithTags = [
+			{
+				value: 'salutation',
+				label: 'prefix',
+			},
 			...keysWithoutLabel.map((key) => ({
 				value: key,
 				label: key,
