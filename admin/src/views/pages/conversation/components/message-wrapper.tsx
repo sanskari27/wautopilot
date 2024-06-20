@@ -110,6 +110,7 @@ const ChatMessageWrapper = ({
 											colorScheme='green'
 											cursor={'pointer'}
 											textAlign={'center'}
+											py={'0.5rem'}
 											leftIcon={
 												<Icon
 													as={
@@ -123,6 +124,8 @@ const ChatMessageWrapper = ({
 													}
 												/>
 											}
+											whiteSpace={'pre-wrap'}
+											height={'max-content'}
 										>
 											{button.button_content}
 										</Button>
