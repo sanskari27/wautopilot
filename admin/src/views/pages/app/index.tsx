@@ -2,6 +2,7 @@ import { Box, useBoolean } from '@chakra-ui/react';
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useOutlet } from 'react-router-dom';
+import APIInstance from '../../../config/APIInstance';
 import { AUTH_URL, NAVIGATION } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
 import DeviceService from '../../../services/device.service';
@@ -9,6 +10,7 @@ import MediaService from '../../../services/media.service';
 import MessagesService from '../../../services/messages.service';
 import TemplateService from '../../../services/template.service';
 import { StoreNames, StoreState } from '../../../store';
+import { setContactList } from '../../../store/reducers/ContactReducer';
 import {
 	setDevicesList,
 	startDeviceLoading,
@@ -22,6 +24,7 @@ import {
 	setSelectedDeviceId,
 	setUserDetails,
 } from '../../../store/reducers/UserReducers';
+import { Contact } from '../../../store/types/ContactState';
 import AppNavbar from '../../components/navbar/AppNavbar';
 import NavigationDrawer from '../../components/navbar/NavigationDrawer';
 
@@ -57,12 +60,14 @@ const AppPage = () => {
 					MessagesService.fetchAllConversation(selected_device_id),
 					MediaService.getMedias(selected_device_id),
 					TemplateService.listTemplates(selected_device_id),
+					APIInstance.get(`/contacts`),
 				];
 
 				const results = await Promise.all(promises);
 				dispatch(setRecipientsList(results[0]));
 				dispatch(setMediaList(results[1]));
 				dispatch(setTemplatesList(results[2]));
+				dispatch(setContactList(results[3].data.contacts as Contact[]));
 			} catch (e) {
 				return;
 			}
