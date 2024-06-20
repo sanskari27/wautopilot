@@ -70,6 +70,7 @@ export default class BroadcastService extends WhatsappLinkService {
 					_id: '$_id', // Group by the campaign ID
 					name: { $first: '$name' },
 					description: { $first: '$description' },
+					template_name: { $first: '$template_name' },
 					status: { $first: '$status' },
 					startTime: { $first: '$startTime' },
 					endTime: { $first: '$endTime' },
@@ -97,7 +98,7 @@ export default class BroadcastService extends WhatsappLinkService {
 						$sum: {
 							$cond: {
 								if: {
-									$and: [
+									$or: [
 										{ $eq: ['$messagesInfo.status', MESSAGE_STATUS.PROCESSING] },
 										{ $eq: ['$messagesInfo.status', MESSAGE_STATUS.PENDING] },
 									],
@@ -115,6 +116,7 @@ export default class BroadcastService extends WhatsappLinkService {
 					_id: 0,
 					name: 1,
 					description: 1,
+					template_name: 1,
 					status: 1,
 					sent: 1,
 					failed: 1,
@@ -135,6 +137,7 @@ export default class BroadcastService extends WhatsappLinkService {
 				broadcast_id: message.broadcast_id as string,
 				name: message.name as string,
 				description: message.description as string,
+				template_name: message.template_name as string,
 				status: message.status as string,
 				sent: message.sent as number,
 				failed: message.failed as number,
@@ -196,18 +199,19 @@ export default class BroadcastService extends WhatsappLinkService {
 			},
 		]);
 
-		return messages as {
-			to: string;
-			status: string;
-			sendAt: string;
-			text: string;
-			template_name: string;
-			sent_at: string;
-			read_at: string;
-			delivered_at: string;
-			failed_at: string;
-			failed_reason: string;
-		}[];
+		return messages.map((message) => ({
+			to: message.to as string,
+			status: message.status as string,
+			sendAt: DateUtils.format(message.sendAt, 'DD-MM-YYYY HH:mm') as string,
+			text: message.text as string,
+			template_name: message.template_name as string,
+			sent_at: DateUtils.format(message.sent_at, 'DD-MM-YYYY HH:mm') as string,
+			read_at: DateUtils.format(message.read_at, 'DD-MM-YYYY HH:mm') as string,
+			delivered_at: DateUtils.format(message.delivered_at, 'DD-MM-YYYY HH:mm') as string,
+			failed_at: DateUtils.format(message.failed_at, 'DD-MM-YYYY HH:mm') as string,
+			failed_reason: message.failed_reason as string,
+			description: broadcast.description as string,
+		}));
 	}
 
 	public async startBroadcast(

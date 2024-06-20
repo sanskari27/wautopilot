@@ -16,7 +16,6 @@ import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
 import {
-	setAvailableCoupon,
 	setCouponCode,
 	setCouponPerUser,
 	setDiscountAmount,
@@ -40,7 +39,6 @@ const CouponInputDrawer = forwardRef(({ onConfirm }: { onConfirm: () => void }, 
 
 	const {
 		couponDetails: {
-			availableCoupon,
 			couponCode,
 			couponPerUser,
 			discountAmount,
@@ -86,15 +84,6 @@ const CouponInputDrawer = forwardRef(({ onConfirm }: { onConfirm: () => void }, 
 				setError({
 					type: 'COUPON_CODE',
 					message: 'Coupon code is required',
-				})
-			);
-			return;
-		}
-		if (availableCoupon <= 0) {
-			dispatch(
-				setError({
-					type: 'AVAILABLE_COUPON',
-					message: 'Available coupon is required',
 				})
 			);
 			return;
@@ -161,19 +150,11 @@ const CouponInputDrawer = forwardRef(({ onConfirm }: { onConfirm: () => void }, 
 							placeholder='Enter coupon code'
 						/>
 					</FormControl>
-					<FormControl mt={'0.5rem'} isInvalid={error.type === 'AVAILABLE_COUPON'}>
-						<FormLabel mb={0}>Available Coupon</FormLabel>
-						<Input
-							type={'number'}
-							value={availableCoupon}
-							onChange={(e) => dispatch(setAvailableCoupon(e.target.value))}
-						/>
-					</FormControl>
 					<FormControl mt={'0.5rem'} isInvalid={error.type === 'TOTAL_COUPONS'}>
 						<FormLabel mb={0}>Total Coupon</FormLabel>
 						<Input
 							type={'number'}
-							value={totalCoupons}
+							value={totalCoupons.toString()}
 							onChange={(e) => dispatch(setTotalCoupons(e.target.value))}
 						/>
 					</FormControl>
@@ -181,7 +162,7 @@ const CouponInputDrawer = forwardRef(({ onConfirm }: { onConfirm: () => void }, 
 						<FormLabel mb={0}>Count Per User</FormLabel>
 						<Input
 							type={'number'}
-							value={couponPerUser}
+							value={couponPerUser.toString()}
 							onChange={(e) => dispatch(setCouponPerUser(e.target.value))}
 						/>
 					</FormControl>
@@ -200,7 +181,7 @@ const CouponInputDrawer = forwardRef(({ onConfirm }: { onConfirm: () => void }, 
 							<FormLabel mb={0}>Discount Amount</FormLabel>
 							<Input
 								type={'number'}
-								value={discountAmount}
+								value={discountAmount.toString()}
 								onChange={(e) => dispatch(setDiscountAmount(e.target.value))}
 							/>
 						</FormControl>
@@ -209,7 +190,7 @@ const CouponInputDrawer = forwardRef(({ onConfirm }: { onConfirm: () => void }, 
 							<FormLabel mb={0}>Discount Percentage</FormLabel>
 							<Input
 								type={'number'}
-								value={discountPercentage}
+								value={discountPercentage.toString()}
 								onChange={(e) => dispatch(setDiscountPercentage(e.target.value))}
 							/>
 						</FormControl>

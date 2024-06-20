@@ -20,6 +20,7 @@ import { PLANS } from '../../../config/const';
 import AdminsService from '../../../services/admin.service';
 import { setAdminExpiry } from '../../../store/reducers/AdminReducer';
 import { Admin } from '../../../store/types/AdminState';
+import Each from '../utils/Each';
 
 export type UpgradePlanDialogHandle = {
 	open: (admin: Admin) => void;
@@ -102,9 +103,10 @@ const UpgradePlanDialog = forwardRef<UpgradePlanDialogHandle>((_, ref) => {
 						<FormLabel>Upgrade Plan</FormLabel>
 						<Select value={plan} onChange={handlePlanChange}>
 							<option value={'remove'}>Remove plan</option>
-							{PLANS.map((plan) => (
-								<option value={plan._id}>{plan.plan_name}</option>
-							))}
+							<Each
+								items={PLANS}
+								render={(plan) => <option value={plan._id}>{plan.plan_name}</option>}
+							/>
 						</Select>
 					</FormControl>
 					{plan !== 'remove' && (

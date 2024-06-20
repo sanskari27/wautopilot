@@ -85,7 +85,7 @@ export default class UserService {
 			phone: this._account.phone,
 			isSubscribed,
 			subscription_expiry,
-			walletBalance: this._account.walletBalance,
+			walletBalance: this._account.walletBalance.toFixed(2),
 			no_of_devices,
 		};
 	}

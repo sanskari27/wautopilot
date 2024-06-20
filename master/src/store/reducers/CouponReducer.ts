@@ -66,19 +66,23 @@ const Slice = createSlice({
 			state.couponDetails.availableCoupon = parseInt(action.payload);
 		},
 		setCouponPerUser: (state, action: PayloadAction<string>) => {
-			state.couponDetails.couponPerUser = parseInt(action.payload);
+			if (isNaN(Number(action.payload))) return;
+			state.couponDetails.couponPerUser = Number(action.payload);
 		},
 		setDiscountAmount: (state, action: PayloadAction<string>) => {
-			state.couponDetails.discountAmount = parseInt(action.payload);
+			if (isNaN(Number(action.payload))) return;
+			state.couponDetails.discountAmount = Number(action.payload);
 		},
 		setDiscountPercentage: (state, action: PayloadAction<string>) => {
-			state.couponDetails.discountPercentage = parseInt(action.payload);
+			if (isNaN(Number(action.payload))) return;
+			state.couponDetails.discountPercentage = Number(action.payload);
 		},
 		setDiscountType: (state, action: PayloadAction<'amount' | 'percentage'>) => {
 			state.couponDetails.discountType = action.payload;
 		},
 		setTotalCoupons: (state, action: PayloadAction<string>) => {
-			state.couponDetails.totalCoupons = parseInt(action.payload);
+			if (isNaN(Number(action.payload))) return;
+			state.couponDetails.totalCoupons = Number(action.payload);
 		},
 		setSaving: (state, action: PayloadAction<boolean>) => {
 			state.uiDetails.isSaving = action.payload;

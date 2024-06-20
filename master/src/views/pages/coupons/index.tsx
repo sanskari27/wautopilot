@@ -45,7 +45,6 @@ export default function Coupons() {
 		selectedCouponId,
 		couponDetails: {
 			couponCode,
-			availableCoupon,
 			couponPerUser,
 			discountAmount,
 			discountPercentage,
@@ -86,7 +85,6 @@ export default function Coupons() {
 		dispatch(setCouponSaving(true));
 		const details = {
 			code: couponCode,
-			available_coupon: availableCoupon,
 			count_per_user: couponPerUser,
 			discount_amount: discountAmount,
 			discount_percentage: discountPercentage,

@@ -34,10 +34,8 @@ export default interface IContact extends Document {
 	phones: {
 		phone: string;
 		wa_id: string;
-		type: string;
 	}[];
 	urls: {
 		url: string;
-		type: string;
 	}[];
 }

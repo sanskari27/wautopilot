@@ -35,15 +35,7 @@ function LoginTab() {
 		if (!email) {
 			return dispatch(setError({ message: 'Email is required', type: 'email' }));
 		}
-		const token = await recaptchaRef.current?.executeAsync();
-		if (!token) {
-			return toast({
-				title: 'Captcha failed',
-				description: 'Please refresh the page and try again',
-				status: 'error',
-				duration: 3000,
-			});
-		}
+		await recaptchaRef.current?.execute();
 		const valid = await AuthService.forgotPassword(email, `${AUTH_URL}auth/reset-password`);
 		if (valid) {
 			return toast({
@@ -66,15 +58,8 @@ function LoginTab() {
 		if (!password) {
 			return dispatch(setError({ message: 'Password is required', type: 'password' }));
 		}
-		const token = await recaptchaRef.current?.executeAsync();
-		if (!token) {
-			return toast({
-				title: 'Captcha failed',
-				description: 'Please refresh the page and try again',
-				status: 'error',
-				duration: 3000,
-			});
-		}
+		await recaptchaRef.current?.execute();
+
 		dispatch(startUserAuthenticating());
 		const valid = await AuthService.login(
 			email,

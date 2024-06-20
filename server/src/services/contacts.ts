@@ -13,6 +13,8 @@ function processContactDocs(docs: IContact[]) {
 		addresses: doc.addresses ?? [],
 		birthday: doc.birthday ?? '',
 		emails: doc.emails ?? [],
+		phones: doc.phones ?? [],
+		urls: doc.urls ?? [],
 		name: {
 			formatted_name: doc.name.formatted_name ?? '',
 			first_name: doc.name.first_name ?? '',
