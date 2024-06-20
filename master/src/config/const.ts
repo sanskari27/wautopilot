@@ -1,4 +1,4 @@
-import { RiAdminFill } from 'react-icons/ri';
+import { RiAdminFill, RiCoupon2Fill } from 'react-icons/ri';
 
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 export const WEBPAGE_URL = import.meta.env.VITE_WEBPAGE_URL;
@@ -54,6 +54,16 @@ export const PLANS = [
 		no_of_agents: 2,
 		no_of_devices: 5,
 	},
+	{
+		_id: '666aea42531f14911cb79893',
+		plan_name: 'Silver 3 @ Year',
+		plan_description: 'Silver Plan 3 Year',
+		plan_price: 50000,
+		plan_duration: 336,
+		no_of_agents: 2,
+		no_of_devices: 5,
+		__v: 0,
+	},
 ];
 
 export const NAVIGATION = {
@@ -74,6 +84,7 @@ export const NAVIGATION = {
 	MEDIA: 'media',
 
 	ADMINS: '/admins',
+	COUPONS: '/coupons',
 };
 
 export const MenuItems = [
@@ -86,6 +97,11 @@ export const MenuItems = [
 		icon: RiAdminFill,
 		route: NAVIGATION.ADMINS,
 		title: 'Admins',
+	},
+	{
+		icon: RiCoupon2Fill,
+		route: NAVIGATION.COUPONS,
+		title: 'Coupons',
 	},
 ];
 

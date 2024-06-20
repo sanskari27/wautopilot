@@ -4,6 +4,7 @@ import { StoreNames } from './config';
 import AdminReducer from './reducers/AdminReducer';
 import { default as BroadcastReducer } from './reducers/BroadcastReducer';
 import ContactReducer from './reducers/ContactReducer';
+import CouponReducer from './reducers/CouponReducer';
 import DevicesReducers from './reducers/DevicesReducers';
 import { default as MediaReducer } from './reducers/MediaReducer';
 import MessagesReducers from './reducers/MessagesReducers';
@@ -24,6 +25,7 @@ const store = configureStore({
 		[StoreNames.MESSAGES]: MessagesReducers,
 		[StoreNames.CONTACT]: ContactReducer,
 		[StoreNames.ADMIN]: AdminReducer,
+		[StoreNames.COUPON]: CouponReducer,
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({

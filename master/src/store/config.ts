@@ -9,4 +9,5 @@ export enum StoreNames {
 	RECIPIENT = 'recipient',
 	MESSAGES = 'messages',
 	CONTACT = 'contact',
+	COUPON = 'coupon',
 }

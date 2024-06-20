@@ -7,12 +7,15 @@ import { Box, Flex, Progress, useBoolean } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
 import AdminsService from './services/admin.service';
 import AuthService from './services/auth.service';
+import CouponService from './services/coupon.service';
 import { listAdmins, setAdminLoading } from './store/reducers/AdminReducer';
+import { setCouponFetching, setCouponList } from './store/reducers/CouponReducer';
 import { setIsAuthenticated } from './store/reducers/UserReducers';
 import AppNavbar from './views/components/navbar/AppNavbar';
 import NavigationDrawer from './views/components/navbar/NavigationDrawer';
 
 const AdminPage = lazy(() => import('./views/pages/admin'));
+const CouponPage = lazy(() => import('./views/pages/coupons'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -27,6 +30,11 @@ function App() {
 				dispatch(listAdmins(res));
 			})
 			.finally(() => dispatch(setAdminLoading(false)));
+		CouponService.listCoupons()
+			.then((res) => {
+				dispatch(setCouponList(res));
+			})
+			.finally(() => dispatch(setCouponFetching(false)));
 	}, [dispatch]);
 
 	return (
@@ -41,6 +49,7 @@ function App() {
 					<Suspense fallback={<Loading />}>
 						<Routes>
 							<Route path={NAVIGATION.ADMINS} element={<AdminPage />} />
+							<Route path={NAVIGATION.COUPONS} element={<CouponPage />} />
 							<Route path='*' element={<Navigate to={NAVIGATION.ADMINS} />} />
 						</Routes>
 					</Suspense>
