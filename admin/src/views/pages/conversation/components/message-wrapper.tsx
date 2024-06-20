@@ -30,10 +30,11 @@ import { BiCheckDouble, BiLink } from 'react-icons/bi';
 import { CgTimer } from 'react-icons/cg';
 import { FaReply } from 'react-icons/fa';
 import { IoCall } from 'react-icons/io5';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import useFilterLabels from '../../../../hooks/useFilterLabels';
 import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
+import { setNewMessageLabels } from '../../../../store/reducers/MessagesReducers';
 import { Message } from '../../../../store/types/MessageState';
 import LabelFilter from '../../../components/labelFilter';
 import Each from '../../../components/utils/Each';
@@ -90,7 +91,9 @@ const ChatMessageWrapper = ({
 							zIndex={10000}
 						/>
 						<MenuList>
-							<MenuItem onClick={() => assignMessageLabelsRef.current?.onOpen(message._id)}>
+							<MenuItem
+								onClick={() => assignMessageLabelsRef.current?.onOpen(message._id, message.labels)}
+							>
 								Assign Labels
 							</MenuItem>
 						</MenuList>
@@ -169,13 +172,14 @@ const FormatTime = ({ time }: { time: string }) => {
 };
 
 type AssignMessageLabelsHandle = {
-	onOpen: (messageId: string) => void;
+	onOpen: (messageId: string, labels: string[]) => void;
 	onClose: () => void;
 };
 
 const AssignMessageLabelsDialog = forwardRef<AssignMessageLabelsHandle>((_, ref) => {
-	const { isOpen, onOpen, onClose } = useDisclosure();
 	const toast = useToast();
+	const dispatch = useDispatch();
+	const { isOpen, onOpen, onClose } = useDisclosure();
 	const { messageLabels } = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const [messageId, setMessageId] = useState<string>('');
@@ -186,8 +190,9 @@ const AssignMessageLabelsDialog = forwardRef<AssignMessageLabelsHandle>((_, ref)
 	const { onAddLabel, onRemoveLabel, selectedLabels } = useFilterLabels();
 
 	useImperativeHandle(ref, () => ({
-		onOpen: (messageId: string) => {
+		onOpen: (messageId: string, labels: string[]) => {
 			setMessageId(messageId);
+			setLabels(labels);
 			onOpen();
 		},
 		onClose: () => {
@@ -198,9 +203,9 @@ const AssignMessageLabelsDialog = forwardRef<AssignMessageLabelsHandle>((_, ref)
 	const handleLabelChange = (label: string) => {
 		onAddLabel(label);
 		setLabels((prev) => {
+			if (prev.includes(label)) return prev;
 			return [...prev, label];
 		});
-		setNewLabels('');
 	};
 
 	const handleRemoveTags = (labels: string) => {
@@ -220,14 +225,15 @@ const AssignMessageLabelsDialog = forwardRef<AssignMessageLabelsHandle>((_, ref)
 	const handleSave = () => {
 		if (newLabels !== '') {
 			newLabels.split(',').forEach((label) => {
-				if (!labels.includes(label.trim())) {
-					labels.push(label.trim());
-				}
+				handleLabelChange(label);
 			});
 		} // TODO: add handle Text input for labels managed via array jut like phonebook
 
 		toast.promise(MessagesService.assignMessageLabels(selected_device_id, messageId, labels), {
 			success: (res) => {
+				if (res) {
+					dispatch(setNewMessageLabels({ messageId, labels }));
+				}
 				handleClose();
 				return {
 					title: res ? 'Labels assigned successfully' : 'Failed to assign labels',
@@ -238,6 +244,18 @@ const AssignMessageLabelsDialog = forwardRef<AssignMessageLabelsHandle>((_, ref)
 			loading: { title: 'Assigning labels...' },
 			error: { title: 'Failed to assign labels' },
 		});
+	};
+
+	const handleNewLabelInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setNewLabels(e.target.value);
+		const new_label = e.target.value;
+		if (new_label.includes(' ')) {
+			const label = new_label.split(' ')[0];
+			if (!labels.includes(label) && label.trim().length !== 0) {
+				setLabels((prev) => [...prev, label]);
+			}
+			setNewLabels('');
+		}
 	};
 
 	return (
@@ -266,7 +284,7 @@ const AssignMessageLabelsDialog = forwardRef<AssignMessageLabelsHandle>((_, ref)
 							placeholder='Assign new labels'
 							type='text'
 							value={newLabels}
-							onChange={(e) => setNewLabels(e.target.value)}
+							onChange={handleNewLabelInput}
 						/>
 						<LabelFilter
 							onClear={() => setLabels([])}

@@ -70,13 +70,11 @@ const Conversation = () => {
 	const handleAddRecipientLabel = (label: string) => {
 		onAddLabel(label);
 		dispatch(setLabelFilter(selectedLabels));
-		console.log(selectedLabels);
 	};
 
 	const handleRemoveRecipientLabel = (label: string) => {
 		onRemoveLabel(label);
 		dispatch(setLabelFilter(selectedLabels));
-		console.log(selectedLabels);
 	};
 
 	useEffect(() => {

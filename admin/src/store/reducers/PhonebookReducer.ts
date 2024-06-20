@@ -86,8 +86,6 @@ const Slice = createSlice({
 			state.details.middle_name = action.payload;
 		},
 		setPhoneNumber: (state, action: PayloadAction<string>) => {
-			//condition to input only number to state
-			console.log(isNaN(Number(action.payload)));
 			if (isNaN(Number(action.payload))) {
 				return;
 			}

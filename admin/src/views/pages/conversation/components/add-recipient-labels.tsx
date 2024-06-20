@@ -116,7 +116,7 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 					selected_recipient.labels.push(label.trim());
 				}
 			});
-		} // TODO: add handle Text input for labels managed via array jut like phonebook 
+		} // TODO: add handle Text input for labels managed via array jut like phonebook
 
 		// if (selected_recipient.labels.length === 0) {
 		// 	toast({
@@ -164,6 +164,23 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 			});
 	};
 
+	const handleNewLabelInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setNewLabel(e.target.value);
+		const new_label = e.target.value;
+		if (new_label.includes(' ')) {
+			const label = new_label.split(' ')[0];
+			if (!selected_recipient.labels.includes(label) && label.trim().length !== 0) {
+				setSelectedRecipient((prev) => {
+					return {
+						...prev,
+						labels: [...prev.labels, label],
+					};
+				});
+			}
+			setNewLabel('');
+		}
+	};
+
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} size={'2xl'} closeOnOverlayClick={false}>
 			<ModalOverlay />
@@ -196,7 +213,7 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 								type='text'
 								placeholder='Add new label'
 								value={newLabel}
-								onChange={(e) => setNewLabel(e.target.value)}
+								onChange={handleNewLabelInput}
 							/>
 							<LabelFilter
 								labels={all_labels}

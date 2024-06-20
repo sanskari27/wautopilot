@@ -108,6 +108,21 @@ const Slice = createSlice({
 		setMessageLabels: (state, action: PayloadAction<string[]>) => {
 			state.messageLabels = action.payload;
 		},
+
+		setNewMessageLabels: (
+			state,
+			action: PayloadAction<{ messageId: string; labels: string[] }>
+		) => {
+			state.messageList = state.messageList.map((msg) =>
+				msg._id === action.payload.messageId
+					? {
+							...msg,
+							labels: action.payload.labels,
+							// eslint-disable-next-line no-mixed-spaces-and-tabs
+					  }
+					: msg
+			);
+		},
 	},
 });
 
@@ -132,6 +147,7 @@ export const {
 	updateMessage,
 	resetMessage,
 	setMessageLabels,
+	setNewMessageLabels,
 } = Slice.actions;
 
 export default Slice.reducer;
