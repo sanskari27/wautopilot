@@ -197,16 +197,6 @@ export default function Broadcast() {
 			return;
 		}
 
-		if (!description) {
-			dispatch(setError({ type: 'DESCRIPTION', message: 'Description is required' }));
-			toast({
-				title: 'Description is required',
-				status: 'error',
-				isClosable: true,
-			});
-			return;
-		}
-
 		if (broadcast_options.broadcast_type === 'scheduled') {
 			if (!broadcast_options.startDate) {
 				dispatch(setError({ type: 'START_DATE', message: 'Start date is required' }));
@@ -250,6 +240,13 @@ export default function Broadcast() {
 				return;
 			}
 		}
+
+		dispatch(
+			setError({
+				message: '',
+				type: '',
+			})
+		);
 
 		if (header_file) {
 			toast.promise(UploadService.generateMetaMediaId(selected_device_id, header_file), {
