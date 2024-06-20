@@ -183,8 +183,14 @@ export const MediaMessage = ({
 				</Box>
 			) : (
 				// <Image src={media.url} width={'260px'} aspectRatio={16 / 9} rounded={'lg'} />
-				<Box width={'400px'} height={'420px'} position={'relative'} marginLeft={'-1rem'}>
-					<Center width={'97%'} mx={'auto'}>
+				<Box
+					width={'400px'}
+					height={'420px'}
+					maxWidth={'100%'}
+					position={'relative'}
+					marginX={'auto'}
+				>
+					<Center width={'98%'} mx={'auto'}>
 						<Preview
 							data={{
 								url: `${SERVER_URL}uploads/${selected_device_id}/download-meta-media/${message.body?.media_id}`,

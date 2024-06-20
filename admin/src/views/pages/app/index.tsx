@@ -1,8 +1,8 @@
 import { Box, useBoolean } from '@chakra-ui/react';
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useOutlet } from 'react-router-dom';
-import { AUTH_URL } from '../../../config/const';
+import { Navigate, useOutlet } from 'react-router-dom';
+import { AUTH_URL, NAVIGATION } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
 import DeviceService from '../../../services/device.service';
 import MediaService from '../../../services/media.service';
@@ -96,7 +96,7 @@ const AppPage = () => {
 		return <></>;
 	}
 
-	// if (!outlet) return <Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />;
+	if (!outlet) return <Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />;
 
 	return (
 		<Box width={'full'}>
