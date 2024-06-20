@@ -192,9 +192,9 @@ export default function Coupons() {
 						<Thead>
 							<Tr>
 								<Th width={'10%'}>Sl. no.</Th>
-								<Th width={'30%'}>Code</Th>
-								<Th width={'30%'}>Available coupon</Th>
-								<Th width={'30%'}>Total Coupon</Th>
+								<Th width={'60%'}>Code</Th>
+								<Th width={'10%'}>Available coupon</Th>
+								<Th width={'10%'}>Total Coupon</Th>
 							</Tr>
 						</Thead>
 						<Tbody>
