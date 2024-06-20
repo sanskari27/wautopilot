@@ -103,7 +103,7 @@ function LoginTab() {
 				<Stack spacing='3'>
 					<FormControl isInvalid={error.type === 'email' || error.type === 'server'}>
 						<FormLabel htmlFor='email' color={'#0b826f'}>
-							Username
+							Email
 						</FormLabel>
 						<Input
 							type='email'
