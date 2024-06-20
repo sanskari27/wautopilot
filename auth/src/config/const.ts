@@ -1,6 +1,7 @@
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 export const WEBPAGE_URL = import.meta.env.VITE_WEBPAGE_URL;
 export const AUTH_URL = import.meta.env.VITE_AUTH_URL;
+export const ADMIN_URL = import.meta.env.VITE_ADMIN_URL;
 export const CAPTCHA_KEY = import.meta.env.VITE_CAPTCHA_KEY;
 export const DATA_LOADED_DELAY = import.meta.env.VITE_DATA_LOADED_DELAY;
 

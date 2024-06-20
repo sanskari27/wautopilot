@@ -13,7 +13,7 @@ import {
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
-import { Color, LOGO_PRIMARY, WEBPAGE_URL } from '../../../config/const';
+import { ADMIN_URL, Color, LOGO_PRIMARY, WEBPAGE_URL } from '../../../config/const';
 import { useGeoLocation } from '../../../hooks/useGeolocation';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
@@ -79,7 +79,7 @@ export default function LoginPopup() {
 					>
 						<TabList width={'200px'} margin={'auto'} bgColor={'whitesmoke'} rounded={'full'}>
 							<Tab>Login</Tab>
-							<Tab isDisabled={!callback_url?.includes('admin')}>Signup</Tab>
+							<Tab isDisabled={!callback_url?.startsWith(ADMIN_URL)}>Signup</Tab>
 						</TabList>
 						<TabPanels>
 							<TabPanel>
