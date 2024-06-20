@@ -10,7 +10,6 @@ import {
 	MenuButton,
 	MenuItem,
 	MenuList,
-	Tag,
 	Text,
 	Textarea,
 	useToast,
@@ -68,10 +67,10 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 		message: { textMessage },
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
 
-	const timeStamp = selected_recipient.expiration_timestamp
-		? new Date(selected_recipient.expiration_timestamp)
-		: null;
-	const currentTime = new Date();
+	// const timeStamp = selected_recipient.expiration_timestamp
+	// 	? new Date(selected_recipient.expiration_timestamp)
+	// 	: null;
+	// const currentTime = new Date();
 
 	const handleMessageInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		e.target.style.height = '5px';
@@ -132,11 +131,11 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 				</HStack>
 				<HStack>
 					<Flex alignItems={'center'}>
-						{timeStamp && timeStamp < currentTime ? (
+						{/* {timeStamp && timeStamp < currentTime ? (
 							<Tag colorScheme='green'>Active</Tag>
 						) : (
 							<Tag colorScheme='red'>Expired</Tag>
-						)}
+						)} */}
 						{messagesLoading ? null : (
 							<Menu>
 								<MenuButton m={0} p={0} as={Button} variant={'unstyled'}>
