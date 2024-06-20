@@ -85,14 +85,6 @@ const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
 						</Tag>
 					)}
 				/>
-				<Each
-					items={item.labels}
-					render={(label) => (
-						<Tag variant={'subtle'} minWidth={'max-content'} mt={'0.5rem'}>
-							{label}
-						</Tag>
-					)}
-				/>
 			</HStack>
 		</Box>
 	);
