@@ -229,21 +229,24 @@ const AssignMessageLabelsDialog = forwardRef<AssignMessageLabelsHandle>((_, ref)
 			});
 		} // TODO: add handle Text input for labels managed via array jut like phonebook
 
-		toast.promise(MessagesService.assignMessageLabels(selected_device_id, messageId, labels), {
-			success: (res) => {
-				if (res) {
-					dispatch(setNewMessageLabels({ messageId, labels }));
-				}
-				handleClose();
-				return {
-					title: res ? 'Labels assigned successfully' : 'Failed to assign labels',
-					description: res ? 'Please refresh the page to update tags' : 'Please try again later',
-					status: res ? 'success' : 'error',
-				};
-			},
-			loading: { title: 'Assigning labels...' },
-			error: { title: 'Failed to assign labels' },
-		});
+		toast.promise(
+			MessagesService.assignMessageLabels(selected_device_id, messageId, [...labels, newLabels]),
+			{
+				success: (res) => {
+					if (res) {
+						dispatch(setNewMessageLabels({ messageId, labels: [...labels, newLabels] }));
+					}
+					handleClose();
+					return {
+						title: res ? 'Labels assigned successfully' : 'Failed to assign labels',
+						description: res ? 'Please refresh the page to update tags' : 'Please try again later',
+						status: res ? 'success' : 'error',
+					};
+				},
+				loading: { title: 'Assigning labels...' },
+				error: { title: 'Failed to assign labels' },
+			}
+		);
 	};
 
 	const handleNewLabelInput = (e: React.ChangeEvent<HTMLInputElement>) => {

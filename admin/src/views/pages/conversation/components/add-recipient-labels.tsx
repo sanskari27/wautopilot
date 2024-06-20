@@ -110,13 +110,27 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 	const handleSave = async () => {
 		setIsSaving.on();
 
-		if (newLabel !== '') {
-			newLabel.split(',').forEach((label) => {
-				if (!selected_recipient.labels.includes(label.trim())) {
-					selected_recipient.labels.push(label.trim());
-				}
+		if (newLabel.trim().length !== 0) {
+			setSelectedRecipient((prev) => {
+				return {
+					...prev,
+					labels: [...prev.labels, newLabel.trim()],
+				};
 			});
-		} // TODO: add handle Text input for labels managed via array jut like phonebook
+		}
+
+		// if (newLabel !== '') {
+		// 	newLabel.split(',').forEach((label) => {
+		// 		if (!selected_recipient.labels.includes(label.trim())) {
+		// 			setSelectedRecipient((prev) => {
+		// 				return {
+		// 					...prev,
+		// 					labels: [...prev.labels, label.trim()],
+		// 				};
+		// 			});
+		// 		}
+		// 	});
+		// } // TODO: add handle Text input for labels managed via array jut like phonebook
 
 		// if (selected_recipient.labels.length === 0) {
 		// 	toast({
@@ -129,7 +143,10 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 		// 	return;
 		// }
 
-		MessagesService.ConversationLabels(selected_recipient.recipient, selected_recipient.labels)
+		MessagesService.ConversationLabels(selected_recipient.recipient, [
+			...selected_recipient.labels,
+			newLabel.trim(),
+		])
 			.then((res) => {
 				if (res) {
 					toast({
@@ -139,7 +156,10 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 						isClosable: true,
 					});
 					dispatch(
-						setRecipientLabels({ labels: selected_recipient.labels, id: selected_recipient._id })
+						setRecipientLabels({
+							labels: [...selected_recipient.labels, newLabel.trim()],
+							id: selected_recipient._id,
+						})
 					);
 					onClose();
 					return;
