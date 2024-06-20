@@ -62,7 +62,7 @@ const Slice = createSlice({
 			state.details.category = action.payload;
 		},
 		setTemplateName: (state, action: PayloadAction<string>) => {
-			state.details.name = action.payload;
+			state.details.name = action.payload.replace(/ /g, '_');
 		},
 		setHeaderType: (state, action: PayloadAction<string>) => {
 			state.details.components = state.details.components.filter(
