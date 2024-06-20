@@ -85,6 +85,14 @@ export default function Broadcast() {
 	const selectedTemplate = templateListFiltered.find((t) => t.id === template_id);
 
 	useEffect(() => {
+		if (!selected_device_id) {
+			toast({
+				title: 'Please add a device to send a broadcast',
+				status: 'error',
+				isClosable: true,
+			});
+			return;
+		}
 		DeviceService.fetchMessageHealth(selected_device_id).then((res) => {
 			if (res === 'RED') {
 				toast({
