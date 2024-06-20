@@ -79,7 +79,7 @@ export default function LoginPopup() {
 					>
 						<TabList width={'200px'} margin={'auto'} bgColor={'whitesmoke'} rounded={'full'}>
 							<Tab>Login</Tab>
-							<Tab>Signup</Tab>
+							<Tab isDisabled={!callback_url?.includes('admin')}>Signup</Tab>
 						</TabList>
 						<TabPanels>
 							<TabPanel>
