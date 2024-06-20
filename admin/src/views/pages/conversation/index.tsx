@@ -33,7 +33,6 @@ const Conversation = () => {
 		unpinnedConversations,
 		uiDetails: { loading },
 		selected_recipient,
-		label_filter,
 	} = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 
 	const { all_labels } = useFetchLabels();
@@ -71,18 +70,20 @@ const Conversation = () => {
 	const handleAddRecipientLabel = (label: string) => {
 		onAddLabel(label);
 		dispatch(setLabelFilter(selectedLabels));
+		console.log(selectedLabels);
 	};
 
 	const handleRemoveRecipientLabel = (label: string) => {
 		onRemoveLabel(label);
 		dispatch(setLabelFilter(selectedLabels));
+		console.log(selectedLabels);
 	};
 
 	useEffect(() => {
-		MessagesService.fetchAllConversation(selected_device_id, label_filter).then((data) =>
+		MessagesService.fetchAllConversation(selected_device_id, selectedLabels).then((data) =>
 			dispatch(setRecipientsList(data))
 		);
-	}, [dispatch, label_filter, selected_device_id]);
+	}, [dispatch, selectedLabels, selected_device_id]);
 
 	useEffect(() => {
 		const socket = io(SERVER_URL + 'conversation');
