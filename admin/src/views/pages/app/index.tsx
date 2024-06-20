@@ -93,6 +93,7 @@ const AppPage = () => {
 
 	if (!isAuthenticated) {
 		window.location.replace(`${AUTH_URL}auth/login?callback_url=${window.location.href}`);
+		return <></>;
 	}
 
 	// if (!outlet) return <Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />;
