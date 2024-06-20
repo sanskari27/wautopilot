@@ -282,7 +282,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 										<HStack pb={2}>
 											<Input
 												flex={2}
-												placeholder='Phone Number'
+												placeholder='Phone Number with country code'
 												type='tel'
 												readOnly={!isNewContact}
 												onChange={(e) =>
