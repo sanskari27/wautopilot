@@ -1,7 +1,8 @@
-import { Avatar, Box, Flex, Icon, Text } from '@chakra-ui/react';
+import { Avatar, Box, Flex, HStack, Icon, Tag, Text } from '@chakra-ui/react';
 import { TiPinOutline } from 'react-icons/ti';
 import { useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
+import Each from '../../../components/utils/Each';
 import ContextMenu from './recipient-context-menu';
 
 type Item = {
@@ -75,23 +76,24 @@ const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
 					) : null}
 				</Flex>
 			</Flex>
-			{/* <HStack justifyContent={'flex-start'} width={'full'} overflowX={'auto'}>
+			<HStack justifyContent={'flex-start'} width={'full'} overflowX={'auto'}>
 				<Each
 					items={item.labels}
 					render={(label) => (
-						<Tag colorScheme='gray.700' minWidth={'max-content'} mt={'0.5rem'}>
+						<Tag variant={'subtle'} minWidth={'max-content'} mt={'0.5rem'}>
 							{label}
 						</Tag>
 					)}
 				/>
-				<Each items={item.labels} render={(label) => <Tag minWidth={'max-content'} mt={'0.5rem'}>{label}</Tag>} />
-				<Each items={item.labels} render={(label) => <Tag minWidth={'max-content'} mt={'0.5rem'}>{label}</Tag>} />
-				<Each items={item.labels} render={(label) => <Tag minWidth={'max-content'} mt={'0.5rem'}>{label}</Tag>} />
-				<Each items={item.labels} render={(label) => <Tag minWidth={'max-content'} mt={'0.5rem'}>{label}</Tag>} />
-				<Each items={item.labels} render={(label) => <Tag minWidth={'max-content'} mt={'0.5rem'}>{label}</Tag>} />
-				<Each items={item.labels} render={(label) => <Tag minWidth={'max-content'} mt={'0.5rem'}>{label}</Tag>} />
-				<Each items={item.labels} render={(label) => <Tag minWidth={'max-content'} mt={'0.5rem'}>{label}</Tag>} />
-			</HStack> */}
+				<Each
+					items={item.labels}
+					render={(label) => (
+						<Tag variant={'subtle'} minWidth={'max-content'} mt={'0.5rem'}>
+							{label}
+						</Tag>
+					)}
+				/>
+			</HStack>
 		</Box>
 	);
 };
