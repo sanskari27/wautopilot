@@ -54,16 +54,17 @@ const DevicesDialog = forwardRef<DevicesHandle>((_, ref) => {
 		},
 	}));
 
-	// useEffect(() => {
-	// 	DeviceService.listDevices()
-	// 		.then((devices) => {
-	// 			setDevices(devices);
-	// 			if (devices.length > 0) {
-	// 				dispatch(setSelectedDeviceId(devices[0].id ?? '')); // TODO
-	// 			}
-	// 		})
-	// 		.finally(() => setLoading(false));
-	// }, []);
+	const onDeviceAdded = () => {
+		DeviceService.listDevices().then((devices) => {
+			dispatch(setDevicesList(devices));
+			if (devices.length > 0) {
+				const selectedDevice = localStorage.getItem('selected_device_id') ?? '';
+				const isValidSelectedDevice =
+					devices.findIndex((device) => device.id === selectedDevice) !== -1;
+				dispatch(setSelectedDeviceId(isValidSelectedDevice ? selectedDevice : devices[0].id ?? ''));
+			}
+		});
+	};
 
 	const handleChangeSelectedDeviceId = (id: string) => {
 		dispatch(setSelectedDeviceId(id));
@@ -71,7 +72,16 @@ const DevicesDialog = forwardRef<DevicesHandle>((_, ref) => {
 
 	const handleRemoveDevice = (id: string) => {
 		DeviceService.removeDevice(id).then((res) => {
-			res && DeviceService.listDevices().then((res) => dispatch(setDevicesList(res)));
+			res &&
+				DeviceService.listDevices().then((res) => {
+					dispatch(setDevicesList(res));
+					if (res.length > 0) {
+						const selectedDevice = localStorage.getItem('selected_device_id') ?? '';
+						const isValidSelectedDevice =
+							res.findIndex((device) => device.id === selectedDevice) !== -1;
+						dispatch(setSelectedDeviceId(isValidSelectedDevice ? selectedDevice : res[0].id ?? ''));
+					}
+				});
 		});
 	};
 
@@ -163,7 +173,7 @@ const DevicesDialog = forwardRef<DevicesHandle>((_, ref) => {
 			</Modal>
 
 			<DeleteAlert ref={confirmationAlertDialogRef} onConfirm={handleRemoveDevice} type='Device' />
-			<AddDevice ref={addDeviceDialogRef} />
+			<AddDevice ref={addDeviceDialogRef} onDeviceAdded={onDeviceAdded} />
 		</>
 	);
 });

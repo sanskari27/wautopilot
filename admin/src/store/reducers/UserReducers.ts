@@ -92,6 +92,7 @@ const Slice = createSlice({
 		},
 
 		setSelectedDeviceId: (state, action: PayloadAction<string>) => {
+			localStorage.setItem('selected_device_id', action.payload);
 			state.selected_device_id = action.payload;
 		},
 	},

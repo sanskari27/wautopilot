@@ -28,9 +28,6 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 	let { accessToken } = data;
 
 	const userDetails = await req.locals.user.getDetails();
-	if (userDetails.no_of_devices < 1) {
-		return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
-	}
 
 	const devices = await new WhatsappLinkService(req.locals.account).fetchRecords();
 
@@ -81,6 +78,8 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 			},
 		});
 	} catch (err) {
+		console.log(err);
+
 		return next(new CustomError(COMMON_ERRORS.ALREADY_EXISTS));
 	}
 }

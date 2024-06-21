@@ -83,10 +83,13 @@ const AppPage = () => {
 		DeviceService.listDevices()
 			.then((devices) => {
 				dispatch(setDevicesList(devices));
-				// setDevices(devices);
 				if (devices.length > 0) {
-					dispatch(setSelectedDeviceId(devices[0].id ?? '')); // TODO
-					// dispatch(setSelectedDevice(devices[0]));
+					const selectedDevice = localStorage.getItem('selected_device_id') ?? '';
+					const isValidSelectedDevice =
+						devices.findIndex((device) => device.id === selectedDevice) !== -1;
+					dispatch(
+						setSelectedDeviceId(isValidSelectedDevice ? selectedDevice : devices[0].id ?? '')
+					);
 				}
 			})
 			.finally(() => dispatch(stopDeviceLoading()));
