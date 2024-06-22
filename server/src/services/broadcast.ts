@@ -437,8 +437,12 @@ export default class BroadcastService extends WhatsappLinkService {
 			} catch (err) {
 				if (axios.isAxiosError(err)) {
 					Logger.info('Error sending broadcast message', err.response?.data as string);
+					msg.failed_reason = JSON.stringify(err.response?.data ?? '') as string;
+				} else {
+					msg.failed_reason = (err as any).message as string;
 				}
 
+				msg.failed_at = DateUtils.getMomentNow().toDate();
 				msg.status = MESSAGE_STATUS.FAILED;
 				msg.save();
 				return;
