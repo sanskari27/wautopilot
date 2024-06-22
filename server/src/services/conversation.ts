@@ -299,6 +299,17 @@ export default class ConversationService extends WhatsappLinkService {
 				},
 			},
 			{
+				$group: {
+					_id: '$_id',
+					linked_to: { $first: '$linked_to' },
+					device_id: { $first: '$device_id' },
+					recipient: { $first: '$recipient' },
+					recipientDetails: { $first: '$recipientDetails' },
+					labels: { $first: '$labels' },
+					last_message_at: { $first: '$last_message_at' },
+				},
+			},
+			{
 				$sort: {
 					last_message_at: -1,
 				},

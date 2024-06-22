@@ -190,11 +190,11 @@ export default class BroadcastService extends WhatsappLinkService {
 					sendAt: 1,
 					text: 1,
 					template_name: '$messageObject.template_name',
-					sent_at: '$message.sent_at',
-					read_at: '$message.read_at',
-					delivered_at: '$message.delivered_at',
-					failed_at: '$message.failed_at',
-					failed_reason: '$message.failed_reason',
+					sent_at: 1,
+					read_at: 1,
+					delivered_at: 1,
+					failed_at: 1,
+					failed_reason: 1,
 				},
 			},
 		]);
@@ -403,6 +403,13 @@ export default class BroadcastService extends WhatsappLinkService {
 
 		docs.forEach(async (msg) => {
 			const userService = new UserService(msg.linked_to);
+			if (userService.walletBalance < userService.markupPrice) {
+				msg.failed_at = DateUtils.getMomentNow().toDate();
+				msg.failed_reason = 'Insufficient balance';
+				msg.status = MESSAGE_STATUS.FAILED;
+				msg.save();
+				return;
+			}
 			try {
 				const { data } = await MetaAPI.post(
 					`${msg.device_id.phoneNumberId}/messages`,
