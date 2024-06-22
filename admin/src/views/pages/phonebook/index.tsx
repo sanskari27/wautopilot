@@ -105,6 +105,7 @@ export default function Phonebook() {
 
 	const { filtered, setSearchText } = useFilteredList(list, {
 		first_name: 1,
+		phone_number: 1,
 		email: 1,
 	});
 

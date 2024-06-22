@@ -14,7 +14,7 @@ export default function useFilteredList<T extends object>(
 			list.filter((obj) => {
 				for (const key in opts) {
 					if (key in obj && opts[key] === 1) {
-						if ((obj[key] as string).toLowerCase().startsWith(searchText.toLowerCase())) {
+						if ((obj[key] as string).toLowerCase().includes(searchText.toLowerCase())) {
 							return true;
 						}
 					}
