@@ -60,7 +60,7 @@ async function upgradePlan(req: Request, res: Response, next: NextFunction) {
 }
 
 async function setMarkupPrice(req: Request, res: Response, next: NextFunction) {
-	const rate = req.body.rate as number;
+	const rate = Number(req.body.rate) as number;
 
 	try {
 		const userService = await UserService.findById(req.locals.id);
