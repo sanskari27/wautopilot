@@ -255,6 +255,7 @@ export default function Phonebook() {
 							<Th>S.No.</Th>
 							<Th>Prefix</Th>
 							<Th>Name</Th>
+							<Th>Phone</Th>
 							<Th>Email</Th>
 							<Th>Birthday</Th>
 							<Th>Anniversary</Th>
@@ -268,7 +269,7 @@ export default function Phonebook() {
 									items={Array.from({ length: 20 })}
 									render={() => (
 										<Tr>
-											<Td colSpan={7} textAlign={'center'}>
+											<Td colSpan={8} textAlign={'center'}>
 												<Skeleton height={'1.2rem'} />
 											</Td>
 										</Tr>
@@ -304,6 +305,9 @@ export default function Phonebook() {
 										<Td onClick={() => openRecord(record)}>{record.salutation}</Td>
 										<Td onClick={() => openRecord(record)}>
 											{record.first_name} {record.middle_name} {record.last_name}
+										</Td>
+										<Td onClick={() => openRecord(record)}>
+											{record.phone_number.length > 0 ? `+${record.phone_number}` : ''}
 										</Td>
 										<Td onClick={() => openRecord(record)}>{record.email}</Td>
 										<Td onClick={() => openRecord(record)}>{record.birthday}</Td>
