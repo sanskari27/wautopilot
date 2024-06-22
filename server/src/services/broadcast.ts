@@ -5,7 +5,7 @@ import { BroadcastDB, BroadcastMessageDB, ConversationMessageDB } from '../../mo
 import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import MetaAPI from '../config/MetaAPI';
-import { BROADCAST_STATUS, MESSAGE_STATUS } from '../config/const';
+import { BROADCAST_STATUS, IS_PRODUCTION, MESSAGE_STATUS } from '../config/const';
 import DateUtils from '../utils/DateUtils';
 import { extractBody, extractButtons, extractFooter, extractHeader } from '../utils/MessageHelper';
 import TimeGenerator from '../utils/TimeGenerator';
@@ -378,6 +378,7 @@ export default class BroadcastService extends WhatsappLinkService {
 	}
 
 	public static async sendScheduledBroadcastMessage() {
+		if (!IS_PRODUCTION) return;
 		let docs;
 		try {
 			docs = await BroadcastMessageDB.find({
