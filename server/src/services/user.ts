@@ -304,7 +304,9 @@ export default class UserService {
 		}
 
 		const users = await AccountDB.find({
-			userLevel: UserLevel.Admin,
+			userLevel: {
+				$gte: UserLevel.Admin,
+			},
 		});
 
 		return users.map((user) => {
