@@ -29,6 +29,7 @@ const initialState: Admin = {
 	isSubscribed: false,
 	phone: '',
 	subscription_expiry: '',
+	markup: 0,
 };
 
 const ExtendExpiryModal = forwardRef<ExtendExpiryModalHandle>((_, ref) => {
