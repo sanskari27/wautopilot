@@ -26,9 +26,17 @@ const Slice = createSlice({
 				return admin;
 			});
 		},
+		setAdminMarkup(state, action: PayloadAction<{ id: string; rate: number }>) {
+			state.admins.map((admin) => {
+				if (admin.id === action.payload.id) {
+					admin.markup = action.payload.rate;
+				}
+				return admin;
+			});
+		},
 	},
 });
 
-export const { listAdmins, setAdminLoading, setAdminExpiry } = Slice.actions;
+export const { listAdmins, setAdminLoading, setAdminExpiry,setAdminMarkup } = Slice.actions;
 
 export default Slice.reducer;

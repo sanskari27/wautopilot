@@ -21,11 +21,14 @@ import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ADMIN_URL, AUTH_URL } from '../../../config/const';
 import useFilteredList from '../../../hooks/useFilteredList';
+import AdminsService from '../../../services/admin.service';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
+import { setAdminMarkup } from '../../../store/reducers/AdminReducer';
 import { setIsAuthenticated } from '../../../store/reducers/UserReducers';
 import { Admin } from '../../../store/types/AdminState';
 import ExtendExpiryModal, { ExtendExpiryModalHandle } from '../../components/extend-expiry';
+import MarkUpDialog, { MarkUpDialogHandle } from '../../components/markup-price-dialog';
 import SearchBar from '../../components/searchBar';
 import UpgradePlanDialog, { UpgradePlanDialogHandle } from '../../components/upgrade-plan';
 import Each from '../../components/utils/Each';
@@ -134,8 +137,12 @@ type AdminContextMenuProps = {
 
 const AdminContextMenu = ({ admin }: AdminContextMenuProps) => {
 	const toast = useToast();
+
+	const dispatch = useDispatch();
+
 	const extendExpiryRef = useRef<ExtendExpiryModalHandle>(null);
 	const upgradePlanRef = useRef<UpgradePlanDialogHandle>(null);
+	const markupPriceDialog = useRef<MarkUpDialogHandle>(null);
 
 	const openServiceAccount = async () => {
 		const status = await AuthService.serviceAccount(admin.id);
@@ -144,6 +151,27 @@ const AdminContextMenu = ({ admin }: AdminContextMenuProps) => {
 		} else {
 			toast({
 				title: 'Unable to switch account.',
+				description: 'Please try again later.',
+				status: 'error',
+			});
+		}
+	};
+
+	const openMarkupPriceDialog = () => {
+		markupPriceDialog.current?.open(admin.name, admin.markup);
+	};
+
+	const handleMarkupPriceChange = async (rate: number) => {
+		const status = await AdminsService.setMarkUpPrice(admin.id, rate);
+		if (status) {
+			toast({
+				title: 'Markup price updated successfully',
+				status: 'success',
+			});
+			dispatch(setAdminMarkup({ id: admin.id, rate }));
+		} else {
+			toast({
+				title: 'Unable to update markup price',
 				description: 'Please try again later.',
 				status: 'error',
 			});
@@ -163,11 +191,13 @@ const AdminContextMenu = ({ admin }: AdminContextMenuProps) => {
 						</MenuItem>
 					)}
 					<MenuItem onClick={() => upgradePlanRef.current?.open(admin)}>Upgrade Plan</MenuItem>
+					<MenuItem onClick={openMarkupPriceDialog}>Set Markup Price</MenuItem>
 					<MenuItem onClick={openServiceAccount}>Service Account</MenuItem>
 				</MenuList>
 			</Menu>
 			<ExtendExpiryModal ref={extendExpiryRef} />
 			<UpgradePlanDialog ref={upgradePlanRef} />
+			<MarkUpDialog onConfirm={handleMarkupPriceChange} ref={markupPriceDialog} />
 		</>
 	);
 };

@@ -11,4 +11,5 @@ export type Admin = {
 	isSubscribed: boolean;
 	phone: string;
 	subscription_expiry: string;
+	markup: number;
 };

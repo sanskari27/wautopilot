@@ -34,6 +34,7 @@ const initialState: Admin = {
 	isSubscribed: false,
 	phone: '',
 	subscription_expiry: '',
+	markup: 0,
 };
 
 const UpgradePlanDialog = forwardRef<UpgradePlanDialogHandle>((_, ref) => {
