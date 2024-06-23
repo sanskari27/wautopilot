@@ -319,7 +319,7 @@ export default class UserService {
 					user.subscription &&
 					DateUtils.getMoment(user.subscription.end_date).isAfter(DateUtils.getMomentNow()),
 				plan_id: user.subscription?.plan_id ?? '',
-
+				markup: user.markupPrice ?? 0,
 				subscription_expiry: user.subscription?.end_date ?? '',
 			};
 		});
