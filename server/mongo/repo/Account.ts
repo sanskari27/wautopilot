@@ -28,7 +28,7 @@ const schema = new mongoose.Schema<IAccount>({
 	},
 	markupPrice: {
 		type: Number,
-		default: 0.05,
+		default: 0.03,
 	},
 
 	subscription: {

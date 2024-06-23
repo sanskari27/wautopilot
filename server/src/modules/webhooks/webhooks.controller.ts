@@ -73,7 +73,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		const recipient = message.from;
 		const timestamp = DateUtils.fromUnixTime(message.timestamp).toDate();
 		if (data.contacts && data.contacts.length > 0) {
-			ConversationService.updateConversationDetails(contact.wa_id, {
+			conversationService.updateConversationDetails(contact.wa_id, {
 				profile_name: contact.profile.name,
 			});
 		}

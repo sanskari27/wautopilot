@@ -214,12 +214,29 @@ export default class ConversationService extends WhatsappLinkService {
 			meta_conversation_id: string;
 			conversationExpiry: number;
 			origin: string;
+		}>
+	) {
+		await ConversationDB.updateOne(
+			{
+				recipient: recipient,
+			},
+			{
+				$set: filterUndefinedKeys(details),
+			}
+		);
+	}
+
+	public async updateConversationDetails(
+		recipient: string,
+		details: Partial<{
 			profile_name: string;
 		}>
 	) {
 		await ConversationDB.updateOne(
 			{
 				recipient: recipient,
+				linked_to: this.userId,
+				device_id: this.whatsappLink._id,
 			},
 			{
 				$set: filterUndefinedKeys(details),
