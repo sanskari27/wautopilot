@@ -139,7 +139,7 @@ const MediaPage = () => {
 									</>
 								) : list.length === 0 ? (
 									<Tr>
-										<Td colSpan={4} textAlign={'center'}>
+										<Td colSpan={5} textAlign={'center'}>
 											No records found
 										</Td>
 									</Tr>

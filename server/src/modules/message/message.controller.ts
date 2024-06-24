@@ -387,6 +387,7 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 				  }
 				: {}),
 		});
+		req.locals.user.deductCredit(1);
 	} catch (err) {
 		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 	}
