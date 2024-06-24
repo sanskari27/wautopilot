@@ -316,12 +316,37 @@ export default class ConversationService extends WhatsappLinkService {
 				},
 			},
 			{
+				$addFields: {
+					saved_name: {
+						$cond: {
+							if: { $ne: ['$recipientDetails', {}] },
+							then: {
+								$cond: {
+									if: { $eq: ['$recipientDetails.first_name', ''] },
+									then: '$profile_name',
+									else: {
+										$concat: [
+											{ $ifNull: ['$recipientDetails.first_name', ''] },
+											' ',
+											{ $ifNull: ['$recipientDetails.last_name', ''] },
+										],
+									},
+								},
+							},
+							else: '$profile_name',
+						},
+					},
+				},
+			},
+			{
 				$group: {
 					_id: '$_id',
 					linked_to: { $first: '$linked_to' },
 					device_id: { $first: '$device_id' },
 					recipient: { $first: '$recipient' },
+					profile_name: { $first: '$saved_name' },
 					recipientDetails: { $first: '$recipientDetails' },
+					saved_name: { $first: '$saved_name' },
 					labels: { $first: '$labels' },
 					last_message_at: { $first: '$last_message_at' },
 				},

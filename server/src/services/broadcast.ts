@@ -206,9 +206,11 @@ export default class BroadcastService extends WhatsappLinkService {
 			text: message.text as string,
 			template_name: message.template_name as string,
 			sent_at: DateUtils.format(message.sent_at, 'DD-MM-YYYY HH:mm') as string,
-			read_at: DateUtils.format(message.read_at, 'DD-MM-YYYY HH:mm') as string,
-			delivered_at: DateUtils.format(message.delivered_at, 'DD-MM-YYYY HH:mm') as string,
-			failed_at: DateUtils.format(message.failed_at, 'DD-MM-YYYY HH:mm') as string,
+			read_at: message.read_at ? DateUtils.format(message.read_at, 'DD-MM-YYYY HH:mm') : '',
+			delivered_at: message.delivered_at
+				? DateUtils.format(message.delivered_at, 'DD-MM-YYYY HH:mm')
+				: '',
+			failed_at: message.failed_at ? DateUtils.format(message.failed_at, 'DD-MM-YYYY HH:mm') : '',
 			failed_reason: message.failed_reason as string,
 			description: broadcast.description as string,
 		}));
