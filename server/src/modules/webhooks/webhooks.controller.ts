@@ -33,12 +33,12 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 
 	const link = await WhatsappLinkDB.findOne({ waid, phoneNumberId: phone_number_id });
 	if (!link) {
-		return res.status(400);
+		return res.status(400).send("Resource doesn't exist");
 	}
 
 	const user = await AccountDB.findOne({ _id: link.linked_to });
 	if (!user) {
-		return res.status(400);
+		return res.status(400).send("Resource doesn't exist");
 	}
 	const conversationService = new ConversationService(user, link);
 	const contact = data.contacts?.[0] ?? {
@@ -163,7 +163,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		}
 	}
 
-	return res.status(200);
+	return res.status(200).send('OK');
 }
 
 async function razorpayPayment(req: Request, res: Response) {
