@@ -4,6 +4,7 @@ import ContactsRoute from './contacts/contacts.route';
 import CouponRoute from './coupon/coupon.route';
 import MediaRoute from './media/media.route';
 import MessageRoute from './message/message.route';
+import ChatBotRoute from './chatbot/chatbot.route';
 import PaymentRoute from './payment/payment.route';
 import PhonebookRoute from './phonebook/phonebook.route';
 import TemplateRoute from './template/template.route';
@@ -31,6 +32,7 @@ router.use('/payment', VerifySession, PaymentRoute);
 
 router.use('/template/:device_id', VerifySession, VerifyDevice, TemplateRoute);
 router.use('/message/:device_id', VerifySession, VerifyDevice, MessageRoute);
+router.use('/chatbot/:device_id', VerifySession, VerifyDevice, ChatBotRoute);
 router.use('/media/:device_id', VerifySession, VerifyDevice, MediaRoute);
 router.use('/uploads/:device_id', VerifySession, VerifyDevice, UploadsRoute);
 router.use('/users', VerifySession, UsersRoute);
