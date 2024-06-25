@@ -38,9 +38,4 @@ router
 	.post(Controller.assignLabelToMessage);
 router.route('/mark-read/:message_id').post(Controller.markRead);
 
-// router
-// 	.route('/:id/schedule-template')
-// 	.all(VerifySession, IDValidator, SendTemplateMessage)
-// 	.post(Controller.sendTemplateMessage);
-
 export default router;

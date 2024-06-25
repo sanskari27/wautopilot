@@ -8,8 +8,7 @@ import { WhatsappLinkCreateValidationResult } from './whatsappLink.validator';
 
 async function getAllLinkedDevices(req: Request, res: Response, next: NextFunction) {
 	try {
-		const whatsappLinkService = new WhatsappLinkService(req.locals.account);
-		const devices = await whatsappLinkService.fetchRecords();
+		const devices = await WhatsappLinkService.fetchRecords(req.locals.account._id);
 
 		return Respond({
 			res,
@@ -23,13 +22,14 @@ async function getAllLinkedDevices(req: Request, res: Response, next: NextFuncti
 	}
 }
 async function linkDevice(req: Request, res: Response, next: NextFunction) {
+	const { account } = req.locals;
 	const data = req.locals.data as WhatsappLinkCreateValidationResult;
 	const { phoneNumberId, waid, code } = data;
 	let { accessToken } = data;
 
 	const userDetails = await req.locals.user.getDetails();
 
-	const devices = await new WhatsappLinkService(req.locals.account).fetchRecords();
+	const devices = await WhatsappLinkService.fetchRecords(account._id);
 
 	if (devices.length >= userDetails.no_of_devices) {
 		return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
@@ -37,23 +37,15 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 
 	if (code) {
 		try {
-			const { data } = await MetaAPI.get(
+			const { data } = await MetaAPI().get(
 				`/oauth/access_token?client_id=3850065088596673&client_secret=ffb5e1c194cbc07e8ccaabed534e6a0d&code=${code}`
 			);
 			accessToken = data.access_token;
 
-			await MetaAPI.post(
-				`/${phoneNumberId}/register`,
-				{
-					messaging_product: 'whatsapp',
-					pin: '000000',
-				},
-				{
-					headers: {
-						Authorization: `Bearer ${accessToken}`,
-					},
-				}
-			);
+			await MetaAPI(accessToken).post(`/${phoneNumberId}/register`, {
+				messaging_product: 'whatsapp',
+				pin: '000000',
+			});
 		} catch (err) {
 			return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
 		}
@@ -64,8 +56,7 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 	}
 
 	try {
-		const whatsappLinkService = new WhatsappLinkService(req.locals.account);
-		const device = await whatsappLinkService.addRecord({
+		const device = await WhatsappLinkService.addRecord(account._id, {
 			phoneNumberId,
 			waid,
 			accessToken,
@@ -84,11 +75,10 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 	}
 }
 async function removeDevice(req: Request, res: Response, next: NextFunction) {
-	const id = req.locals.id;
+	const { id, account } = req.locals;
 
 	try {
-		const whatsappLinkService = new WhatsappLinkService(req.locals.account);
-		await whatsappLinkService.deleteRecord(id);
+		await WhatsappLinkService.deleteRecord(account._id, id);
 		return Respond({
 			res,
 			status: 200,
@@ -99,14 +89,17 @@ async function removeDevice(req: Request, res: Response, next: NextFunction) {
 	}
 }
 async function fetchMessageHealth(req: Request, res: Response, next: NextFunction) {
-	const { device } = req.locals;
+	const {
+		device: { device },
+		account,
+	} = req.locals;
 
 	try {
 		return Respond({
 			res,
 			status: 200,
 			data: {
-				health: await WhatsappLinkService.fetchMessageHealth(device),
+				health: await new WhatsappLinkService(account, device).fetchMessageHealth(),
 			},
 		});
 	} catch (err) {

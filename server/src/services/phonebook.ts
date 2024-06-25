@@ -148,7 +148,7 @@ export default class PhoneBookService extends UserService {
 		return Array.from(labels);
 	}
 
-	public async findFieldsByPhone(phone: string) {
+	public async findRecordByPhone(phone: string) {
 		const record = await PhoneBookDB.findOne({
 			phone_number: phone,
 			linked_to: this.userId,

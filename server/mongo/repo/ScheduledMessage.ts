@@ -1,12 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
 import { MESSAGE_STATUS } from '../../src/config/const';
-import IBroadcastMessage from '../types/broadcastmessage';
+import { default as IScheduledMessage } from '../types/scheduledmessage';
 import { AccountDB_name } from './Account';
 import { WhatsappLinkDB_name } from './WhatsappLink';
 
-export const BroadcastMessageDB_name = 'BroadcastMessage';
+export const ScheduledMessageDB_name = 'ScheduledMessage';
 
-const schema = new mongoose.Schema<IBroadcastMessage>(
+const schema = new mongoose.Schema<IScheduledMessage>(
 	{
 		linked_to: {
 			type: mongoose.Schema.Types.ObjectId,
@@ -18,11 +18,11 @@ const schema = new mongoose.Schema<IBroadcastMessage>(
 			ref: WhatsappLinkDB_name,
 			required: true,
 		},
-		broadcast_id: {
+		scheduler_id: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Broadcast',
 			required: true,
 		},
+		scheduler_type: String,
 
 		to: {
 			type: String,
@@ -46,7 +46,10 @@ const schema = new mongoose.Schema<IBroadcastMessage>(
 			type: Date,
 			required: true,
 		},
-
+		message_type: {
+			type: String,
+			enum: ['template', 'normal'],
+		},
 		messageObject: {
 			type: Schema.Types.Mixed,
 			default: {},
@@ -57,6 +60,6 @@ const schema = new mongoose.Schema<IBroadcastMessage>(
 	}
 );
 
-const BroadcastMessageDB = mongoose.model<IBroadcastMessage>(BroadcastMessageDB_name, schema);
+const ScheduledMessageDB = mongoose.model<IScheduledMessage>(ScheduledMessageDB_name, schema);
 
-export default BroadcastMessageDB;
+export default ScheduledMessageDB;

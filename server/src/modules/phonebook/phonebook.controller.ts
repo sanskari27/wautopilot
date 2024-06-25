@@ -172,7 +172,7 @@ async function setLabelsByPhone(req: Request, res: Response, next: NextFunction)
 
 	try {
 		const phoneBookService = new PhoneBookService(req.locals.account);
-		const doc = await phoneBookService.findFieldsByPhone(phone_number);
+		const doc = await phoneBookService.findRecordByPhone(phone_number);
 		if (!doc) {
 			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 		}

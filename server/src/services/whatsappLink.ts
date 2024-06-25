@@ -37,21 +37,39 @@ function processPhonebookDocs(
 }
 
 export default class WhatsappLinkService extends UserService {
-	public constructor(account: IAccount) {
+	private _device: IWhatsappLink;
+	public constructor(account: IAccount, device: IWhatsappLink) {
 		super(account);
+		this._device = device;
 	}
 
-	public async addRecord(details: RecordWithAccessToken) {
+	get accessToken() {
+		return this._device.accessToken;
+	}
+
+	get phoneNumberId() {
+		return this._device.phoneNumberId;
+	}
+
+	get waid() {
+		return this._device.waid;
+	}
+
+	get deviceId() {
+		return this._device._id;
+	}
+
+	get device() {
+		return this._device;
+	}
+
+	public static async addRecord(user: Types.ObjectId, details: RecordWithAccessToken) {
 		let phoneNumber: string | null = null;
 		let verifiedName: string | null = null;
 		try {
 			const {
 				data: { data },
-			} = await MetaAPI.get(`/${details.waid}/phone_numbers`, {
-				headers: {
-					Authorization: `Bearer ${details.accessToken}`,
-				},
-			});
+			} = await MetaAPI(details.accessToken).get(`/${details.waid}/phone_numbers`);
 
 			if (!data) {
 				return null;
@@ -76,23 +94,23 @@ export default class WhatsappLinkService extends UserService {
 			...details,
 			phoneNumber: phoneNumber,
 			verifiedName: verifiedName,
-			linked_to: this.userId,
+			linked_to: user,
 		});
 
 		return processPhonebookDocs([doc])[0];
 	}
 
-	public async fetchRecords(): Promise<
+	public static async fetchRecords(user: Types.ObjectId): Promise<
 		(Record & {
 			id: string;
 		})[]
 	> {
-		const records = await WhatsappLinkDB.find({ linked_to: this.userId });
+		const records = await WhatsappLinkDB.find({ linked_to: user });
 		return processPhonebookDocs(records);
 	}
 
-	public async deleteRecord(recordId: Types.ObjectId) {
-		const record = await WhatsappLinkDB.findOne({ _id: recordId, linked_to: this.userId });
+	public static async deleteRecord(user: Types.ObjectId, recordId: Types.ObjectId) {
+		const record = await WhatsappLinkDB.findOne({ _id: recordId, linked_to: user });
 
 		if (!record) {
 			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
@@ -101,8 +119,8 @@ export default class WhatsappLinkService extends UserService {
 		await WhatsappLinkDB.deleteOne({ _id: recordId });
 	}
 
-	public async fetchDeviceDoc(recordId: Types.ObjectId) {
-		const record = await WhatsappLinkDB.findOne({ _id: recordId, linked_to: this.userId });
+	public static async fetchDeviceDoc(recordId: Types.ObjectId, user: Types.ObjectId) {
+		const record = await WhatsappLinkDB.findOne({ _id: recordId, linked_to: user });
 
 		if (!record) {
 			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
@@ -111,15 +129,11 @@ export default class WhatsappLinkService extends UserService {
 		return record;
 	}
 
-	public static async fetchMessageHealth(record: IWhatsappLink) {
+	public async fetchMessageHealth() {
 		try {
 			const {
 				data: { data },
-			} = await MetaAPI.get(`/${record.waid}/phone_numbers`, {
-				headers: {
-					Authorization: `Bearer ${record.accessToken}`,
-				},
-			});
+			} = await MetaAPI(this.accessToken).get(`/${this.waid}/phone_numbers`);
 
 			if (!data) {
 				return 'RED';
@@ -127,7 +141,7 @@ export default class WhatsappLinkService extends UserService {
 
 			const phoneNumberDoc = data.find(
 				(phone: { id: string; display_phone_number: string; verified_name: string }) =>
-					phone.id === record.phoneNumberId
+					phone.id === this.phoneNumberId
 			);
 
 			if (!phoneNumberDoc) {

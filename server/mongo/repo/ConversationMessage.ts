@@ -117,6 +117,10 @@ const schema = new mongoose.Schema<IConversationMessage>(
 			from: String,
 			id: String,
 		},
+		scheduled_by: {
+			id: mongoose.Schema.Types.ObjectId,
+			name: String,
+		},
 	},
 	{
 		timestamps: { createdAt: true },

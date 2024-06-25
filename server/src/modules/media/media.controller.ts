@@ -11,7 +11,10 @@ import { Respond, RespondFile } from '../../utils/ExpressUtils';
 import FileUtils from '../../utils/FileUtils';
 
 async function addMedia(req: Request, res: Response, next: NextFunction) {
-	const { account, device } = req.locals;
+	const {
+		account,
+		device: { device },
+	} = req.locals;
 	const fileUploadOptions: SingleFileUploadOptions = {
 		field_name: 'file',
 		options: {},
@@ -35,18 +38,9 @@ async function addMedia(req: Request, res: Response, next: NextFunction) {
 
 		const {
 			data: { id: media_id },
-		} = await MetaAPI.post(`/${device.phoneNumberId}/media`, form, {
-			headers: {
-				Authorization: `Bearer ${device.accessToken}`,
-				'Content-Type': 'multipart/form-data',
-			},
-		});
+		} = await MetaAPI(device.accessToken).post(`/${device.phoneNumberId}/media`, form);
 
-		const { data } = await MetaAPI.get(`/${media_id}`, {
-			headers: {
-				Authorization: `Bearer ${req.locals.device.accessToken}`,
-			},
-		});
+		const { data } = await MetaAPI(device.accessToken).get(`/${media_id}`);
 
 		const media = await new MediaService(account, device).addMedia({
 			filename: uploadedFile.filename,
@@ -71,7 +65,11 @@ async function addMedia(req: Request, res: Response, next: NextFunction) {
 }
 
 async function downloadMedia(req: Request, res: Response, next: NextFunction) {
-	const { account, device, id } = req.locals;
+	const {
+		account,
+		device: { device },
+		id,
+	} = req.locals;
 	try {
 		let path = await new MediaService(account, device).getMediaLocalPath(id);
 		path = __basedir + path;
@@ -89,15 +87,17 @@ async function downloadMedia(req: Request, res: Response, next: NextFunction) {
 }
 
 async function deleteMedia(req: Request, res: Response, next: NextFunction) {
-	const { account, device, id } = req.locals;
+	const {
+		account,
+		device: { device },
+		id,
+	} = req.locals;
 
 	try {
 		const media = await new MediaService(account, device).getMedia(id);
-		await MetaAPI.delete(`/${media.media_id}/?phone_number_id=${device.phoneNumberId}`, {
-			headers: {
-				Authorization: `Bearer ${device.accessToken}`,
-			},
-		});
+		await MetaAPI(device.accessToken).delete(
+			`/${media.media_id}/?phone_number_id=${device.phoneNumberId}`
+		);
 	} catch (err: unknown) {
 		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 	}
@@ -117,7 +117,11 @@ async function deleteMedia(req: Request, res: Response, next: NextFunction) {
 }
 
 async function mediaById(req: Request, res: Response, next: NextFunction) {
-	const { account, device, id } = req.locals;
+	const {
+		account,
+		device: { device },
+		id,
+	} = req.locals;
 
 	try {
 		const media = await new MediaService(account, device).getMedia(id);
@@ -134,7 +138,10 @@ async function mediaById(req: Request, res: Response, next: NextFunction) {
 }
 
 async function listMedia(req: Request, res: Response, next: NextFunction) {
-	const { account, device } = req.locals;
+	const {
+		account,
+		device: { device },
+	} = req.locals;
 
 	const list = await new MediaService(account, device).listMedias();
 	return Respond({

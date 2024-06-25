@@ -11,19 +11,13 @@ import {
 import WhatsappLinkService from './whatsappLink';
 
 export default class TemplateService extends WhatsappLinkService {
-	private whatsappLink: IWhatsappLink;
 	public constructor(account: IAccount, whatsappLink: IWhatsappLink) {
-		super(account);
-		this.whatsappLink = whatsappLink;
+		super(account, whatsappLink);
 	}
 
 	public async addTemplate(details: Template) {
 		try {
-			await MetaAPI.post(`/${this.whatsappLink.waid}/message_templates`, details, {
-				headers: {
-					Authorization: `Bearer ${this.whatsappLink.accessToken}`,
-				},
-			});
+			await MetaAPI(this.accessToken).post(`/${this.waid}/message_templates`, details);
 			return true;
 		} catch (err) {
 			return false;
@@ -32,11 +26,7 @@ export default class TemplateService extends WhatsappLinkService {
 
 	public async editTemplate(id: string, details: Template) {
 		try {
-			await MetaAPI.post(`/${id}`, details, {
-				headers: {
-					Authorization: `Bearer ${this.whatsappLink.accessToken}`,
-				},
-			});
+			await MetaAPI(this.accessToken).post(`/${id}`, details);
 			return true;
 		} catch (err) {
 			return false;
@@ -47,11 +37,7 @@ export default class TemplateService extends WhatsappLinkService {
 		try {
 			const {
 				data: { data },
-			} = await MetaAPI.get(`/${this.whatsappLink.waid}/message_templates`, {
-				headers: {
-					Authorization: `Bearer ${this.whatsappLink.accessToken}`,
-				},
-			});
+			} = await MetaAPI(this.accessToken).get(`/${this.waid}/message_templates`);
 
 			return data.map((template: any) => ({
 				id: template.id,
@@ -72,11 +58,7 @@ export default class TemplateService extends WhatsappLinkService {
 
 	public async fetchTemplate(id: string) {
 		try {
-			const { data } = await MetaAPI.get(`/${id}`, {
-				headers: {
-					Authorization: `Bearer ${this.whatsappLink.accessToken}`,
-				},
-			});
+			const { data } = await MetaAPI(this.accessToken).get(`/${id}`);
 
 			return {
 				id: data.id,
@@ -100,13 +82,8 @@ export default class TemplateService extends WhatsappLinkService {
 
 	public async fetchTemplateByName(name: string) {
 		try {
-			const { data: res } = await MetaAPI.get(
-				`/${this.whatsappLink.waid}/message_templates?name=${name}`,
-				{
-					headers: {
-						Authorization: `Bearer ${this.whatsappLink.accessToken}`,
-					},
-				}
+			const { data: res } = await MetaAPI(this.accessToken).get(
+				`/${this.waid}/message_templates?name=${name}`
 			);
 			const data = res.data[0];
 
@@ -132,13 +109,8 @@ export default class TemplateService extends WhatsappLinkService {
 
 	public async deleteTemplate(template_id: string, name: string) {
 		try {
-			await MetaAPI.delete(
-				`/${this.whatsappLink.waid}/message_templates?hsm_id=${template_id}&name=${name}`,
-				{
-					headers: {
-						Authorization: `Bearer ${this.whatsappLink.accessToken}`,
-					},
-				}
+			await MetaAPI(this.accessToken).delete(
+				`/${this.waid}/message_templates?hsm_id=${template_id}&name=${name}`
 			);
 			return true;
 		} catch (err: any) {
@@ -175,26 +147,18 @@ export default class TemplateService extends WhatsappLinkService {
 	) {
 		const promises = to.map(async (phone) => {
 			try {
-				await MetaAPI.post(
-					`/${this.whatsappLink.phoneNumberId}/messages`,
-					{
-						messaging_product: 'whatsapp',
-						to: phone,
-						type: 'template',
-						template: {
-							name: template_name,
-							language: {
-								code: 'en_US',
-							},
-							components,
+				await MetaAPI(this.accessToken).post(`/${this.phoneNumberId}/messages`, {
+					messaging_product: 'whatsapp',
+					to: phone,
+					type: 'template',
+					template: {
+						name: template_name,
+						language: {
+							code: 'en_US',
 						},
+						components,
 					},
-					{
-						headers: {
-							Authorization: `Bearer ${this.whatsappLink.accessToken}`,
-						},
-					}
-				);
+				});
 
 				return true;
 			} catch (err) {

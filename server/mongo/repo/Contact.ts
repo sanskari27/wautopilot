@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import IContact from '../types/contact';
+import { AccountDB_name } from './Account';
 
 export const ContactDB_name = 'Contact';
 
@@ -7,7 +8,7 @@ const schema = new mongoose.Schema<IContact>(
 	{
 		linked_to: {
 			type: Schema.Types.ObjectId,
-			ref: ContactDB_name,
+			ref: AccountDB_name,
 		},
 
 		addresses: [

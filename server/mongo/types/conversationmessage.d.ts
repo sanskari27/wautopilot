@@ -84,6 +84,10 @@ export default interface IConversationMessage extends Document {
 		from: string;
 		id: string;
 	};
+	scheduled_by: {
+		id: Types.ObjectId;
+		name: string;
+	};
 
 	createdAt: Date;
 	sendAt: Date;

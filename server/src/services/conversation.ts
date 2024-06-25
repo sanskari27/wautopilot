@@ -52,22 +52,20 @@ function processConversationMessages(docs: Partial<IConversationMessage>[]) {
 }
 
 export default class ConversationService extends WhatsappLinkService {
-	private whatsappLink: IWhatsappLink;
 	public constructor(account: IAccount, whatsappLink: IWhatsappLink) {
-		super(account);
-		this.whatsappLink = whatsappLink;
+		super(account, whatsappLink);
 	}
 
 	public async createConversation(recipient: string, name?: string) {
 		try {
 			const doc = await ConversationDB.create({
 				linked_to: this.userId,
-				device_id: this.whatsappLink._id,
+				device_id:  this.deviceId,
 				recipient,
 			});
 
 			const phoneBookService = new PhoneBookService(this.account);
-			const contact = await phoneBookService.findFieldsByPhone(recipient);
+			const contact = await phoneBookService.findRecordByPhone(recipient);
 			if (!contact) {
 				phoneBookService.addRecords([
 					{
@@ -82,7 +80,7 @@ export default class ConversationService extends WhatsappLinkService {
 		} catch (err) {
 			const doc = await ConversationDB.findOne({
 				linked_to: this.userId,
-				device_id: this.whatsappLink._id,
+				device_id:  this.deviceId,
 				recipient,
 			});
 			return doc!._id;
@@ -135,12 +133,16 @@ export default class ConversationService extends WhatsappLinkService {
 				from?: string;
 				id: string;
 			};
+			scheduled_by?: {
+				id: Types.ObjectId;
+				name: string;
+			};
 		}
 	) {
 		try {
 			const doc = await ConversationMessageDB.create({
 				linked_to: this.userId,
-				device_id: this.whatsappLink._id,
+				device_id:  this.deviceId,
 				conversation_id,
 				status: details.status ?? MESSAGE_STATUS.PROCESSING,
 				...filterUndefinedKeys(details),
@@ -236,7 +238,7 @@ export default class ConversationService extends WhatsappLinkService {
 			{
 				recipient: recipient,
 				linked_to: this.userId,
-				device_id: this.whatsappLink._id,
+				device_id:  this.deviceId,
 			},
 			{
 				$set: filterUndefinedKeys(details),
@@ -248,7 +250,7 @@ export default class ConversationService extends WhatsappLinkService {
 		await ConversationMessageDB.updateOne(
 			{
 				linked_to: this.userId,
-				device_id: this.whatsappLink._id,
+				device_id:  this.deviceId,
 				message_id,
 			},
 			{
@@ -274,7 +276,7 @@ export default class ConversationService extends WhatsappLinkService {
 			{
 				$match: {
 					linked_to: this.userId,
-					device_id: this.whatsappLink._id,
+					device_id:  this.deviceId,
 					...(labels.length > 0 ? { recipient: { $in: recipients } } : {}),
 				},
 			},
@@ -364,7 +366,7 @@ export default class ConversationService extends WhatsappLinkService {
 	public async fetchConversationMessages(conversation_id: Types.ObjectId) {
 		const docs = await ConversationMessageDB.find({
 			linked_to: this.userId,
-			device_id: this.whatsappLink._id,
+			device_id:  this.deviceId,
 			conversation_id,
 		}).sort({ createdAt: -1 });
 

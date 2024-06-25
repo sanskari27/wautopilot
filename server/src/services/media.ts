@@ -19,17 +19,15 @@ function processMediaDocs(docs: IMedia[]) {
 }
 
 export default class MediaService extends WhatsappLinkService {
-	private whatsappLink: IWhatsappLink;
 	public constructor(account: IAccount, whatsappLink: IWhatsappLink) {
-		super(account);
-		this.whatsappLink = whatsappLink;
+		super(account, whatsappLink);
 	}
 
 	async delete(id: Types.ObjectId) {
 		const doc = await MediaDB.findOneAndDelete({
 			_id: id,
 			linked_to: this.userId,
-			device_id: this.whatsappLink._id,
+			device_id: this.deviceId,
 		});
 		if (!doc) {
 			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
@@ -40,7 +38,7 @@ export default class MediaService extends WhatsappLinkService {
 	async listMedias() {
 		const medias = await MediaDB.find({
 			linked_to: this.userId,
-			device_id: this.whatsappLink._id,
+			device_id: this.deviceId,
 		});
 		return processMediaDocs(medias);
 	}
@@ -48,7 +46,7 @@ export default class MediaService extends WhatsappLinkService {
 	async getMedia(id: Types.ObjectId) {
 		const media = await MediaDB.findOne({
 			linked_to: this.userId,
-			device_id: this.whatsappLink._id,
+			device_id: this.deviceId,
 			_id: id,
 		});
 		if (!media) {
@@ -60,7 +58,7 @@ export default class MediaService extends WhatsappLinkService {
 	async getMediaLocalPath(id: Types.ObjectId) {
 		const media = await MediaDB.findOne({
 			linked_to: this.userId,
-			device_id: this.whatsappLink._id,
+			device_id: this.deviceId,
 			_id: id,
 		});
 		if (!media) {
@@ -79,7 +77,7 @@ export default class MediaService extends WhatsappLinkService {
 	}) {
 		const media = await MediaDB.create({
 			linked_to: this.userId,
-			device_id: this.whatsappLink._id,
+			device_id: this.deviceId,
 			...details,
 		});
 

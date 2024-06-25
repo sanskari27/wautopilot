@@ -9,7 +9,7 @@ import routes from './modules';
 import Logger from 'n23-logger';
 import { IS_PRODUCTION, IS_WINDOWS, Path } from './config/const';
 import { CustomError } from './errors';
-import BroadcastService from './services/broadcast';
+import SchedulerService from './services/scheduler';
 
 const allowlist = [
 	'http://localhost:5173',
@@ -118,7 +118,7 @@ export default function (app: Express) {
 		next();
 	});
 	cron.schedule('*/5 * * * * *', () => {
-		BroadcastService.sendScheduledBroadcastMessage();
+		SchedulerService.sendScheduledTemplateMessages();
 	});
 	createDir();
 }

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { BROADCAST_STATUS } from '../../src/config/const';
 import IBroadcast from '../types/broadcast';
 import { AccountDB_name } from './Account';
-import { BroadcastMessageDB_name } from './BroadcastMessage';
+import { ScheduledMessageDB_name } from './ScheduledMessage';
 import { WhatsappLinkDB_name } from './WhatsappLink';
 
 export const BroadcastDB_name = 'Broadcast';
@@ -38,7 +38,7 @@ const schema = new mongoose.Schema<IBroadcast>(
 		messages: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
-				ref: BroadcastMessageDB_name,
+				ref: ScheduledMessageDB_name,
 			},
 		],
 		broadcast_type: {

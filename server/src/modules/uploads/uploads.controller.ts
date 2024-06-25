@@ -22,7 +22,7 @@ async function uploadMetaHandle(req: Request, res: Response, next: NextFunction)
 
 	let id = '';
 	try {
-		const { data } = await MetaAPI.post(
+		const { data } = await MetaAPI().post(
 			'/app/uploads',
 			{},
 			{
@@ -45,7 +45,7 @@ async function uploadMetaHandle(req: Request, res: Response, next: NextFunction)
 		const fileBuffer = fs.readFileSync(uploadedFile.path);
 		const form = new FormData();
 		form.append('file', fileBuffer);
-		const { data } = await MetaAPI.post(id, form, {
+		const { data } = await MetaAPI().post(id, form, {
 			headers: {
 				Authorization: `OAuth ${req.locals.device.accessToken}`,
 				file_offset: 0,
@@ -68,6 +68,7 @@ async function uploadMetaHandle(req: Request, res: Response, next: NextFunction)
 }
 
 async function uploadMetaMedia(req: Request, res: Response, next: NextFunction) {
+	const { device } = req.locals;
 	let uploadedFile: ResolvedFile | null = null;
 	try {
 		uploadedFile = await FileUpload.SingleFileUpload(req, res, {
@@ -83,12 +84,15 @@ async function uploadMetaMedia(req: Request, res: Response, next: NextFunction) 
 		form.append('messaging_product', 'whatsapp');
 		form.append('file', fs.createReadStream(uploadedFile.path));
 
-		const { data } = await MetaAPI.post(`/${req.locals.device.phoneNumberId}/media`, form, {
-			headers: {
-				Authorization: `Bearer ${req.locals.device.accessToken}`,
-				'Content-Type': 'multipart/form-data',
-			},
-		});
+		const { data } = await MetaAPI(device.accessToken).post(
+			`/${device.phoneNumberId}/media`,
+			form,
+			{
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+			}
+		);
 		return Respond({
 			res,
 			status: 200,
@@ -105,11 +109,7 @@ async function uploadMetaMedia(req: Request, res: Response, next: NextFunction) 
 async function fetchMetaMediaUrl(req: Request, res: Response, next: NextFunction) {
 	const media_id = req.params.id;
 	try {
-		const { data } = await MetaAPI.get(`/${media_id}`, {
-			headers: {
-				Authorization: `Bearer ${req.locals.device.accessToken}`,
-			},
-		});
+		const { data } = await MetaAPI(req.locals.device.accessToken).get(`/${media_id}`);
 
 		return Respond({
 			res,
@@ -131,11 +131,7 @@ async function downloadMetaMedia(req: Request, res: Response, next: NextFunction
 		return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
 	}
 	try {
-		const { data } = await MetaAPI.get(`/${id}`, {
-			headers: {
-				Authorization: `Bearer ${req.locals.device.accessToken}`,
-			},
-		});
+		const { data } = await MetaAPI(req.locals.device.accessToken).get(`/${id}`);
 
 		const response = await axios.get(data.url, {
 			responseType: 'stream',

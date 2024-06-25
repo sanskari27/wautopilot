@@ -1,11 +1,12 @@
 import { Document, Types } from 'mongoose';
 import { MESSAGE_STATUS } from '../../src/config/const';
 
-export default interface IBroadcastMessage extends Document {
+export default interface IScheduledMessage extends Document {
 	_id: Types.ObjectId;
 	linked_to: Types.ObjectId;
 	device_id: Types.ObjectId;
-	broadcast_id: Types.ObjectId;
+	scheduler_id: Types.ObjectId;
+	scheduler_type: string;
 
 	to: string;
 
@@ -21,6 +22,7 @@ export default interface IBroadcastMessage extends Document {
 	createdAt: Date;
 	sendAt: Date;
 
+	message_type: 'normal' | 'template';
 	messageObject: {
 		[key: string]: any;
 	};

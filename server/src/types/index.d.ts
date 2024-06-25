@@ -3,8 +3,8 @@
 import { Types } from 'mongoose';
 import IAccount from '../../mongo/types/account';
 import IPlan from '../../mongo/types/plan';
-import IWhatsappLink from '../../mongo/types/whatsapplink';
 import { UserService } from '../services';
+import WhatsappLinkService from '../services/whatsappLink';
 
 declare global {
 	var __basedir: string;
@@ -28,7 +28,7 @@ export interface LocalVariables {
 	id: IDType;
 	account: IAccount;
 	user: UserService;
-	device: IWhatsappLink;
+	device: WhatsappLinkService;
 	plan: IPlan;
 }
 

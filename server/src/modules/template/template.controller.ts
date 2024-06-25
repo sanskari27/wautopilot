@@ -7,8 +7,12 @@ import { Respond } from '../../utils/ExpressUtils';
 import { TemplateRemoveValidationResult } from './template.validator';
 
 async function addTemplate(req: Request, res: Response, next: NextFunction) {
+	const {
+		account,
+		device: { device },
+	} = req.locals;
 	try {
-		const templateService = new TemplateService(req.locals.account, req.locals.device);
+		const templateService = new TemplateService(account, device);
 		const success = await templateService.addTemplate(req.locals.data as Template);
 
 		if (!success) {
@@ -25,10 +29,14 @@ async function addTemplate(req: Request, res: Response, next: NextFunction) {
 }
 
 async function editTemplate(req: Request, res: Response, next: NextFunction) {
+	const {
+		account,
+		device: { device },
+	} = req.locals;
 	try {
 		const { id, ...data } = req.locals.data as Template & { id: string };
 
-		const templateService = new TemplateService(req.locals.account, req.locals.device);
+		const templateService = new TemplateService(account, device);
 		const success = await templateService.editTemplate(id, data);
 
 		if (!success) {
@@ -46,8 +54,12 @@ async function editTemplate(req: Request, res: Response, next: NextFunction) {
 
 async function deleteTemplate(req: Request, res: Response, next: NextFunction) {
 	const { id, name } = req.locals.data as TemplateRemoveValidationResult;
+	const {
+		account,
+		device: { device },
+	} = req.locals;
 	try {
-		const templateService = new TemplateService(req.locals.account, req.locals.device);
+		const templateService = new TemplateService(account, device);
 		const success = await templateService.deleteTemplate(id, name);
 
 		if (!success) {
@@ -63,8 +75,12 @@ async function deleteTemplate(req: Request, res: Response, next: NextFunction) {
 	}
 }
 async function fetchTemplates(req: Request, res: Response, next: NextFunction) {
+	const {
+		account,
+		device: { device },
+	} = req.locals;
 	try {
-		const templateService = new TemplateService(req.locals.account, req.locals.device);
+		const templateService = new TemplateService(account, device);
 		const templates = await templateService.fetchTemplates();
 
 		return Respond({
@@ -81,8 +97,12 @@ async function fetchTemplates(req: Request, res: Response, next: NextFunction) {
 
 async function fetchTemplate(req: Request, res: Response, next: NextFunction) {
 	const id = req.params.id;
+	const {
+		account,
+		device: { device },
+	} = req.locals;
 	try {
-		const templateService = new TemplateService(req.locals.account, req.locals.device);
+		const templateService = new TemplateService(account, device);
 		const template = await templateService.fetchTemplate(id);
 
 		if (!template) {

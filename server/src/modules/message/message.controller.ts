@@ -20,8 +20,12 @@ const bodyParametersList = [
 ];
 
 async function broadcastReport(req: Request, res: Response, next: NextFunction) {
+	const {
+		account,
+		device: { device },
+	} = req.locals;
 	try {
-		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+		const broadcastService = new BroadcastService(account, device);
 
 		const reports = await broadcastService.fetchReports();
 
@@ -38,10 +42,14 @@ async function broadcastReport(req: Request, res: Response, next: NextFunction) 
 }
 
 async function pauseBroadcast(req: Request, res: Response, next: NextFunction) {
-	const { id } = req.locals;
+	const {
+		id,
+		account,
+		device: { device },
+	} = req.locals;
 
 	try {
-		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+		const broadcastService = new BroadcastService(account, device);
 		await broadcastService.pauseBroadcast(id);
 
 		return Respond({
@@ -54,10 +62,14 @@ async function pauseBroadcast(req: Request, res: Response, next: NextFunction) {
 }
 
 async function resumeBroadcast(req: Request, res: Response, next: NextFunction) {
-	const { id } = req.locals;
+	const {
+		id,
+		account,
+		device: { device },
+	} = req.locals;
 
 	try {
-		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+		const broadcastService = new BroadcastService(account, device);
 		await broadcastService.resumeBroadcast(id);
 
 		return Respond({
@@ -70,10 +82,14 @@ async function resumeBroadcast(req: Request, res: Response, next: NextFunction) 
 }
 
 async function resendBroadcast(req: Request, res: Response, next: NextFunction) {
-	const { id } = req.locals;
+	const {
+		id,
+		account,
+		device: { device },
+	} = req.locals;
 
 	try {
-		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+		const broadcastService = new BroadcastService(account, device);
 		await broadcastService.resendBroadcast(id);
 
 		return Respond({
@@ -86,10 +102,14 @@ async function resendBroadcast(req: Request, res: Response, next: NextFunction) 
 }
 
 async function downloadBroadcast(req: Request, res: Response, next: NextFunction) {
-	const { id } = req.locals;
+	const {
+		id,
+		account,
+		device: { device },
+	} = req.locals;
 
 	try {
-		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+		const broadcastService = new BroadcastService(account, device);
 		const records = await broadcastService.generateBroadcastReport(id);
 
 		return RespondCSV({
@@ -103,10 +123,14 @@ async function downloadBroadcast(req: Request, res: Response, next: NextFunction
 }
 
 async function deleteBroadcast(req: Request, res: Response, next: NextFunction) {
-	const { id } = req.locals;
+	const {
+		id,
+		account,
+		device: { device },
+	} = req.locals;
 
 	try {
-		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+		const broadcastService = new BroadcastService(account, device);
 		await broadcastService.deleteBroadcast(id);
 
 		return Respond({
@@ -131,9 +155,14 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 		header,
 	} = req.locals.data as CreateBroadcastValidationResult;
 
+	const {
+		account,
+		device: { device },
+	} = req.locals;
+
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.account);
-		const broadcastService = new BroadcastService(req.locals.account, req.locals.device);
+		const phoneBookService = new PhoneBookService(account);
+		const broadcastService = new BroadcastService(account, device);
 
 		let _to = to;
 		if (to.length === 0) {
@@ -153,7 +182,7 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 		}
 
 		const messages = _to.map(async (number) => {
-			const fields = await phoneBookService.findFieldsByPhone(number);
+			const fields = await phoneBookService.findRecordByPhone(number);
 
 			let headers = [] as Record<string, unknown>[];
 
@@ -248,7 +277,10 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 
 async function fetchConversations(req: Request, res: Response, next: NextFunction) {
 	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];
-	const { account, device } = req.locals;
+	const {
+		account,
+		device: { device },
+	} = req.locals;
 
 	const conversationService = new ConversationService(account, device);
 	const conversations = await conversationService.fetchConversations(labels);
@@ -261,7 +293,11 @@ async function fetchConversations(req: Request, res: Response, next: NextFunctio
 }
 
 async function fetchConversationMessages(req: Request, res: Response, next: NextFunction) {
-	const { account, id, device } = req.locals;
+	const {
+		account,
+		id,
+		device: { device },
+	} = req.locals;
 
 	const conversationService = new ConversationService(account, device);
 	const messages = await conversationService.fetchConversationMessages(id);
@@ -275,23 +311,18 @@ async function fetchConversationMessages(req: Request, res: Response, next: Next
 }
 
 async function markRead(req: Request, res: Response, next: NextFunction) {
-	const { account, device } = req.locals;
+	const {
+		account,
+		device: { device },
+	} = req.locals;
 	const message_id = req.params.message_id;
 
 	try {
-		await MetaAPI.put(
-			`/${device.phoneNumberId}/messages`,
-			{
-				messaging_product: 'whatsapp',
-				status: 'read',
-				message_id: message_id,
-			},
-			{
-				headers: {
-					Authorization: `Bearer ${device.accessToken}`,
-				},
-			}
-		);
+		await MetaAPI(device.accessToken).put(`/${device.phoneNumberId}/messages`, {
+			messaging_product: 'whatsapp',
+			status: 'read',
+			message_id: message_id,
+		});
 	} catch (err) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
@@ -310,7 +341,11 @@ async function markRead(req: Request, res: Response, next: NextFunction) {
 }
 
 async function assignLabelToMessage(req: Request, res: Response, next: NextFunction) {
-	const { account, device, id } = req.locals;
+	const {
+		account,
+		device: { device },
+		id,
+	} = req.locals;
 
 	try {
 		const conversationService = new ConversationService(account, device);
@@ -326,7 +361,11 @@ async function assignLabelToMessage(req: Request, res: Response, next: NextFunct
 }
 
 async function sendMessageToConversation(req: Request, res: Response, next: NextFunction) {
-	const { account, id, device } = req.locals;
+	const {
+		account,
+		id,
+		device: { device },
+	} = req.locals;
 	const data = req.locals.data as SendMessageValidationResult;
 
 	const conversationService = new ConversationService(account, device);
@@ -354,11 +393,10 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 	};
 
 	try {
-		const { data: res } = await MetaAPI.post(`/${device.phoneNumberId}/messages`, msgObj, {
-			headers: {
-				Authorization: `Bearer ${device.accessToken}`,
-			},
-		});
+		const { data: res } = await MetaAPI(device.accessToken).post(
+			`/${device.phoneNumberId}/messages`,
+			msgObj
+		);
 
 		await conversationService.addMessageToConversation(id, {
 			message_id: res.messages[0].id,
