@@ -11,6 +11,11 @@ const AUTH_ERRORS = {
 		TITLE: 'USER_NOT_FOUND_ERROR',
 		MESSAGE: 'The user was not found. Please try again later.',
 	},
+	DEVICE_NOT_FOUND: {
+		STATUS: 404,
+		TITLE: 'DEVICE_NOT_FOUND',
+		MESSAGE: 'The device was not found. Please try again later.',
+	},
 	SESSION_INVALIDATED: {
 		STATUS: 404,
 		TITLE: 'SESSION_INVALIDATED',

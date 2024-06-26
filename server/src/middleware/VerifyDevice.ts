@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { CustomError } from '../errors';
-import COMMON_ERRORS from '../errors/common-errors';
+import { AUTH_ERRORS, CustomError } from '../errors';
 import WhatsappLinkService from '../services/whatsappLink';
 import { idValidator } from '../utils/ExpressUtils';
 
@@ -9,19 +8,18 @@ export default async function VerifyDevice(req: Request, res: Response, next: Ne
 	const [valid, id] = idValidator(device_id);
 
 	if (!valid) {
-		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+		return next(new CustomError(AUTH_ERRORS.DEVICE_NOT_FOUND));
 	}
 
 	try {
-		const device = await WhatsappLinkService.fetchDeviceDoc(req.locals.user.userId, id);
-
+		const device = await WhatsappLinkService.fetchDeviceDoc(id, req.locals.user.userId);
 		if (!device) {
-			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+			return next(new CustomError(AUTH_ERRORS.DEVICE_NOT_FOUND));
 		}
 
 		req.locals.device = new WhatsappLinkService(req.locals.account, device);
 		next();
 	} catch (err) {
-		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+		return next(new CustomError(AUTH_ERRORS.DEVICE_NOT_FOUND));
 	}
 }

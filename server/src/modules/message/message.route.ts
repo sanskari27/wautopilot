@@ -21,7 +21,6 @@ router
 	.all(CreateBroadcastValidator)
 	.post(Controller.sendTemplateMessage);
 
-router.route('/conversations').get(Controller.fetchConversations);
 router
 	.route('/conversations/:id/messages')
 	.all(IDValidator)
@@ -37,5 +36,7 @@ router
 	.all(IDValidator, LabelValidator)
 	.post(Controller.assignLabelToMessage);
 router.route('/mark-read/:message_id').post(Controller.markRead);
+
+router.route('/conversations').get(Controller.fetchConversations);
 
 export default router;
