@@ -103,6 +103,7 @@ export default class SchedulerService extends WhatsappLinkService {
 				);
 				msg.message_id = data.messages[0].id;
 				msg.save();
+				userService.deductCredit(1);
 			} catch (err) {
 				if (axios.isAxiosError(err)) {
 					Logger.info('Error sending broadcast message', err.response?.data as string);
@@ -116,7 +117,6 @@ export default class SchedulerService extends WhatsappLinkService {
 				msg.save();
 				return;
 			}
-			userService.deductCredit(1);
 
 			const conversationService = new ConversationService(msg.linked_to, msg.device_id);
 			const templateService = new TemplateService(msg.linked_to, msg.device_id);

@@ -20,6 +20,7 @@ import {
 	TagCloseButton,
 	TagLabel,
 	Text,
+	Tooltip,
 	VStack,
 	Wrap,
 	useDisclosure,
@@ -143,14 +144,26 @@ const ChatMessageWrapper = ({
 						</>
 					)}
 				</Flex>
-				<Flex gap={1} alignItems={'center'} justifyContent={isMe ? 'flex-start' : 'flex-end'}>
+				<Flex
+					gap={1}
+					alignItems={'center'}
+					justifyContent={isMe ? 'flex-start' : 'flex-end'}
+					position={'relative'}
+				>
 					{message.delivered_at && <FormatTime time={message.read_at || message.delivered_at} />}
 					{message.received_at && <FormatTime time={message.received_at} />}
 					{message.read_at ? (
 						<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={BiCheckDouble} color='blue.500' />
 					) : message.delivered_at ? (
 						<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={BiCheckDouble} color='gray.500' />
-					) : !isMe ? (
+					) : message.failed_at ? (
+						<Tooltip label={message.failed_reason}>
+							<span>
+								<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={CgTimer} color='red.500' />
+							</span>
+						</Tooltip>
+					) : // <Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={CgTimer} color='red.500' />
+					!isMe ? (
 						<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={CgTimer} color='gray.500' />
 					) : null}
 				</Flex>
