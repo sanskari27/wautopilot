@@ -178,6 +178,7 @@ ${
 			rounded={'lg'}
 			gap={'1.1rem'}
 			onClick={handleButtonClick}
+			whiteSpace={'nowrap'}
 		>
 			<Icon as={icon} color={'green.400'} width={5} height={5} />
 			<Text fontSize={'sm'}>{name}</Text>

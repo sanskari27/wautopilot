@@ -5,10 +5,10 @@ import { NAVIGATION } from './config/const';
 
 import { Flex, Progress } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
+import { useFetchLabels } from './hooks/useFetchLabels';
 import useFilterLabels from './hooks/useFilterLabels';
 import AuthService from './services/auth.service';
 import { setIsAuthenticated } from './store/reducers/UserReducers';
-import { useFetchLabels } from './hooks/useFetchLabels';
 
 const BroadcastReport = lazy(() => import('./views/pages/broadcast-report'));
 const AppPage = lazy(() => import('./views/pages/app'));
@@ -21,6 +21,7 @@ const EditTemplate = lazy(() => import('./views/pages/templates/edit-template'))
 const Phonebook = lazy(() => import('./views/pages/phonebook'));
 const MediaPage = lazy(() => import('./views/pages/media'));
 const AddMedia = lazy(() => import('./views/pages/media/add-media'));
+const ChatBot = lazy(() => import('./views/pages/chatbot'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -56,6 +57,7 @@ function App() {
 							<Route path={NAVIGATION.BROADCAST_REPORT} element={<BroadcastReport />} />
 							<Route path={NAVIGATION.CONTACT} element={<ContactPage />} />
 							<Route path={NAVIGATION.INBOX} element={<Conversation />} />
+							<Route path={NAVIGATION.CHATBOT} element={<ChatBot />} />
 							<Route
 								path={NAVIGATION.DASHBOARD}
 								element={<Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />}

@@ -1,4 +1,4 @@
-import { BiConversation } from 'react-icons/bi';
+import { BiBot, BiConversation } from 'react-icons/bi';
 import { MdContacts, MdOutlinePermMedia } from 'react-icons/md';
 import { RiContactsBook2Line } from 'react-icons/ri';
 import { TbMessage2Plus, TbReportSearch, TbTemplate } from 'react-icons/tb';
@@ -21,6 +21,7 @@ export const NAVIGATION = {
 	BROADCAST: 'broadcast',
 	BROADCAST_REPORT: 'campaign-report',
 	PHONEBOOK: 'phonebook',
+	CHATBOT: 'chatbot',
 
 	TEMPLATES: 'templates',
 	ADD_TEMPLATE: 'add-template',
@@ -69,6 +70,11 @@ export const MenuItems = [
 		icon: MdContacts,
 		route: NAVIGATION.CONTACT,
 		title: 'Contacts',
+	},
+	{
+		icon: BiBot,
+		route: NAVIGATION.CHATBOT,
+		title: 'Chat Bot',
 	},
 ];
 

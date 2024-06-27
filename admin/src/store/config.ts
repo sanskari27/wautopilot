@@ -9,4 +9,5 @@ export enum StoreNames {
 	MESSAGES = 'messages',
 	CONTACT = 'contact',
 	FILTER_LABELS = 'filterLabels',
+	CHATBOT = 'chatbot',
 }

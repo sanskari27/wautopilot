@@ -33,10 +33,11 @@ export type AttachmentDialogHandle = {
 
 type Props = {
 	onConfirm: (type: string, ids: string[]) => void;
+	isSelect?: boolean;
 };
 
 const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
-	({ onConfirm }: Props, ref) => {
+	({ onConfirm, isSelect = false }: Props, ref) => {
 		const [selected, setSelected] = useState<string[]>([]);
 		const { list } = useSelector((state: StoreState) => state[StoreNames.MEDIA]);
 		const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
@@ -169,8 +170,12 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 							<Button colorScheme='red' mr={3} onClick={onClose}>
 								Cancel
 							</Button>
-							<Button isDisabled={selected.length === 0} colorScheme='green' onClick={handleAdd}>
-								Send
+							<Button
+								isDisabled={!isSelect && selected.length === 0}
+								colorScheme='green'
+								onClick={handleAdd}
+							>
+								{isSelect ? 'Select' : 'Send'}
 							</Button>
 						</Flex>
 					</ModalFooter>

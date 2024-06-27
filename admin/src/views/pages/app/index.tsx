@@ -5,11 +5,13 @@ import { Navigate, useOutlet } from 'react-router-dom';
 import APIInstance from '../../../config/APIInstance';
 import { AUTH_URL, NAVIGATION } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
+import ChatBotService from '../../../services/chatbot.service';
 import DeviceService from '../../../services/device.service';
 import MediaService from '../../../services/media.service';
 import MessagesService from '../../../services/messages.service';
 import TemplateService from '../../../services/template.service';
 import { StoreNames, StoreState } from '../../../store';
+import { setChatBotList } from '../../../store/reducers/ChatBotReducer';
 import { setContactList } from '../../../store/reducers/ContactReducer';
 import {
 	setDevicesList,
@@ -61,6 +63,7 @@ const AppPage = () => {
 					MediaService.getMedias(selected_device_id),
 					TemplateService.listTemplates(selected_device_id),
 					APIInstance.get(`/contacts`),
+					ChatBotService.listChatBots({ deviceId: selected_device_id }),
 				];
 
 				const results = await Promise.all(promises);
@@ -68,6 +71,7 @@ const AppPage = () => {
 				dispatch(setMediaList(results[1]));
 				dispatch(setTemplatesList(results[2]));
 				dispatch(setContactList(results[3].data.contacts as Contact[]));
+				dispatch(setChatBotList(results[4]));
 			} catch (e) {
 				return;
 			}
