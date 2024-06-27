@@ -10,9 +10,11 @@ router
 	.all(IDValidator)
 	.delete(Controller.deleteBot)
 	.put(Controller.toggleActive)
-	.all(CreateBotValidator)
-	.patch(Controller.updateBot);
+	.patch(CreateBotValidator,Controller.updateBot);
 
-router.route('/').get(Controller.listBots).all(CreateBotValidator).post(Controller.createBot);
+router
+	.route('/')
+	.get(Controller.listBots)
+	.post(CreateBotValidator,Controller.createBot);
 
 export default router;
