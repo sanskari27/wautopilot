@@ -40,6 +40,7 @@ const initState: ChatBotState = {
 		time: 1,
 		type: '',
 	},
+	template_header_file: null,
 	ui: {
 		isAddingBot: false,
 		isEditingBot: false,
@@ -53,6 +54,9 @@ const initState: ChatBotState = {
 		responseGapError: '',
 		startAtError: '',
 		endAtError: '',
+		bodyError: '',
+		headerError: '',
+		templateError: '',
 	},
 };
 
@@ -66,6 +70,7 @@ const Slice = createSlice({
 			state.response_delay = initState.response_delay;
 			state.trigger_gap = initState.trigger_gap;
 			state.ui = initState.ui;
+			state.template_header_file = initState.template_header_file;
 		},
 		setChatBotList: (state, action: PayloadAction<typeof initState.list>) => {
 			state.list = action.payload;
@@ -86,15 +91,12 @@ const Slice = createSlice({
 			state.details = action.payload;
 		},
 		setTrigger: (state, action: PayloadAction<string>) => {
-			state.ui = initState.ui;
 			state.details.trigger = action.payload;
 		},
 		setRespondTo: (state, action: PayloadAction<typeof initState.details.respond_to>) => {
-			state.ui = initState.ui;
 			state.details.respond_to = action.payload;
 		},
 		setCondition: (state, action: PayloadAction<typeof initState.details.options>) => {
-			state.ui = initState.ui;
 			state.details.options = action.payload;
 		},
 		setResponseDelayTime: (state, action: PayloadAction<number>) => {
@@ -135,19 +137,15 @@ const Slice = createSlice({
 			state.ui.triggerGapError = '';
 		},
 		setStartAt: (state, action: PayloadAction<typeof initState.details.startAt>) => {
-			state.ui = initState.ui;
 			state.details.startAt = action.payload;
 		},
 		setEndAt: (state, action: PayloadAction<typeof initState.details.endAt>) => {
-			state.ui = initState.ui;
 			state.details.endAt = action.payload;
 		},
 		setTemplateId: (state, action: PayloadAction<string>) => {
-			state.ui = initState.ui;
 			state.details.template_id = action.payload;
 		},
 		setBodyParameterCount: (state, action: PayloadAction<number>) => {
-			state.ui = initState.ui;
 			state.details.template_body = Array.from({ length: action.payload }).map(() => ({
 				custom_text: '',
 				phonebook_data: '',
@@ -156,7 +154,6 @@ const Slice = createSlice({
 			}));
 		},
 		setMessage: (state, action: PayloadAction<string>) => {
-			state.ui = initState.ui;
 			state.details.message = action.payload;
 		},
 		setImages: (state, action: PayloadAction<string[]>) => {
@@ -180,6 +177,116 @@ const Slice = createSlice({
 		setAddingBot: (state, action: PayloadAction<boolean>) => {
 			state.ui.isAddingBot = action.payload;
 		},
+		setTemplateHeaderLink: (state, action: PayloadAction<string>) => {
+			state.details.template_header.link = action.payload;
+		},
+		setTemplateHeaderMediaId: (state, action: PayloadAction<string>) => {
+			state.details.template_header.media_id = action.payload;
+		},
+		setTemplateBodyCustomText: (
+			state,
+			action: PayloadAction<{ index: number; custom_text: string }>
+		) => {
+			state.details.template_body[action.payload.index].custom_text = action.payload.custom_text;
+		},
+		setTemplateBodyPhonebookData: (
+			state,
+			action: PayloadAction<{ index: number; phonebook_data: string }>
+		) => {
+			state.details.template_body[action.payload.index].phonebook_data =
+				action.payload.phonebook_data;
+		},
+		setTemplateBodyVariableFrom: (
+			state,
+			action: PayloadAction<{ index: number; variable_from: 'custom_text' | 'phonebook_data' }>
+		) => {
+			state.details.template_body[action.payload.index].variable_from =
+				action.payload.variable_from;
+		},
+		setTemplateBodyFallbackValue: (
+			state,
+			action: PayloadAction<{ index: number; fallback_value: string }>
+		) => {
+			state.details.template_body[action.payload.index].fallback_value =
+				action.payload.fallback_value;
+		},
+		setHeaderFile: (state, action: PayloadAction<File | null>) => {
+			state.template_header_file = action.payload;
+		},
+		setRespondType: (state, action: PayloadAction<'template' | 'normal'>) => {
+			state.details.respond_type = action.payload;
+		},
+		setGroupRespond: (state, action: PayloadAction<boolean>) => {
+			state.details.group_respond = action.payload;
+		},
+		createEmptyNurturing: (state) => {
+			state.details.nurturing.push({
+				after: {
+					value: '1',
+					type: 'days',
+				},
+				start_from: '',
+				end_at: '',
+				template_id: '',
+				template_name: '',
+				template_body: [],
+				template_header: {
+					type: 'IMAGE',
+					link: '',
+					media_id: '',
+				},
+			});
+		},
+		removeNurturing: (state, action: PayloadAction<number>) => {
+			state.details.nurturing.splice(action.payload, 1);
+		},
+		setNurturingStartFrom: (
+			state,
+			action: PayloadAction<{ index: number; start_from: string }>
+		) => {
+			state.details.nurturing[action.payload.index].start_from = action.payload.start_from;
+		},
+		setNurturingEndAt: (state, action: PayloadAction<{ index: number; end_at: string }>) => {
+			state.details.nurturing[action.payload.index].end_at = action.payload.end_at;
+		},
+		setNurturingAfterValue: (
+			state,
+			action: PayloadAction<{ index: number; value: string }>
+		) => {
+			state.details.nurturing[action.payload.index].after.value = action.payload.value;
+		},
+		setNurturingAfterType: (
+			state,
+			action: PayloadAction<{ index: number; type: 'minutes' | 'hours' | 'days' }>
+		) => {
+			state.details.nurturing[action.payload.index].after.type = action.payload.type;
+		},
+		setNurturingTemplateId: (
+			state,
+			action: PayloadAction<{ index: number; template_id: string }>
+		) => {
+			state.details.nurturing[action.payload.index].template_id = action.payload.template_id;
+		},
+		setNurturingTemplateDetails: (
+			state,
+			action: PayloadAction<{
+				index: number;
+				template_body: {
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value: string;
+				}[];
+				template_header: {
+					type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+					link: string;
+					media_id: string;
+				};
+			}>
+		) => {
+			state.details.nurturing[action.payload.index].template_body = action.payload.template_body;
+			state.details.nurturing[action.payload.index].template_header = action.payload.template_header;
+		},
 		setError: (
 			state,
 			action: PayloadAction<{
@@ -193,7 +300,10 @@ const Slice = createSlice({
 					| 'triggerGapError'
 					| 'responseGapError'
 					| 'startAtError'
-					| 'endAtError';
+					| 'endAtError'
+					| 'templateError'
+					| 'headerError'
+					| 'bodyError';
 
 				error: string;
 			}>
@@ -211,6 +321,14 @@ export const {
 	setChatBotList,
 	setTrigger,
 	setError,
+	createEmptyNurturing,
+	removeNurturing,
+	setNurturingStartFrom,
+	setNurturingEndAt,
+	setNurturingAfterValue,
+	setNurturingAfterType,
+	setNurturingTemplateId,
+	setNurturingTemplateDetails,
 	setRespondTo,
 	setCondition,
 	setResponseDelayTime,
@@ -221,6 +339,15 @@ export const {
 	setTemplateId,
 	setStartAt,
 	setBodyParameterCount,
+	setTemplateHeaderLink,
+	setTemplateHeaderMediaId,
+	setTemplateBodyCustomText,
+	setTemplateBodyPhonebookData,
+	setTemplateBodyVariableFrom,
+	setTemplateBodyFallbackValue,
+	setHeaderFile,
+	setRespondType,
+	setGroupRespond,
 	setMessage,
 	setImages,
 	setVideos,

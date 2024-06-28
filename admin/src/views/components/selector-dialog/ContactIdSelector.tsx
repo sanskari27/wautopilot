@@ -92,7 +92,6 @@ const ContactIdSelectorDialog = forwardRef<ContactIdSelectorHandle, Props>(
 														if (!e.target.checked) {
 															setSelected([]);
 														} else {
-															console.log(filtered.map((item) => item.id));
 															setSelected(filtered.map((item) => item.id));
 														}
 													}}

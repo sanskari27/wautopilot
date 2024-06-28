@@ -1,9 +1,7 @@
 import {
 	Button,
-	Checkbox,
 	FormControl,
 	FormErrorMessage,
-	HStack,
 	Tag,
 	TagLabel,
 	Text,
@@ -27,6 +25,17 @@ import AttachmentSelectorDialog, {
 import ContactIdSelectorDialog, {
 	ContactIdSelectorHandle,
 } from '../../../components/selector-dialog/ContactIdSelector';
+
+const tagsVariable = [
+	'{{first_name}}',
+	'{{last_name}}',
+	'{{middle_name}}',
+	'{{phone_number}}',
+	'{{email}}',
+	'{{birthday}}',
+	'{{anniversary}}',
+	'{{others}}',
+];
 
 export default function StaticMessageInput() {
 	const dispatch = useDispatch();
@@ -147,29 +156,23 @@ export default function StaticMessageInput() {
 				/>
 				{ui.messageError && <FormErrorMessage>{ui.messageError}</FormErrorMessage>}
 			</FormControl>
-			<HStack width={'full'} justifyContent={'space-between'}>
-				<Tag
-					size={'sm'}
-					m={'0.25rem'}
-					p={'0.5rem'}
-					width={'fit-content'}
-					borderRadius='md'
-					variant='solid'
-					colorScheme='gray'
-					_hover={{ cursor: 'pointer' }}
-					onClick={() => insertVariablesToMessage('{{public_name}}')}
-				>
-					<TagLabel>{'{{public_name}}'}</TagLabel>
-				</Tag>
-				<Checkbox
-					colorScheme='green'
-					size='md'
-					// isChecked={details.random_string}
-					// onChange={() => dispatch(toggleRandomString())}
-				>
-					Append Random Text
-				</Checkbox>
-			</HStack>
+			<Wrap>
+				{tagsVariable.map((tag) => (
+					<Tag
+						size={'sm'}
+						m={'0.25rem'}
+						p={'0.5rem'}
+						width={'fit-content'}
+						borderRadius='md'
+						variant='solid'
+						colorScheme='gray'
+						_hover={{ cursor: 'pointer' }}
+						onClick={() => insertVariablesToMessage(tag)}
+					>
+						<TagLabel>{tag}</TagLabel>
+					</Tag>
+				))}
+			</Wrap>
 		</>
 	);
 }

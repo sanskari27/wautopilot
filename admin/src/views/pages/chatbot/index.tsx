@@ -18,7 +18,7 @@ import {
 	Text,
 	useToast,
 } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ChatBotService from '../../../services/chatbot.service';
 import UploadService from '../../../services/upload.service';
@@ -31,35 +31,40 @@ import {
 	setCondition,
 	setEndAt,
 	setError,
-	setMessage,
+	setGroupRespond,
+	setHeaderFile,
 	setRespondTo,
+	setRespondType,
 	setResponseDelayTime,
 	setResponseDelayType,
 	setStartAt,
+	setTemplateBodyCustomText,
+	setTemplateBodyFallbackValue,
+	setTemplateBodyPhonebookData,
+	setTemplateBodyVariableFrom,
+	setTemplateHeaderLink,
 	setTemplateId,
 	setTrigger,
 	setTriggerGapTime,
 	setTriggerGapType,
+	updateBot,
 } from '../../../store/reducers/ChatBotReducer';
 import { countOccurrences } from '../../../utils/templateHelper';
-import TemplateComponentParameter, {
-	ComponentParameterHandle,
-} from '../../components/template-component-parameters';
+import TemplateComponentParameter from '../../components/template-component-parameters';
 import Each from '../../components/utils/Each';
 import AllResponders from './components/AllResponders';
 import { NumberInput, SelectElement, TextAreaElement } from './components/Inputs';
+import LeadsNurturing, { LeadsNurturingHandle } from './components/LeadsNurturingDialog';
 import StaticMessageInput from './components/StaticMessageInput';
 
 export default function ChatBotPage() {
-	const componentParameterRef = useRef<ComponentParameterHandle>(null);
-
 	const dispatch = useDispatch();
 	const toast = useToast();
 
-	const [messageType, setMessageType] = useState<'static' | 'template'>('static');
+	const leadsNurtureRef = useRef<LeadsNurturingHandle>(null);
 
 	const { list: templateList } = useSelector((state: StoreState) => state[StoreNames.TEMPLATES]);
-	const { details, response_delay, trigger_gap, ui } = useSelector(
+	const { details, response_delay, trigger_gap, template_header_file, ui } = useSelector(
 		(state: StoreState) => state[StoreNames.CHATBOT]
 	);
 
@@ -78,6 +83,11 @@ export default function ChatBotPage() {
 		response_delay_seconds,
 		trigger_gap_seconds,
 		template_body,
+		template_header,
+		template_id,
+		respond_type,
+		group_respond,
+		nurturing,
 	} = details;
 	const { isAddingBot, isEditingBot } = ui;
 
@@ -96,7 +106,10 @@ export default function ChatBotPage() {
 				| 'triggerGapError'
 				| 'responseGapError'
 				| 'startAtError'
-				| 'endAtError';
+				| 'endAtError'
+				| 'templateError'
+				| 'headerError'
+				| 'bodyError';
 			error: string;
 		} = {
 			type: 'triggerError',
@@ -108,91 +121,149 @@ export default function ChatBotPage() {
 		errorPayload.type = 'triggerError';
 		errorPayload.error = '';
 		dispatch(setError(errorPayload));
+		if (respond_type === 'normal') {
+			if (
+				!message &&
+				audios.length === 0 &&
+				documents.length === 0 &&
+				images.length === 0 &&
+				contacts.length === 0 &&
+				videos.length === 0
+			) {
+				errorPayload.type = 'messageError';
+				errorPayload.error = 'Message or Attachment or Contact or Poll is required';
+				dispatch(setError(errorPayload));
+				notHasError = false;
+			} else {
+				errorPayload.type = 'messageError';
+				errorPayload.error = '';
+				dispatch(setError(errorPayload));
+			}
 
-		if (
-			!message &&
-			audios.length === 0 &&
-			documents.length === 0 &&
-			images.length === 0 &&
-			contacts.length === 0 &&
-			videos.length === 0
-		) {
-			errorPayload.type = 'messageError';
-			errorPayload.error = 'Message or Attachment or Contact or Poll is required';
-			dispatch(setError(errorPayload));
-			notHasError = false;
-		} else {
-			errorPayload.type = 'messageError';
-			errorPayload.error = '';
-			dispatch(setError(errorPayload));
-		}
+			if (!respond_to) {
+				errorPayload.type = 'respondToError';
+				errorPayload.error = 'Recipients is required';
+				dispatch(setError(errorPayload));
+				notHasError = false;
+			} else {
+				errorPayload.type = 'respondToError';
+				errorPayload.error = '';
+				dispatch(setError(errorPayload));
+			}
 
-		if (!respond_to) {
-			errorPayload.type = 'respondToError';
-			errorPayload.error = 'Recipients is required';
-			dispatch(setError(errorPayload));
-			notHasError = false;
-		} else {
-			errorPayload.type = 'respondToError';
-			errorPayload.error = '';
-			dispatch(setError(errorPayload));
-		}
+			if (!options) {
+				errorPayload.type = 'optionsError';
+				errorPayload.error = 'Conditions is required';
+				dispatch(setError(errorPayload));
+				notHasError = false;
+			} else {
+				errorPayload.type = 'optionsError';
+				errorPayload.error = '';
+				dispatch(setError(errorPayload));
+			}
 
-		if (!options) {
-			errorPayload.type = 'optionsError';
-			errorPayload.error = 'Conditions is required';
-			dispatch(setError(errorPayload));
-			notHasError = false;
-		} else {
-			errorPayload.type = 'optionsError';
-			errorPayload.error = '';
-			dispatch(setError(errorPayload));
-		}
+			if (response_delay_seconds <= 0) {
+				errorPayload.type = 'responseGapError';
+				errorPayload.error = 'Invalid Message Delay';
+				dispatch(setError(errorPayload));
+				notHasError = false;
+			} else {
+				errorPayload.type = 'responseGapError';
+				errorPayload.error = '';
+				dispatch(setError(errorPayload));
+			}
 
-		if (response_delay_seconds <= 0) {
-			errorPayload.type = 'responseGapError';
-			errorPayload.error = 'Invalid Message Delay';
-			dispatch(setError(errorPayload));
-			notHasError = false;
-		} else {
-			errorPayload.type = 'responseGapError';
-			errorPayload.error = '';
-			dispatch(setError(errorPayload));
+			if (trigger_gap_seconds <= 0) {
+				errorPayload.type = 'triggerGapError';
+				errorPayload.error = 'Invalid Delay Gap';
+				dispatch(setError(errorPayload));
+				notHasError = false;
+			} else {
+				errorPayload.type = 'triggerGapError';
+				errorPayload.error = '';
+				dispatch(setError(errorPayload));
+			}
+			if (!details.startAt) {
+				errorPayload.type = 'startAtError';
+				errorPayload.error = 'Invalid Start Time';
+				dispatch(setError(errorPayload));
+				notHasError = false;
+			} else {
+				errorPayload.type = 'startAtError';
+				errorPayload.error = '';
+			}
+			if (!details.endAt) {
+				errorPayload.type = 'endAtError';
+				errorPayload.error = 'Invalid End Time';
+				dispatch(setError(errorPayload));
+				notHasError = false;
+			} else {
+				errorPayload.type = 'endAtError';
+				errorPayload.error = '';
+			}
 		}
+		if (respond_type === 'template') {
+			if (template_id === '') {
+				errorPayload.type = 'templateError';
+				errorPayload.error = 'Template is required';
+				dispatch(setError(errorPayload));
+				notHasError = false;
+			} else {
+				errorPayload.type = 'templateError';
+				errorPayload.error = '';
+			}
 
-		if (trigger_gap_seconds <= 0) {
-			errorPayload.type = 'triggerGapError';
-			errorPayload.error = 'Invalid Delay Gap';
-			dispatch(setError(errorPayload));
-			notHasError = false;
-		} else {
-			errorPayload.type = 'triggerGapError';
-			errorPayload.error = '';
-			dispatch(setError(errorPayload));
-		}
-		if (!details.startAt) {
-			errorPayload.type = 'startAtError';
-			errorPayload.error = 'Invalid Start Time';
-			dispatch(setError(errorPayload));
-			notHasError = false;
-		} else {
-			errorPayload.type = 'startAtError';
-			errorPayload.error = '';
-		}
-		if (!details.endAt) {
-			errorPayload.type = 'endAtError';
-			errorPayload.error = 'Invalid End Time';
-			dispatch(setError(errorPayload));
-			notHasError = false;
-		} else {
-			errorPayload.type = 'endAtError';
-			errorPayload.error = '';
-		}
+			if (template_header?.type === ('IMAGE' || 'VIDEO' || 'DOCUMENT')) {
+				if (!template_header_file && !template_header.link) {
+					errorPayload.type = 'headerError';
+					errorPayload.error = 'Header link or file is required';
+					console.log('error found header');
+					dispatch(setError(errorPayload));
+					notHasError = false;
+				} else {
+					errorPayload.type = 'headerError';
+					errorPayload.error = '';
+					dispatch(setError(errorPayload));
+				}
+			}
 
-		if (messageType === 'template') {
-			console.log(componentParameterRef.current?.validate());
+			template_body.forEach((body) => {
+				if (body.variable_from === 'phonebook_data') {
+					if (!body.phonebook_data) {
+						errorPayload.type = 'bodyError';
+						errorPayload.error = 'Phonebook Data is required';
+						console.log('error found phonebook data');
+						dispatch(setError(errorPayload));
+						notHasError = false;
+					} else {
+						errorPayload.type = 'bodyError';
+						errorPayload.error = '';
+						dispatch(setError(errorPayload));
+					}
+					if (!body.fallback_value) {
+						errorPayload.type = 'bodyError';
+						errorPayload.error = 'Fallback Value is required';
+						console.log('error found fallback');
+						dispatch(setError(errorPayload));
+						notHasError = false;
+					} else {
+						errorPayload.type = 'bodyError';
+						errorPayload.error = '';
+						dispatch(setError(errorPayload));
+					}
+				}
+				if (body.variable_from === 'custom_text' && !body.custom_text) {
+					errorPayload.type = 'bodyError';
+					errorPayload.error = 'Custom Text is required';
+					dispatch(setError(errorPayload));
+					notHasError = false;
+				} else {
+					errorPayload.type = 'bodyError';
+					errorPayload.error = '';
+					dispatch(setError(errorPayload));
+				}
+			});
 		}
-
 		return notHasError;
 	}
 
@@ -205,66 +276,100 @@ export default function ChatBotPage() {
 		dispatch(setBodyParameterCount(variables));
 	}, [templateList, dispatch, details.template_id]);
 
+	const handleTemplateDetailsChange = ({
+		headerLink,
+		headerFile,
+		body,
+	}: {
+		headerLink: string;
+		headerFile: File | null;
+		body?: {
+			index: number;
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
+		};
+	}) => {
+		dispatch(setTemplateHeaderLink(headerLink ?? ''));
+		if (headerFile) {
+			dispatch(setHeaderFile(headerFile));
+		}
+		if (body) {
+			dispatch(setTemplateBodyCustomText({ index: body.index, custom_text: body.custom_text }));
+			dispatch(
+				setTemplateBodyPhonebookData({ index: body.index, phonebook_data: body.phonebook_data })
+			);
+			dispatch(
+				setTemplateBodyVariableFrom({
+					index: body.index,
+					variable_from: body.variable_from,
+				})
+			);
+			dispatch(
+				setTemplateBodyFallbackValue({ index: body.index, fallback_value: body.fallback_value })
+			);
+		}
+	};
+
 	async function handleSave() {
 		if (!validate()) {
 			return;
 		}
-		if (!componentParameterRef.current?.validate()) {
-			return;
-		}
 		if (isEditingBot && !details.id) return;
 
-		const templateMessageDetails = componentParameterRef.current?.getTemplateDetails();
-
-		if (templateMessageDetails?.headerFile) {
-			toast.promise(
-				UploadService.generateMetaMediaId(selected_device_id, templateMessageDetails.headerFile),
-				{
-					success: (media_id) => {
-						addChatBot({ media_id });
-						return {
-							title: 'File uploaded',
-						};
-					},
-					error: {
-						title: 'Failed to upload file',
-					},
-					loading: {
-						title: 'Uploading file',
-					},
-				}
-			);
-		} else if (templateMessageDetails?.headerLink) {
-			addChatBot({ link: templateMessageDetails?.headerLink });
+		if (template_header_file) {
+			toast.promise(UploadService.generateMetaMediaId(selected_device_id, template_header_file), {
+				success: (media_id) => {
+					addChatBot(media_id);
+					return {
+						title: 'File uploaded',
+					};
+				},
+				error: {
+					title: 'Failed to upload file',
+				},
+				loading: {
+					title: 'Uploading file',
+				},
+			});
 		} else {
 			addChatBot();
 		}
 	}
 
-	const addChatBot = (header_media: { link?: string; media_id?: string } = {}) => {
-		const ChatbotDetails =
-			messageType === 'static'
-				? {
-						...details,
-						template_id: '',
-				  }
-				: {
-						...details,
-						template_header: {
-							type: details.template_header.type,
-							...header_media,
-						},
-				  };
+	const addChatBot = (mediaId?: string) => {
+		const chatbotDetails = {
+			...details,
+			template_header: { ...template_header, media_id: mediaId },
+			nurturing: details.nurturing.map((n) => {
+				return {
+					...n,
+					after:
+						n.after.type === 'hours'
+							? Number(n.after.value) * 60
+							: n.after.type === 'days'
+							? Number(n.after.value) * 60 * 24
+							: Number(n.after.value) * 60 * 60,
+				};
+			}),
+		};
 
-		console.log('ChatbotDetails', ChatbotDetails);
 		dispatch(setAddingBot(true));
 		const promise = isEditingBot
 			? // ? null
-			  ChatBotService.createBot({ deviceId: selected_device_id, details: ChatbotDetails })
-			: ChatBotService.createBot({ deviceId: selected_device_id, details: ChatbotDetails });
+			  ChatBotService.editChatBot({
+					deviceId: selected_device_id,
+					botId: details.id,
+					details: chatbotDetails,
+			  })
+			: ChatBotService.createBot({
+					deviceId: selected_device_id,
+					details: chatbotDetails,
+			  });
 		toast.promise(promise, {
 			success: (data) => {
-				const acton = isEditingBot ? addBot(data) : addBot(data);
+				const acton = isEditingBot ? updateBot(data[0]) : addBot(data[0]);
 				dispatch(acton);
 				dispatch(reset());
 				return {
@@ -308,7 +413,9 @@ export default function ChatBotPage() {
 									aria-label='Done'
 									size='xs'
 									icon={!trigger ? <CheckIcon color='white' /> : <></>}
-									onClick={() => {}}
+									onClick={() => {
+										dispatch(setTrigger(''));
+									}}
 									className={`${
 										!trigger ? '!bg-[#4CB072]' : '!bg-[#A6A6A6] '
 									} hover:!bg-green-700 `}
@@ -484,48 +591,68 @@ export default function ChatBotPage() {
 							</FormControl>
 						</Flex>
 					</HStack>
+					<Flex justifyContent={'space-between'} my={'1rem'}>
+						<Button colorScheme='teal' onClick={() => leadsNurtureRef.current?.open()}>
+							Leads Nurturing ({nurturing.length})
+						</Button>
+						<Flex gap={2} alignItems={'center'}>
+							<IconButton
+								isRound={true}
+								variant='solid'
+								aria-label='Done'
+								size='xs'
+								icon={group_respond ? <CheckIcon color='white' /> : <></>}
+								onClick={() => dispatch(setGroupRespond(!group_respond))}
+								className={`${
+									group_respond ? '!bg-[#4CB072]' : '!bg-[#A6A6A6] '
+								} hover:!bg-green-700 `}
+							/>
+							<Text fontSize='sm'>Group Respond</Text>
+						</Flex>
+						<LeadsNurturing ref={leadsNurtureRef} />
+					</Flex>
 
 					{/*--------------------------------- MESSAGE SECTION--------------------------- */}
 
-					<Tabs variant='soft-rounded' colorScheme='green' mt={'1rem'}>
+					<Tabs
+						variant='soft-rounded'
+						colorScheme='green'
+						mt={'1rem'}
+						index={respond_type === 'normal' ? 0 : 1}
+					>
 						<TabList>
-							<Tab
-								onClick={() => {
-									dispatch(setMessage(''));
-									setMessageType('static');
-								}}
-							>
-								Message
-							</Tab>
-							<Tab
-								onClick={() => {
-									dispatch(setTemplateId(''));
-									setMessageType('template');
-								}}
-							>
-								Template Message
-							</Tab>
+							<Tab onClick={() => dispatch(setRespondType('normal'))}>Normal Message</Tab>
+							<Tab onClick={() => dispatch(setRespondType('template'))}>Template Message</Tab>
 						</TabList>
 						<TabPanels>
 							<TabPanel>
 								<StaticMessageInput />
 							</TabPanel>
 							<TabPanel>
-								<Select
-									placeholder='Select one!'
-									value={details.template_id}
-									onChange={(e) => dispatch(setTemplateId(e.target.value))}
-								>
-									<Each
-										items={templateListFiltered}
-										render={(t) => <option value={t.id}>{t.name}</option>}
-									/>
-								</Select>
+								<FormControl isInvalid={!!ui.templateError}>
+									<Select
+										placeholder='Select one!'
+										value={details.template_id}
+										onChange={(e) => dispatch(setTemplateId(e.target.value))}
+									>
+										<Each
+											items={templateListFiltered}
+											render={(t) => <option value={t.id}>{t.name}</option>}
+										/>
+									</Select>
+									{ui.templateError && <FormErrorMessage>{ui.templateError}</FormErrorMessage>}
+								</FormControl>
 								<Divider my={'1rem'} />
 								<TemplateComponentParameter
-									ref={componentParameterRef}
+									headerFile={template_header_file}
 									components={selectedTemplate?.components ?? []}
 									body={template_body ?? []}
+									headerLink={details.template_header.link ?? ''}
+									handleTemplateDetailsChange={handleTemplateDetailsChange}
+									error={{
+										headerError: ui.headerError,
+										bodyError: ui.bodyError,
+									}}
 								/>
 							</TabPanel>
 						</TabPanels>
@@ -539,7 +666,9 @@ export default function ChatBotPage() {
 								<Button
 									bgColor={'red.300'}
 									width={'100%'}
-									onClick={() => {}}
+									onClick={() => {
+										dispatch(reset());
+									}}
 									isLoading={isAddingBot}
 								>
 									<Text color={'white'}>Cancel</Text>
@@ -553,7 +682,7 @@ export default function ChatBotPage() {
 									width={'100%'}
 									onClick={handleSave}
 								>
-									<Text color={'white'}>Save</Text>
+									<Text color={'white'}>Edit</Text>
 								</Button>
 							</>
 						) : (

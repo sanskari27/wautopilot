@@ -10,6 +10,7 @@ const validateChatBot = (bots: any) => {
 			trigger_gap_seconds: bot.trigger_gap_seconds ?? 1,
 			response_delay_seconds: bot.response_delay_seconds ?? 1,
 			options: bot.options ?? 'INCLUDES_IGNORE_CASE',
+			respond_type: bot.respond_type ?? 'template',
 			startAt: bot.startAt ?? '',
 			endAt: bot.endAt ?? '',
 			message: bot.message ?? '',
@@ -20,7 +21,15 @@ const validateChatBot = (bots: any) => {
 			contacts: bot.contacts.map((contact: any) => contact) ?? [],
 			template_id: bot.template_id ?? '',
 			template_name: bot.template_name ?? '',
-			template_body: bot.template_body.map((body: any) => body) ?? [],
+			template_body:
+				bot.template_body.map((body: any) => {
+					return {
+						custom_text: body.custom_text ?? '',
+						phonebook_data: body.phonebook_data ?? '',
+						variable_from: body.variable_from ?? 'custom_text',
+						fallback_value: body.fallback_value ?? '',
+					};
+				}) ?? [],
 			template_header: {
 				type: bot.template_header.type ?? 'IMAGE',
 				link: bot.template_header.link ?? '',
@@ -101,7 +110,9 @@ export default class ChatBotService {
 		try {
 			const { data } = await APIInstance.post(`/chatbot/${deviceId}`, details);
 
-			return validateChatBot(data.bots);
+			console.log(validateChatBot([data.bot]));
+
+			return validateChatBot([data.bot]);
 		} catch (err) {
 			return [];
 		}
@@ -122,6 +133,71 @@ export default class ChatBotService {
 			const { data } = await APIInstance.put(`/chatbot/${deviceId}/${botId}`);
 
 			return validateChatBot([data.bots]);
+		} catch (err) {
+			return [];
+		}
+	}
+
+	static async editChatBot({
+		deviceId,
+		botId,
+		details,
+	}: {
+		deviceId: string;
+		botId: string;
+		details: {
+			respond_to: string;
+			trigger: string;
+			trigger_gap_seconds: number;
+			response_delay_seconds: number;
+			options: string;
+			startAt: string;
+			endAt: string;
+			respond_type: string;
+			message: string;
+			images: string[];
+			videos: string[];
+			audios: string[];
+			documents: string[];
+			contacts: string[];
+			template_id: string;
+			template_name: string;
+			template_body: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: string;
+				fallback_value: string;
+			}[];
+			template_header?: {
+				type: string;
+				link?: string;
+				media_id?: string;
+			};
+			group_respond: boolean;
+			nurturing: {
+				after: number;
+				start_from: string;
+				end_at: string;
+				template_id: string;
+				template_name: string;
+				template_body: {
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: string;
+					fallback_value: string;
+				}[];
+				template_header?: {
+					type: string;
+					link?: string;
+					media_id?: string;
+				};
+			}[];
+		};
+	}) {
+		try {
+			const { data } = await APIInstance.put(`/chatbot/${deviceId}/${botId}`, details);
+
+			return validateChatBot([data.bot]);
 		} catch (err) {
 			return [];
 		}

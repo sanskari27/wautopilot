@@ -9,6 +9,7 @@ export type ChatBotState = {
 		time: number;
 		type: string;
 	};
+	template_header_file: File | null;
 	ui: {
 		isAddingBot: boolean;
 		isEditingBot: boolean;
@@ -22,6 +23,9 @@ export type ChatBotState = {
 		responseGapError: string;
 		startAtError: string;
 		endAtError: string;
+		headerError: string;
+		bodyError: string;
+		templateError: string;
 	};
 };
 
@@ -61,7 +65,10 @@ export type ChatBot = {
 	};
 	group_respond: boolean;
 	nurturing: {
-		after: number;
+		after: {
+			value: string;
+			type: 'minutes' | 'hours' | 'days';
+		};
 		start_from: string;
 		end_at: string;
 		template_id: string;
