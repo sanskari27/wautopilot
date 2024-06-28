@@ -77,6 +77,7 @@ function processDocs(docs: IChatBot[]) {
 			message: bot.message,
 			startAt: bot.startAt,
 			endAt: bot.endAt,
+			respond_type: bot.respond_type,
 			images: bot.images ?? [],
 			videos: bot.videos ?? [],
 			audios: bot.audios ?? [],
