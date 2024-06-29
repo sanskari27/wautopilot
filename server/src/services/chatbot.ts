@@ -122,7 +122,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		const bots = await ChatBotDB.find({
 			linked_to: this.userId,
 			device_id: this.deviceId,
-		}).populate('images videos audios documents contacts ');
+		});
 		return processDocs(bots);
 	}
 
@@ -509,14 +509,12 @@ export default class ChatBotService extends WhatsappLinkService {
 			if (bot.nurturing.length > 0) {
 				const dateGenerator = new TimeGenerator();
 
-
 				bot.nurturing.map(async (el) => {
 					const fields = await phonebook.findRecordByPhone(recipient);
 
 					let headers = [] as Record<string, unknown>[];
 
 					if (el.template_header && el.template_header.type) {
-
 						const object = {
 							...(el.template_header.media_id
 								? { id: el.template_header.media_id }

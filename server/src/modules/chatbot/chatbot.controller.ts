@@ -47,6 +47,8 @@ async function listBots(req: Request, res: Response, next: NextFunction) {
 	} = req.locals;
 
 	const list = await new ChatBotService(account, device).allBots();
+	console.log(list);
+
 	return Respond({
 		res,
 		status: 200,

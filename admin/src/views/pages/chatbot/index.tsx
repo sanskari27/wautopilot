@@ -28,7 +28,6 @@ import {
 	setAddingBot,
 	setCondition,
 	setEndAt,
-	setGroupRespond,
 	setHeaderFile,
 	setRespondTo,
 	setRespondType,
@@ -80,7 +79,6 @@ export default function ChatBotPage() {
 		template_header,
 		template_id,
 		respond_type,
-		group_respond,
 		nurturing,
 	} = details;
 	const { isAddingBot, isEditingBot } = ui;
@@ -466,26 +464,6 @@ export default function ChatBotPage() {
 							</FormControl>
 						</Flex>
 					</HStack>
-					<Flex justifyContent={'space-between'} my={'1rem'}>
-						<Button colorScheme='teal' onClick={() => leadsNurtureRef.current?.open()}>
-							Leads Nurturing ({nurturing.length})
-						</Button>
-						<Flex gap={2} alignItems={'center'}>
-							<IconButton
-								isRound={true}
-								variant='solid'
-								aria-label='Done'
-								size='xs'
-								icon={group_respond ? <CheckIcon color='white' /> : <></>}
-								onClick={() => dispatch(setGroupRespond(!group_respond))}
-								className={`${
-									group_respond ? '!bg-[#4CB072]' : '!bg-[#A6A6A6] '
-								} hover:!bg-green-700 `}
-							/>
-							<Text fontSize='sm'>Group Respond</Text>
-						</Flex>
-						<LeadsNurturing ref={leadsNurtureRef} />
-					</Flex>
 
 					{/*--------------------------------- MESSAGE SECTION--------------------------- */}
 
@@ -516,7 +494,7 @@ export default function ChatBotPage() {
 										/>
 									</Select>
 								</FormControl>
-								<Divider my={'1rem'} />
+
 								<TemplateComponentParameter
 									headerFile={template_header_file}
 									components={selectedTemplate?.components ?? []}
@@ -527,6 +505,14 @@ export default function ChatBotPage() {
 							</TabPanel>
 						</TabPanels>
 					</Tabs>
+					<Flex justifyContent={'flex-end'} m={'1rem'}>
+						<Button colorScheme='teal' onClick={() => leadsNurtureRef.current?.open()}>
+							Leads Nurturing ({nurturing.length})
+						</Button>
+						<LeadsNurturing ref={leadsNurtureRef} />
+					</Flex>
+
+					<Divider my={'1rem'} />
 
 					{/*--------------------------------- BUTTONS SECTION--------------------------- */}
 

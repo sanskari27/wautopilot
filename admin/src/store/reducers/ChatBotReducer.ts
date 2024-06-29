@@ -55,7 +55,6 @@ const Slice = createSlice({
 	reducers: {
 		reset: (state) => {
 			state.details = initState.details;
-			state.list = initState.list;
 			state.response_delay = initState.response_delay;
 			state.trigger_gap = initState.trigger_gap;
 			state.ui = initState.ui;
