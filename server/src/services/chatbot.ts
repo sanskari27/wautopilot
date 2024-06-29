@@ -513,12 +513,15 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			if (bot.nurturing.length > 0) {
 				const dateGenerator = new TimeGenerator();
+
+
 				bot.nurturing.map(async (el) => {
 					const fields = await phonebook.findRecordByPhone(recipient);
 
 					let headers = [] as Record<string, unknown>[];
 
-					if (el.template_header) {
+					if (el.template_header && el.template_header.type) {
+
 						const object = {
 							...(el.template_header.media_id
 								? { id: el.template_header.media_id }
@@ -591,7 +594,7 @@ export default class ChatBotService extends WhatsappLinkService {
 						scheduler_id: bot._id,
 						scheduler_type: ChatBotDB_name,
 						sendAt: dateGenerator.next(el.after).value,
-						message_type: 'normal',
+						message_type: 'template',
 					});
 				});
 			}
