@@ -434,7 +434,7 @@ export default class ChatBotService extends WhatsappLinkService {
 			if (bot.template_id) {
 				let headers = [] as Record<string, unknown>[];
 
-				if (bot.template_header) {
+				if (bot.template_header && bot.template_header.type) {
 					const object = {
 						...(bot.template_header.media_id
 							? { id: bot.template_header.media_id }
@@ -509,8 +509,6 @@ export default class ChatBotService extends WhatsappLinkService {
 					sendAt: DateUtils.getMomentNow().toDate(),
 					message_type: 'template',
 				});
-			}else{
-				
 			}
 
 			if (bot.nurturing.length > 0) {
