@@ -229,6 +229,9 @@ export default class ChatBotService {
 			}[];
 		};
 	}) {
+		if (details.respond_type === 'normal') {
+			delete details.template_header;
+		}
 		try {
 			const { data } = await APIInstance.patch(`/chatbot/${deviceId}/${botId}`, details);
 
