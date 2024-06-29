@@ -264,11 +264,6 @@ export default class ChatBotService extends WhatsappLinkService {
 		const schedulerService = new SchedulerService(this.account, this.device);
 		const phonebook = new PhoneBookService(this.account);
 		const contact = await phonebook.findRecordByPhone(recipient);
-		Logger.debug({
-			recipient,
-			text,
-			botCount: botsEngaged.length,
-		});
 
 		botsEngaged.forEach(async (bot) => {
 			if (opts.fromGroup && !bot.group_respond) {
