@@ -69,7 +69,7 @@ async function toggleActive(req: Request, res: Response, next: NextFunction) {
 		res,
 		status: 200,
 		data: {
-			bots: list,
+			bot: list,
 		},
 	});
 }
@@ -81,13 +81,10 @@ async function deleteBot(req: Request, res: Response, next: NextFunction) {
 		id,
 	} = req.locals;
 
-	const list = await new ChatBotService(account, device).deleteBot(id);
+	await new ChatBotService(account, device).deleteBot(id);
 	return Respond({
 		res,
 		status: 200,
-		data: {
-			bots: list,
-		},
 	});
 }
 

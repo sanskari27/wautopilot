@@ -31,9 +31,9 @@ const validateChatBot = (bots: any) => {
 					};
 				}) ?? [],
 			template_header: {
-				type: bot.template_header.type ?? '',
-				link: bot.template_header.link ?? '',
-				media_id: bot.template_header.media_id ?? '',
+				type: bot.template_header?.type ?? '',
+				link: bot.template_header?.link ?? '',
+				media_id: bot.template_header?.media_id ?? '',
 			},
 			group_respond: bot.group_respond ?? false,
 			nurturing: bot.nurturing.map((nurture: any) => {
@@ -57,15 +57,15 @@ const validateChatBot = (bots: any) => {
 					template_id: nurture.template_id ?? '',
 					template_name: nurture.template_name ?? '',
 					template_body: {
-						custom_text: nurture.template_body.custom_text ?? '',
-						phonebook_data: nurture.template_body.phonebook_data ?? '',
-						variable_from: nurture.template_body.variable_from ?? 'custom_text',
-						fallback_value: nurture.template_body.fallback_value ?? '',
+						custom_text: nurture.template_body?.custom_text ?? '',
+						phonebook_data: nurture.template_body?.phonebook_data ?? '',
+						variable_from: nurture.template_body?.variable_from ?? 'custom_text',
+						fallback_value: nurture.template_body?.fallback_value ?? '',
 					},
 					template_header: {
-						type: nurture.template_header.type ?? '',
-						link: nurture.template_header.link ?? '',
-						media_id: nurture.template_header.media_id ?? '',
+						type: nurture.template_header?.type ?? '',
+						link: nurture.template_header?.link ?? '',
+						media_id: nurture.template_header?.media_id ?? '',
 					},
 				};
 			}),
@@ -142,22 +142,20 @@ export default class ChatBotService {
 		if (details.respond_type === 'normal') {
 			delete details.template_header;
 		}
-		try {
-			const { data } = await APIInstance.post(`/chatbot/${deviceId}`, details);
-
-			console.log(validateChatBot([data.bot]));
-
-			return validateChatBot([data.bot]);
-		} catch (err) {
-			return [];
+		for (let i = 0; i < details.nurturing.length; i++) {
+			if ((details.nurturing[i].template_header?.type ?? '') === '') {
+				delete details.nurturing[i].template_header;
+			}
 		}
+		const { data } = await APIInstance.post(`/chatbot/${deviceId}`, details);
+		return validateChatBot([data.bot]);
 	}
 
 	static async DeleteBot({ deviceId, botId }: { deviceId: string; botId: string }) {
 		try {
 			const { data } = await APIInstance.delete(`/chatbot/${deviceId}/${botId}`);
 
-			return validateChatBot([data.bots]);
+			return validateChatBot([data.bot]);
 		} catch (err) {
 			return [];
 		}
@@ -167,7 +165,7 @@ export default class ChatBotService {
 		try {
 			const { data } = await APIInstance.put(`/chatbot/${deviceId}/${botId}`);
 
-			return validateChatBot([data.bots]);
+			return validateChatBot([data.bot]);
 		} catch (err) {
 			return [];
 		}
@@ -232,12 +230,12 @@ export default class ChatBotService {
 		if (details.respond_type === 'normal') {
 			delete details.template_header;
 		}
-		try {
-			const { data } = await APIInstance.patch(`/chatbot/${deviceId}/${botId}`, details);
-
-			return validateChatBot([data.bots]);
-		} catch (err) {
-			return [];
+		for (let i = 0; i < details.nurturing.length; i++) {
+			if ((details.nurturing[i].template_header?.type ?? '') === '') {
+				delete details.nurturing[i].template_header;
+			}
 		}
+		const { data } = await APIInstance.patch(`/chatbot/${deviceId}/${botId}`, details);
+		return validateChatBot([data.bot]);
 	}
 }
