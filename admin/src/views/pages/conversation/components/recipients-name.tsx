@@ -41,14 +41,9 @@ const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
 			rounded={'lg'}
 			padding={'0.5rem'}
 			borderBottomWidth={'1px'}
+			onClick={handleRecipientClick}
 		>
-			<Flex
-				alignItems={'center'}
-				key={item._id}
-				onClick={handleRecipientClick}
-				className='group'
-				direction={'column'}
-			>
+			<Flex alignItems={'center'} key={item._id} className='group' direction={'column'}>
 				<Flex width={'full'} gap={'0.5rem'} position={'relative'}>
 					<Box position={'relative'}>
 						<Avatar name={item.profile_name} />
