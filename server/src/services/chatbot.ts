@@ -35,7 +35,7 @@ type CreateBotData = {
 	template_id: string;
 	template_name: string;
 	template_header?: {
-		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+		type?: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
 		media_id?: string;
 		link?: string;
 	};
@@ -94,8 +94,8 @@ function processDocs(docs: IChatBot[]) {
 				after: el.after,
 				start_from: el.start_from,
 				end_at: el.end_at,
-				template_header: bot.template_header,
-				template_body: bot.template_body,
+				template_header: el.template_header,
+				template_body: el.template_body,
 			})),
 			group_respond: bot.group_respond,
 			isActive: bot.active,
@@ -605,6 +605,8 @@ export default class ChatBotService extends WhatsappLinkService {
 	}
 
 	public async modifyBot(id: Types.ObjectId, data: Partial<CreateBotData>) {
+		console.log(data);
+
 		await ChatBotDB.updateOne({ _id: id }, { $set: filterUndefinedKeys(data) });
 		const bot = await ChatBotDB.findOne({
 			_id: id,

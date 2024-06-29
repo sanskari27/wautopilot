@@ -44,7 +44,7 @@ const validateChatBot = (bots: any) => {
 								? nurture.after / 86400
 								: nurture.after % 3600 === 0
 								? nurture.after / 3600
-								: nurture.after,
+								: nurture.after / 60,
 						type:
 							nurture.after % 86400 === 0
 								? 'days'
@@ -139,6 +139,9 @@ export default class ChatBotService {
 			}[];
 		};
 	}) {
+		if (details.respond_type === 'normal') {
+			delete details.template_header;
+		}
 		try {
 			const { data } = await APIInstance.post(`/chatbot/${deviceId}`, details);
 
@@ -227,7 +230,7 @@ export default class ChatBotService {
 		};
 	}) {
 		try {
-			const { data } = await APIInstance.put(`/chatbot/${deviceId}/${botId}`, details);
+			const { data } = await APIInstance.patch(`/chatbot/${deviceId}/${botId}`, details);
 
 			return validateChatBot([data.bots]);
 		} catch (err) {

@@ -28,7 +28,7 @@ export type CreateBotValidationResult = {
 		fallback_value: string;
 	}[];
 	template_header?: {
-		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+		type?: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
 		link?: string | undefined;
 		media_id?: string | undefined;
 	};
@@ -109,7 +109,7 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 		template_name: z.string().default(''),
 		template_header: z
 			.object({
-				type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
+				type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']).optional(),
 				media_id: z.string().optional(),
 				link: z.string().optional(),
 			})
