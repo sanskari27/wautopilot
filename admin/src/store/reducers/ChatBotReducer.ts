@@ -308,7 +308,7 @@ const Slice = createSlice({
 			state.details.nurturing.push({
 				after: {
 					value: '1',
-					type: 'days',
+					type: 'minutes',
 				},
 				start_from: '00:01',
 				end_at: '23:59',

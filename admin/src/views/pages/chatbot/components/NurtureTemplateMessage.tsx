@@ -74,11 +74,12 @@ const NurtureTemplateMessage = forwardRef<NurtureMessageHandle>((_, ref) => {
 	const validate = () => {
 		let notHasError = true;
 		if (
-			nurturing[nurturingIndex]?.template_header?.type === 'IMAGE' ||
-			nurturing[nurturingIndex]?.template_header?.type === 'VIDEO' ||
-			nurturing[nurturingIndex]?.template_header?.type === 'DOCUMENT'
+			nurturing[nurturingIndex]?.template_header.type === 'IMAGE' ||
+			nurturing[nurturingIndex]?.template_header.type === 'VIDEO' ||
+			nurturing[nurturingIndex]?.template_header.type === 'DOCUMENT'
 		) {
-			if (!nurturing[nurturingIndex]?.template_header?.link && !nurturingHeaderFile) {
+			if (!nurturing[nurturingIndex]?.template_header.link && !nurturingHeaderFile) {
+				console.log(nurturing[nurturingIndex].template_header.link, nurturingHeaderFile);
 				toast({
 					title: 'Header is required',
 					status: 'error',
@@ -163,7 +164,7 @@ const NurtureTemplateMessage = forwardRef<NurtureMessageHandle>((_, ref) => {
 						<TemplateComponentParameter
 							components={components}
 							headerLink={nurturing[nurturingIndex]?.template_header?.link ?? ''}
-							headerFile={null}
+							headerFile={nurturingHeaderFile}
 							body={nurturing[nurturingIndex]?.template_body ?? []}
 							header={
 								nurturing[nurturingIndex]?.template_header ?? {
