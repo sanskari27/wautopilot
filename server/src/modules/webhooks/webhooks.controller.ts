@@ -8,6 +8,7 @@ import {
 	RAZORPAY_WEBHOOK_SECRET,
 } from '../../config/const';
 import BroadcastService from '../../services/broadcast';
+import ChatBotService from '../../services/chatbot';
 import ConversationService from '../../services/conversation';
 import DateUtils from '../../utils/DateUtils';
 
@@ -41,6 +42,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		return res.status(400).send("Resource doesn't exist");
 	}
 	const conversationService = new ConversationService(user, link);
+	const chatBotService = new ChatBotService(user, link);
 	const contact = data.contacts?.[0] ?? {
 		wa_id: '',
 		profile: {
@@ -95,6 +97,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				status: MESSAGE_STATUS.DELIVERED,
 				context: message.context,
 			});
+			chatBotService.handleMessage(recipient, message.text.body);
 		} else if (
 			message.type === 'image' ||
 			message.type === 'video' ||
@@ -137,6 +140,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				status: MESSAGE_STATUS.DELIVERED,
 				context: message.context,
 			});
+			chatBotService.handleMessage(recipient, message.button.text);
 		} else if (message.location) {
 			conversationService.addMessageToConversation(conversation_id, {
 				message_id: msgID,

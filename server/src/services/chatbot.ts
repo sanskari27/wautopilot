@@ -260,7 +260,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		text: string,
 		opts: {
 			fromGroup?: boolean;
-		}
+		} = {}
 	) {
 		const message_from = recipient;
 
