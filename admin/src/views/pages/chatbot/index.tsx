@@ -17,7 +17,7 @@ import {
 	Text,
 	useToast,
 } from '@chakra-ui/react';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { BiRefresh } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import ChatBotService from '../../../services/chatbot.service';
@@ -271,6 +271,10 @@ export default function ChatBotPage() {
 		});
 		dispatch(reset());
 	};
+
+	useEffect(() => {
+		dispatch(reset());
+	}, [dispatch]);
 
 	return (
 		<Flex

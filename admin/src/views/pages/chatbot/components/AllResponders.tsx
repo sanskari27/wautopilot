@@ -13,7 +13,6 @@ import {
 	Tr,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { IoIosCloudDownload } from 'react-icons/io';
 import { MdDelete } from 'react-icons/md';
 import { PiPause, PiPlay } from 'react-icons/pi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -142,7 +141,7 @@ export default function AllResponders() {
 											border='none'
 										/>
 									</Tooltip>
-									<Tooltip label='Download History' aria-label='Download History'>
+									{/* <Tooltip label='Download History' aria-label='Download History'>
 										<IconButton
 											aria-label='History'
 											icon={<IoIosCloudDownload />}
@@ -155,7 +154,7 @@ export default function AllResponders() {
 											outline='none'
 											border='none'
 										/>
-									</Tooltip>
+									</Tooltip> */}
 								</Td>
 							</Tr>
 						))}
