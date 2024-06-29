@@ -1,13 +1,4 @@
-import {
-	Button,
-	FormControl,
-	FormErrorMessage,
-	Tag,
-	TagLabel,
-	Text,
-	Textarea,
-	Wrap,
-} from '@chakra-ui/react';
+import { Button, FormControl, Tag, Text, Textarea, Wrap } from '@chakra-ui/react';
 import { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
@@ -25,6 +16,7 @@ import AttachmentSelectorDialog, {
 import ContactIdSelectorDialog, {
 	ContactIdSelectorHandle,
 } from '../../../components/selector-dialog/ContactIdSelector';
+import Each from '../../../components/utils/Each';
 
 const tagsVariable = [
 	'{{first_name}}',
@@ -48,7 +40,6 @@ export default function StaticMessageInput() {
 
 	const {
 		details: { message, images, videos, audios, documents, contacts },
-		ui,
 	} = useSelector((state: StoreState) => state[StoreNames.CHATBOT]);
 
 	const insertVariablesToMessage = (variable: string) => {
@@ -137,7 +128,7 @@ export default function StaticMessageInput() {
 					isSelect={true}
 				/>
 			</Wrap>
-			<FormControl isInvalid={!!ui.messageError}>
+			<FormControl>
 				<Textarea
 					value={message ?? ''}
 					minHeight={'80px'}
@@ -150,28 +141,29 @@ export default function StaticMessageInput() {
 						messageRef.current = e.target.selectionStart;
 						dispatch(setMessage(e.target.value));
 					}}
-					isInvalid={!!ui.messageError}
 					placeholder={'Type your message here. \nex. You are invited to join fanfest'}
 					width={'full'}
 				/>
-				{ui.messageError && <FormErrorMessage>{ui.messageError}</FormErrorMessage>}
 			</FormControl>
 			<Wrap>
-				{tagsVariable.map((tag) => (
-					<Tag
-						size={'sm'}
-						m={'0.25rem'}
-						p={'0.5rem'}
-						width={'fit-content'}
-						borderRadius='md'
-						variant='solid'
-						colorScheme='gray'
-						_hover={{ cursor: 'pointer' }}
-						onClick={() => insertVariablesToMessage(tag)}
-					>
-						<TagLabel>{tag}</TagLabel>
-					</Tag>
-				))}
+				<Each
+					items={tagsVariable}
+					render={(tag) => (
+						<Tag
+							size={'sm'}
+							m={'0.25rem'}
+							p={'0.5rem'}
+							width={'fit-content'}
+							borderRadius='md'
+							variant='solid'
+							colorScheme='gray'
+							_hover={{ cursor: 'pointer' }}
+							onClick={() => insertVariablesToMessage(tag)}
+						>
+							{tag}
+						</Tag>
+					)}
+				/>
 			</Wrap>
 		</>
 	);

@@ -13,26 +13,13 @@ export type ChatBotState = {
 	ui: {
 		isAddingBot: boolean;
 		isEditingBot: boolean;
-		triggerError: string;
-		messageError: string;
-		respondToError: string;
-		optionsError: string;
-		contactCardsError: string;
-		attachmentError: string;
-		triggerGapError: string;
-		responseGapError: string;
-		startAtError: string;
-		endAtError: string;
-		headerError: string;
-		bodyError: string;
-		templateError: string;
 	};
 };
 
 export type ChatBot = {
 	id: string;
 	isActive: boolean;
-	respond_to: 'All' | 'SAVED_CONTACTS' | 'NON_SAVED_CONTACTS';
+	respond_to: 'ALL' | 'SAVED_CONTACTS' | 'NON_SAVED_CONTACTS';
 	trigger_gap_seconds: number;
 	response_delay_seconds: number;
 	trigger: string;
@@ -58,7 +45,7 @@ export type ChatBot = {
 		variable_from: 'custom_text' | 'phonebook_data';
 		fallback_value: string;
 	}[];
-	template_header: {
+	template_header?: {
 		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
 		link: string;
 		media_id: string;
@@ -79,7 +66,7 @@ export type ChatBot = {
 			variable_from: 'custom_text' | 'phonebook_data';
 			fallback_value: string;
 		}[];
-		template_header: {
+		template_header?: {
 			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
 			link: string;
 			media_id: string;

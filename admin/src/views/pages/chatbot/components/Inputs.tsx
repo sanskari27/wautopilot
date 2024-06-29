@@ -3,14 +3,14 @@ import { Input, Select, Textarea } from '@chakra-ui/react';
 export function TextAreaElement({
 	value,
 	onChange,
-	isInvalid,
+	isInvalid = false,
 	placeholder,
 	minHeight = '80px',
 }: {
 	placeholder: string;
 	value: string;
 	onChange: React.ChangeEventHandler<HTMLTextAreaElement>;
-	isInvalid: boolean;
+	isInvalid?: boolean;
 	minHeight?: string;
 }) {
 	return (
@@ -37,17 +37,9 @@ export function SelectElement({
 	size?: string;
 }) {
 	return (
-		<Select
-			value={value}
-			rounded={'md'}
-			size={size}
-			onChange={(e) => onChangeText(e.target.value)}
-		>
+		<Select value={value} rounded={'md'} size={size} onChange={(e) => onChangeText(e.target.value)}>
 			{options.map((option, index) => (
-				<option
-					key={index}
-					value={option.value}
-				>
+				<option key={index} value={option.value}>
 					{option.title}
 				</option>
 			))}

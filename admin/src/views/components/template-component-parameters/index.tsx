@@ -6,7 +6,6 @@ import {
 	Divider,
 	Flex,
 	FormControl,
-	FormErrorMessage,
 	FormLabel,
 	Input,
 	InputGroup,
@@ -52,10 +51,7 @@ type Props = {
 			fallback_value: string;
 		};
 	}) => void;
-	error: {
-		headerError: string;
-		bodyError: string;
-	};
+
 	showSampleMessage?: boolean;
 };
 
@@ -63,7 +59,6 @@ const TemplateComponentParameter = ({
 	components,
 	body,
 	headerLink,
-	error,
 	headerFile,
 	handleTemplateDetailsChange,
 	showSampleMessage = true,
@@ -89,11 +84,7 @@ const TemplateComponentParameter = ({
 				<Text fontSize={'2xl'} fontWeight={'medium'}>
 					Template details
 				</Text>
-				<FormControl
-					hidden={!header || header.format === 'TEXT'}
-					mt={'1rem'}
-					isInvalid={!!error.headerError}
-				>
+				<FormControl hidden={!header || header.format === 'TEXT'} mt={'1rem'}>
 					<FormLabel>Header media link</FormLabel>
 					<Input
 						placeholder='Media file link'
@@ -121,9 +112,8 @@ const TemplateComponentParameter = ({
 							}}
 						/>
 					</Box>
-					{error.headerError && <FormErrorMessage>{error.headerError}</FormErrorMessage>}
 				</FormControl>
-				<FormControl gap={3} mt={'1rem'} hidden={body.length === 0} isInvalid={!!error.bodyError}>
+				<FormControl gap={3} mt={'1rem'} hidden={body.length === 0}>
 					<FormLabel>Template body details</FormLabel>
 					<Each
 						items={body}
@@ -257,7 +247,6 @@ const TemplateComponentParameter = ({
 							</InputGroup>
 						)}
 					/>
-					{error.bodyError && <FormErrorMessage>{error.bodyError}</FormErrorMessage>}
 				</FormControl>
 			</Flex>
 

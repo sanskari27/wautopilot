@@ -5,7 +5,6 @@ import {
 	Divider,
 	Flex,
 	FormControl,
-	FormErrorMessage,
 	HStack,
 	IconButton,
 	Input,
@@ -18,7 +17,7 @@ import {
 	Text,
 	useToast,
 } from '@chakra-ui/react';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ChatBotService from '../../../services/chatbot.service';
 import UploadService from '../../../services/upload.service';
@@ -27,29 +26,26 @@ import {
 	addBot,
 	reset,
 	setAddingBot,
-	setBodyParameterCount,
 	setCondition,
 	setEndAt,
-	setError,
 	setGroupRespond,
 	setHeaderFile,
 	setRespondTo,
 	setRespondType,
 	setResponseDelayTime,
 	setResponseDelayType,
+	setSelectedTemplate,
 	setStartAt,
 	setTemplateBodyCustomText,
 	setTemplateBodyFallbackValue,
 	setTemplateBodyPhonebookData,
 	setTemplateBodyVariableFrom,
 	setTemplateHeaderLink,
-	setTemplateId,
 	setTrigger,
 	setTriggerGapTime,
 	setTriggerGapType,
 	updateBot,
 } from '../../../store/reducers/ChatBotReducer';
-import { countOccurrences } from '../../../utils/templateHelper';
 import TemplateComponentParameter from '../../components/template-component-parameters';
 import Each from '../../components/utils/Each';
 import AllResponders from './components/AllResponders';
@@ -80,8 +76,6 @@ export default function ChatBotPage() {
 		documents,
 		videos,
 		images,
-		response_delay_seconds,
-		trigger_gap_seconds,
 		template_body,
 		template_header,
 		template_id,
@@ -95,32 +89,8 @@ export default function ChatBotPage() {
 	const selectedTemplate = templateListFiltered.find((t) => t.id === details.template_id);
 
 	function validate() {
-		const errorPayload: {
-			type:
-				| 'triggerError'
-				| 'messageError'
-				| 'respondToError'
-				| 'optionsError'
-				| 'contactCardsError'
-				| 'attachmentError'
-				| 'triggerGapError'
-				| 'responseGapError'
-				| 'startAtError'
-				| 'endAtError'
-				| 'templateError'
-				| 'headerError'
-				| 'bodyError';
-			error: string;
-		} = {
-			type: 'triggerError',
-			error: '',
-		};
+		let hasError = false;
 
-		let notHasError = true;
-
-		errorPayload.type = 'triggerError';
-		errorPayload.error = '';
-		dispatch(setError(errorPayload));
 		if (respond_type === 'normal') {
 			if (
 				!message &&
@@ -130,151 +100,57 @@ export default function ChatBotPage() {
 				contacts.length === 0 &&
 				videos.length === 0
 			) {
-				errorPayload.type = 'messageError';
-				errorPayload.error = 'Message or Attachment or Contact or Poll is required';
-				dispatch(setError(errorPayload));
-				notHasError = false;
-			} else {
-				errorPayload.type = 'messageError';
-				errorPayload.error = '';
-				dispatch(setError(errorPayload));
-			}
-
-			if (!respond_to) {
-				errorPayload.type = 'respondToError';
-				errorPayload.error = 'Recipients is required';
-				dispatch(setError(errorPayload));
-				notHasError = false;
-			} else {
-				errorPayload.type = 'respondToError';
-				errorPayload.error = '';
-				dispatch(setError(errorPayload));
-			}
-
-			if (!options) {
-				errorPayload.type = 'optionsError';
-				errorPayload.error = 'Conditions is required';
-				dispatch(setError(errorPayload));
-				notHasError = false;
-			} else {
-				errorPayload.type = 'optionsError';
-				errorPayload.error = '';
-				dispatch(setError(errorPayload));
-			}
-
-			if (response_delay_seconds <= 0) {
-				errorPayload.type = 'responseGapError';
-				errorPayload.error = 'Invalid Message Delay';
-				dispatch(setError(errorPayload));
-				notHasError = false;
-			} else {
-				errorPayload.type = 'responseGapError';
-				errorPayload.error = '';
-				dispatch(setError(errorPayload));
-			}
-
-			if (trigger_gap_seconds <= 0) {
-				errorPayload.type = 'triggerGapError';
-				errorPayload.error = 'Invalid Delay Gap';
-				dispatch(setError(errorPayload));
-				notHasError = false;
-			} else {
-				errorPayload.type = 'triggerGapError';
-				errorPayload.error = '';
-				dispatch(setError(errorPayload));
-			}
-			if (!details.startAt) {
-				errorPayload.type = 'startAtError';
-				errorPayload.error = 'Invalid Start Time';
-				dispatch(setError(errorPayload));
-				notHasError = false;
-			} else {
-				errorPayload.type = 'startAtError';
-				errorPayload.error = '';
-			}
-			if (!details.endAt) {
-				errorPayload.type = 'endAtError';
-				errorPayload.error = 'Invalid End Time';
-				dispatch(setError(errorPayload));
-				notHasError = false;
-			} else {
-				errorPayload.type = 'endAtError';
-				errorPayload.error = '';
+				toast({
+					title: 'Message content is required',
+					status: 'error',
+				});
+				hasError = true;
 			}
 		}
 		if (respond_type === 'template') {
 			if (template_id === '') {
-				errorPayload.type = 'templateError';
-				errorPayload.error = 'Template is required';
-				dispatch(setError(errorPayload));
-				notHasError = false;
-			} else {
-				errorPayload.type = 'templateError';
-				errorPayload.error = '';
+				toast({
+					title: 'Template is required',
+					status: 'error',
+				});
+				hasError = true;
 			}
 
 			if (template_header?.type === ('IMAGE' || 'VIDEO' || 'DOCUMENT')) {
 				if (!template_header_file && !template_header.link) {
-					errorPayload.type = 'headerError';
-					errorPayload.error = 'Header link or file is required';
-					console.log('error found header');
-					dispatch(setError(errorPayload));
-					notHasError = false;
-				} else {
-					errorPayload.type = 'headerError';
-					errorPayload.error = '';
-					dispatch(setError(errorPayload));
+					toast({
+						title: 'Header link or file is required',
+						status: 'error',
+					});
+					hasError = true;
 				}
 			}
 
-			template_body.forEach((body) => {
+			const invalid = template_body.some((body) => {
 				if (body.variable_from === 'phonebook_data') {
-					if (!body.phonebook_data) {
-						errorPayload.type = 'bodyError';
-						errorPayload.error = 'Phonebook Data is required';
-						console.log('error found phonebook data');
-						dispatch(setError(errorPayload));
-						notHasError = false;
-					} else {
-						errorPayload.type = 'bodyError';
-						errorPayload.error = '';
-						dispatch(setError(errorPayload));
+					if (!body.phonebook_data || !body.fallback_value) {
+						return true;
 					}
-					if (!body.fallback_value) {
-						errorPayload.type = 'bodyError';
-						errorPayload.error = 'Fallback Value is required';
-						console.log('error found fallback');
-						dispatch(setError(errorPayload));
-						notHasError = false;
-					} else {
-						errorPayload.type = 'bodyError';
-						errorPayload.error = '';
-						dispatch(setError(errorPayload));
-					}
-				}
-				if (body.variable_from === 'custom_text' && !body.custom_text) {
-					errorPayload.type = 'bodyError';
-					errorPayload.error = 'Custom Text is required';
-					dispatch(setError(errorPayload));
-					notHasError = false;
-				} else {
-					errorPayload.type = 'bodyError';
-					errorPayload.error = '';
-					dispatch(setError(errorPayload));
+				} else if (body.variable_from === 'custom_text' && !body.custom_text) {
+					return true;
 				}
 			});
+			if (invalid) {
+				toast({
+					title: 'Phonebook Data & Fallback Value is required',
+					status: 'error',
+				});
+			}
 		}
-		return notHasError;
+
+		return !hasError;
 	}
 
-	useEffect(() => {
-		const template = templateList.find((t) => t.id === details.template_id);
+	const handleTemplateChange = (templateId: string) => {
+		const template = templateList.find((t) => t.id === templateId);
 		if (!template) return;
-
-		const body = template.components.find((c) => c.type === 'BODY');
-		const variables = countOccurrences(body?.text ?? '');
-		dispatch(setBodyParameterCount(variables));
-	}, [templateList, dispatch, details.template_id]);
+		dispatch(setSelectedTemplate(template));
+	};
 
 	const handleTemplateDetailsChange = ({
 		headerLink,
@@ -341,7 +217,14 @@ export default function ChatBotPage() {
 	const addChatBot = (mediaId?: string) => {
 		const chatbotDetails = {
 			...details,
-			template_header: { ...template_header, media_id: mediaId },
+			...(details.template_header
+				? {
+						template_header: {
+							...details.template_header,
+							media_id: mediaId,
+						},
+				  }
+				: {}),
 			nurturing: details.nurturing.map((n) => {
 				return {
 					...n,
@@ -428,21 +311,19 @@ export default function ChatBotPage() {
 							onChange={(e) => {
 								dispatch(setTrigger(e.target.value));
 							}}
-							isInvalid={!!ui.triggerError}
 							placeholder={'ex. hello'}
 						/>
-						{ui.triggerError && <FormErrorMessage>{ui.triggerError}</FormErrorMessage>}
 					</FormControl>
 
 					{/*--------------------------------- RECIPIENTS SECTION--------------------------- */}
 
 					<Flex gap={4}>
-						<FormControl isInvalid={!!ui.respondToError} flexGrow={1}>
+						<FormControl flexGrow={1}>
 							<Text>Recipients</Text>
 							<SelectElement
 								value={respond_to}
 								onChangeText={(text) =>
-									dispatch(setRespondTo(text as 'All' | 'SAVED_CONTACTS' | 'NON_SAVED_CONTACTS'))
+									dispatch(setRespondTo(text as 'ALL' | 'SAVED_CONTACTS' | 'NON_SAVED_CONTACTS'))
 								}
 								options={[
 									{
@@ -459,9 +340,8 @@ export default function ChatBotPage() {
 									},
 								]}
 							/>
-							{ui.respondToError && <FormErrorMessage>{ui.respondToError}</FormErrorMessage>}
 						</FormControl>
-						<FormControl isInvalid={!!ui.optionsError} flexGrow={1}>
+						<FormControl flexGrow={1}>
 							<Text>Conditions</Text>
 							<SelectElement
 								value={options}
@@ -495,14 +375,13 @@ export default function ChatBotPage() {
 									},
 								]}
 							/>
-							{ui.optionsError && <FormErrorMessage>{ui.optionsError}</FormErrorMessage>}
 						</FormControl>
 					</Flex>
 
 					<HStack alignItems={'start'}>
 						{/*--------------------------------- GAP & DELAY SECTION--------------------------- */}
 
-						<FormControl isInvalid={!!ui.triggerGapError} flex={1}>
+						<FormControl flex={1}>
 							<Flex alignItems={'center'}>
 								<Text>Gap Delay</Text>
 								{/* <Info>Time Gap if same trigger is sent.</Info> */}
@@ -532,9 +411,8 @@ export default function ChatBotPage() {
 									]}
 								/>
 							</HStack>
-							{ui.triggerGapError && <FormErrorMessage>{ui.triggerGapError}</FormErrorMessage>}
 						</FormControl>
-						<FormControl isInvalid={!!ui.responseGapError} flex={1}>
+						<FormControl flex={1}>
 							<Flex alignItems={'center'}>
 								<Text>Message Delay</Text>
 								{/* <Info>Time Delay between trigger and response.</Info> */}
@@ -563,10 +441,9 @@ export default function ChatBotPage() {
 									]}
 								/>
 							</HStack>
-							{ui.responseGapError && <FormErrorMessage>{ui.responseGapError}</FormErrorMessage>}
 						</FormControl>
 						<Flex flex={1} gap={'0.5rem'}>
-							<FormControl flex={1} isInvalid={!!ui.startAtError}>
+							<FormControl flex={1}>
 								<Text>Start At (in IST)</Text>
 								<Input
 									type='time'
@@ -575,9 +452,8 @@ export default function ChatBotPage() {
 									value={details.startAt}
 									onChange={(e) => dispatch(setStartAt(e.target.value))}
 								/>
-								<FormErrorMessage>{ui.startAtError}</FormErrorMessage>
 							</FormControl>
-							<FormControl flex={1} isInvalid={!!ui.endAtError}>
+							<FormControl flex={1}>
 								<Text>End At (in IST)</Text>
 								<Input
 									type='time'
@@ -587,7 +463,6 @@ export default function ChatBotPage() {
 									value={details.endAt}
 									onChange={(e) => dispatch(setEndAt(e.target.value))}
 								/>
-								<FormErrorMessage>{ui.endAtError}</FormErrorMessage>
 							</FormControl>
 						</Flex>
 					</HStack>
@@ -629,30 +504,25 @@ export default function ChatBotPage() {
 								<StaticMessageInput />
 							</TabPanel>
 							<TabPanel>
-								<FormControl isInvalid={!!ui.templateError}>
+								<FormControl>
 									<Select
 										placeholder='Select one!'
 										value={details.template_id}
-										onChange={(e) => dispatch(setTemplateId(e.target.value))}
+										onChange={(e) => handleTemplateChange(e.target.value)}
 									>
 										<Each
 											items={templateListFiltered}
 											render={(t) => <option value={t.id}>{t.name}</option>}
 										/>
 									</Select>
-									{ui.templateError && <FormErrorMessage>{ui.templateError}</FormErrorMessage>}
 								</FormControl>
 								<Divider my={'1rem'} />
 								<TemplateComponentParameter
 									headerFile={template_header_file}
 									components={selectedTemplate?.components ?? []}
 									body={template_body ?? []}
-									headerLink={details.template_header.link ?? ''}
+									headerLink={details.template_header?.link ?? ''}
 									handleTemplateDetailsChange={handleTemplateDetailsChange}
-									error={{
-										headerError: ui.headerError,
-										bodyError: ui.bodyError,
-									}}
 								/>
 							</TabPanel>
 						</TabPanels>
