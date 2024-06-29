@@ -81,7 +81,6 @@ const TemplateComponentParameter = ({
 	headerMediaId,
 }: Props) => {
 	const attachmentSelectorRef = useRef<AttachmentDialogHandle>(null);
-	// const header = components?.find((component) => component.type === 'HEADER');
 
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
@@ -94,7 +93,7 @@ const TemplateComponentParameter = ({
 		});
 	};
 
-	const attachmentSelectorId = (type: string, ids: string[]) => {
+	const attachmentSelectorId = (_type: string, ids: string[]) => {
 		handleTemplateDetailsChange({
 			headerLink: '',
 			headerFile: null,
