@@ -605,8 +605,6 @@ export default class ChatBotService extends WhatsappLinkService {
 	}
 
 	public async modifyBot(id: Types.ObjectId, data: Partial<CreateBotData>) {
-		console.log(data);
-
 		await ChatBotDB.updateOne({ _id: id }, { $set: filterUndefinedKeys(data) });
 		const bot = await ChatBotDB.findOne({
 			_id: id,

@@ -69,8 +69,6 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 			},
 		});
 	} catch (err) {
-		console.log(err);
-
 		return next(new CustomError(COMMON_ERRORS.ALREADY_EXISTS));
 	}
 }
