@@ -29,7 +29,7 @@ const initState: ChatBotState = {
 		group_respond: true,
 		nurturing: [],
 		template_header: {
-			type: 'IMAGE',
+			type: '',
 			link: '',
 			media_id: '',
 		},
@@ -69,10 +69,13 @@ const Slice = createSlice({
 		removeBot: (state, action: PayloadAction<string>) => {
 			state.list = state.list.filter((bot) => bot.id !== action.payload);
 		},
-		updateBot: (state, action: PayloadAction<{ id: string; data: typeof initState.details }>) => {
-			state.list = state.list.map((bot) =>
-				bot.id === action.payload.id ? action.payload.data : bot
-			);
+		updateBot: (state, action: PayloadAction<typeof initState.details>) => {
+			state.list = state.list.map((bot) => {
+				if (bot.id === action.payload.id) {
+					return action.payload;
+				}
+				return bot;
+			});
 		},
 		setChatbot: (state, action: PayloadAction<typeof initState.details>) => {
 			state.ui.isEditingBot = true;
@@ -143,14 +146,94 @@ const Slice = createSlice({
 
 			const header = template.components.find((c) => c.type === 'HEADER');
 			if (!header) {
-				state.details.template_header = undefined;
+				state.details.template_header = {
+					link: '',
+					media_id: '',
+					type: '',
+				};
 			} else {
 				state.details.template_header = {
-					type: header.media_type,
+					type: header.format,
 					link: header.link,
 					media_id: header.media_id,
 				};
 			}
+		},
+		clearSelectedTemplate: (state) => {
+			state.details.template_id = '';
+			state.details.template_name = '';
+			state.details.template_body = [];
+			state.details.template_header = {
+				link: '',
+				media_id: '',
+				type: '',
+			};
+		},
+		setSelectedNurturingTemplate: (
+			state,
+			action: PayloadAction<{ index: number; template: Template }>
+		) => {
+			const template = action.payload.template;
+			state.details.nurturing[action.payload.index].template_id = template.id;
+			state.details.nurturing[action.payload.index].template_name = template.name;
+
+			const body = template.components.find((c) => c.type === 'BODY');
+			const variables = countOccurrences(body?.text ?? '');
+			state.details.nurturing[action.payload.index].template_body = Array.from({
+				length: variables,
+			}).map(() => ({
+				custom_text: '',
+				phonebook_data: '',
+				variable_from: 'custom_text',
+				fallback_value: '',
+			}));
+			const header = template.components.find((c) => c.type === 'HEADER');
+			if (!header) {
+				state.details.nurturing[action.payload.index].template_header = {
+					type: '',
+					link: '',
+					media_id: '',
+				};
+			} else {
+				state.details.nurturing[action.payload.index].template_header = {
+					type: header.format,
+					link: header.link,
+					media_id: header.media_id,
+				};
+			}
+		},
+		setNurturingTemplateHeaderLink: (
+			state,
+			action: PayloadAction<{ index: number; link: string }>
+		) => {
+			state.details.nurturing[action.payload.index].template_header.link = action.payload.link;
+		},
+		setNurturingTemplateBody: (
+			state,
+			action: PayloadAction<{
+				index: number;
+				body: {
+					index: number;
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value: string;
+				};
+			}>
+		) => {
+			state.details.nurturing[action.payload.index].template_body[action.payload.body.index] = {
+				custom_text: action.payload.body.custom_text,
+				phonebook_data: action.payload.body.phonebook_data,
+				variable_from: action.payload.body.variable_from,
+				fallback_value: action.payload.body.fallback_value,
+			};
+		},
+		setNurturingTemplateHeaderMediaId: (
+			state,
+			action: PayloadAction<{ index: number; media_id: string }>
+		) => {
+			state.details.nurturing[action.payload.index].template_header.media_id =
+				action.payload.media_id;
 		},
 		setMessage: (state, action: PayloadAction<string>) => {
 			state.details.message = action.payload;
@@ -227,12 +310,16 @@ const Slice = createSlice({
 					value: '1',
 					type: 'days',
 				},
-				start_from: '',
-				end_at: '',
+				start_from: '00:01',
+				end_at: '23:59',
 				template_id: '',
 				template_name: '',
 				template_body: [],
-				template_header: undefined,
+				template_header: {
+					type: '',
+					link: '',
+					media_id: '',
+				},
 			});
 		},
 		removeNurturing: (state, action: PayloadAction<number>) => {
@@ -302,7 +389,11 @@ export const {
 	setNurturingAfterType,
 	setNurturingTemplateId,
 	setNurturingTemplateDetails,
+	setSelectedNurturingTemplate,
 	setRespondTo,
+	setNurturingTemplateHeaderLink,
+	setNurturingTemplateBody,
+	setNurturingTemplateHeaderMediaId,
 	setCondition,
 	setResponseDelayTime,
 	setResponseDelayType,
@@ -310,6 +401,7 @@ export const {
 	setTriggerGapType,
 	setEndAt,
 	setStartAt,
+	clearSelectedTemplate,
 	setTemplateHeaderLink,
 	setTemplateHeaderMediaId,
 	setTemplateBodyCustomText,

@@ -31,12 +31,44 @@ const validateChatBot = (bots: any) => {
 					};
 				}) ?? [],
 			template_header: {
-				type: bot.template_header.type ?? 'IMAGE',
+				type: bot.template_header.type ?? '',
 				link: bot.template_header.link ?? '',
 				media_id: bot.template_header.media_id ?? '',
 			},
 			group_respond: bot.group_respond ?? false,
-			nurturing: bot.nurturing ?? [],
+			nurturing: bot.nurturing.map((nurture: any) => {
+				return {
+					after: {
+						value:
+							nurture.after % 86400 === 0
+								? nurture.after / 86400
+								: nurture.after % 3600 === 0
+								? nurture.after / 3600
+								: nurture.after,
+						type:
+							nurture.after % 86400 === 0
+								? 'days'
+								: nurture.after % 3600 === 0
+								? 'hours'
+								: 'minutes',
+					},
+					start_from: nurture.start_from ?? '',
+					end_at: nurture.end_at ?? '',
+					template_id: nurture.template_id ?? '',
+					template_name: nurture.template_name ?? '',
+					template_body: {
+						custom_text: nurture.template_body.custom_text ?? '',
+						phonebook_data: nurture.template_body.phonebook_data ?? '',
+						variable_from: nurture.template_body.variable_from ?? 'custom_text',
+						fallback_value: nurture.template_body.fallback_value ?? '',
+					},
+					template_header: {
+						type: nurture.template_header.type ?? '',
+						link: nurture.template_header.link ?? '',
+						media_id: nurture.template_header.media_id ?? '',
+					},
+				};
+			}),
 			isActive: bot.isActive ?? true,
 		};
 	});
@@ -197,7 +229,7 @@ export default class ChatBotService {
 		try {
 			const { data } = await APIInstance.put(`/chatbot/${deviceId}/${botId}`, details);
 
-			return validateChatBot([data.bot]);
+			return validateChatBot([data.bots]);
 		} catch (err) {
 			return [];
 		}

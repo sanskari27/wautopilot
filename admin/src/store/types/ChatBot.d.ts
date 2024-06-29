@@ -45,8 +45,8 @@ export type ChatBot = {
 		variable_from: 'custom_text' | 'phonebook_data';
 		fallback_value: string;
 	}[];
-	template_header?: {
-		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+	template_header: {
+		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | '' ;
 		link: string;
 		media_id: string;
 	};
@@ -66,8 +66,8 @@ export type ChatBot = {
 			variable_from: 'custom_text' | 'phonebook_data';
 			fallback_value: string;
 		}[];
-		template_header?: {
-			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+		template_header: {
+			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | '';
 			link: string;
 			media_id: string;
 		};

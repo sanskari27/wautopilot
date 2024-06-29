@@ -42,7 +42,7 @@ export default function AllResponders() {
 			if (!res) {
 				return;
 			}
-			dispatch(updateBot({ id, data: res[0] }));
+			dispatch(updateBot(res[0]));
 		});
 	};
 

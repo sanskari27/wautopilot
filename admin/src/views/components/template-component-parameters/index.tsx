@@ -28,7 +28,7 @@ const bodyParametersList = [
 ];
 
 type Props = {
-	components?: Record<string, any>[];
+	components: Record<string, any>[];
 	headerLink: string;
 	headerFile: File | null;
 	body: {
@@ -51,7 +51,11 @@ type Props = {
 			fallback_value: string;
 		};
 	}) => void;
-
+	header: {
+		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | '';
+		link: string;
+		media_id: string;
+	};
 	showSampleMessage?: boolean;
 };
 
@@ -62,8 +66,9 @@ const TemplateComponentParameter = ({
 	headerFile,
 	handleTemplateDetailsChange,
 	showSampleMessage = true,
+	header,
 }: Props) => {
-	const header = components?.find((component) => component.type === 'HEADER');
+	// const header = components?.find((component) => component.type === 'HEADER');
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files ? e.target.files[0] : null;
@@ -78,13 +83,13 @@ const TemplateComponentParameter = ({
 			className='flex-col md:flex-row w-full'
 			justifyContent={'space-between'}
 			gap={3}
-			hidden={components?.length === 0}
+			hidden={components.length === 0}
 		>
 			<Flex direction={'column'} className='w-full md:w-[70%]'>
 				<Text fontSize={'2xl'} fontWeight={'medium'}>
 					Template details
 				</Text>
-				<FormControl hidden={!header || header.format === 'TEXT'} mt={'1rem'}>
+				<FormControl hidden={!header || header.type === 'TEXT'} mt={'1rem'}>
 					<FormLabel>Header media link</FormLabel>
 					<Input
 						placeholder='Media file link'

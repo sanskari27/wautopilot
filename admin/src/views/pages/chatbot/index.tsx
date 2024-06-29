@@ -18,12 +18,14 @@ import {
 	useToast,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
+import { BiRefresh } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import ChatBotService from '../../../services/chatbot.service';
 import UploadService from '../../../services/upload.service';
 import { StoreNames, StoreState } from '../../../store';
 import {
 	addBot,
+	clearSelectedTemplate,
 	reset,
 	setAddingBot,
 	setCondition,
@@ -145,6 +147,9 @@ export default function ChatBotPage() {
 	}
 
 	const handleTemplateChange = (templateId: string) => {
+		if (!templateId) {
+			dispatch(clearSelectedTemplate());
+		}
 		const template = templateList.find((t) => t.id === templateId);
 		if (!template) return;
 		dispatch(setSelectedTemplate(template));
@@ -227,11 +232,11 @@ export default function ChatBotPage() {
 				return {
 					...n,
 					after:
-						n.after.type === 'hours'
-							? Number(n.after.value) * 60
-							: n.after.type === 'days'
-							? Number(n.after.value) * 60 * 24
-							: Number(n.after.value) * 60 * 60,
+						n.after.type === 'days'
+							? Number(n.after.value) * 86400
+							: n.after.type === 'hours'
+							? Number(n.after.value) * 3600
+							: Number(n.after.value) * 60,
 				};
 			}),
 		};
@@ -496,6 +501,7 @@ export default function ChatBotPage() {
 								</FormControl>
 
 								<TemplateComponentParameter
+									header={template_header ?? { type: '', link: '', media_id: '' }}
 									headerFile={template_header_file}
 									components={selectedTemplate?.components ?? []}
 									body={template_body ?? []}
@@ -554,6 +560,7 @@ export default function ChatBotPage() {
 								<Text color={'white'}>Save</Text>
 							</Button>
 						)}
+						<IconButton aria-label='reest' icon={<BiRefresh />} onClick={() => dispatch(reset())} />
 					</HStack>
 				</Flex>
 				<AllResponders />

@@ -21,6 +21,7 @@ import {
 	ModalOverlay,
 	Select,
 	Text,
+	useToast,
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -32,8 +33,7 @@ import {
 	setNurturingAfterValue,
 	setNurturingEndAt,
 	setNurturingStartFrom,
-	setNurturingTemplateDetails,
-	setNurturingTemplateId,
+	setSelectedNurturingTemplate,
 } from '../../../../store/reducers/ChatBotReducer';
 import Each from '../../../components/utils/Each';
 import NurtureTemplateMessage, { NurtureMessageHandle } from './NurtureTemplateMessage';
@@ -43,6 +43,8 @@ export type LeadsNurturingHandle = {
 };
 
 const LeadsNurturing = forwardRef<LeadsNurturingHandle>((_, ref) => {
+	const toast = useToast();
+
 	const nurturingMessageRef = useRef<NurtureMessageHandle>(null);
 
 	const dispatch = useDispatch();
@@ -73,42 +75,43 @@ const LeadsNurturing = forwardRef<LeadsNurturingHandle>((_, ref) => {
 		} else if (key === 'template_id') {
 			if (value === 'Select one!') return;
 			const selectedTemplate = templateListFiltered.find((t) => t.id === value);
+			if (!selectedTemplate) return;
+			dispatch(setSelectedNurturingTemplate({ index, template: selectedTemplate }));
 			nurturingMessageRef.current?.open({
 				index,
-				templateId: value,
-				components: selectedTemplate?.components ?? [],
-				template_header: {
-					type: nurturing[index].template_header.type,
-					link: nurturing[index].template_header.link,
-				},
-				template_body: nurturing[index].template_body,
+				components: selectedTemplate.components,
 			});
-			dispatch(setNurturingTemplateId({ index, template_id: value }));
 		}
 	};
 
-	const handleNurturingMessageConfirm = (nurturing: {
-		index: number;
-		template_id: string;
-		template_body: {
-			custom_text: string;
-			phonebook_data: string;
-			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
-		}[];
-		template_header: {
-			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
-			link: string;
-			media_id: string;
-		};
-	}) => {
-		dispatch(
-			setNurturingTemplateDetails({
-				index: nurturing.index,
-				template_body: nurturing.template_body,
-				template_header: nurturing.template_header,
-			})
-		);
+	const handleClose = () => {
+		let error = false;
+
+		nurturing.map((item, index) => {
+			if (item.template_id === 'Select one!') {
+				dispatch(removeNurturing(index));
+			}
+
+			if (item.after.value === '') {
+				toast({
+					title: 'Error',
+					description: 'Please fill the delay field',
+					status: 'error',
+				});
+				error = true;
+			}
+
+			if (item.start_from === '' || item.end_at === '') {
+				toast({
+					title: 'Error',
+					description: 'Please fill the start and end field',
+					status: 'error',
+				});
+				error = true;
+			}
+		});
+		if (error) return;
+		setIsOpen(false);
 	};
 
 	return (
@@ -206,16 +209,10 @@ const LeadsNurturing = forwardRef<LeadsNurturingHandle>((_, ref) => {
 							)}
 						/>
 					</Accordion>
-					<NurtureTemplateMessage
-						ref={nurturingMessageRef}
-						onConfirm={handleNurturingMessageConfirm}
-					/>
+					<NurtureTemplateMessage ref={nurturingMessageRef} />
 				</ModalBody>
 				<ModalFooter>
-					<Button colorScheme='red' variant={'outline'} onClick={() => setIsOpen(false)}>
-						Close
-					</Button>
-					<Button ml={'1rem'} colorScheme='green'>
+					<Button ml={'1rem'} colorScheme='green' onClick={handleClose}>
 						Save
 					</Button>
 				</ModalFooter>

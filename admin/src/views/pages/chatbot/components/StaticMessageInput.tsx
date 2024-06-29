@@ -125,6 +125,7 @@ export default function StaticMessageInput() {
 					ref={attachmentSelector}
 					onConfirm={(type, ids) => handleAddMedias({ type, ids })}
 					isSelect={true}
+					returnMediaId={false}
 				/>
 			</Wrap>
 			<FormControl>
