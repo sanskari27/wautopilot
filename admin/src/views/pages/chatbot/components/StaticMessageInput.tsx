@@ -26,7 +26,6 @@ const tagsVariable = [
 	'{{email}}',
 	'{{birthday}}',
 	'{{anniversary}}',
-	'{{others}}',
 ];
 
 export default function StaticMessageInput() {

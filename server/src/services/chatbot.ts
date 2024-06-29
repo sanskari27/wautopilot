@@ -178,11 +178,9 @@ export default class ChatBotService extends WhatsappLinkService {
 	}
 
 	private async botsEngaged({
-		message_from,
 		message_body,
 		recipient,
 	}: {
-		message_from: string;
 		message_body: string;
 		recipient: string;
 	}) {
@@ -191,7 +189,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		const bots = await this.activeBots();
 		const last_messages = await this.lastMessages(
 			bots.map((bot) => bot._id),
-			message_from
+			recipient
 		);
 
 		return bots.filter((bot) => {
@@ -262,12 +260,15 @@ export default class ChatBotService extends WhatsappLinkService {
 			fromGroup?: boolean;
 		} = {}
 	) {
-		const message_from = recipient;
-
-		const botsEngaged = await this.botsEngaged({ message_body: text, message_from, recipient });
+		const botsEngaged = await this.botsEngaged({ message_body: text, recipient });
 		const schedulerService = new SchedulerService(this.account, this.device);
 		const phonebook = new PhoneBookService(this.account);
 		const contact = await phonebook.findRecordByPhone(recipient);
+		Logger.debug({
+			recipient,
+			text,
+			botCount: botsEngaged.length,
+		});
 
 		botsEngaged.forEach(async (bot) => {
 			if (opts.fromGroup && !bot.group_respond) {
@@ -294,6 +295,18 @@ export default class ChatBotService extends WhatsappLinkService {
 				}
 				if (msg.includes('{{last_name}}')) {
 					msg = msg.replace('{{last_name}}', contact?.last_name ?? '');
+				}
+				if (msg.includes('{{phone_number}}')) {
+					msg = msg.replace('{{phone_number}}', contact?.phone_number ?? '');
+				}
+				if (msg.includes('{{email}}')) {
+					msg = msg.replace('{{email}}', contact?.email ?? '');
+				}
+				if (msg.includes('{{birthday}}')) {
+					msg = msg.replace('{{birthday}}', contact?.birthday ?? '');
+				}
+				if (msg.includes('{{anniversary}}')) {
+					msg = msg.replace('{{anniversary}}', contact?.anniversary ?? '');
 				}
 
 				const msgObj = {
@@ -417,6 +430,88 @@ export default class ChatBotService extends WhatsappLinkService {
 					message_type: 'normal',
 				});
 			});
+
+			if (bot.template_id) {
+				let headers = [] as Record<string, unknown>[];
+
+				if (bot.template_header) {
+					const object = {
+						...(bot.template_header.media_id
+							? { id: bot.template_header.media_id }
+							: bot.template_header.link
+							? { link: bot.template_header.link }
+							: {}),
+					};
+
+					headers = [
+						{
+							type: 'HEADER',
+							parameters:
+								bot.template_header.type !== 'TEXT'
+									? [
+											{
+												type: bot.template_header.type,
+												[bot.template_header.type.toLowerCase()]: object,
+											},
+									  ]
+									: [],
+						},
+					];
+				}
+
+				const messageObject = {
+					template_name: bot.template_name,
+					to: recipient,
+					components: [
+						{
+							type: 'BODY',
+							parameters: bot.template_body.map((b) => {
+								if (b.variable_from === 'custom_text') {
+									return {
+										type: 'text',
+										text: b.custom_text,
+									};
+								} else {
+									if (!contact) {
+										return {
+											type: 'text',
+											text: b.fallback_value,
+										};
+									}
+
+									const fieldVal = (
+										bodyParametersList.includes(b.phonebook_data)
+											? contact[b.phonebook_data as keyof typeof contact]
+											: contact.others[b.phonebook_data]
+									) as string;
+
+									if (typeof fieldVal === 'string') {
+										return {
+											type: 'text',
+											text: fieldVal || b.fallback_value,
+										};
+									}
+									// const field = fields[]
+									return {
+										type: 'text',
+										text: b.fallback_value,
+									};
+								}
+							}),
+						},
+						...headers,
+					],
+				};
+
+				await schedulerService.schedule(recipient, messageObject, {
+					scheduler_id: bot._id,
+					scheduler_type: ChatBotDB_name,
+					sendAt: DateUtils.getMomentNow().toDate(),
+					message_type: 'template',
+				});
+			}else{
+				
+			}
 
 			if (bot.nurturing.length > 0) {
 				const dateGenerator = new TimeGenerator();

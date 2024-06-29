@@ -14,7 +14,7 @@ const initState: ChatBotState = {
 		trigger_gap_seconds: 1,
 		trigger: '',
 		options: 'INCLUDES_IGNORE_CASE',
-		startAt: '12:01',
+		startAt: '00:01',
 		endAt: '23:59',
 		respond_type: 'template',
 		message: '',
