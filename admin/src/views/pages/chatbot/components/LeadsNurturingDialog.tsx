@@ -96,9 +96,14 @@ const LeadsNurturing = forwardRef<LeadsNurturingHandle>((_, ref) => {
 	const handleClose = () => {
 		let error = false;
 
-		nurturing.map((item, index) => {
-			if (item.template_id === 'Select one!') {
-				dispatch(removeNurturing(index));
+		nurturing.map((item) => {
+			if (item.template_id === '') {
+				toast({
+					title: 'Error',
+					description: 'Please select a template',
+					status: 'error',
+				});
+				error = true;
 			}
 
 			if (item.after.value === '') {
@@ -124,7 +129,13 @@ const LeadsNurturing = forwardRef<LeadsNurturingHandle>((_, ref) => {
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={() => setIsOpen(false)} size={'3xl'}>
+		<Modal
+			isOpen={isOpen}
+			onClose={() => setIsOpen(false)}
+			size={'3xl'}
+			closeOnEsc={false}
+			closeOnOverlayClick={false}
+		>
 			<ModalOverlay />
 			<ModalContent>
 				<ModalHeader>
@@ -146,7 +157,7 @@ const LeadsNurturing = forwardRef<LeadsNurturingHandle>((_, ref) => {
 								<AccordionItem key={index}>
 									<h2>
 										<AccordionButton>
-											<Box as='span' flex='1' textAlign='left'>
+											<Box as='span' flex='1' textAlign='left' fontSize={'1.25rem'}>
 												Nurturing {index + 1}
 											</Box>
 											<AccordionIcon />
