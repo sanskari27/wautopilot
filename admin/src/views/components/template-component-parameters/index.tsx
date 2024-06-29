@@ -89,7 +89,7 @@ const TemplateComponentParameter = ({
 				<Text fontSize={'2xl'} fontWeight={'medium'}>
 					Template details
 				</Text>
-				<FormControl hidden={!header || header.type === 'TEXT'} mt={'1rem'}>
+				<FormControl hidden={!header || header.type === 'TEXT' || header.type === ''} mt={'1rem'}>
 					<FormLabel>Header media link</FormLabel>
 					<Input
 						placeholder='Media file link'
