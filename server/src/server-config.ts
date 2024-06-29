@@ -119,6 +119,7 @@ export default function (app: Express) {
 	});
 	cron.schedule('*/5 * * * * *', () => {
 		SchedulerService.sendScheduledTemplateMessages();
+		SchedulerService.sendScheduledMessages();
 	});
 	createDir();
 }
