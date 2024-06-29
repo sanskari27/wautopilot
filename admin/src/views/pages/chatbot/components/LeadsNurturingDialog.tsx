@@ -225,7 +225,7 @@ const LeadsNurturing = forwardRef<LeadsNurturingHandle>((_, ref) => {
 													});
 												}}
 											>
-												Edit
+												Edit Template
 											</Button>
 											<Button
 												aria-label='add-nurturing'

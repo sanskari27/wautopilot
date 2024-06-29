@@ -53,11 +53,13 @@ const NurtureTemplateMessage = forwardRef<NurtureMessageHandle>((_, ref) => {
 
 	const handleTemplateDetailsChange = ({
 		headerLink,
+		headerMediaId,
 		body,
 		headerFile,
 	}: {
 		headerLink: string;
 		headerFile: File | null;
+		headerMediaId: string;
 		body?: {
 			index: number;
 			custom_text: string;
@@ -67,6 +69,7 @@ const NurtureTemplateMessage = forwardRef<NurtureMessageHandle>((_, ref) => {
 		};
 	}) => {
 		dispatch(setNurturingTemplateHeaderLink({ index: nurturingIndex, link: headerLink }));
+		dispatch(setNurturingTemplateHeaderMediaId({ index: nurturingIndex, media_id: headerMediaId }));
 		setNurturingHeaderFile(headerFile);
 		if (body) dispatch(setNurturingTemplateBody({ index: nurturingIndex, body: body }));
 	};
@@ -78,8 +81,11 @@ const NurtureTemplateMessage = forwardRef<NurtureMessageHandle>((_, ref) => {
 			nurturing[nurturingIndex]?.template_header.type === 'VIDEO' ||
 			nurturing[nurturingIndex]?.template_header.type === 'DOCUMENT'
 		) {
-			if (!nurturing[nurturingIndex]?.template_header.link && !nurturingHeaderFile) {
-				console.log(nurturing[nurturingIndex].template_header.link, nurturingHeaderFile);
+			if (
+				!nurturing[nurturingIndex]?.template_header.link &&
+				!nurturingHeaderFile &&
+				!nurturing[nurturingIndex]?.template_header.media_id
+			) {
 				toast({
 					title: 'Header is required',
 					status: 'error',
@@ -153,7 +159,7 @@ const NurtureTemplateMessage = forwardRef<NurtureMessageHandle>((_, ref) => {
 			<Modal
 				isOpen={isOpen}
 				onClose={() => setIsOpen(false)}
-				size={'4xl'}
+				size={'6xl'}
 				closeOnOverlayClick={false}
 				closeOnEsc={false}
 			>
@@ -165,6 +171,7 @@ const NurtureTemplateMessage = forwardRef<NurtureMessageHandle>((_, ref) => {
 							components={components}
 							headerLink={nurturing[nurturingIndex]?.template_header?.link ?? ''}
 							headerFile={nurturingHeaderFile}
+							headerMediaId={nurturing[nurturingIndex]?.template_header?.media_id ?? ''}
 							body={nurturing[nurturingIndex]?.template_body ?? []}
 							header={
 								nurturing[nurturingIndex]?.template_header ?? {

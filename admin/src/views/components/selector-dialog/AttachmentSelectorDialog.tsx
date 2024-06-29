@@ -35,10 +35,11 @@ type Props = {
 	onConfirm: (type: string, ids: string[]) => void;
 	isSelect?: boolean;
 	returnMediaId?: boolean;
+	isMultiSelect?: boolean;
 };
 
 const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
-	({ onConfirm, isSelect = false, returnMediaId = true }: Props, ref) => {
+	({ onConfirm, isSelect = false, returnMediaId = true, isMultiSelect = true }: Props, ref) => {
 		const [selected, setSelected] = useState<string[]>([]);
 		const { list } = useSelector((state: StoreState) => state[StoreNames.MEDIA]);
 		const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
@@ -104,6 +105,7 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 									<Tr>
 										<Th width={'10%'}>
 											<Checkbox
+												hidden={!isMultiSelect}
 												isChecked={filtered.length === selected.length && selected.length > 0}
 												isIndeterminate={selected.length > 0 && selected.length !== filtered.length}
 												onChange={(e) => {
@@ -135,9 +137,19 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 														mr={4}
 														onChange={(e) => {
 															if (e.target.checked) {
-																setSelected((prev) => returnMediaId ? [...prev, item.media_id] : [...prev, item.id]);
+																setSelected((prev) =>
+																	returnMediaId
+																		? isMultiSelect
+																			? [...prev, item.media_id]
+																			: [item.media_id]
+																		: [...prev, item.id]
+																);
 															} else {
-																setSelected((prev) => prev.filter((i) => i !== (returnMediaId ? item.media_id : item.id)));
+																setSelected((prev) =>
+																	prev.filter(
+																		(i) => i !== (returnMediaId ? item.media_id : item.id)
+																	)
+																);
 															}
 														}}
 													/>

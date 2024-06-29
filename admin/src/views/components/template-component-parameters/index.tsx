@@ -3,6 +3,7 @@
 import {
 	AbsoluteCenter,
 	Box,
+	Button,
 	Divider,
 	Flex,
 	FormControl,
@@ -14,7 +15,14 @@ import {
 	Select,
 	Text,
 } from '@chakra-ui/react';
+import { useRef } from 'react';
+import { useSelector } from 'react-redux';
+import MessagesService from '../../../services/messages.service';
+import { StoreNames, StoreState } from '../../../store';
 import SampleMessage from '../sampleMessage';
+import AttachmentSelectorDialog, {
+	AttachmentDialogHandle,
+} from '../selector-dialog/AttachmentSelectorDialog';
 import Each from '../utils/Each';
 
 const bodyParametersList = [
@@ -31,6 +39,7 @@ type Props = {
 	components: Record<string, any>[];
 	headerLink: string;
 	headerFile: File | null;
+	headerMediaId: string;
 	body: {
 		custom_text: string;
 		phonebook_data: string;
@@ -39,10 +48,12 @@ type Props = {
 	}[];
 	handleTemplateDetailsChange: ({
 		headerLink,
+		headerMediaId,
 		body,
 	}: {
 		headerLink: string;
 		headerFile: File | null;
+		headerMediaId: string;
 		body?: {
 			index: number;
 			custom_text: string;
@@ -67,14 +78,27 @@ const TemplateComponentParameter = ({
 	handleTemplateDetailsChange,
 	showSampleMessage = true,
 	header,
+	headerMediaId,
 }: Props) => {
+	const attachmentSelectorRef = useRef<AttachmentDialogHandle>(null);
 	// const header = components?.find((component) => component.type === 'HEADER');
+
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files ? e.target.files[0] : null;
 		handleTemplateDetailsChange({
 			headerLink: '',
 			headerFile: file,
+			headerMediaId: '',
+		});
+	};
+
+	const attachmentSelectorId = (type: string, ids: string[]) => {
+		handleTemplateDetailsChange({
+			headerLink: '',
+			headerFile: null,
+			headerMediaId: ids[0],
 		});
 	};
 
@@ -98,6 +122,7 @@ const TemplateComponentParameter = ({
 							handleTemplateDetailsChange({
 								headerLink: e.target.value,
 								headerFile: null,
+								headerMediaId: '',
 							});
 						}}
 						value={headerLink}
@@ -108,13 +133,58 @@ const TemplateComponentParameter = ({
 							or
 						</AbsoluteCenter>
 					</Box>
-					<Box marginTop={'0.5rem'}>
+					<FormControl marginTop={'0.5rem'}>
 						<FormLabel mb={'0.5rem'}>Upload header media</FormLabel>
 						<Input
 							type='file'
 							onChange={(e) => {
 								handleFileChange(e);
 							}}
+						/>
+					</FormControl>
+					<Box position='relative' my={'1rem'}>
+						<Divider />
+						<AbsoluteCenter p='4' color='gray.600' bg={'white'}>
+							or
+						</AbsoluteCenter>
+					</Box>
+					<Box marginTop={'0.5rem'}>
+						<FormLabel mb={'0.5rem'}>Select header media</FormLabel>
+						<Button
+							width={'full'}
+							variant={'outline'}
+							colorScheme='teal'
+							onClick={() =>
+								attachmentSelectorRef.current?.open({
+									type:
+										header.type === 'IMAGE'
+											? 'PHOTOS'
+											: header.type === 'VIDEO'
+											? 'VIDEO'
+											: 'DOCUMENT',
+									ids: [],
+								})
+							}
+						>
+							Select {header.type}
+						</Button>
+						{header.media_id && (
+							<Button
+								colorScheme='blue'
+								variant={'link'}
+								onClick={() => {
+									MessagesService.getMedia(selected_device_id, header.media_id).then((res) => {
+										window.open(res.url);
+									});
+								}}
+							>
+								Media selected. Click here to preview
+							</Button>
+						)}
+						<AttachmentSelectorDialog
+							onConfirm={attachmentSelectorId}
+							ref={attachmentSelectorRef}
+							isMultiSelect={false}
 						/>
 					</Box>
 				</FormControl>
@@ -133,6 +203,7 @@ const TemplateComponentParameter = ({
 											handleTemplateDetailsChange({
 												headerLink,
 												headerFile,
+												headerMediaId,
 												body: {
 													index,
 													variable_from: 'custom_text',
@@ -160,6 +231,7 @@ const TemplateComponentParameter = ({
 												handleTemplateDetailsChange({
 													headerLink,
 													headerFile,
+													headerMediaId,
 													body: {
 														index,
 														variable_from: 'phonebook_data',
@@ -191,6 +263,7 @@ const TemplateComponentParameter = ({
 														handleTemplateDetailsChange({
 															headerLink,
 															headerFile,
+															headerMediaId,
 															body: {
 																index,
 																variable_from: 'phonebook_data',
@@ -212,6 +285,7 @@ const TemplateComponentParameter = ({
 												handleTemplateDetailsChange({
 													headerLink,
 													headerFile,
+													headerMediaId,
 													body: {
 														index,
 														variable_from: 'phonebook_data',
@@ -235,6 +309,7 @@ const TemplateComponentParameter = ({
 											handleTemplateDetailsChange({
 												headerLink,
 												headerFile,
+												headerMediaId,
 												body: {
 													index,
 													variable_from: e.target.value as 'custom_text' | 'phonebook_data',

@@ -42,6 +42,7 @@ import {
 	setTemplateBodyPhonebookData,
 	setTemplateBodyVariableFrom,
 	setTemplateHeaderLink,
+	setTemplateHeaderMediaId,
 	setTrigger,
 	setTriggerGapTime,
 	setTriggerGapType,
@@ -117,7 +118,7 @@ export default function ChatBotPage() {
 			}
 
 			if (template_header?.type === ('IMAGE' || 'VIDEO' || 'DOCUMENT')) {
-				if (!template_header_file && !template_header.link) {
+				if (!template_header_file && !template_header.link && !template_header.media_id) {
 					toast({
 						title: 'Header link or file is required',
 						status: 'error',
@@ -158,10 +159,12 @@ export default function ChatBotPage() {
 	const handleTemplateDetailsChange = ({
 		headerLink,
 		headerFile,
+		headerMediaId,
 		body,
 	}: {
 		headerLink: string;
 		headerFile: File | null;
+		headerMediaId: string;
 		body?: {
 			index: number;
 			custom_text: string;
@@ -170,6 +173,7 @@ export default function ChatBotPage() {
 			fallback_value: string;
 		};
 	}) => {
+		dispatch(setTemplateHeaderMediaId(headerMediaId ?? ''));
 		dispatch(setTemplateHeaderLink(headerLink ?? ''));
 		if (headerFile) {
 			dispatch(setHeaderFile(headerFile));
@@ -509,6 +513,7 @@ export default function ChatBotPage() {
 								<TemplateComponentParameter
 									header={template_header ?? { type: '', link: '', media_id: '' }}
 									headerFile={template_header_file}
+									headerMediaId={details.template_header?.media_id ?? ''}
 									components={selectedTemplate?.components ?? []}
 									body={template_body ?? []}
 									headerLink={details.template_header?.link ?? ''}
