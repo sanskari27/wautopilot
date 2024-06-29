@@ -25,164 +25,168 @@ export type NurtureMessageHandle = {
 	open: ({ index, components }: { index: number; components: Record<string, any>[] }) => void;
 };
 
-const NurtureTemplateMessage = forwardRef<NurtureMessageHandle>(
-	(_, ref) => {
-		const dispatch = useDispatch();
-		const toast = useToast();
+const NurtureTemplateMessage = forwardRef<NurtureMessageHandle>((_, ref) => {
+	const dispatch = useDispatch();
+	const toast = useToast();
 
-		const {
-			details: { nurturing },
-		} = useSelector((state: StoreState) => state[StoreNames.CHATBOT]);
+	const {
+		details: { nurturing },
+	} = useSelector((state: StoreState) => state[StoreNames.CHATBOT]);
 
-		const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
-		const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
 
-		const [nurturingIndex, setNurturingIndex] = useState(0);
+	const [nurturingIndex, setNurturingIndex] = useState(0);
 
-		const [nurturingHeaderFile, setNurturingHeaderFile] = useState<File | null>(null);
+	const [nurturingHeaderFile, setNurturingHeaderFile] = useState<File | null>(null);
 
-		const [components, setComponents] = useState<Record<string, any>[]>([]);
+	const [components, setComponents] = useState<Record<string, any>[]>([]);
 
-		useImperativeHandle(ref, () => ({
-			open: ({ index, components }: { index: number; components: Record<string, any>[] }) => {
-				setIsOpen(true);
-				setNurturingIndex(index);
-				setComponents(components);
-			},
-		}));
+	useImperativeHandle(ref, () => ({
+		open: ({ index, components }: { index: number; components: Record<string, any>[] }) => {
+			setIsOpen(true);
+			setNurturingIndex(index);
+			setComponents(components);
+		},
+	}));
 
-		const handleTemplateDetailsChange = ({
-			headerLink,
-			body,
-			headerFile,
-		}: {
-			headerLink: string;
-			headerFile: File | null;
-			body?: {
-				index: number;
-				custom_text: string;
-				phonebook_data: string;
-				variable_from: 'custom_text' | 'phonebook_data';
-				fallback_value: string;
-			};
-		}) => {
-			dispatch(setNurturingTemplateHeaderLink({ index: nurturingIndex, link: headerLink }));
-			setNurturingHeaderFile(headerFile);
-			if (body) dispatch(setNurturingTemplateBody({ index: nurturingIndex, body: body }));
+	const handleTemplateDetailsChange = ({
+		headerLink,
+		body,
+		headerFile,
+	}: {
+		headerLink: string;
+		headerFile: File | null;
+		body?: {
+			index: number;
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
 		};
+	}) => {
+		dispatch(setNurturingTemplateHeaderLink({ index: nurturingIndex, link: headerLink }));
+		setNurturingHeaderFile(headerFile);
+		if (body) dispatch(setNurturingTemplateBody({ index: nurturingIndex, body: body }));
+	};
 
-		const validate = () => {
-			let notHasError = true;
-			if (
-				nurturing[nurturingIndex]?.template_header?.type === 'IMAGE' ||
-				nurturing[nurturingIndex]?.template_header?.type === 'VIDEO' ||
-				nurturing[nurturingIndex]?.template_header?.type === 'DOCUMENT'
-			) {
-				if (!nurturing[nurturingIndex]?.template_header?.link && !nurturingHeaderFile) {
-					toast({
-						title: 'Header is required',
-						status: 'error',
-					});
-					notHasError = false;
-				}
-			}
-			nurturing[nurturingIndex].template_body.map((body) => {
-				if (body.variable_from === 'phonebook_data') {
-					if (!body.phonebook_data) {
-						toast({
-							title: 'Phonebook data is required',
-							status: 'error',
-						});
-						notHasError = false;
-					}
-					if (!body.fallback_value) {
-						toast({
-							title: 'Fallback value is required',
-							status: 'error',
-						});
-						notHasError = false;
-					}
-				}
-				if (body.variable_from === 'custom_text' && !body.custom_text) {
-					toast({
-						title: 'Custom text is required',
-						status: 'error',
-					});
-					notHasError = false;
-				}
-			});
-
-			return notHasError;
-		};
-
-		const handleClose = () => {
-			setIsOpen(false);
-
-			dispatch(setNurturingTemplateId({ index: nurturingIndex, template_id: '' }));
-		};
-
-		const handleSave = () => {
-			if (!validate()) {
-				return;
-			}
-
-			if (nurturingHeaderFile) {
-				toast.promise(UploadService.generateMetaMediaId(selected_device_id, nurturingHeaderFile), {
-					success: (media_id) => {
-						dispatch(setNurturingTemplateHeaderMediaId({ index: nurturingIndex, media_id }));
-						setIsOpen(false);
-						return {
-							title: 'File uploaded',
-						};
-					},
-					error: {
-						title: 'Failed to upload file',
-					},
-					loading: {
-						title: 'Uploading file',
-					},
+	const validate = () => {
+		let notHasError = true;
+		if (
+			nurturing[nurturingIndex]?.template_header?.type === 'IMAGE' ||
+			nurturing[nurturingIndex]?.template_header?.type === 'VIDEO' ||
+			nurturing[nurturingIndex]?.template_header?.type === 'DOCUMENT'
+		) {
+			if (!nurturing[nurturingIndex]?.template_header?.link && !nurturingHeaderFile) {
+				toast({
+					title: 'Header is required',
+					status: 'error',
 				});
-			} else {
-				setIsOpen(false);
+				notHasError = false;
 			}
-		};
+		}
+		nurturing[nurturingIndex].template_body.map((body) => {
+			if (body.variable_from === 'phonebook_data') {
+				if (!body.phonebook_data) {
+					toast({
+						title: 'Phonebook data is required',
+						status: 'error',
+					});
+					notHasError = false;
+				}
+				if (!body.fallback_value) {
+					toast({
+						title: 'Fallback value is required',
+						status: 'error',
+					});
+					notHasError = false;
+				}
+			}
+			if (body.variable_from === 'custom_text' && !body.custom_text) {
+				toast({
+					title: 'Custom text is required',
+					status: 'error',
+				});
+				notHasError = false;
+			}
+		});
 
-		return (
-			<>
-				<Modal isOpen={isOpen} onClose={() => setIsOpen(false)} size={'4xl'}>
-					<ModalOverlay />
-					<ModalContent>
-						<ModalHeader>Nurturing Message</ModalHeader>
-						<ModalBody>
-							<TemplateComponentParameter
-								components={components}
-								headerLink={nurturing[nurturingIndex]?.template_header?.link ?? ''}
-								headerFile={null}
-								body={nurturing[nurturingIndex]?.template_body ?? []}
-								header={
-									nurturing[nurturingIndex]?.template_header ?? {
-										type: 'TEXT',
-										link: '',
-										media_id: '',
-									}
+		return notHasError;
+	};
+
+	const handleClose = () => {
+		setIsOpen(false);
+
+		dispatch(setNurturingTemplateId({ index: nurturingIndex, template_id: '' }));
+	};
+
+	const handleSave = () => {
+		if (!validate()) {
+			return;
+		}
+
+		if (nurturingHeaderFile) {
+			toast.promise(UploadService.generateMetaMediaId(selected_device_id, nurturingHeaderFile), {
+				success: (media_id) => {
+					dispatch(setNurturingTemplateHeaderMediaId({ index: nurturingIndex, media_id }));
+					setIsOpen(false);
+					return {
+						title: 'File uploaded',
+					};
+				},
+				error: {
+					title: 'Failed to upload file',
+				},
+				loading: {
+					title: 'Uploading file',
+				},
+			});
+		} else {
+			setIsOpen(false);
+		}
+	};
+
+	return (
+		<>
+			<Modal
+				isOpen={isOpen}
+				onClose={() => setIsOpen(false)}
+				size={'4xl'}
+				closeOnOverlayClick={false}
+				closeOnEsc={false}
+			>
+				<ModalOverlay />
+				<ModalContent>
+					<ModalHeader>Nurturing Message</ModalHeader>
+					<ModalBody>
+						<TemplateComponentParameter
+							components={components}
+							headerLink={nurturing[nurturingIndex]?.template_header?.link ?? ''}
+							headerFile={null}
+							body={nurturing[nurturingIndex]?.template_body ?? []}
+							header={
+								nurturing[nurturingIndex]?.template_header ?? {
+									type: 'TEXT',
+									link: '',
+									media_id: '',
 								}
-								handleTemplateDetailsChange={handleTemplateDetailsChange}
-							/>
-						</ModalBody>
-						<ModalFooter>
-							<Button onClick={handleClose} variant={'outline'} colorScheme='red'>
-								Close
-							</Button>
-							<Button colorScheme='green' ml={'1rem'} onClick={handleSave}>
-								Save
-							</Button>
-						</ModalFooter>
-					</ModalContent>
-				</Modal>
-			</>
-		);
-	}
-);
+							}
+							handleTemplateDetailsChange={handleTemplateDetailsChange}
+						/>
+					</ModalBody>
+					<ModalFooter>
+						<Button onClick={handleClose} variant={'outline'} colorScheme='red'>
+							Cancel
+						</Button>
+						<Button colorScheme='green' ml={'1rem'} onClick={handleSave}>
+							Save
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+		</>
+	);
+});
 
 export default NurtureTemplateMessage;

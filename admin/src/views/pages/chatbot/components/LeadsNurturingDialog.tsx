@@ -63,7 +63,14 @@ const LeadsNurturing = forwardRef<LeadsNurturingHandle>((_, ref) => {
 		open: () => setIsOpen(true),
 	}));
 
-	const handleChange = (key: string, value: string, index: number) => {
+	const handleChange = (
+		key: string,
+		value: string,
+		index: number,
+		{ editTemplate = false }: { editTemplate?: boolean } = {
+			editTemplate: false,
+		}
+	) => {
 		if (key === 'value') {
 			dispatch(setNurturingAfterValue({ index, value: value }));
 		} else if (key === 'type') {
@@ -76,7 +83,9 @@ const LeadsNurturing = forwardRef<LeadsNurturingHandle>((_, ref) => {
 			if (value === 'Select one!') return;
 			const selectedTemplate = templateListFiltered.find((t) => t.id === value);
 			if (!selectedTemplate) return;
-			dispatch(setSelectedNurturingTemplate({ index, template: selectedTemplate }));
+			if (!editTemplate) {
+				dispatch(setSelectedNurturingTemplate({ index, template: selectedTemplate }));
+			}
 			nurturingMessageRef.current?.open({
 				index,
 				components: selectedTemplate.components,
@@ -194,7 +203,19 @@ const LeadsNurturing = forwardRef<LeadsNurturingHandle>((_, ref) => {
 											</Select>
 											{/* {ui.templateError && <FormErrorMessage>{ui.templateError}</FormErrorMessage>} */}
 										</FormControl>
-										<HStack justifyContent={'flex-end'} mt={'1rem'}>
+										<HStack justifyContent={'space-between'} mt={'1rem'}>
+											<Button
+												aria-label='edit-nurturing'
+												variant={'outline'}
+												colorScheme='green'
+												onClick={() => {
+													handleChange('template_id', item.template_id, index, {
+														editTemplate: true,
+													});
+												}}
+											>
+												Edit
+											</Button>
 											<Button
 												aria-label='add-nurturing'
 												variant={'outline'}

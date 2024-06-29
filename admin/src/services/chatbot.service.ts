@@ -56,12 +56,14 @@ const validateChatBot = (bots: any) => {
 					end_at: nurture.end_at ?? '',
 					template_id: nurture.template_id ?? '',
 					template_name: nurture.template_name ?? '',
-					template_body: {
-						custom_text: nurture.template_body?.custom_text ?? '',
-						phonebook_data: nurture.template_body?.phonebook_data ?? '',
-						variable_from: nurture.template_body?.variable_from ?? 'custom_text',
-						fallback_value: nurture.template_body?.fallback_value ?? '',
-					},
+					template_body: nurture.template_body.map((body: any) => {
+						return {
+							custom_text: body.custom_text ?? '',
+							phonebook_data: body.phonebook_data ?? '',
+							variable_from: body.variable_from ?? 'custom_text',
+							fallback_value: body.fallback_value ?? '',
+						};
+					}),
 					template_header: {
 						type: nurture.template_header?.type ?? '',
 						link: nurture.template_header?.link ?? '',
