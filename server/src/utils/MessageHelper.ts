@@ -23,10 +23,12 @@ export function extractHeader(
 			return null;
 		}
 		const parameter = headerMsg.parameters[0];
+		const source = parameter[parameter.type.toLowerCase()].id ? 'ID' : 'LINK';
+
 		return {
 			header_type: header.format,
-			header_content_source: 'MEDIA_ID',
-			header_content: parameter[parameter.type.toLowerCase()].id,
+			header_content_source: source,
+			header_content: parameter[parameter.type.toLowerCase()][source.toLowerCase()],
 		};
 	}
 	return null;
