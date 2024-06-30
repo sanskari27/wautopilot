@@ -1,10 +1,10 @@
 import express from 'express';
 import SessionRoute from './auth/auth.route';
+import ChatBotRoute from './chatbot/chatbot.route';
 import ContactsRoute from './contacts/contacts.route';
 import CouponRoute from './coupon/coupon.route';
 import MediaRoute from './media/media.route';
 import MessageRoute from './message/message.route';
-import ChatBotRoute from './chatbot/chatbot.route';
 import PaymentRoute from './payment/payment.route';
 import PhonebookRoute from './phonebook/phonebook.route';
 import TemplateRoute from './template/template.route';
@@ -30,11 +30,11 @@ router.use('/coupon', VerifySession, CouponRoute);
 router.use('/whatsapp-link', VerifySession, WhatsappLinkRoute);
 router.use('/payment', VerifySession, PaymentRoute);
 
-router.use('/template/:device_id', VerifySession, VerifyDevice, TemplateRoute);
-router.use('/message/:device_id', VerifySession, VerifyDevice, MessageRoute);
-router.use('/chatbot/:device_id', VerifySession, VerifyDevice, ChatBotRoute);
-router.use('/media/:device_id', VerifySession, VerifyDevice, MediaRoute);
-router.use('/uploads/:device_id', VerifySession, VerifyDevice, UploadsRoute);
+router.use('/:device_id/template', VerifySession, VerifyDevice, TemplateRoute);
+router.use('/:device_id/message', VerifySession, VerifyDevice, MessageRoute);
+router.use('/:device_id/chatbot', VerifySession, VerifyDevice, ChatBotRoute);
+router.use('/:device_id/media', VerifySession, VerifyDevice, MediaRoute);
+router.use('/:device_id/uploads', VerifySession, VerifyDevice, UploadsRoute);
 router.use('/users', VerifySession, UsersRoute);
 router.use('/webhooks', WebhooksRoute);
 
