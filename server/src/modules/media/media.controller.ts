@@ -38,7 +38,10 @@ async function addMedia(req: Request, res: Response, next: NextFunction) {
 
 		const {
 			data: { id: media_id },
-		} = await MetaAPI(device.accessToken).post(`/${device.phoneNumberId}/media`, form);
+		} = await MetaAPI(device.accessToken).post(`/${device.phoneNumberId}/media`, form, {
+			maxContentLength: Infinity,
+			maxBodyLength: Infinity,
+		});
 
 		const { data } = await MetaAPI(device.accessToken).get(`/${media_id}`);
 

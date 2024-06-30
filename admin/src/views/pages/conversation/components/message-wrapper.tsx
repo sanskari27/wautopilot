@@ -58,7 +58,7 @@ const ChatMessageWrapper = ({
 			<Flex
 				direction={'column'}
 				key={message._id}
-				maxW={'65%'}
+				className='max-w-4/5 md:max-w-[45%]'
 				marginBottom={'1rem'}
 				alignSelf={isMe ? 'flex-start' : 'flex-end'}
 				ref={ref}

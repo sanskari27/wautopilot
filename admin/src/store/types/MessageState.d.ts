@@ -78,9 +78,9 @@ export type Message = {
 	failed_at: string;
 	failed_reason: string;
 
-	// header_type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT';
-	// header_content_source: 'LINK' | 'MEDIA_ID' | 'TEXT';
-	// header_content: string;
+	header_type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT';
+	header_content_source: 'LINK' | 'ID' | 'TEXT';
+	header_content: string;
 	body: {
 		body_type: 'TEXT' | 'MEDIA' | 'CONTACT' | 'LOCATION' | 'UNKNOWN';
 		text: string;

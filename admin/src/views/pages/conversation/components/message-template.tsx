@@ -39,9 +39,65 @@ export const TextMessage = ({
 	ref: RefObject<HTMLDivElement>;
 	id: string;
 }) => {
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
+
+	const [media, setMedia] = useState(initialState);
+	const { ref: inViewRef, inView } = useInView({ triggerOnce: true });
+	useEffect(() => {
+		const showHeader = !!message.header_content;
+		const headerIsMedia =
+			message.header_type === 'IMAGE' ||
+			message.header_type === 'VIDEO' ||
+			message.header_type === 'DOCUMENT';
+		if (!showHeader || !headerIsMedia) {
+			return;
+		}
+		if (!inView) return;
+		MessagesService.getMedia(selected_device_id, message.header_content).then((data) => {
+			setMedia({
+				...initialState,
+				loaded: true,
+				mimeType: data.mime_type,
+				url: data.url,
+				size: data.size,
+			});
+		});
+	}, [selected_device_id, inView, message.header_content, message.header_type]);
+
+	const showHeader = !!message.header_content;
+	const headerIsMedia =
+		message.header_type === 'IMAGE' ||
+		message.header_type === 'VIDEO' ||
+		message.header_type === 'DOCUMENT';
+	const headerIsText = message.header_type === 'TEXT';
+	console.log(message.footer_content);
+
 	return (
 		<ChatMessageWrapper id={id} ref={ref} message={message}>
+			{showHeader ? (
+				headerIsMedia ? (
+					<Center width={'98%'} mx={'auto'} ref={inViewRef}>
+						<Box hidden={!media.loaded}>
+							<Preview
+								data={{
+									url:
+										message.header_content_source === 'ID'
+											? `${SERVER_URL}uploads/${selected_device_id}/download-meta-media/${message.header_content}`
+											: message.header_content,
+									type: getFileType(media.mimeType),
+								}}
+								progress={-1}
+							/>
+						</Box>
+					</Center>
+				) : headerIsText ? (
+					<Text fontWeight={'bold'}>{message.header_content}</Text>
+				) : null
+			) : null}
 			<Text whiteSpace={'pre-wrap'}>{message.body?.text}</Text>
+			<Text whiteSpace={'pre-wrap'} fontSize={'sm'} textColor={'gray'}>
+				{message.footer_content}
+			</Text>
 		</ChatMessageWrapper>
 	);
 };

@@ -48,9 +48,9 @@ export default class MessagesService {
 						failed_at: message.failed_at ?? '',
 						failed_reason: message.failed_reason ?? '',
 
-						// header_type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT';
-						// header_content_source: 'LINK' | 'MEDIA_ID' | 'TEXT';
-						// header_content: string;
+						header_type: message.header_type as 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT',
+						header_content_source: message.header_content_source as 'LINK' | 'ID' | 'TEXT',
+						header_content: message.header_content as string,
 						body: {
 							body_type: message.body.body_type ?? 'UNKNOWN',
 							text: message.body.text ?? '',
