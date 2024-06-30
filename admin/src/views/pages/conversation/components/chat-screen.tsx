@@ -181,7 +181,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 							Loading Chats...
 						</Text>
 					) : (
-						<Each items={messageList} render={(item) => <ChatMessage message={item} />} />
+						<Each items={messageList} id='_id' render={(item) => <ChatMessage message={item} />} />
 					)}
 				</Flex>
 				<HStack bg={'white'} width={'full'} p={'0.5rem'} alignItems={'flex-end'}>
