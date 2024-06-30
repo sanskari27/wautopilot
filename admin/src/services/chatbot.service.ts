@@ -79,7 +79,7 @@ const validateChatBot = (bots: any) => {
 export default class ChatBotService {
 	static async listChatBots({ deviceId }: { deviceId: string }) {
 		try {
-			const { data } = await APIInstance.get(`/chatbot/${deviceId}`);
+			const { data } = await APIInstance.get(`/${deviceId}/chatbot`);
 
 			return validateChatBot(data.bots);
 		} catch (err) {
@@ -149,13 +149,13 @@ export default class ChatBotService {
 				delete details.nurturing[i].template_header;
 			}
 		}
-		const { data } = await APIInstance.post(`/chatbot/${deviceId}`, details);
+		const { data } = await APIInstance.post(`/${deviceId}/chatbot`, details);
 		return validateChatBot([data.bot]);
 	}
 
 	static async DeleteBot({ deviceId, botId }: { deviceId: string; botId: string }) {
 		try {
-			const { data } = await APIInstance.delete(`/chatbot/${deviceId}/${botId}`);
+			const { data } = await APIInstance.delete(`/${deviceId}/chatbot/${botId}`);
 
 			return validateChatBot([data.bot]);
 		} catch (err) {
@@ -165,7 +165,7 @@ export default class ChatBotService {
 
 	static async toggleBot({ deviceId, botId }: { deviceId: string; botId: string }) {
 		try {
-			const { data } = await APIInstance.put(`/chatbot/${deviceId}/${botId}`);
+			const { data } = await APIInstance.put(`/${deviceId}/chatbot/${botId}`);
 
 			return validateChatBot([data.bot]);
 		} catch (err) {
@@ -237,7 +237,7 @@ export default class ChatBotService {
 				delete details.nurturing[i].template_header;
 			}
 		}
-		const { data } = await APIInstance.patch(`/chatbot/${deviceId}/${botId}`, details);
+		const { data } = await APIInstance.patch(`/${deviceId}/chatbot/${botId}`, details);
 		return validateChatBot([data.bot]);
 	}
 }

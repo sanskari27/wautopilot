@@ -6,7 +6,7 @@ import { ScheduledBroadcast } from '../views/pages/broadcast-report';
 export default class MessagesService {
 	static async fetchAllConversation(deviceId: string, label_filter: string[] = []) {
 		try {
-			const { data } = await APIInstance.get(`/message/${deviceId}/conversations`, {
+			const { data } = await APIInstance.get(`/${deviceId}/message/conversations`, {
 				params: {
 					labels: label_filter.join(','),
 				},
@@ -29,7 +29,7 @@ export default class MessagesService {
 	static async fetchConversationMessages(deviceId: string, recipientId: string) {
 		try {
 			const { data } = await APIInstance.get(
-				`/message/${deviceId}/conversations/${recipientId}/messages`
+				`/${deviceId}/message/conversations/${recipientId}/messages`
 			);
 			return {
 				messageLabels: data.labels ?? [],
@@ -134,7 +134,7 @@ export default class MessagesService {
 	}
 	static async getMedia(deviceId: string, mediaId: string) {
 		try {
-			const { data } = await APIInstance.get(`/uploads/${deviceId}/meta-media-url/${mediaId}`);
+			const { data } = await APIInstance.get(`/${deviceId}/uploads/meta-media-url/${mediaId}`);
 			return {
 				url: data.url ?? '',
 				mime_type: data.mime_type ?? '',
@@ -169,7 +169,7 @@ export default class MessagesService {
 	) {
 		try {
 			await APIInstance.post(
-				`/message/${deviceId}/conversations/${recipientId}/send-message`,
+				`/${deviceId}/message/conversations/${recipientId}/send-message`,
 				message
 			);
 			return true;
@@ -191,7 +191,7 @@ export default class MessagesService {
 
 	static async broadcastReport(deviceId: string) {
 		try {
-			const { data } = await APIInstance.get(`/message/${deviceId}/broadcast/reports`);
+			const { data } = await APIInstance.get(`/${deviceId}/message/broadcast/reports`);
 			return data.reports as ScheduledBroadcast[];
 		} catch (err) {
 			return [];
@@ -200,7 +200,7 @@ export default class MessagesService {
 
 	static async pauseBroadcast(deviceId: string, broadcastId: string) {
 		try {
-			await APIInstance.post(`/message/${deviceId}/broadcast/${broadcastId}/pause`);
+			await APIInstance.post(`/${deviceId}/message/broadcast/${broadcastId}/pause`);
 			return true;
 		} catch (err) {
 			return false;
@@ -209,7 +209,7 @@ export default class MessagesService {
 
 	static async resumeBroadcast(deviceId: string, broadcastId: string) {
 		try {
-			await APIInstance.post(`/message/${deviceId}/broadcast/${broadcastId}/resume`);
+			await APIInstance.post(`/${deviceId}/message/broadcast/${broadcastId}/resume`);
 			return true;
 		} catch (err) {
 			return false;
@@ -218,7 +218,7 @@ export default class MessagesService {
 
 	static async deleteBroadcast(deviceId: string, broadcastId: string) {
 		try {
-			await APIInstance.post(`/message/${deviceId}/broadcast/${broadcastId}/delete`);
+			await APIInstance.post(`/${deviceId}/message/broadcast/${broadcastId}/delete`);
 			return true;
 		} catch (err) {
 			return false;
@@ -227,7 +227,7 @@ export default class MessagesService {
 
 	static async resendFailedBroadcast(deviceId: string, broadcastId: string) {
 		try {
-			await APIInstance.post(`/message/${deviceId}/broadcast/${broadcastId}/resend`);
+			await APIInstance.post(`/${deviceId}/message/broadcast/${broadcastId}/resend`);
 			return true;
 		} catch (err) {
 			return false;
@@ -236,7 +236,7 @@ export default class MessagesService {
 
 	static async downloadBroadcast(deviceId: string, broadcastId: string) {
 		const response = await APIInstance.get(
-			`/message/${deviceId}/broadcast/${broadcastId}/download`,
+			`/${deviceId}/message/broadcast/${broadcastId}/download`,
 			{
 				responseType: 'blob',
 			}
@@ -262,7 +262,7 @@ export default class MessagesService {
 
 	static async assignMessageLabels(deviceId: string, messageId: string, labels: string[]) {
 		try {
-			await APIInstance.post(`/message/${deviceId}/message/${messageId}/assign-labels`, {
+			await APIInstance.post(`/${deviceId}/message/message/${messageId}/assign-labels`, {
 				labels,
 			});
 			return true;
@@ -272,7 +272,7 @@ export default class MessagesService {
 	}
 	static async markRead(deviceId: string, message_id: string) {
 		try {
-			await APIInstance.post(`/message/${deviceId}/mark-read/${message_id}`);
+			await APIInstance.post(`/${deviceId}/message/mark-read/${message_id}`);
 			return true;
 		} catch (err) {
 			return false;

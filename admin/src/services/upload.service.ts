@@ -4,7 +4,7 @@ export default class UploadService {
 	static async generateMetaHandle(device_id: string, file: File) {
 		const form = new FormData();
 		form.append('file', file);
-		const { data } = await APIInstance.post(`/uploads/${device_id}/upload-meta-handle`, form, {
+		const { data } = await APIInstance.post(`/${device_id}/uploads/upload-meta-handle`, form, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
 			},
@@ -19,7 +19,7 @@ export default class UploadService {
 	) {
 		const form = new FormData();
 		form.append('file', file);
-		const { data } = await APIInstance.post(`/uploads/${device_id}/upload-meta-media`, form, {
+		const { data } = await APIInstance.post(`/${device_id}/uploads/upload-meta-media`, form, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
 			},
@@ -36,7 +36,7 @@ export default class UploadService {
 	static async downloadMetaMedia(deviceId: string, media_id: string) {
 		try {
 			const response = await APIInstance.get(
-				`/uploads/${deviceId}/download-meta-media/${media_id}`,
+				`/${deviceId}/uploads/download-meta-media/${media_id}`,
 				{
 					responseType: 'blob',
 				}

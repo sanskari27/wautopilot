@@ -3,7 +3,7 @@ import { Media } from '../store/types/MediaState';
 export default class MediaService {
 	static async getMedias(device_id: string) {
 		try {
-			const { data } = await APIInstance.get(`/media/${device_id}`);
+			const { data } = await APIInstance.get(`/${device_id}/media`);
 			return data.list as Media[];
 		} catch (err) {
 			return [];
@@ -11,12 +11,12 @@ export default class MediaService {
 	}
 
 	static async deleteMedia(device_id: string, id: string) {
-		await APIInstance.delete(`/media/${device_id}/${id}`);
+		await APIInstance.delete(`/${device_id}/media/${id}`);
 	}
 
 	static async downloadMedia(device_id: string, id: string) {
 		try {
-			const response = await APIInstance.get(`/media/${device_id}/${id}/download`, {
+			const response = await APIInstance.get(`/${device_id}/media/${id}/download`, {
 				responseType: 'blob',
 			});
 			const blob = new Blob([response.data]);
@@ -48,7 +48,7 @@ export default class MediaService {
 	) {
 		const formData = new FormData();
 		formData.append('file', file);
-		const { data } = await APIInstance.post(`/media/${device_id}`, formData, {
+		const { data } = await APIInstance.post(`/${device_id}/media`, formData, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
 			},
@@ -58,6 +58,4 @@ export default class MediaService {
 		});
 		return data.media;
 	}
-
-	
 }

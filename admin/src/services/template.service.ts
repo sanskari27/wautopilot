@@ -3,7 +3,7 @@ import APIInstance from '../config/APIInstance';
 export default class TemplateService {
 	static async listTemplates(device_id: string) {
 		try {
-			const { data } = await APIInstance.get(`/template/${device_id}`);
+			const { data } = await APIInstance.get(`/${device_id}/template`);
 
 			const templates = data.templates as {
 				id: string;
@@ -20,7 +20,7 @@ export default class TemplateService {
 	}
 	static async fetchTemplate(device_id: string, template_id: string) {
 		try {
-			const { data } = await APIInstance.get(`/template/${device_id}/${template_id}`);
+			const { data } = await APIInstance.get(`/${device_id}//template${template_id}`);
 
 			return data.template as {
 				id: string;
@@ -35,17 +35,17 @@ export default class TemplateService {
 	}
 
 	static async removeTemplate(device_id: string, id: string, name: string) {
-		await APIInstance.post(`/template/${device_id}/delete-template`, {
+		await APIInstance.post(`/${device_id}/template/delete-template`, {
 			id,
 			name,
 		});
 	}
 
 	static async addTemplate(device_id: string, template: Record<string, unknown>) {
-		await APIInstance.post(`/template/${device_id}/add-template`, template);
+		await APIInstance.post(`/${device_id}/template/add-template`, template);
 	}
 
 	static async editTemplate(device_id: string, template: Record<string, unknown>) {
-		await APIInstance.post(`/template/${device_id}/edit-template`, template);
+		await APIInstance.post(`/${device_id}/template/edit-template`, template);
 	}
 }
