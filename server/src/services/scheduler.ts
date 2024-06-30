@@ -127,6 +127,8 @@ export default class SchedulerService extends WhatsappLinkService {
 				const body = extractBody(template.components, msg.messageObject.components);
 				const footer = extractFooter(template.components);
 				const buttons = extractButtons(template.components);
+				console.log('header', header);
+
 				await conversationService.addMessageToConversation(c_id, {
 					recipient: msg.to,
 					message_id: msg.message_id,
@@ -139,6 +141,7 @@ export default class SchedulerService extends WhatsappLinkService {
 						name: msg.scheduler_type,
 					},
 				});
+				msg.remove();
 			}
 		});
 	}
@@ -232,6 +235,7 @@ export default class SchedulerService extends WhatsappLinkService {
 					name: msg.scheduler_type,
 				},
 			});
+			msg.remove();
 		});
 	}
 }
