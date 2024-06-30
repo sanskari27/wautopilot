@@ -1,5 +1,9 @@
-export function extractHeader(components: Record<string, any>[]) {
+export function extractHeader(
+	components: Record<string, any>[],
+	componentsMsg: Record<string, any>[]
+) {
 	const header = components.find((component) => component.type === 'HEADER');
+	const headerMsg = componentsMsg.find((component) => component.type === 'HEADER');
 	if (!header) {
 		return null;
 	}
@@ -9,6 +13,20 @@ export function extractHeader(components: Record<string, any>[]) {
 			header_type: 'TEXT',
 			header_content_source: 'TEXT',
 			header_content: header.text,
+		};
+	} else if (
+		header.format === 'IMAGE' ||
+		header.format === 'VIDEO' ||
+		header.format === 'DOCUMENT'
+	) {
+		if (!headerMsg || !headerMsg.parameters[0]) {
+			return null;
+		}
+		const parameter = headerMsg.parameters[0];
+		return {
+			header_type: header.format,
+			header_content_source: 'MEDIA_ID',
+			header_content: parameter[parameter.type.toLowerCase()].id,
 		};
 	}
 	return null;

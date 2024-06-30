@@ -123,11 +123,10 @@ export default class SchedulerService extends WhatsappLinkService {
 			const template = await templateService.fetchTemplateByName(msg.messageObject.template_name);
 			if (template) {
 				const c_id = await conversationService.createConversation(msg.to);
-				const header = extractHeader(template.components);
+				const header = extractHeader(template.components, msg.messageObject.components);
 				const body = extractBody(template.components, msg.messageObject.components);
 				const footer = extractFooter(template.components);
 				const buttons = extractButtons(template.components);
-				console.log('header', header);
 
 				await conversationService.addMessageToConversation(c_id, {
 					recipient: msg.to,
