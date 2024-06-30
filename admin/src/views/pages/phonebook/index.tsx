@@ -278,7 +278,7 @@ export default function Phonebook() {
 							</>
 						) : filtered.length === 0 ? (
 							<Tr>
-								<Td colSpan={7} textAlign={'center'}>
+								<Td colSpan={8} textAlign={'center'}>
 									No records found
 								</Td>
 							</Tr>
