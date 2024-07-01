@@ -535,43 +535,29 @@ export default function ChatBotPage() {
 					{/*--------------------------------- BUTTONS SECTION--------------------------- */}
 
 					<HStack justifyContent={'space-between'} alignItems={'center'} py={8}>
-						{isEditingBot ? (
-							<>
-								<Button
-									bgColor={'red.300'}
-									width={'100%'}
-									onClick={() => {
-										dispatch(reset());
-									}}
-									isLoading={isAddingBot}
-								>
-									<Text color={'white'}>Cancel</Text>
-								</Button>
-								<Button
-									isLoading={isAddingBot}
-									bgColor={'green.300'}
-									_hover={{
-										bgColor: 'green.400',
-									}}
-									width={'100%'}
-									onClick={handleSave}
-								>
-									<Text color={'white'}>Edit</Text>
-								</Button>
-							</>
-						) : (
+						{isEditingBot && (
 							<Button
-								isLoading={isAddingBot}
-								bgColor={'green.300'}
-								_hover={{
-									bgColor: 'green.400',
-								}}
+								bgColor={'red.300'}
 								width={'100%'}
-								onClick={handleSave}
+								onClick={() => {
+									dispatch(reset());
+								}}
+								isLoading={isAddingBot}
 							>
-								<Text color={'white'}>Save</Text>
+								<Text color={'white'}>Cancel</Text>
 							</Button>
 						)}
+						<Button
+							isLoading={isAddingBot}
+							bgColor={'green.300'}
+							_hover={{
+								bgColor: 'green.400',
+							}}
+							width={'100%'}
+							onClick={handleSave}
+						>
+							<Text color={'white'}>Save</Text>
+						</Button>
 						<IconButton aria-label='reest' icon={<BiRefresh />} onClick={() => dispatch(reset())} />
 					</HStack>
 				</Flex>
