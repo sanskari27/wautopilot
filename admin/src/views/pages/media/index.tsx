@@ -206,7 +206,7 @@ function PreviewElement({ media, onRemove }: { media: Media; onRemove: () => voi
 	useEffect(() => {
 		if (!selected_device_id) return;
 
-		APIInstance.head(`${SERVER_URL}media/${selected_device_id}/${media.id}/download`, {
+		APIInstance.head(`${SERVER_URL}${selected_device_id}/media/${media.id}/download`, {
 			responseType: 'blob',
 		}).then((response) => {
 			const contentDisposition = response.headers['content-disposition'];
@@ -239,7 +239,7 @@ function PreviewElement({ media, onRemove }: { media: Media; onRemove: () => voi
 	}, [media, selected_device_id]);
 
 	useEffect(() => {
-		APIInstance.get(`${SERVER_URL}media/${selected_device_id}/${media.id}/download`, {
+		APIInstance.get(`${SERVER_URL}${selected_device_id}/media/${media.id}/download`, {
 			responseType: 'blob',
 			onDownloadProgress: (progressEvent) => {
 				if (progressEvent.total) {
