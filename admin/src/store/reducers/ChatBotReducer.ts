@@ -77,9 +77,10 @@ const Slice = createSlice({
 				return bot;
 			});
 		},
-		setChatbot: (state, action: PayloadAction<typeof initState.details>) => {
+		setChatbot: (state, action: PayloadAction<string>) => {
 			state.ui.isEditingBot = true;
-			state.details = action.payload;
+			console.log(state.list.find((bot) => bot.id === action.payload));
+			state.details = state.list.find((bot) => bot.id === action.payload) ?? initState.details;
 		},
 		setTrigger: (state, action: PayloadAction<string>) => {
 			state.details.trigger = action.payload;

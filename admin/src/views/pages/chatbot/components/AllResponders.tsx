@@ -6,7 +6,6 @@ import {
 	TableContainer,
 	Tbody,
 	Td,
-	Text,
 	Th,
 	Thead,
 	Tooltip,
@@ -16,15 +15,18 @@ import { useRef } from 'react';
 import { MdDelete } from 'react-icons/md';
 import { PiPause, PiPlay } from 'react-icons/pi';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { NAVIGATION } from '../../../../config/const';
 import ChatBotService from '../../../../services/chatbot.service';
 import { StoreNames, StoreState } from '../../../../store';
-import { removeBot, setChatbot, updateBot } from '../../../../store/reducers/ChatBotReducer';
+import { removeBot, updateBot } from '../../../../store/reducers/ChatBotReducer';
 import ConfirmationAlert, { ConfirmationAlertHandle } from '../../../components/confirmation-alert';
 import DeleteAlert, { DeleteAlertHandle } from '../../../components/delete-alert';
 import Each from '../../../components/utils/Each';
 
 export default function AllResponders() {
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const { list } = useSelector((state: StoreState) => state[StoreNames.CHATBOT]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const deleteAlertRef = useRef<DeleteAlertHandle>(null);
@@ -46,17 +48,12 @@ export default function AllResponders() {
 		});
 	};
 
+	const handleEditBot = (id: string) => {
+		navigate(`${NAVIGATION.APP}/${NAVIGATION.CHATBOT}/${id}`);
+	};
+
 	return (
 		<>
-			<Text
-				fontSize={'2xl'}
-				className='text-gray-700 dark:text-gray-400'
-				textAlign={'center'}
-				pt={'2rem'}
-				pb={'1rem'}
-			>
-				All Responders
-			</Text>
 			<TableContainer>
 				<Table>
 					<Thead>
@@ -115,7 +112,7 @@ export default function AllResponders() {
 												aria-label='Edit'
 												icon={<EditIcon />}
 												color={'yellow.400'}
-												onClick={() => dispatch(setChatbot(bot))}
+												onClick={() => handleEditBot(bot.id)}
 												bgColor={'transparent'}
 												_hover={{
 													bgColor: 'transparent',
@@ -144,20 +141,6 @@ export default function AllResponders() {
 												border='none'
 											/>
 										</Tooltip>
-										{/* <Tooltip label='Download History' aria-label='Download History'>
-										<IconButton
-											aria-label='History'
-											icon={<IoIosCloudDownload />}
-											color={'red.400'}
-											onClick={() => {}}
-											bgColor={'transparent'}
-											_hover={{
-												bgColor: 'transparent',
-											}}
-											outline='none'
-											border='none'
-										/>
-									</Tooltip> */}
 									</Td>
 								</Tr>
 							)}

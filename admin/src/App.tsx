@@ -22,6 +22,7 @@ const Phonebook = lazy(() => import('./views/pages/phonebook'));
 const MediaPage = lazy(() => import('./views/pages/media'));
 const AddMedia = lazy(() => import('./views/pages/media/add-media'));
 const ChatBot = lazy(() => import('./views/pages/chatbot'));
+const CreateChatBot = lazy(() => import('./views/pages/chatbot/components/CreateChatbot'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -57,13 +58,16 @@ function App() {
 							<Route path={NAVIGATION.BROADCAST_REPORT} element={<BroadcastReport />} />
 							<Route path={NAVIGATION.CONTACT} element={<ContactPage />} />
 							<Route path={NAVIGATION.INBOX} element={<Conversation />} />
-							<Route path={NAVIGATION.CHATBOT} element={<ChatBot />} />
+							<Route path={NAVIGATION.CHATBOT} element={<ChatBot />}>
+								<Route path={':id'} element={<CreateChatBot />} />
+								<Route path={'new'} element={<CreateChatBot />} />
+							</Route>
 							<Route
 								path={NAVIGATION.DASHBOARD}
 								element={<Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />}
 							/>
 						</Route>
-						<Route path='*' element={<Navigate to={NAVIGATION.APP} />} />
+						{/* <Route path='*' element={<Navigate to={NAVIGATION.APP} />} /> */}
 					</Routes>
 				</Suspense>
 			</Router>
