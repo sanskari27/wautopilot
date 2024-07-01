@@ -85,7 +85,14 @@ export default class TemplateService extends WhatsappLinkService {
 			const { data: res } = await MetaAPI(this.accessToken).get(
 				`/${this.waid}/message_templates?name=${name}`
 			);
-			const data = res.data[0];
+			let data;
+
+			for (const template of res.data) {
+				if (template.name === name) {
+					data = template;
+					break;
+				}
+			}
 
 			return {
 				id: data.id,

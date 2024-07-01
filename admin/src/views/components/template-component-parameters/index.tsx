@@ -1,10 +1,8 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-	AbsoluteCenter,
 	Box,
 	Button,
-	Divider,
 	Flex,
 	FormControl,
 	FormLabel,
@@ -16,9 +14,6 @@ import {
 	Text,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { useSelector } from 'react-redux';
-import MessagesService from '../../../services/messages.service';
-import { StoreNames, StoreState } from '../../../store';
 import SampleMessage from '../sampleMessage';
 import AttachmentSelectorDialog, {
 	AttachmentDialogHandle,
@@ -82,16 +77,16 @@ const TemplateComponentParameter = ({
 }: Props) => {
 	const attachmentSelectorRef = useRef<AttachmentDialogHandle>(null);
 
-	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
+	// const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files ? e.target.files[0] : null;
-		handleTemplateDetailsChange({
-			headerLink: '',
-			headerFile: file,
-			headerMediaId: '',
-		});
-	};
+	// const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	const file = e.target.files ? e.target.files[0] : null;
+	// 	handleTemplateDetailsChange({
+	// 		headerLink: '',
+	// 		headerFile: file,
+	// 		headerMediaId: '',
+	// 	});
+	// };
 
 	const attachmentSelectorId = (_type: string, ids: string[]) => {
 		handleTemplateDetailsChange({
@@ -113,7 +108,7 @@ const TemplateComponentParameter = ({
 					Template details
 				</Text>
 				<FormControl hidden={!header || header.type === 'TEXT' || header.type === ''} mt={'1rem'}>
-					<FormLabel hidden={true}>Header media link</FormLabel>
+					{/* <FormLabel hidden={true}>Header media link</FormLabel>
 					<Input
 						hidden={true}
 						placeholder='Media file link'
@@ -147,7 +142,7 @@ const TemplateComponentParameter = ({
 						<AbsoluteCenter p='4' color='gray.600' bg={'white'}>
 							or
 						</AbsoluteCenter>
-					</Box>
+					</Box> */}
 					<Box marginTop={'0.5rem'}>
 						<FormLabel mb={'0.5rem'}>Select header media</FormLabel>
 						<Button
@@ -169,19 +164,6 @@ const TemplateComponentParameter = ({
 						>
 							Select {header.type.toLowerCase()}
 						</Button>
-						{header.media_id && (
-							<Button
-								colorScheme='blue'
-								variant={'link'}
-								onClick={() => {
-									MessagesService.getMedia(selected_device_id, header.media_id).then((res) => {
-										window.open(res.url);
-									});
-								}}
-							>
-								Media selected. Click here to preview
-							</Button>
-						)}
 						<AttachmentSelectorDialog
 							onConfirm={attachmentSelectorId}
 							ref={attachmentSelectorRef}
