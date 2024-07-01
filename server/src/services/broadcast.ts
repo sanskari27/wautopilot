@@ -64,88 +64,87 @@ export default class BroadcastService extends WhatsappLinkService {
 				},
 			},
 			{
-				$unwind: '$conversationMessages', // If messages is an array, unwind it to separate documents
+				$unwind: { path: '$conversationMessages', preserveNullAndEmptyArrays: true },
 			},
 			{
-				$unwind: '$scheduledMessages', // If messages is an array, unwind it to separate documents
+				$unwind: { path: '$scheduledMessages', preserveNullAndEmptyArrays: true },
 			},
-			// {
-			// 	$group: {
-			// 		_id: '$_id', // Group by the campaign ID
-			// 		name: { $first: '$name' },
-			// 		description: { $first: '$description' },
-			// 		template_name: { $first: '$template_name' },
-			// 		status: { $first: '$status' },
-			// 		startTime: { $first: '$startTime' },
-			// 		endTime: { $first: '$endTime' },
-			// 		daily_messages_count: { $first: '$daily_messages_count' },
-			// 		createdAt: { $first: '$createdAt' },
-			// 		sent: {
-			// 			$sum: {
-			// 				$cond: {
-			// 					if: {
-			// 						$and: [
-			// 							{ $ne: ['$messagesInfo.status', MESSAGE_STATUS.PROCESSING] },
-			// 							{ $ne: ['$messagesInfo.status', MESSAGE_STATUS.FAILED] },
-			// 							{ $ne: ['$messagesInfo.status', MESSAGE_STATUS.PENDING] },
-			// 						],
-			// 					},
-			// 					then: 1,
-			// 					else: 0,
-			// 				},
-			// 			},
-			// 		},
-			// 		failed: {
-			// 			$sum: {
-			// 				$cond: {
-			// 					if: {
-			// 						$and: [
-			// 							{ $eq: ['$messagesInfo.status', MESSAGE_STATUS.FAILED] },
-			// 							{ $eq: ['$messagesInfoScheduled.status', MESSAGE_STATUS.FAILED] },
-			// 						],
-			// 					},
-			// 					then: 1,
-			// 					else: 0,
-			// 				},
-			// 			},
-			// 		},
-			// 		pending: {
-			// 			$sum: {
-			// 				$cond: {
-			// 					if: {
-			// 						$or: [
-			// 							{ $eq: ['$messagesInfo.status', MESSAGE_STATUS.PROCESSING] },
-			// 							{ $eq: ['$messagesInfoScheduled.status', MESSAGE_STATUS.PROCESSING] },
-			// 							{ $eq: ['$messagesInfoScheduled.status', MESSAGE_STATUS.PENDING] },
-			// 						],
-			// 					},
-			// 					then: 1,
-			// 					else: 0,
-			// 				},
-			// 			},
-			// 		},
-			// 	},
-			// },
-			// {
-			// 	$project: {
-			// 		broadcast_id: '$_id',
-			// 		_id: 0,
-			// 		name: 1,
-			// 		description: 1,
-			// 		template_name: 1,
-			// 		status: 1,
-			// 		sent: 1,
-			// 		failed: 1,
-			// 		pending: 1,
-			// 		createdAt: 1,
-			// 		startTime: 1,
-			// 		endTime: 1,
-			// 		isPaused: { $eq: ['$status', BROADCAST_STATUS.PAUSED] },
-			// 	},
-			// },
+			{
+				$group: {
+					_id: '$_id', // Group by the campaign ID
+					name: { $first: '$name' },
+					description: { $first: '$description' },
+					template_name: { $first: '$template_name' },
+					status: { $first: '$status' },
+					startTime: { $first: '$startTime' },
+					endTime: { $first: '$endTime' },
+					daily_messages_count: { $first: '$daily_messages_count' },
+					createdAt: { $first: '$createdAt' },
+					sent: {
+						$sum: {
+							$cond: {
+								if: {
+									$and: [
+										{ $ne: ['$conversationMessages.status', MESSAGE_STATUS.PROCESSING] },
+										{ $ne: ['$conversationMessages.status', MESSAGE_STATUS.FAILED] },
+										{ $ne: ['$conversationMessages.status', MESSAGE_STATUS.PENDING] },
+									],
+								},
+								then: 1,
+								else: 0,
+							},
+						},
+					},
+					failed: {
+						$sum: {
+							$cond: {
+								if: {
+									$and: [
+										{ $eq: ['$scheduledMessages.status', MESSAGE_STATUS.FAILED] },
+										{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.FAILED] },
+									],
+								},
+								then: 1,
+								else: 0,
+							},
+						},
+					},
+					pending: {
+						$sum: {
+							$cond: {
+								if: {
+									$or: [
+										{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.PROCESSING] },
+										{ $eq: ['$scheduledMessages.status', MESSAGE_STATUS.PROCESSING] },
+										{ $eq: ['$scheduledMessages.status', MESSAGE_STATUS.PENDING] },
+										{ $eq: ['$scheduledMessages.status', MESSAGE_STATUS.PAUSED] },
+									],
+								},
+								then: 1,
+								else: 0,
+							},
+						},
+					},
+				},
+			},
+			{
+				$project: {
+					broadcast_id: '$_id',
+					_id: 0,
+					name: 1,
+					description: 1,
+					template_name: 1,
+					status: 1,
+					sent: 1,
+					failed: 1,
+					pending: 1,
+					createdAt: 1,
+					startTime: 1,
+					endTime: 1,
+					isPaused: { $eq: ['$status', BROADCAST_STATUS.PAUSED] },
+				},
+			},
 		]);
-		console.log(campaigns);
-
 		return campaigns
 			.sort((a, b) =>
 				DateUtils.getMoment(a.createdAt).isAfter(DateUtils.getMoment(b.createdAt)) ? -1 : 1
@@ -177,56 +176,13 @@ export default class BroadcastService extends WhatsappLinkService {
 		const reportSent = await ConversationMessageDB.find({
 			'scheduled_by.id': broadcast_id,
 		});
-		console.log(reportSent);
 
-		const messages = await ScheduledMessageDB.aggregate([
-			{ $match: { broadcast_id: broadcast._id } },
-			{
-				$lookup: {
-					from: ConversationMessageDB.collection.name,
-					localField: 'message_id',
-					foreignField: 'message_id',
-					as: 'message',
-				},
-			},
-			// extract the first element if it exists
-			{ $unwind: { path: '$message', preserveNullAndEmptyArrays: true } },
-			{
-				$addFields: {
-					text: {
-						$cond: {
-							if: {
-								$eq: ['$message.body.body_type', 'TEXT'],
-							},
-							then: '$message.body.text',
-							else: '',
-						},
-					},
-				},
-			},
-			{
-				$project: {
-					_id: 0,
-					to: 1,
-					status: 1,
-					sendAt: 1,
-					text: 1,
-					template_name: '$messageObject.template_name',
-					sent_at: 1,
-					read_at: 1,
-					delivered_at: 1,
-					failed_at: 1,
-					failed_reason: 1,
-				},
-			},
-		]);
-
-		return messages.map((message) => ({
-			to: message.to as string,
+		const sentMessages = reportSent.map((message) => ({
+			to: message.recipient as string,
 			status: message.status as string,
 			sendAt: DateUtils.format(message.sendAt, 'DD-MM-YYYY HH:mm') as string,
-			text: message.text as string,
-			template_name: message.template_name as string,
+			text: message.body?.body_type === 'TEXT' ? message.body.text : '',
+			template_name: broadcast.template_name as string,
 			sent_at: DateUtils.format(message.sent_at, 'DD-MM-YYYY HH:mm') as string,
 			read_at: message.read_at ? DateUtils.format(message.read_at, 'DD-MM-YYYY HH:mm') : '',
 			delivered_at: message.delivered_at
@@ -236,6 +192,34 @@ export default class BroadcastService extends WhatsappLinkService {
 			failed_reason: message.failed_reason as string,
 			description: broadcast.description as string,
 		}));
+
+		const reportPending = await ScheduledMessageDB.find({
+			scheduler_id: broadcast_id,
+		});
+
+		const pendingMessages = reportPending.map((message) => ({
+			to: message.to as string,
+			status: message.status as string,
+			sendAt: DateUtils.format(message.sendAt, 'DD-MM-YYYY HH:mm') as string,
+			text: '', //message.body?.body_type === 'TEXT' ? message.body.text : '',
+			template_name: broadcast.template_name as string,
+			sent_at: DateUtils.format(message.sent_at, 'DD-MM-YYYY HH:mm') as string,
+			read_at: message.read_at ? DateUtils.format(message.read_at, 'DD-MM-YYYY HH:mm') : '',
+			delivered_at: message.delivered_at
+				? DateUtils.format(message.delivered_at, 'DD-MM-YYYY HH:mm')
+				: '',
+			failed_at: message.failed_at ? DateUtils.format(message.failed_at, 'DD-MM-YYYY HH:mm') : '',
+			failed_reason: message.failed_reason as string,
+			description: broadcast.description as string,
+		}));
+
+		return [...sentMessages, ...pendingMessages].sort((a, b) =>
+			DateUtils.getMoment(a.sendAt, 'DD-MM-YYYY HH:mm').isAfter(
+				DateUtils.getMoment(b.sendAt, 'DD-MM-YYYY HH:mm')
+			)
+				? 1
+				: -1
+		);
 	}
 
 	public async startBroadcast(
