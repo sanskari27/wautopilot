@@ -226,7 +226,7 @@ export const MediaMessage = ({
 						bgColor={'lightgray'}
 						aspectRatio={16 / 9}
 						rounded={'lg'}
-						className=' w-[200px] md:w-[260px]'
+						width={'16.25rem'}
 					>
 						<MdOutlinePermMedia size={'2.5rem'} color='white' />
 					</Center>
@@ -235,7 +235,7 @@ export const MediaMessage = ({
 						opacity={0.8}
 						width={'fit-content'}
 						px={'1rem'}
-						height={'50px'}
+						height={'3.25rem'}
 						rounded={'full'}
 					>
 						<Flex
@@ -255,12 +255,12 @@ export const MediaMessage = ({
 				// <Image src={media.url} width={'260px'} aspectRatio={16 / 9} rounded={'lg'} />
 				<Box
 					width={'400px'}
-					height={'420px'}
 					maxWidth={'100%'}
+					aspectRatio={1 / 1}
 					position={'relative'}
 					marginX={'auto'}
 				>
-					<Center width={'100%'} mx={'auto'} height={'96%'}>
+					<Center width={'100%'} mx={'auto'} height={'94%'}>
 						<Preview
 							data={{
 								url: `${SERVER_URL}${selected_device_id}/uploads/download-meta-media/${message.body?.media_id}`,
