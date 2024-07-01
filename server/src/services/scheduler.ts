@@ -1,13 +1,14 @@
 import axios from 'axios';
 import { Types } from 'mongoose';
-import Logger from 'n23-logger';
 import { ScheduledMessageDB } from '../../mongo';
+import { BroadcastDB_name } from '../../mongo/repo/Broadcast';
 import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import MetaAPI from '../config/MetaAPI';
 import { IS_PRODUCTION, MESSAGE_STATUS } from '../config/const';
 import DateUtils from '../utils/DateUtils';
 import { extractBody, extractButtons, extractFooter, extractHeader } from '../utils/MessageHelper';
+import BroadcastService from './broadcast';
 import ConversationService from './conversation';
 import TemplateService from './templates';
 import UserService from './user';
@@ -76,72 +77,88 @@ export default class SchedulerService extends WhatsappLinkService {
 		);
 
 		docs.forEach(async (msg) => {
-			const userService = new UserService(msg.linked_to);
-			if (userService.walletBalance < userService.markupPrice) {
-				msg.failed_at = DateUtils.getMomentNow().toDate();
-				msg.failed_reason = 'Insufficient balance';
-				msg.status = MESSAGE_STATUS.FAILED;
-				msg.save();
-				return;
-			}
-			try {
-				const { data } = await MetaAPI(msg.device_id.accessToken).post(
-					`${msg.device_id.phoneNumberId}/messages`,
-					{
-						messaging_product: 'whatsapp',
-						to: msg.to,
-						recipient_type: 'individual',
-						type: 'template',
-						template: {
-							name: msg.messageObject.template_name,
-							language: {
-								code: 'en_US',
-							},
-							components: msg.messageObject.components,
-						},
-					}
-				);
-				msg.message_id = data.messages[0].id;
-				msg.save();
-				userService.deductCredit(1);
-			} catch (err) {
-				if (axios.isAxiosError(err)) {
-					Logger.info('Error sending broadcast message', err.response?.data as string);
-					msg.failed_reason = JSON.stringify(err.response?.data ?? '') as string;
-				} else {
-					msg.failed_reason = (err as any).message as string;
-				}
-
-				msg.failed_at = DateUtils.getMomentNow().toDate();
-				msg.status = MESSAGE_STATUS.FAILED;
-				msg.save();
-				return;
-			}
-
 			const conversationService = new ConversationService(msg.linked_to, msg.device_id);
 			const templateService = new TemplateService(msg.linked_to, msg.device_id);
 			const template = await templateService.fetchTemplateByName(msg.messageObject.template_name);
-			if (template) {
-				const c_id = await conversationService.createConversation(msg.to);
-				const header = extractHeader(template.components, msg.messageObject.components);
-				const body = extractBody(template.components, msg.messageObject.components);
-				const footer = extractFooter(template.components);
-				const buttons = extractButtons(template.components);
+			const userService = new UserService(msg.linked_to);
 
-				await conversationService.addMessageToConversation(c_id, {
-					recipient: msg.to,
-					message_id: msg.message_id,
-					...(header ? { ...header } : {}),
-					...(body ? { body: { body_type: 'TEXT', text: body } } : {}),
-					...(footer ? { footer_content: footer } : {}),
-					...(buttons ? { buttons } : {}),
-					scheduled_by: {
-						id: msg.scheduler_id,
-						name: msg.scheduler_type,
-					},
-				});
-				msg.remove();
+			if (!template) {
+				msg.failed_at = DateUtils.getMomentNow().toDate();
+				msg.failed_reason = 'Template not found';
+				msg.status = MESSAGE_STATUS.FAILED;
+				msg.save();
+				return;
 			}
+
+			const c_id = await conversationService.createConversation(msg.to);
+			const header = extractHeader(template.components, msg.messageObject.components);
+			const body = extractBody(template.components, msg.messageObject.components);
+			const footer = extractFooter(template.components);
+			const buttons = extractButtons(template.components);
+
+			let failed_at: Date | undefined = undefined;
+			let failed_reason: string | undefined = undefined;
+			let status = MESSAGE_STATUS.PROCESSING;
+			let message_id: string | undefined = undefined;
+
+			if (userService.walletBalance < userService.markupPrice) {
+				failed_at = DateUtils.getMomentNow().toDate();
+				failed_reason = 'Insufficient balance';
+				status = MESSAGE_STATUS.FAILED;
+			} else {
+				try {
+					const { data } = await MetaAPI(msg.device_id.accessToken).post(
+						`${msg.device_id.phoneNumberId}/messages`,
+						{
+							messaging_product: 'whatsapp',
+							to: msg.to,
+							recipient_type: 'individual',
+							type: 'template',
+							template: {
+								name: msg.messageObject.template_name,
+								language: {
+									code: 'en_US',
+								},
+								components: msg.messageObject.components,
+							},
+						}
+					);
+					message_id = data.messages[0].id;
+					userService.deductCredit(1);
+				} catch (err) {
+					if (axios.isAxiosError(err)) {
+						failed_reason = JSON.stringify(err.response?.data ?? '') as string;
+					} else {
+						failed_reason = (err as any).message as string;
+					}
+					failed_at = DateUtils.getMomentNow().toDate();
+					msg.status = MESSAGE_STATUS.FAILED;
+				}
+			}
+
+			const addedMessage = await conversationService.addMessageToConversation(c_id, {
+				recipient: msg.to,
+				message_id: message_id,
+				...(header ? { ...header } : {}),
+				...(body ? { body: { body_type: 'TEXT', text: body } } : {}),
+				...(footer ? { footer_content: footer } : {}),
+				...(buttons ? { buttons } : {}),
+				scheduled_by: {
+					id: msg.scheduler_id,
+					name: msg.scheduler_type,
+				},
+				failed_at,
+				failed_reason,
+				status,
+			});
+
+			if (addedMessage && msg.scheduler_type === BroadcastDB_name) {
+				BroadcastService.updateBroadcastMessageId(msg.scheduler_id, {
+					prev_id: msg._id,
+					new_id: addedMessage._id,
+				});
+			}
+			msg.remove();
 		});
 	}
 
@@ -172,47 +189,48 @@ export default class SchedulerService extends WhatsappLinkService {
 		);
 
 		docs.forEach(async (msg) => {
+			const conversationService = new ConversationService(msg.linked_to, msg.device_id);
 			const userService = new UserService(msg.linked_to);
-			if (userService.walletBalance < userService.markupPrice) {
-				msg.failed_at = DateUtils.getMomentNow().toDate();
-				msg.failed_reason = 'Insufficient balance';
-				msg.status = MESSAGE_STATUS.FAILED;
-				msg.save();
-				return;
-			}
-			try {
-				const { data } = await MetaAPI(msg.device_id.accessToken).post(
-					`${msg.device_id.phoneNumberId}/messages`,
-					{
-						messaging_product: 'whatsapp',
-						to: msg.to,
-						recipient_type: 'individual',
-						...msg.messageObject,
-					}
-				);
-				msg.message_id = data.messages[0].id;
-				msg.save();
-			} catch (err) {
-				if (axios.isAxiosError(err)) {
-					Logger.info('Error sending broadcast message', err.response?.data as string);
-					msg.failed_reason = JSON.stringify(err.response?.data ?? '') as string;
-				} else {
-					msg.failed_reason = (err as any).message as string;
-				}
 
-				msg.failed_at = DateUtils.getMomentNow().toDate();
-				msg.status = MESSAGE_STATUS.FAILED;
-				msg.save();
-				return;
+			const c_id = await conversationService.createConversation(msg.to);
+
+			let failed_at: Date | undefined = undefined;
+			let failed_reason: string | undefined = undefined;
+			let status = MESSAGE_STATUS.PROCESSING;
+			let message_id: string | undefined = undefined;
+
+			if (userService.walletBalance < userService.markupPrice) {
+				failed_at = DateUtils.getMomentNow().toDate();
+				failed_reason = 'Insufficient balance';
+				status = MESSAGE_STATUS.FAILED;
+			} else {
+				try {
+					const { data } = await MetaAPI(msg.device_id.accessToken).post(
+						`${msg.device_id.phoneNumberId}/messages`,
+						{
+							messaging_product: 'whatsapp',
+							to: msg.to,
+							recipient_type: 'individual',
+							...msg.messageObject,
+						}
+					);
+					message_id = data.messages[0].id;
+					userService.deductCredit(1);
+				} catch (err) {
+					if (axios.isAxiosError(err)) {
+						failed_reason = JSON.stringify(err.response?.data ?? '') as string;
+					} else {
+						failed_reason = (err as any).message as string;
+					}
+					failed_at = DateUtils.getMomentNow().toDate();
+					status = MESSAGE_STATUS.FAILED;
+				}
 			}
-			userService.deductCredit(1);
 			const data = msg.messageObject;
 
-			const conversationService = new ConversationService(msg.linked_to, msg.device_id);
-			const c_id = await conversationService.createConversation(msg.to);
-			await conversationService.addMessageToConversation(c_id, {
+			const addedMessage = await conversationService.addMessageToConversation(c_id, {
 				recipient: msg.to,
-				message_id: msg.message_id,
+				message_id: message_id,
 				body: {
 					body_type:
 						data.type === 'text'
@@ -233,7 +251,17 @@ export default class SchedulerService extends WhatsappLinkService {
 					id: msg.scheduler_id,
 					name: msg.scheduler_type,
 				},
+				failed_at,
+				failed_reason,
+				status,
 			});
+
+			if (addedMessage && msg.scheduler_type === BroadcastDB_name) {
+				BroadcastService.updateBroadcastMessageId(msg.scheduler_id, {
+					prev_id: msg._id,
+					new_id: addedMessage._id,
+				});
+			}
 			msg.remove();
 		});
 	}

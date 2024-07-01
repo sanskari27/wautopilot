@@ -28,7 +28,7 @@ function processConversationDocs(
 
 function processConversationMessages(docs: Partial<IConversationMessage>[]) {
 	return docs.map((doc) => ({
-		_id: doc._id,
+		_id: doc._id!,
 		recipient: doc.recipient,
 		conversation_id: doc.conversation_id,
 		message_id: doc.message_id,
@@ -60,7 +60,7 @@ export default class ConversationService extends WhatsappLinkService {
 		try {
 			const doc = await ConversationDB.create({
 				linked_to: this.userId,
-				device_id:  this.deviceId,
+				device_id: this.deviceId,
 				recipient,
 			});
 
@@ -80,7 +80,7 @@ export default class ConversationService extends WhatsappLinkService {
 		} catch (err) {
 			const doc = await ConversationDB.findOne({
 				linked_to: this.userId,
-				device_id:  this.deviceId,
+				device_id: this.deviceId,
 				recipient,
 			});
 			return doc!._id;
@@ -120,7 +120,7 @@ export default class ConversationService extends WhatsappLinkService {
 		conversation_id: Types.ObjectId,
 		details: {
 			recipient: string;
-			message_id: string;
+			message_id?: string;
 			header_type?: string;
 			header_content_source?: string;
 			header_content?: string;
@@ -137,12 +137,14 @@ export default class ConversationService extends WhatsappLinkService {
 				id: Types.ObjectId;
 				name: string;
 			};
+			failed_at?: Date;
+			failed_reason?: string;
 		}
 	) {
 		try {
 			const doc = await ConversationMessageDB.create({
 				linked_to: this.userId,
-				device_id:  this.deviceId,
+				device_id: this.deviceId,
 				conversation_id,
 				status: details.status ?? MESSAGE_STATUS.PROCESSING,
 				...filterUndefinedKeys(details),
@@ -170,7 +172,9 @@ export default class ConversationService extends WhatsappLinkService {
 			);
 
 			return data;
-		} catch (err) {}
+		} catch (err) {
+			return null;
+		}
 	}
 
 	public static async updateStatus(
@@ -238,7 +242,7 @@ export default class ConversationService extends WhatsappLinkService {
 			{
 				recipient: recipient,
 				linked_to: this.userId,
-				device_id:  this.deviceId,
+				device_id: this.deviceId,
 			},
 			{
 				$set: filterUndefinedKeys(details),
@@ -250,7 +254,7 @@ export default class ConversationService extends WhatsappLinkService {
 		await ConversationMessageDB.updateOne(
 			{
 				linked_to: this.userId,
-				device_id:  this.deviceId,
+				device_id: this.deviceId,
 				message_id,
 			},
 			{
@@ -276,7 +280,7 @@ export default class ConversationService extends WhatsappLinkService {
 			{
 				$match: {
 					linked_to: this.userId,
-					device_id:  this.deviceId,
+					device_id: this.deviceId,
 					...(labels.length > 0 ? { recipient: { $in: recipients } } : {}),
 				},
 			},
@@ -366,7 +370,7 @@ export default class ConversationService extends WhatsappLinkService {
 	public async fetchConversationMessages(conversation_id: Types.ObjectId) {
 		const docs = await ConversationMessageDB.find({
 			linked_to: this.userId,
-			device_id:  this.deviceId,
+			device_id: this.deviceId,
 			conversation_id,
 		}).sort({ createdAt: -1 });
 
