@@ -40,7 +40,7 @@ export default class SchedulerService extends WhatsappLinkService {
 			linked_to: this.account._id,
 			device_id: this.deviceId,
 			scheduler_id: scheduler_id,
-			scheduled_type: scheduler_type,
+			scheduler_type: scheduler_type,
 			to,
 			messageObject,
 			sendAt,
