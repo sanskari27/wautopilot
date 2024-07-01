@@ -50,19 +50,31 @@ const AppPage = () => {
 		});
 	}, [dispatch, setAuthLoaded]);
 
-	const fetchUserDetails = useCallback(
+	const fetchUserDetails = useCallback(async () => {
+		try {
+			AuthService.userDetails().then((user) => user && dispatch(setUserDetails(user)));
+
+			const promises = [APIInstance.get(`/contacts`)];
+
+			const results = await Promise.all(promises);
+			dispatch(setContactList(results[0].data.contacts as Contact[]));
+		} catch (e) {
+			return;
+		}
+	}, [dispatch]);
+
+	const fetchDeviceBasedUserDetails = useCallback(
 		async (selected_device_id: string) => {
+			if (!selected_device_id) return;
 			try {
 				dispatch(setRecipientsLoading(false));
 				dispatch(setMediaFetching(false));
 				dispatch(setTemplateFetching(false));
-				AuthService.userDetails().then((user) => user && dispatch(setUserDetails(user)));
 
 				const promises = [
 					MessagesService.fetchAllConversation(selected_device_id),
 					MediaService.getMedias(selected_device_id),
 					TemplateService.listTemplates(selected_device_id),
-					APIInstance.get(`/contacts`),
 					ChatBotService.listChatBots({ deviceId: selected_device_id }),
 				];
 
@@ -70,8 +82,7 @@ const AppPage = () => {
 				dispatch(setRecipientsList(results[0]));
 				dispatch(setMediaList(results[1]));
 				dispatch(setTemplatesList(results[2]));
-				dispatch(setContactList(results[3].data.contacts as Contact[]));
-				dispatch(setChatBotList(results[4]));
+				dispatch(setChatBotList(results[3]));
 			} catch (e) {
 				return;
 			}
@@ -96,10 +107,12 @@ const AppPage = () => {
 					);
 				}
 			})
-			.finally(() => dispatch(stopDeviceLoading()));
-
-		fetchUserDetails(selected_device_id);
-	}, [dispatch, fetchUserDetails, selected_device_id]);
+			.finally(() => {
+				dispatch(stopDeviceLoading());
+			});
+		fetchUserDetails();
+		fetchDeviceBasedUserDetails(selected_device_id);
+	}, [dispatch, fetchDeviceBasedUserDetails, fetchUserDetails, selected_device_id]);
 
 	if (!authLoaded) return <></>;
 

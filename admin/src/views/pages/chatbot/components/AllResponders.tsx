@@ -21,6 +21,7 @@ import { StoreNames, StoreState } from '../../../../store';
 import { removeBot, setChatbot, updateBot } from '../../../../store/reducers/ChatBotReducer';
 import ConfirmationAlert, { ConfirmationAlertHandle } from '../../../components/confirmation-alert';
 import DeleteAlert, { DeleteAlertHandle } from '../../../components/delete-alert';
+import Each from '../../../components/utils/Each';
 
 export default function AllResponders() {
 	const dispatch = useDispatch();
@@ -69,79 +70,81 @@ export default function AllResponders() {
 						</Tr>
 					</Thead>
 					<Tbody>
-						{list.map((bot, index) => (
-							<Tr key={index}>
-								<Td>
-									{bot.trigger.split('\n').map((trigger, index) => (
-										<Box key={index}>
-											{trigger.length > 20 ? trigger.substring(0, 18) + '...' : trigger}
-										</Box>
-									))}
-								</Td>
-								<Td className='whitespace-break-spaces'>{bot.message}</Td>
-								<Td>{bot.respond_to.split('_').join(' ')}</Td>
-								<Td>{bot.options.split('_').join(' ')}</Td>
-								<Td>
-									{bot.trigger_gap_seconds < 60
-										? `${bot.trigger_gap_seconds} s`
-										: bot.trigger_gap_seconds < 3600
-										? `${Math.floor(bot.trigger_gap_seconds / 60)} m`
-										: bot.trigger_gap_seconds < 86400
-										? `${Math.floor(bot.trigger_gap_seconds / 3600)} h`
-										: `${Math.floor(bot.trigger_gap_seconds / 86400)} day`}
-								</Td>
-								<Td>
-									<Tooltip label='Delete Responder' aria-label='Delete Responder'>
-										<IconButton
-											aria-label='Delete'
-											icon={<MdDelete />}
-											color={'red.400'}
-											onClick={() => {
-												deleteAlertRef.current?.open(bot.id);
-											}}
-											bgColor={'transparent'}
-											_hover={{
-												bgColor: 'transparent',
-											}}
-											outline='none'
-											border='none'
-										/>
-									</Tooltip>
-									<Tooltip label='Edit Responder' aria-label='Edit Responder'>
-										<IconButton
-											aria-label='Edit'
-											icon={<EditIcon />}
-											color={'yellow.400'}
-											onClick={() => dispatch(setChatbot(bot))}
-											bgColor={'transparent'}
-											_hover={{
-												bgColor: 'transparent',
-											}}
-											outline='none'
-											border='none'
-										/>
-									</Tooltip>
-									<Tooltip label='Toggle Responder' aria-label='Toggle Responder'>
-										<IconButton
-											aria-label='toggle'
-											icon={bot.isActive ? <PiPause /> : <PiPlay />}
-											color={bot.isActive ? 'blue.400' : 'green.400'}
-											onClick={() => {
-												confirmationAlertRef.current?.open({
-													id: bot.id,
-													disclaimer: 'Are you sure you want to change running status?',
-													type: 'TOGGLE_BOT',
-												});
-											}}
-											bgColor={'transparent'}
-											_hover={{
-												bgColor: 'transparent',
-											}}
-											outline='none'
-											border='none'
-										/>
-									</Tooltip>
-									{/* <Tooltip label='Download History' aria-label='Download History'>
+						<Each
+							items={list}
+							render={(bot, index) => (
+								<Tr key={index}>
+									<Td>
+										{bot.trigger.split('\n').map((trigger, index) => (
+											<Box key={index}>
+												{trigger.length > 20 ? trigger.substring(0, 18) + '...' : trigger}
+											</Box>
+										))}
+									</Td>
+									<Td className='whitespace-break-spaces'>{bot.message}</Td>
+									<Td>{bot.respond_to.split('_').join(' ')}</Td>
+									<Td>{bot.options.split('_').join(' ')}</Td>
+									<Td>
+										{bot.trigger_gap_seconds < 60
+											? `${bot.trigger_gap_seconds} s`
+											: bot.trigger_gap_seconds < 3600
+											? `${Math.floor(bot.trigger_gap_seconds / 60)} m`
+											: bot.trigger_gap_seconds < 86400
+											? `${Math.floor(bot.trigger_gap_seconds / 3600)} h`
+											: `${Math.floor(bot.trigger_gap_seconds / 86400)} day`}
+									</Td>
+									<Td>
+										<Tooltip label='Delete Responder' aria-label='Delete Responder'>
+											<IconButton
+												aria-label='Delete'
+												icon={<MdDelete />}
+												color={'red.400'}
+												onClick={() => {
+													deleteAlertRef.current?.open(bot.id);
+												}}
+												bgColor={'transparent'}
+												_hover={{
+													bgColor: 'transparent',
+												}}
+												outline='none'
+												border='none'
+											/>
+										</Tooltip>
+										<Tooltip label='Edit Responder' aria-label='Edit Responder'>
+											<IconButton
+												aria-label='Edit'
+												icon={<EditIcon />}
+												color={'yellow.400'}
+												onClick={() => dispatch(setChatbot(bot))}
+												bgColor={'transparent'}
+												_hover={{
+													bgColor: 'transparent',
+												}}
+												outline='none'
+												border='none'
+											/>
+										</Tooltip>
+										<Tooltip label='Toggle Responder' aria-label='Toggle Responder'>
+											<IconButton
+												aria-label='toggle'
+												icon={bot.isActive ? <PiPause /> : <PiPlay />}
+												color={bot.isActive ? 'blue.400' : 'green.400'}
+												onClick={() => {
+													confirmationAlertRef.current?.open({
+														id: bot.id,
+														disclaimer: 'Are you sure you want to change running status?',
+														type: 'TOGGLE_BOT',
+													});
+												}}
+												bgColor={'transparent'}
+												_hover={{
+													bgColor: 'transparent',
+												}}
+												outline='none'
+												border='none'
+											/>
+										</Tooltip>
+										{/* <Tooltip label='Download History' aria-label='Download History'>
 										<IconButton
 											aria-label='History'
 											icon={<IoIosCloudDownload />}
@@ -155,9 +158,10 @@ export default function AllResponders() {
 											border='none'
 										/>
 									</Tooltip> */}
-								</Td>
-							</Tr>
-						))}
+									</Td>
+								</Tr>
+							)}
+						/>
 					</Tbody>
 				</Table>
 			</TableContainer>

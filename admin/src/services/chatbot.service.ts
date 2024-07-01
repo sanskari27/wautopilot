@@ -80,7 +80,6 @@ export default class ChatBotService {
 	static async listChatBots({ deviceId }: { deviceId: string }) {
 		try {
 			const { data } = await APIInstance.get(`/${deviceId}/chatbot`);
-
 			return validateChatBot(data.bots);
 		} catch (err) {
 			return [];

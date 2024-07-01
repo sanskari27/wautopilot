@@ -113,8 +113,9 @@ const TemplateComponentParameter = ({
 					Template details
 				</Text>
 				<FormControl hidden={!header || header.type === 'TEXT' || header.type === ''} mt={'1rem'}>
-					<FormLabel>Header media link</FormLabel>
+					<FormLabel hidden={true}>Header media link</FormLabel>
 					<Input
+						hidden={true}
 						placeholder='Media file link'
 						type='url'
 						onChange={(e) => {
@@ -126,13 +127,13 @@ const TemplateComponentParameter = ({
 						}}
 						value={headerLink}
 					/>
-					<Box position='relative' my={'1rem'}>
+					<Box position='relative' my={'1rem'} hidden={true}>
 						<Divider />
 						<AbsoluteCenter p='4' color='gray.600' bg={'white'}>
 							or
 						</AbsoluteCenter>
 					</Box>
-					<FormControl marginTop={'0.5rem'}>
+					<FormControl marginTop={'0.5rem'} hidden={true}>
 						<FormLabel mb={'0.5rem'}>Upload header media</FormLabel>
 						<Input
 							type='file'
@@ -141,7 +142,7 @@ const TemplateComponentParameter = ({
 							}}
 						/>
 					</FormControl>
-					<Box position='relative' my={'1rem'}>
+					<Box position='relative' my={'1rem'} hidden={true}>
 						<Divider />
 						<AbsoluteCenter p='4' color='gray.600' bg={'white'}>
 							or
@@ -164,8 +165,9 @@ const TemplateComponentParameter = ({
 									ids: [],
 								})
 							}
+							textTransform={'capitalize'}
 						>
-							Select {header.type}
+							Select {header.type.toLowerCase()}
 						</Button>
 						{header.media_id && (
 							<Button
