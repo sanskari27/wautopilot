@@ -169,6 +169,7 @@ export default function Phonebook() {
 					{selected.length !== 0 ? (
 						<>
 							<Button
+								size={'sm'}
 								colorScheme='red'
 								leftIcon={<DeleteIcon color='white' fontSize={'1rem'} />}
 								onClick={() => {
@@ -178,6 +179,7 @@ export default function Phonebook() {
 								Delete
 							</Button>
 							<Button
+								size={'sm'}
 								colorScheme='teal'
 								leftIcon={<BiLabel color='white' fontSize={'1.2rem'} />}
 								onClick={() => {
@@ -189,6 +191,7 @@ export default function Phonebook() {
 						</>
 					) : (
 						<Button
+							size={'sm'}
 							colorScheme='teal'
 							leftIcon={<BiExport color='white' fontSize={'1.2rem'} />}
 							onClick={handleExport}
@@ -197,6 +200,7 @@ export default function Phonebook() {
 						</Button>
 					)}
 					<Button
+						size={'sm'}
 						colorScheme='blue'
 						leftIcon={<HiUpload color='white' fontSize={'1.2rem'} />}
 						onClick={() => {
@@ -206,6 +210,7 @@ export default function Phonebook() {
 						Upload CSV
 					</Button>
 					<Button
+						size={'sm'}
 						colorScheme='green'
 						leftIcon={<BiPlus color='white' fontSize={'1.2rem'} />}
 						onClick={() => {
