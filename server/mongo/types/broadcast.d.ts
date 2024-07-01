@@ -12,7 +12,8 @@ export default interface IBroadcast extends Document {
 	name: string;
 	description: string;
 	status: BROADCAST_STATUS;
-	messages: Types.ObjectId[];
+	unProcessedMessages: Types.ObjectId[];
+	processedMessages: Types.ObjectId[];
 
 	createdAt: Date;
 

@@ -52,7 +52,7 @@ export default class BroadcastService extends WhatsappLinkService {
 					from: ConversationMessageDB.collection.name, // Name of the OtherModel collection
 					localField: 'messages',
 					foreignField: '_id',
-					as: 'messagesInfo',
+					as: 'conversationMessages',
 				},
 			},
 			{
@@ -60,14 +60,14 @@ export default class BroadcastService extends WhatsappLinkService {
 					from: ScheduledMessageDB.collection.name, // Name of the OtherModel collection
 					localField: 'messages',
 					foreignField: '_id',
-					as: 'messagesInfoScheduled',
+					as: 'scheduledMessages',
 				},
 			},
 			{
-				$unwind: '$messagesInfo', // If messages is an array, unwind it to separate documents
+				$unwind: '$conversationMessages', // If messages is an array, unwind it to separate documents
 			},
 			{
-				$unwind: '$messagesInfoScheduled', // If messages is an array, unwind it to separate documents
+				$unwind: '$scheduledMessages', // If messages is an array, unwind it to separate documents
 			},
 			// {
 			// 	$group: {
@@ -288,7 +288,7 @@ export default class BroadcastService extends WhatsappLinkService {
 
 		const message_ids = await Promise.all(messages);
 
-		await BroadcastDB.updateOne({ _id: broadcastDoc._id }, { messages: message_ids });
+		await BroadcastDB.updateOne({ _id: broadcastDoc._id }, { unProcessedMessages: message_ids });
 	}
 
 	public async pauseBroadcast(broadcast_id: Types.ObjectId) {
@@ -298,7 +298,7 @@ export default class BroadcastService extends WhatsappLinkService {
 				return;
 			}
 			await ScheduledMessageDB.updateMany(
-				{ _id: campaign.messages, status: MESSAGE_STATUS.PENDING },
+				{ _id: campaign.unProcessedMessages, status: MESSAGE_STATUS.PENDING },
 				{
 					$set: {
 						status: MESSAGE_STATUS.PAUSED,
@@ -327,11 +327,11 @@ export default class BroadcastService extends WhatsappLinkService {
 				daily_count:
 					campaign.broadcast_type === 'scheduled'
 						? campaign.daily_messages_count
-						: campaign.messages.length,
+						: campaign.unProcessedMessages.length,
 			});
 
 			const messages = await ScheduledMessageDB.find({
-				_id: campaign.messages,
+				_id: campaign.unProcessedMessages,
 				status: MESSAGE_STATUS.PAUSED,
 			});
 
@@ -364,11 +364,11 @@ export default class BroadcastService extends WhatsappLinkService {
 				daily_count:
 					campaign.broadcast_type === 'scheduled'
 						? campaign.daily_messages_count
-						: campaign.messages.length,
+						: campaign.unProcessedMessages.length,
 			});
 
 			const messages = await ScheduledMessageDB.find({
-				_id: campaign.messages,
+				_id: campaign.unProcessedMessages,
 				status: MESSAGE_STATUS.FAILED,
 			});
 
@@ -391,7 +391,7 @@ export default class BroadcastService extends WhatsappLinkService {
 				return;
 			}
 
-			await ScheduledMessageDB.deleteMany({ _id: campaign.messages });
+			await ScheduledMessageDB.deleteMany({ _id: campaign.unProcessedMessages });
 			await campaign.delete();
 		} catch (err) {
 			return;
@@ -441,11 +441,14 @@ export default class BroadcastService extends WhatsappLinkService {
 		await BroadcastDB.updateOne(
 			{
 				_id: broadcast_id,
-				messages: prev_id,
+				unProcessedMessages: prev_id,
 			},
 			{
-				$set: {
-					'messages.$': new_id,
+				$push: {
+					processedMessages: new_id,
+				},
+				$pull: {
+					unProcessedMessages: prev_id,
 				},
 			}
 		);

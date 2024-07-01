@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { BROADCAST_STATUS } from '../../src/config/const';
 import IBroadcast from '../types/broadcast';
 import { AccountDB_name } from './Account';
+import { ConversationMessageDB_name } from './ConversationMessage';
 import { ScheduledMessageDB_name } from './ScheduledMessage';
 import { WhatsappLinkDB_name } from './WhatsappLink';
 
@@ -35,10 +36,16 @@ const schema = new mongoose.Schema<IBroadcast>(
 			default: BROADCAST_STATUS.ACTIVE,
 		},
 
-		messages: [
+		unProcessedMessages: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				ref: ScheduledMessageDB_name,
+			},
+		],
+		processedMessages: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: ConversationMessageDB_name,
 			},
 		],
 		broadcast_type: {
