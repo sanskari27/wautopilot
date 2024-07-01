@@ -70,7 +70,6 @@ export const TextMessage = ({
 		message.header_type === 'VIDEO' ||
 		message.header_type === 'DOCUMENT';
 	const headerIsText = message.header_type === 'TEXT';
-	console.log(message.footer_content);
 
 	return (
 		<ChatMessageWrapper id={id} ref={ref} message={message}>
@@ -82,7 +81,7 @@ export const TextMessage = ({
 								data={{
 									url:
 										message.header_content_source === 'ID'
-											? `${SERVER_URL}uploads/${selected_device_id}/download-meta-media/${message.header_content}`
+											? `${SERVER_URL}${selected_device_id}/uploads/download-meta-media/${message.header_content}`
 											: message.header_content,
 									type: getFileType(media.mimeType),
 								}}
@@ -162,6 +161,12 @@ export const MediaMessage = ({
 	const { ref: inViewRef, inView } = useInView({ triggerOnce: true });
 	useEffect(() => {
 		if (!message.body?.media_id || !selected_device_id) {
+			setMedia({
+				...initialState,
+				loaded: true,
+				showPreview: true,
+				mimeType: 'file',
+			});
 			return;
 		}
 		if (!inView) return;
@@ -177,6 +182,11 @@ export const MediaMessage = ({
 	}, [message.body?.media_id, selected_device_id, inView]);
 
 	const handleDownload = () => {
+		console.log(
+			getFileType(media.mimeType),
+			`${SERVER_URL}${selected_device_id}/uploads/download-meta-media/${message.body?.media_id}`
+		);
+		return;
 		if (!selected_device_id || !message.body?.media_id) {
 			return;
 		}
@@ -193,7 +203,11 @@ export const MediaMessage = ({
 
 	return (
 		<ChatMessageWrapper id={id} ref={ref} message={message}>
-			{!media.loaded ? (
+			{!message.body?.media_id ? (
+				<Text textAlign={'center'} color={'red.500'} my={'0.5rem'}>
+					No Preview Available
+				</Text>
+			) : !media.loaded ? (
 				<Box width={'100%'} ref={inViewRef}>
 					<Center
 						alignItems={'center'}
@@ -246,10 +260,10 @@ export const MediaMessage = ({
 					position={'relative'}
 					marginX={'auto'}
 				>
-					<Center width={'98%'} mx={'auto'}>
+					<Center width={'100%'} mx={'auto'} height={'96%'}>
 						<Preview
 							data={{
-								url: `${SERVER_URL}uploads/${selected_device_id}/download-meta-media/${message.body?.media_id}`,
+								url: `${SERVER_URL}${selected_device_id}/uploads/download-meta-media/${message.body?.media_id}`,
 								type: getFileType(media.mimeType),
 							}}
 							progress={-1}

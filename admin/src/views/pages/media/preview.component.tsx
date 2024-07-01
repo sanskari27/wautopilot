@@ -27,12 +27,13 @@ export default function Preview({
 			</>
 		);
 	}
+	console.log(data.type);
 
 	if (data.type === 'image') {
 		return <Image src={data.url} aspectRatio={'1/1'} borderRadius='lg' />;
 	} else if (data.type === 'video') {
 		return (
-			<AspectRatio ratio={1 / 1}>
+			<AspectRatio ratio={1 / 1} width={'100%'} height={'100%'}>
 				<video style={{ borderRadius: '0.75rem' }} controls autoPlay={false} muted>
 					<source src={data.url} type='video/mp4' />
 				</video>
@@ -40,7 +41,7 @@ export default function Preview({
 		);
 	} else if (data.type === 'PDF') {
 		return (
-			<AspectRatio ratio={1 / 1}>
+			<AspectRatio ratio={1 / 1} width={'100%'} height={'100%'}>
 				<embed
 					src={data.url + '#toolbar=0&navpanes=0&scrollbar=0'}
 					type='application/pdf'
