@@ -110,7 +110,7 @@ export default function Broadcast() {
 		const template = templateListFiltered.find((t) => t.id === template_id)!;
 		const header = template.components.find((c) => c.type === 'HEADER');
 		const promise = APIInstance.post(
-			`${selected_device_id}/${selected_device_id}/message/broadcast/send-broadcast`,
+			`${selected_device_id}/message/broadcast/send-broadcast`,
 			{
 				name: name,
 				description: description,
