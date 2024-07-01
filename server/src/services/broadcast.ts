@@ -50,7 +50,7 @@ export default class BroadcastService extends WhatsappLinkService {
 			{
 				$lookup: {
 					from: ConversationMessageDB.collection.name, // Name of the OtherModel collection
-					localField: 'messages',
+					localField: 'processedMessages',
 					foreignField: '_id',
 					as: 'conversationMessages',
 				},
@@ -58,7 +58,7 @@ export default class BroadcastService extends WhatsappLinkService {
 			{
 				$lookup: {
 					from: ScheduledMessageDB.collection.name, // Name of the OtherModel collection
-					localField: 'messages',
+					localField: 'unProcessedMessages',
 					foreignField: '_id',
 					as: 'scheduledMessages',
 				},
