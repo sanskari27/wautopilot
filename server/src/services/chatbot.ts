@@ -136,7 +136,7 @@ export default class ChatBotService extends WhatsappLinkService {
 			audios: IMedia[];
 			documents: IMedia[];
 			contacts: IContact[];
-		}>('images videos audios documents contacts ');
+		}>('images videos audios documents contacts');
 		return bots;
 	}
 
@@ -328,7 +328,7 @@ export default class ChatBotService extends WhatsappLinkService {
 						to: recipient,
 						type: 'image',
 						image: {
-							id: mediaObject.id,
+							id: mediaObject.media_id,
 						},
 					};
 
@@ -346,7 +346,7 @@ export default class ChatBotService extends WhatsappLinkService {
 						to: recipient,
 						type: 'video',
 						video: {
-							id: mediaObject.id,
+							id: mediaObject.media_id,
 						},
 					};
 
@@ -364,7 +364,7 @@ export default class ChatBotService extends WhatsappLinkService {
 						to: recipient,
 						type: 'audio',
 						audio: {
-							id: mediaObject.id,
+							id: mediaObject.media_id,
 						},
 					};
 
@@ -382,7 +382,7 @@ export default class ChatBotService extends WhatsappLinkService {
 						to: recipient,
 						type: 'document',
 						document: {
-							id: mediaObject.id,
+							id: mediaObject.media_id,
 						},
 					};
 

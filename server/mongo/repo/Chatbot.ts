@@ -2,6 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 import { BOT_TRIGGER_OPTIONS, BOT_TRIGGER_TO } from '../../src/config/const';
 import IChatBot from '../types/chatbot';
 import { AccountDB_name } from './Account';
+import { ContactDB_name } from './Contact';
 import { MediaDB_name } from './Media';
 import { WhatsappLinkDB_name } from './WhatsappLink';
 
@@ -67,7 +68,7 @@ const schema = new mongoose.Schema<IChatBot>(
 		contacts: [
 			{
 				type: Schema.Types.ObjectId,
-				ref: MediaDB_name,
+				ref: ContactDB_name,
 			},
 		],
 		template_id: String,
