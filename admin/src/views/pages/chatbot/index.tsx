@@ -392,71 +392,72 @@ export default function ChatBotPage() {
 						</FormControl>
 					</Flex>
 
-					<HStack alignItems={'start'}>
-						{/*--------------------------------- GAP & DELAY SECTION--------------------------- */}
+					{/*--------------------------------- GAP & DELAY SECTION--------------------------- */}
+					<Flex gap={'1rem'} className='flex-col md:flex-row'>
+						<Flex flex={1} gap={'0.5rem'} className='flex-col md:flex-row'>
+							<FormControl flex={1}>
+								<Flex alignItems={'center'}>
+									<Text>Gap Delay</Text>
+									{/* <Info>Time Gap if same trigger is sent.</Info> */}
+								</Flex>
 
-						<FormControl flex={1}>
-							<Flex alignItems={'center'}>
-								<Text>Gap Delay</Text>
-								{/* <Info>Time Gap if same trigger is sent.</Info> */}
-							</Flex>
-
-							<HStack>
-								<NumberInput
-									value={trigger_gap.time}
-									onChangeText={(text) => dispatch(setTriggerGapTime(text))}
-								/>
-								<SelectElement
-									value={trigger_gap.type}
-									onChangeText={(text) => dispatch(setTriggerGapType(text))}
-									options={[
-										{
-											value: 'SEC',
-											title: 'Second',
-										},
-										{
-											value: 'MINUTE',
-											title: 'Min',
-										},
-										{
-											value: 'HOUR',
-											title: 'Hour',
-										},
-									]}
-								/>
-							</HStack>
-						</FormControl>
-						<FormControl flex={1}>
-							<Flex alignItems={'center'}>
-								<Text>Message Delay</Text>
-								{/* <Info>Time Delay between trigger and response.</Info> */}
-							</Flex>
-							<HStack>
-								<NumberInput
-									value={response_delay.time}
-									onChangeText={(text) => dispatch(setResponseDelayTime(text))}
-								/>
-								<SelectElement
-									value={response_delay.type}
-									onChangeText={(text) => dispatch(setResponseDelayType(text))}
-									options={[
-										{
-											value: 'SEC',
-											title: 'Second',
-										},
-										{
-											value: 'MINUTE',
-											title: 'Min',
-										},
-										{
-											value: 'HOUR',
-											title: 'Hour',
-										},
-									]}
-								/>
-							</HStack>
-						</FormControl>
-						<Flex flex={1} gap={'0.5rem'}>
+								<HStack>
+									<NumberInput
+										value={trigger_gap.time}
+										onChangeText={(text) => dispatch(setTriggerGapTime(text))}
+									/>
+									<SelectElement
+										value={trigger_gap.type}
+										onChangeText={(text) => dispatch(setTriggerGapType(text))}
+										options={[
+											{
+												value: 'SEC',
+												title: 'Second',
+											},
+											{
+												value: 'MINUTE',
+												title: 'Min',
+											},
+											{
+												value: 'HOUR',
+												title: 'Hour',
+											},
+										]}
+									/>
+								</HStack>
+							</FormControl>
+							<FormControl flex={1}>
+								<Flex alignItems={'center'}>
+									<Text>Message Delay</Text>
+									{/* <Info>Time Delay between trigger and response.</Info> */}
+								</Flex>
+								<HStack>
+									<NumberInput
+										value={response_delay.time}
+										onChangeText={(text) => dispatch(setResponseDelayTime(text))}
+									/>
+									<SelectElement
+										value={response_delay.type}
+										onChangeText={(text) => dispatch(setResponseDelayType(text))}
+										options={[
+											{
+												value: 'SEC',
+												title: 'Second',
+											},
+											{
+												value: 'MINUTE',
+												title: 'Min',
+											},
+											{
+												value: 'HOUR',
+												title: 'Hour',
+											},
+										]}
+									/>
+								</HStack>
+							</FormControl>
+						</Flex>
+						<Flex flex={1} className='flex-col md:flex-row' gap={'0.5rem'}>
 							<FormControl flex={1}>
 								<Text>Start At (in IST)</Text>
 								<Input
@@ -479,7 +480,7 @@ export default function ChatBotPage() {
 								/>
 							</FormControl>
 						</Flex>
-					</HStack>
+					</Flex>
 
 					{/*--------------------------------- MESSAGE SECTION--------------------------- */}
 
