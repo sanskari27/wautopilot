@@ -403,7 +403,10 @@ export default class ChatBotService extends WhatsappLinkService {
 							{
 								addresses: card.addresses,
 								birthday: card.birthday,
-								emails: card.emails,
+								emails: card.emails.map((email) => ({
+									type: 'HOME',
+									phone: email.email,
+								})),
 								name: card.name,
 								org: card.org,
 								phones: card.phones.map((phone) => ({

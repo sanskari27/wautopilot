@@ -51,6 +51,7 @@ const schema = new mongoose.Schema<IScheduledMessage>(
 			enum: ['template', 'normal'],
 		},
 		messageObject: {
+			_id: false,
 			type: Schema.Types.Mixed,
 			default: {},
 		},
