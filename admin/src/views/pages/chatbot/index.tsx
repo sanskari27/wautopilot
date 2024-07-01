@@ -142,6 +142,7 @@ export default function ChatBotPage() {
 					status: 'error',
 				});
 			}
+			hasError = true;
 		}
 
 		return !hasError;
