@@ -5,6 +5,7 @@ import ContactsRoute from './contacts/contacts.route';
 import CouponRoute from './coupon/coupon.route';
 import MediaRoute from './media/media.route';
 import MessageRoute from './message/message.route';
+import OverviewRoute from './overview/overview.route';
 import PaymentRoute from './payment/payment.route';
 import PhonebookRoute from './phonebook/phonebook.route';
 import TemplateRoute from './template/template.route';
@@ -30,6 +31,7 @@ router.use('/coupon', VerifySession, CouponRoute);
 router.use('/whatsapp-link', VerifySession, WhatsappLinkRoute);
 router.use('/payment', VerifySession, PaymentRoute);
 
+router.use('/:device_id/overview', VerifySession, VerifyDevice, OverviewRoute);
 router.use('/:device_id/template', VerifySession, VerifyDevice, TemplateRoute);
 router.use('/:device_id/message', VerifySession, VerifyDevice, MessageRoute);
 router.use('/:device_id/chatbot', VerifySession, VerifyDevice, ChatBotRoute);

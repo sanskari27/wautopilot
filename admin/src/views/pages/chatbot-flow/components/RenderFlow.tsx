@@ -1,6 +1,7 @@
 import { Flex, IconButton } from '@chakra-ui/react';
 import { useCallback } from 'react';
 import { BiSave } from 'react-icons/bi';
+import { useParams } from 'react-router-dom';
 import ReactFlow, {
 	Background,
 	BackgroundVariant,
@@ -16,15 +17,14 @@ import AudioNode from './nodes/AudioNode';
 import ButtonNode from './nodes/ButtonNode';
 import DocumentNode from './nodes/DocumentNode';
 import ImageNode from './nodes/ImageNode';
+import ListNode from './nodes/ListNode';
+import StartNode from './nodes/StartNode';
 import TextNode from './nodes/TextNode';
 import VideoNode from './nodes/VideoNode';
 
-// const initialNodes = [
-// 	{ id: '1', position: { x: 330, y: 330 }, data: { label: '1' } },
-// 	{ id: '2', position: { x: 330, y: 100 }, data: { label: '2' } },
-// ];
-// const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
-
+export type StartNodeDetails = {
+	type: 'START';
+};
 export type TextNodeDetails = {
 	type: 'TEXT';
 	data: string;
@@ -44,31 +44,56 @@ export type ButtonNodeDetails = {
 		buttons: string[];
 	};
 };
+export type ListNodeDetails = {
+	type: 'LIST';
+	data: {
+		header: string;
+		body: string;
+		footer: string;
+		sections: { title: string; buttons: string[] }[];
+	};
+};
 
 const nodeTypes = {
+	startNode: StartNode,
 	textNode: TextNode,
 	imageNode: ImageNode,
 	audioNode: AudioNode,
 	videoNode: VideoNode,
 	documentNode: DocumentNode,
 	buttonNode: ButtonNode,
+	listNode: ListNode,
 };
 
 export default function RenderFlow() {
 	const [nodes, setNodes, onNodesChange] = useNodesState([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+	const { id } = useParams();
 
-	const handleAddNode = (details: TextNodeDetails | DocumentNodeDetails | ButtonNodeDetails) => {
+	const handleAddNode = (
+		details:
+			| StartNodeDetails
+			| TextNodeDetails
+			| DocumentNodeDetails
+			| ButtonNodeDetails
+			| ListNodeDetails
+	) => {
 		const node = {
 			id: String(nodes.length + 1),
-			position: { x: 0, y: 0 },
+			position: { x: 50, y: 50 },
 			data: { label: String(nodes.length + 1) } as {
-				[key: string]: string | string[];
+				[key: string]:
+					| string
+					| string[]
+					| { id: string; caption: string; buttons: string[] }
+					| { title: string; buttons: string[] }[];
 			},
 			type: 'input',
 		};
 
-		if (details.type === 'TEXT') {
+		if (details.type === 'START') {
+			node.type = 'startNode';
+		} else if (details.type === 'TEXT') {
 			node.type = 'textNode';
 			node.data = { label: details.data };
 		} else if (details.type === 'IMAGE') {
@@ -86,6 +111,9 @@ export default function RenderFlow() {
 		} else if (details.type === 'BUTTON') {
 			node.type = 'buttonNode';
 			node.data = details.data;
+		} else if (details.type === 'LIST') {
+			node.type = 'listNode';
+			node.data = details.data;
 		}
 
 		setNodes((prev) => {
@@ -100,7 +128,11 @@ export default function RenderFlow() {
 		[setEdges]
 	);
 
-	const onSave = () => {};
+	const onSave = () => {
+		console.log(id);
+
+		console.log(nodes, edges);
+	};
 
 	return (
 		<Flex
@@ -127,14 +159,16 @@ export default function RenderFlow() {
 				snapGrid={[20, 20]}
 			>
 				<Panel position='top-left'>
-					<IconButton
-						aria-label='Save Flow'
-						icon={<BiSave />}
-						colorScheme='green'
-						onClick={onSave}
-						cursor={'pointer'}
-						fontSize={'1.25rem'}
-					/>
+					<Flex bgColor={'white'} gap={'1rem'}>
+						<IconButton
+							aria-label='Save Flow'
+							icon={<BiSave />}
+							colorScheme='green'
+							onClick={onSave}
+							cursor={'pointer'}
+							fontSize={'1.25rem'}
+						/>
+					</Flex>
 				</Panel>
 				<CreateFlowComponent addNode={handleAddNode} />
 				<Background color='#000' size={1.25} variant={BackgroundVariant.Dots} />

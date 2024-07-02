@@ -46,6 +46,7 @@ const AudioMessage = forwardRef<AudioMessageHandle, AudioMessageProps>(
 				setAttachment('');
 				setCaption('');
 				setButtons([]);
+				setButtonText('');
 				setOpen.on();
 			},
 		}));

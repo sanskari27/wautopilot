@@ -5,18 +5,24 @@ import {
 	DrawerBody,
 	DrawerContent,
 	DrawerOverlay,
-	Icon,
+	IconButton,
 	Text,
 	VStack,
 	useDisclosure,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { FaImage, FaListAlt, FaVideo } from 'react-icons/fa';
+import { FaGooglePlay, FaImage, FaListAlt, FaVideo } from 'react-icons/fa';
 import { IoMdRadioButtonOn, IoMdText } from 'react-icons/io';
 import { IoDocumentText } from 'react-icons/io5';
 import { MdAudiotrack } from 'react-icons/md';
 import { Panel } from 'reactflow';
-import { ButtonNodeDetails, DocumentNodeDetails, TextNodeDetails } from './RenderFlow';
+import {
+	ButtonNodeDetails,
+	DocumentNodeDetails,
+	ListNodeDetails,
+	StartNodeDetails,
+	TextNodeDetails,
+} from './RenderFlow';
 import {
 	AudioMessage,
 	AudioMessageHandle,
@@ -26,16 +32,25 @@ import {
 	DocumentMessageHandle,
 	ImageMessage,
 	ImageMessageHandle,
+	ListMessage,
+	ListMessageHandle,
 	TextMessage,
 	TextMessageHandle,
 	VideoMessage,
 	VideoMessageHandle,
 } from './createMessage';
 
-type MessageTypes = 'TEXT' | 'IMAGE' | 'AUDIO' | 'VIDEO' | 'DOCUMENT' | 'BUTTON' | 'LIST';
+type MessageTypes = 'TEXT' | 'IMAGE' | 'AUDIO' | 'VIDEO' | 'DOCUMENT' | 'BUTTON' | 'LIST' | 'START';
 
 type Props = {
-	addNode: (details: TextNodeDetails | DocumentNodeDetails | ButtonNodeDetails) => void;
+	addNode: (
+		details:
+			| StartNodeDetails
+			| TextNodeDetails
+			| DocumentNodeDetails
+			| ButtonNodeDetails
+			| ListNodeDetails
+	) => void;
 };
 
 export default function CreateFlowComponent({ addNode }: Props) {
@@ -46,14 +61,20 @@ export default function CreateFlowComponent({ addNode }: Props) {
 	const videoMessageRef = useRef<VideoMessageHandle>(null);
 	const documentMessageRef = useRef<DocumentMessageHandle>(null);
 	const buttonMessageRef = useRef<ButtonMessageHandle>(null);
+	const listMessageRef = useRef<ListMessageHandle>(null);
 
 	const handleMessageTypeClick = (type: MessageTypes) => {
-		if (type === 'TEXT') textMessageRef.current?.open();
+		if (type === 'START') {
+			addNode({
+				type: 'START',
+			});
+		} else if (type === 'TEXT') textMessageRef.current?.open();
 		else if (type === 'IMAGE') imageMessageRef.current?.open();
 		else if (type === 'AUDIO') audioMessageRef.current?.open();
 		else if (type === 'VIDEO') videoMessageRef.current?.open();
 		else if (type === 'DOCUMENT') documentMessageRef.current?.open();
 		else if (type === 'BUTTON') buttonMessageRef.current?.open();
+		else if (type === 'LIST') listMessageRef.current?.open();
 
 		onClose();
 	};
@@ -71,6 +92,17 @@ export default function CreateFlowComponent({ addNode }: Props) {
 				text,
 				buttons,
 			},
+		});
+	};
+	const handleListElement = (details: {
+		header: string;
+		body: string;
+		footer: string;
+		sections: { title: string; buttons: string[] }[];
+	}) => {
+		addNode({
+			type: 'LIST',
+			data: details,
 		});
 	};
 
@@ -93,12 +125,11 @@ export default function CreateFlowComponent({ addNode }: Props) {
 	return (
 		<>
 			<Panel position='top-right'>
-				<Icon
-					as={ArrowLeftIcon}
-					color='green'
+				<IconButton
+					aria-label='Save Flow'
+					icon={<ArrowLeftIcon />}
+					colorScheme='green'
 					onClick={onOpen}
-					cursor={'pointer'}
-					fontSize={'1.25rem'}
 				/>
 			</Panel>
 			<Drawer
@@ -113,6 +144,13 @@ export default function CreateFlowComponent({ addNode }: Props) {
 				<DrawerContent>
 					<DrawerBody paddingY={'2rem'}>
 						<VStack width={'full'} gap={'1rem'}>
+							<MessageType
+								body={'Start Flow'}
+								footer={'Use this to start the flow.'}
+								icon={<FaGooglePlay size={'1.5rem'} />}
+								onClick={() => handleMessageTypeClick('START')}
+								bgColor={'green.500'}
+							/>
 							<MessageType
 								body={'Text Message'}
 								footer={'Use text message to show final output of the flow.'}
@@ -186,6 +224,7 @@ export default function CreateFlowComponent({ addNode }: Props) {
 				}
 			/>
 			<ButtonMessage ref={buttonMessageRef} onButtonMessageAdded={handleButtonElement} />
+			<ListMessage ref={listMessageRef} onListMessageAdded={handleListElement} />
 		</>
 	);
 }

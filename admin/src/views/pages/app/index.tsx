@@ -121,7 +121,7 @@ const AppPage = () => {
 		return <></>;
 	}
 
-	if (!outlet) return <Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />;
+	if (!outlet) return <Navigate to={`${NAVIGATION.APP}/${NAVIGATION.DASHBOARD}`} />;
 
 	return (
 		<Box width={'full'}>

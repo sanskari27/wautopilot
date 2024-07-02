@@ -418,4 +418,84 @@ export default class ConversationService extends WhatsappLinkService {
 			}
 		);
 	}
+
+	public async monthlyStartedConversations() {
+		const start = DateUtils.getMomentNow().subtract(12, 'months').startOf('month').toDate();
+		const end = DateUtils.getMomentNow().endOf('month').toDate();
+
+		const docs = await ConversationDB.aggregate([
+			{
+				$match: {
+					linked_to: this.userId,
+					device_id: this.deviceId,
+					createdAt: {
+						$gte: start,
+						$lte: end,
+					},
+				},
+			},
+			{
+				$group: {
+					_id: {
+						$month: '$createdAt',
+						// $year: '$createdAt',
+					},
+					year: {
+						$first: {
+							$year: '$createdAt',
+						},
+					},
+					count: {
+						$sum: 1,
+					},
+				},
+			},
+		]);
+
+		return docs.map((doc) => ({
+			month: doc._id,
+			year: doc.year,
+			count: doc.count,
+		}));
+	}
+
+	public async dailySentMessages() {
+		const start = DateUtils.getMomentNow().startOf('month').toDate();
+		const end = DateUtils.getMomentNow().endOf('month').toDate();
+
+		const docs = await ConversationMessageDB.aggregate([
+			{
+				$match: {
+					linked_to: this.userId,
+					device_id: this.deviceId,
+					sent_at: {
+						$gte: start,
+						$lte: end,
+					},
+				},
+			},
+			{
+				$group: {
+					_id: {
+						$dayOfMonth: '$sent_at',
+						// $year: '$sent_at',
+					},
+					month: {
+						$first: {
+							$month: '$sent_at',
+						},
+					},
+					count: {
+						$sum: 1,
+					},
+				},
+			},
+		]);
+
+		return docs.map((doc) => ({
+			day: doc._id,
+			month: doc.month,
+			count: doc.count,
+		}));
+	}
 }

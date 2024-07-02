@@ -4,7 +4,7 @@ import { convertToId } from '../../../../../utils/templateHelper';
 import Each from '../../../../components/utils/Each';
 import Preview from '../../../media/preview.component';
 
-const dotStyle = { background: '#555', width: '0.5rem', height: '0.5rem', top: 'auto' };
+const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
 
 export default function DocumentNode({
 	data: { caption, buttons },
@@ -60,7 +60,6 @@ export default function DocumentNode({
 				type='target'
 				position={Position.Left}
 				style={{ ...dotStyle, top: 80 }}
-				onConnect={(params) => console.log('handle onConnect', params)}
 				isConnectable
 			/>
 			<Box

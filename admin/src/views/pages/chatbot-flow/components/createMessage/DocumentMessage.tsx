@@ -46,6 +46,7 @@ const DocumentMessage = forwardRef<DocumentMessageHandle, DocumentMessageProps>(
 				setAttachment('');
 				setCaption('');
 				setButtons([]);
+				setButtonText('');
 				setOpen.on();
 			},
 		}));

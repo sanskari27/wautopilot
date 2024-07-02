@@ -83,4 +83,11 @@ export default class MediaService extends WhatsappLinkService {
 
 		return processMediaDocs([media])[0];
 	}
+
+	async totalMediaStorage() {
+		const medias = await MediaDB.find({
+			linked_to: this.userId,
+		});
+		return medias.reduce((acc, media) => acc + media.file_length, 0);
+	}
 }

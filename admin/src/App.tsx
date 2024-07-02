@@ -65,13 +65,13 @@ function App() {
 								<Route path={'new'} element={<CreateChatBot />} />
 							</Route>
 							<Route path={NAVIGATION.CHATBOT_FLOW} element={<ChatbotFlow />}>
-								<Route path={'new'} element={<RenderFlow />} />
+								<Route path={':id'} element={<RenderFlow />} />
 							</Route>
 							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
 						</Route>
 						<Route
 							path='*'
-							element={<Navigate to={NAVIGATION.APP + '/' + NAVIGATION.PHONEBOOK} />}
+							element={<Navigate to={NAVIGATION.APP + '/' + NAVIGATION.DASHBOARD} />}
 						/>
 					</Routes>
 				</Suspense>

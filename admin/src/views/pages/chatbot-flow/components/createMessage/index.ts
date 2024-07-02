@@ -6,6 +6,8 @@ export { default as DocumentMessage } from './DocumentMessage';
 export type { DocumentMessageHandle, DocumentMessageProps } from './DocumentMessage';
 export { default as ImageMessage } from './ImageMessage';
 export type { ImageMessageHandle, ImageMessageProps } from './ImageMessage';
+export { default as ListMessage } from './ListMessage';
+export type { ListMessageHandle, ListMessageProps } from './ListMessage';
 export { default as TextMessage } from './TextMessage';
 export type { TextMessageHandle, TextMessageProps } from './TextMessage';
 export { default as VideoMessage } from './VideoMessage';

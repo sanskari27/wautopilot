@@ -265,4 +265,16 @@ export default class SchedulerService extends WhatsappLinkService {
 			msg.remove();
 		});
 	}
+
+	public async pendingTodayCount() {
+		const start = DateUtils.getMomentNow().startOf('day').toDate();
+		const end = DateUtils.getMomentNow().endOf('day').toDate();
+
+		return ScheduledMessageDB.countDocuments({
+			linked_to: this.account._id,
+			device_id: this.deviceId,
+			sendAt: { $gte: start, $lte: end },
+			status: MESSAGE_STATUS.PENDING,
+		});
+	}
 }

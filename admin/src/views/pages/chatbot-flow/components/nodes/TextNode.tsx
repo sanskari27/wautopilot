@@ -1,18 +1,12 @@
 import { Box } from '@chakra-ui/react';
 import { Handle, Position } from 'reactflow';
 
-const dotStyle = { background: '#555', top: 80, width: '0.5rem', height: '0.5rem' };
+const dotStyle = { background: '#555', top: 80, width: '0.75rem', height: '0.75rem' };
 
 export default function TextNode({ data: { label } }: { data: { label: string } }) {
 	return (
 		<>
-			<Handle
-				type='target'
-				position={Position.Left}
-				style={dotStyle}
-				onConnect={(params) => console.log('handle onConnect', params)}
-				isConnectable
-			/>
+			<Handle type='target' position={Position.Left} style={dotStyle} isConnectable />
 			<Box
 				rounded={'2xl'}
 				bgColor={'whitesmoke'}

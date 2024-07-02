@@ -46,6 +46,7 @@ const ImageMessage = forwardRef<ImageMessageHandle, ImageMessageProps>(
 				setAttachment('');
 				setCaption('');
 				setButtons([]);
+				setButtonText('');
 				setOpen.on();
 			},
 		}));

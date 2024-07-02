@@ -46,6 +46,7 @@ const VideoMessage = forwardRef<VideoMessageHandle, VideoMessageProps>(
 				setAttachment('');
 				setCaption('');
 				setButtons([]);
+				setButtonText('');
 				setOpen.on();
 			},
 		}));

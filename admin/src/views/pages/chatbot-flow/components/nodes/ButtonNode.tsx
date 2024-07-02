@@ -3,7 +3,7 @@ import { Handle, Position } from 'reactflow';
 import { convertToId } from '../../../../../utils/templateHelper';
 import Each from '../../../../components/utils/Each';
 
-const dotStyle = { background: '#555', width: '0.5rem', height: '0.5rem', top: 'auto' };
+const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
 
 export default function ButtonNode({
 	data: { text, buttons },
@@ -58,7 +58,6 @@ export default function ButtonNode({
 				type='target'
 				position={Position.Left}
 				style={{ ...dotStyle, top: 80 }}
-				onConnect={(params) => console.log('handle onConnect', params)}
 				isConnectable
 			/>
 			<Box

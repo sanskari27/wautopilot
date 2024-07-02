@@ -1,6 +1,10 @@
 export function getFileSize(size: number) {
 	const fileSizeKB = size / 1024; // Convert bytes to kilobytes
 	const fileSizeMB = fileSizeKB / 1024;
+	const fileSizeGB = fileSizeMB / 1024;
+	if (fileSizeGB > 1) {
+		return `${fileSizeGB.toFixed(2)} GB`;
+	}
 	return fileSizeMB > 1 ? `${fileSizeMB.toFixed(2)} MB` : `${fileSizeKB.toFixed(2)} KB`;
 }
 
