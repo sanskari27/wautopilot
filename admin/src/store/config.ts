@@ -10,4 +10,6 @@ export enum StoreNames {
 	CONTACT = 'contact',
 	FILTER_LABELS = 'filterLabels',
 	CHATBOT = 'chatbot',
+	DASHBOARD = 'dashboard',
+	CHATBOT_FLOW = 'chatbot-flow',
 }

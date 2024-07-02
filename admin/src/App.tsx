@@ -25,6 +25,9 @@ const ChatBot = lazy(() => import('./views/pages/chatbot'));
 const CreateChatBot = lazy(() => import('./views/pages/chatbot/components/CreateChatbot'));
 const ChatbotFlow = lazy(() => import('./views/pages/chatbot-flow'));
 const RenderFlow = lazy(() => import('./views/pages/chatbot-flow/components/RenderFlow'));
+const CreateChatbotFlow = lazy(
+	() => import('./views/pages/chatbot-flow/components/CreateChatbotFlow')
+);
 
 function App() {
 	const dispatch = useDispatch();
@@ -65,7 +68,8 @@ function App() {
 								<Route path={'new'} element={<CreateChatBot />} />
 							</Route>
 							<Route path={NAVIGATION.CHATBOT_FLOW} element={<ChatbotFlow />}>
-								<Route path={':id'} element={<RenderFlow />} />
+								<Route path={'update-flow/:id'} element={<RenderFlow />} />
+								<Route path={':id'} element={<CreateChatbotFlow />} />
 							</Route>
 							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
 						</Route>

@@ -2,6 +2,7 @@ import { AddIcon } from '@chakra-ui/icons';
 import { Button, Flex, HStack, Text } from '@chakra-ui/react';
 import { Link, useOutlet } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
+import AllChatbotFlows from './components/AllChatbotFlows';
 
 export default function ChatbotFlow() {
 	const outlet = useOutlet();
@@ -18,14 +19,15 @@ export default function ChatbotFlow() {
 		>
 			<HStack justifyContent={'space-between'}>
 				<Text fontSize={'2xl'} fontWeight={'bold'}>
-					ChatBots
+					ChatBot Flow
 				</Text>
 				<Link to={`${NAVIGATION.APP}/${NAVIGATION.CHATBOT_FLOW}/new`}>
 					<Button variant='outline' size={'sm'} colorScheme='green' leftIcon={<AddIcon />}>
-						Create Flow
+						Create
 					</Button>
 				</Link>
 			</HStack>
+			<AllChatbotFlows />
 		</Flex>
 	);
 }

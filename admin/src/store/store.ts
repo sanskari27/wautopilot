@@ -3,7 +3,9 @@ import { configureStore } from '@reduxjs/toolkit';
 import { StoreNames } from './config';
 import { default as BroadcastReducer } from './reducers/BroadcastReducer';
 import ChatBotReducer from './reducers/ChatBotReducer';
+import ChatbotFlowReducer from './reducers/ChatbotFlowReducer';
 import ContactReducer from './reducers/ContactReducer';
+import DashboardReducer from './reducers/DashboardReducer';
 import DevicesReducers from './reducers/DevicesReducers';
 import { default as MediaReducer } from './reducers/MediaReducer';
 import MessagesReducers from './reducers/MessagesReducers';
@@ -24,6 +26,8 @@ const store = configureStore({
 		[StoreNames.MESSAGES]: MessagesReducers,
 		[StoreNames.CONTACT]: ContactReducer,
 		[StoreNames.CHATBOT]: ChatBotReducer,
+		[StoreNames.DASHBOARD]: DashboardReducer,
+		[StoreNames.CHATBOT_FLOW]: ChatbotFlowReducer,
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({

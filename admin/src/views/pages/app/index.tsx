@@ -5,14 +5,18 @@ import { Navigate, useOutlet } from 'react-router-dom';
 import APIInstance from '../../../config/APIInstance';
 import { AUTH_URL, NAVIGATION } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
+import ChatbotFlowServices from '../../../services/chatbot-flow.service';
 import ChatBotService from '../../../services/chatbot.service';
+import { DashboardService } from '../../../services/dashboard.service';
 import DeviceService from '../../../services/device.service';
 import MediaService from '../../../services/media.service';
 import MessagesService from '../../../services/messages.service';
 import TemplateService from '../../../services/template.service';
 import { StoreNames, StoreState } from '../../../store';
 import { setChatBotList } from '../../../store/reducers/ChatBotReducer';
+import { setChatbotFlow } from '../../../store/reducers/ChatbotFlowReducer';
 import { setContactList } from '../../../store/reducers/ContactReducer';
+import { setDashboardList } from '../../../store/reducers/DashboardReducer';
 import {
 	setDevicesList,
 	startDeviceLoading,
@@ -76,6 +80,8 @@ const AppPage = () => {
 					MediaService.getMedias(selected_device_id),
 					TemplateService.listTemplates(selected_device_id),
 					ChatBotService.listChatBots({ deviceId: selected_device_id }),
+					DashboardService.getDashboardData(selected_device_id),
+					ChatbotFlowServices.listChatBots({ deviceId: selected_device_id }),
 				];
 
 				const results = await Promise.all(promises);
@@ -83,6 +89,8 @@ const AppPage = () => {
 				dispatch(setMediaList(results[1]));
 				dispatch(setTemplatesList(results[2]));
 				dispatch(setChatBotList(results[3]));
+				dispatch(setDashboardList(results[4]));
+				dispatch(setChatbotFlow(results[5]));
 			} catch (e) {
 				return;
 			}
