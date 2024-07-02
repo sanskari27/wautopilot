@@ -16,7 +16,7 @@ const validateChatBot = (bots: any) => {
 	});
 };
 
-export default class ChatbotFlowServices {
+export default class ChatbotFlowService {
 	static async listChatBots({ deviceId }: { deviceId: string }) {
 		try {
 			const { data } = await APIInstance.get(`/${deviceId}/chatbot/flows`);
@@ -110,5 +110,17 @@ export default class ChatbotFlowServices {
 	}) {
 		const { data } = await APIInstance.patch(`/${deviceId}/chatbot/flows/${botId}`, details);
 		return validateChatBot([data.flow]);
+	}
+
+	static async getNodesAndEdges(deviceId: string, botId: string) {
+		try {
+			const { data } = await APIInstance.get(`/${deviceId}/chatbot/flows/${botId}`);
+			return {
+				nodes: data.flow.nodes,
+				edges: data.flow.edges,
+			};
+		} catch (err) {
+			return null;
+		}
 	}
 }

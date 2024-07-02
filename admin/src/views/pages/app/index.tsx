@@ -5,7 +5,7 @@ import { Navigate, useOutlet } from 'react-router-dom';
 import APIInstance from '../../../config/APIInstance';
 import { AUTH_URL, NAVIGATION } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
-import ChatbotFlowServices from '../../../services/chatbot-flow.service';
+import ChatbotFlowService from '../../../services/chatbot-flow.service';
 import ChatBotService from '../../../services/chatbot.service';
 import { DashboardService } from '../../../services/dashboard.service';
 import DeviceService from '../../../services/device.service';
@@ -81,7 +81,7 @@ const AppPage = () => {
 					TemplateService.listTemplates(selected_device_id),
 					ChatBotService.listChatBots({ deviceId: selected_device_id }),
 					DashboardService.getDashboardData(selected_device_id),
-					ChatbotFlowServices.listChatBots({ deviceId: selected_device_id }),
+					ChatbotFlowService.listChatBots({ deviceId: selected_device_id }),
 				];
 
 				const results = await Promise.all(promises);

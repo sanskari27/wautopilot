@@ -16,7 +16,7 @@ import { BiRefresh } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { NAVIGATION } from '../../../../config/const';
-import ChatbotFlowServices from '../../../../services/chatbot-flow.service';
+import ChatbotFlowService from '../../../../services/chatbot-flow.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
 	addChatbotFlow,
@@ -78,11 +78,11 @@ export default function CreateChatBotFlow() {
 		dispatch(setAddingBot(true));
 		const promise =
 			!id || id === 'new'
-				? ChatbotFlowServices.createChatbotFlow({
+				? ChatbotFlowService.createChatbotFlow({
 						device_id: selected_device_id,
 						details,
 				  })
-				: ChatbotFlowServices.updateChatbotFlow({
+				: ChatbotFlowService.updateChatbotFlow({
 						device_id: selected_device_id,
 						bot_id: id,
 						details,

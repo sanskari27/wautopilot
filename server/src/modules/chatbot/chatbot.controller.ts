@@ -176,7 +176,7 @@ async function chatBotFlowDetails(req: Request, res: Response, next: NextFunctio
 			res,
 			status: 200,
 			data: {
-				bot: details,
+				flow: details,
 			},
 		});
 	} catch (e) {
@@ -196,7 +196,7 @@ async function toggleActiveFlow(req: Request, res: Response, next: NextFunction)
 		res,
 		status: 200,
 		data: {
-			bot: list,
+			flow: list,
 		},
 	});
 }

@@ -1,6 +1,7 @@
 import { Flex, IconButton } from '@chakra-ui/react';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { BiSave } from 'react-icons/bi';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import ReactFlow, {
 	Background,
@@ -12,6 +13,8 @@ import ReactFlow, {
 	useEdgesState,
 	useNodesState,
 } from 'reactflow';
+import ChatbotFlowService from '../../../../services/chatbot-flow.service';
+import { StoreNames, StoreState } from '../../../../store';
 import CreateFlowComponent from './CreateFlowComponent';
 import AudioNode from './nodes/AudioNode';
 import ButtonNode from './nodes/ButtonNode';
@@ -69,6 +72,7 @@ export default function RenderFlow() {
 	const [nodes, setNodes, onNodesChange] = useNodesState([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 	const { id } = useParams();
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const handleAddNode = (
 		details:
@@ -127,6 +131,16 @@ export default function RenderFlow() {
 		},
 		[setEdges]
 	);
+
+	useEffect(() => {
+		if (!id) return;
+		ChatbotFlowService.getNodesAndEdges(selected_device_id, id).then((flow) => {
+			if (!flow) return;
+			const { nodes, edges } = flow;
+			setNodes(nodes);
+			setEdges(edges);
+		});
+	}, [id, selected_device_id, setEdges, setNodes]);
 
 	const onSave = () => {
 		console.log(id);

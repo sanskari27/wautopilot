@@ -17,7 +17,7 @@ import { PiPause, PiPlay } from 'react-icons/pi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { NAVIGATION } from '../../../../config/const';
-import ChatbotFlowServices from '../../../../services/chatbot-flow.service';
+import ChatbotFlowService from '../../../../services/chatbot-flow.service';
 import { StoreNames, StoreState } from '../../../../store';
 import { removeBot, updateBot } from '../../../../store/reducers/ChatBotReducer';
 import ConfirmationAlert, { ConfirmationAlertHandle } from '../../../components/confirmation-alert';
@@ -33,7 +33,7 @@ export default function AllChatbotFlows() {
 	const confirmationAlertRef = useRef<ConfirmationAlertHandle>(null);
 
 	const deleteBot = (id: string) => {
-		ChatbotFlowServices.deleteChatbotFlow({ deviceId: selected_device_id, botId: id }).then(
+		ChatbotFlowService.deleteChatbotFlow({ deviceId: selected_device_id, botId: id }).then(
 			(res) => {
 				if (!res) return;
 				dispatch(removeBot(id));
@@ -42,7 +42,7 @@ export default function AllChatbotFlows() {
 	};
 
 	const toggleBot = (id: string) => {
-		ChatbotFlowServices.toggleChatbotFlow({ deviceId: selected_device_id, botId: id }).then(
+		ChatbotFlowService.toggleChatbotFlow({ deviceId: selected_device_id, botId: id }).then(
 			(res) => {
 				if (!res) {
 					return;
