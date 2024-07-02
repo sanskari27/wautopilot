@@ -146,6 +146,7 @@ function processFlowDocs(docs: IChatBotFlow[]) {
 	return docs.map((bot) => {
 		return {
 			bot_id: bot._id as Types.ObjectId,
+			name: bot.name,
 			respond_to: bot.respond_to,
 			trigger: bot.trigger,
 			options: bot.options,
