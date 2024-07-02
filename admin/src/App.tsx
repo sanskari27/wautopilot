@@ -71,7 +71,7 @@ function App() {
 						</Route>
 						<Route
 							path='*'
-							element={<Navigate to={NAVIGATION.APP + '/' + NAVIGATION.DASHBOARD} />}
+							element={<Navigate to={NAVIGATION.APP + '/' + NAVIGATION.PHONEBOOK} />}
 						/>
 					</Routes>
 				</Suspense>

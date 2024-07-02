@@ -1,6 +1,6 @@
 import { BiBot, BiConversation } from 'react-icons/bi';
-import { MdContacts, MdOutlineDashboard, MdOutlinePermMedia } from 'react-icons/md';
-import { RiContactsBook2Line } from 'react-icons/ri';
+import { MdContacts, MdOutlinePermMedia } from 'react-icons/md';
+import { RiContactsBook2Line, RiFlowChart } from 'react-icons/ri';
 import { TbMessage2Plus, TbReportSearch, TbTemplate } from 'react-icons/tb';
 
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -32,11 +32,11 @@ export const NAVIGATION = {
 };
 
 export const MenuItems = [
-	{
-		icon: MdOutlineDashboard,
-		route: NAVIGATION.DASHBOARD,
-		title: 'Dashboard',
-	},
+	// {
+	// 	icon: MdOutlineDashboard,
+	// 	route: NAVIGATION.DASHBOARD,
+	// 	title: 'Dashboard',
+	// },
 	{
 		icon: RiContactsBook2Line,
 		route: NAVIGATION.PHONEBOOK,
@@ -77,11 +77,11 @@ export const MenuItems = [
 		route: NAVIGATION.CHATBOT,
 		title: 'Chat Bot',
 	},
-	// {
-	// 	icon: RiFlowChart,
-	// 	route: NAVIGATION.CHATBOT_FLOW,
-	// 	title: 'Chatbot Flow',
-	// },
+	{
+		icon: RiFlowChart,
+		route: NAVIGATION.CHATBOT_FLOW,
+		title: 'Chatbot Flow',
+	},
 ];
 
 export enum Color {
