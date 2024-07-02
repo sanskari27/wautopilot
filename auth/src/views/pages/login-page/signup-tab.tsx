@@ -17,6 +17,7 @@ import {
 
 export default function SignupTab() {
 	const recaptchaRef = useRef<ReCAPTCHA>(null);
+	const validUser = useRef(false);
 	const toast = useToast();
 	const dispatch = useDispatch();
 
@@ -38,14 +39,19 @@ export default function SignupTab() {
 		if (!name) {
 			return dispatch(setError({ message: 'Name is required', type: 'name' }));
 		}
-		const token = await recaptchaRef.current?.executeAsync();
-		if (!token) {
-			return toast({
-				title: 'Captcha failed',
-				description: 'Please refresh the page and try again',
-				status: 'error',
-				duration: 3000,
-			});
+		if (!validUser.current) {
+			const token = await recaptchaRef.current?.executeAsync();
+			if (!token) {
+				return toast({
+					title: 'Please verify you are not a robot',
+					description:
+						'If you are not a robot, please try again. If the issue persists, please refresh the page.',
+					status: 'error',
+					duration: 4000,
+					isClosable: true,
+				});
+			}
+			validUser.current = true;
 		}
 		dispatch(startUserAuthenticating());
 

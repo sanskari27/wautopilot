@@ -19,6 +19,7 @@ import PasswordInput from './password-input';
 
 function LoginTab() {
 	const recaptchaRef = useRef<ReCAPTCHA>(null);
+	const validUser = useRef(false);
 	const { location } = useGeoLocation();
 	const toast = useToast();
 	const dispatch = useDispatch();
@@ -35,7 +36,20 @@ function LoginTab() {
 		if (!email) {
 			return dispatch(setError({ message: 'Email is required', type: 'email' }));
 		}
-		await recaptchaRef.current?.execute();
+		if (!validUser.current) {
+			const token = await recaptchaRef.current?.executeAsync();
+			if (!token) {
+				return toast({
+					title: 'Please verify you are not a robot',
+					description:
+						'If you are not a robot, please try again. If the issue persists, please refresh the page.',
+					status: 'error',
+					duration: 4000,
+					isClosable: true,
+				});
+			}
+			validUser.current = true;
+		}
 		const valid = await AuthService.forgotPassword(email, `${AUTH_URL}auth/reset-password`);
 		if (valid) {
 			return toast({
@@ -58,7 +72,20 @@ function LoginTab() {
 		if (!password) {
 			return dispatch(setError({ message: 'Password is required', type: 'password' }));
 		}
-		await recaptchaRef.current?.execute();
+		if (!validUser.current) {
+			const token = await recaptchaRef.current?.executeAsync();
+			if (!token) {
+				return toast({
+					title: 'Please verify you are not a robot',
+					description:
+						'If you are not a robot, please try again. If the issue persists, please refresh the page.',
+					status: 'error',
+					duration: 4000,
+					isClosable: true,
+				});
+			}
+			validUser.current = true;
+		}
 
 		dispatch(startUserAuthenticating());
 		const valid = await AuthService.login(
