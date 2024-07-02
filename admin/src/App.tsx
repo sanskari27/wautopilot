@@ -15,7 +15,7 @@ const AppPage = lazy(() => import('./views/pages/app'));
 const Conversation = lazy(() => import('./views/pages/conversation'));
 const ContactPage = lazy(() => import('./views/pages/contacts'));
 const Broadcast = lazy(() => import('./views/pages/broadcast'));
-// const Dashboard = lazy(() => import('./views/pages/dashboard'));
+const Dashboard = lazy(() => import('./views/pages/dashboard'));
 const Templates = lazy(() => import('./views/pages/templates'));
 const EditTemplate = lazy(() => import('./views/pages/templates/edit-template'));
 const Phonebook = lazy(() => import('./views/pages/phonebook'));
@@ -62,10 +62,7 @@ function App() {
 								<Route path={':id'} element={<CreateChatBot />} />
 								<Route path={'new'} element={<CreateChatBot />} />
 							</Route>
-							<Route
-								path={NAVIGATION.DASHBOARD}
-								element={<Navigate to={`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`} />}
-							/>
+							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
 						</Route>
 						<Route path='*' element={<Navigate to={NAVIGATION.APP} />} />
 					</Routes>
