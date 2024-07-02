@@ -71,6 +71,21 @@ export default class ChatbotFlowService {
 			trigger: data.flow.trigger ?? '',
 		};
 	}
+	static async updateNodesAndEdges(
+		deviceId: string,
+		botId: string,
+		details: { nodes: any[]; edges: any[] }
+	) {
+		const { data } = await APIInstance.patch(`/${deviceId}/chatbot/flows/${botId}`, details);
+		return {
+			id: data.flow.bot_id ?? '',
+			name: data.flow.name ?? '',
+			isActive: data.flow.isActive ?? false,
+			options: data.flow.options ?? '',
+			respond_to: data.flow.respond_to ?? '',
+			trigger: data.flow.trigger ?? '',
+		};
+	}
 	static async deleteChatbotFlow({ deviceId, botId }: { deviceId: string; botId: string }) {
 		try {
 			const { data } = await APIInstance.delete(`/${deviceId}/chatbot/flows/${botId}`);
@@ -113,14 +128,10 @@ export default class ChatbotFlowService {
 	}
 
 	static async getNodesAndEdges(deviceId: string, botId: string) {
-		try {
-			const { data } = await APIInstance.get(`/${deviceId}/chatbot/flows/${botId}`);
-			return {
-				nodes: data.flow.nodes,
-				edges: data.flow.edges,
-			};
-		} catch (err) {
-			return null;
-		}
+		const { data } = await APIInstance.get(`/${deviceId}/chatbot/flows/${botId}`);
+		return {
+			nodes: data.flow.nodes,
+			edges: data.flow.edges,
+		};
 	}
 }

@@ -267,8 +267,8 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 							stroke: z.string().default('#000'),
 						})
 						.optional(),
-					sourceHandle: z.string().optional(),
-					targetHandle: z.string().optional(),
+					sourceHandle: z.string().or(z.null()).optional(),
+					targetHandle: z.string().or(z.null()).optional(),
 				})
 			)
 			.default([]),
@@ -347,8 +347,8 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 							stroke: z.string().default('#000'),
 						})
 						.optional(),
-					sourceHandle: z.string().optional(),
-					targetHandle: z.string().optional(),
+					sourceHandle: z.string().or(z.null()).optional(),
+					targetHandle: z.string().or(z.null()).optional(),
 				})
 			)
 			.optional(),

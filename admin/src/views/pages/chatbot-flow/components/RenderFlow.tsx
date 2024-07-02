@@ -1,8 +1,8 @@
-import { Flex, IconButton } from '@chakra-ui/react';
+import { Flex, IconButton, useToast } from '@chakra-ui/react';
 import { useCallback, useEffect } from 'react';
 import { BiSave } from 'react-icons/bi';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ReactFlow, {
 	Background,
 	BackgroundVariant,
@@ -13,6 +13,7 @@ import ReactFlow, {
 	useEdgesState,
 	useNodesState,
 } from 'reactflow';
+import { NAVIGATION } from '../../../../config/const';
 import ChatbotFlowService from '../../../../services/chatbot-flow.service';
 import { StoreNames, StoreState } from '../../../../store';
 import CreateFlowComponent from './CreateFlowComponent';
@@ -72,6 +73,8 @@ export default function RenderFlow() {
 	const [nodes, setNodes, onNodesChange] = useNodesState([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 	const { id } = useParams();
+	const navigate = useNavigate();
+	const toast = useToast();
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const handleAddNode = (
@@ -134,18 +137,44 @@ export default function RenderFlow() {
 
 	useEffect(() => {
 		if (!id) return;
-		ChatbotFlowService.getNodesAndEdges(selected_device_id, id).then((flow) => {
-			if (!flow) return;
-			const { nodes, edges } = flow;
-			setNodes(nodes);
-			setEdges(edges);
+		toast.promise(ChatbotFlowService.getNodesAndEdges(selected_device_id, id), {
+			success: ({ nodes, edges }) => {
+				setNodes(nodes);
+				setEdges(edges);
+				return {
+					title: 'Flow loaded successfully',
+				};
+			},
+			error: {
+				title: 'Failed to load flow',
+			},
+			loading: {
+				title: 'Loading flow',
+				description: 'Please wait',
+			},
 		});
-	}, [id, selected_device_id, setEdges, setNodes]);
+	}, [id, selected_device_id, setEdges, setNodes, toast]);
 
 	const onSave = () => {
-		console.log(id);
-
-		console.log(nodes, edges);
+		if (!id) return;
+		toast.promise(
+			ChatbotFlowService.updateNodesAndEdges(selected_device_id, id, { nodes, edges }),
+			{
+				success: () => {
+					navigate(`${NAVIGATION.APP}/${NAVIGATION.CHATBOT_FLOW}`);
+					return {
+						title: 'Flow saved successfully',
+					};
+				},
+				error: {
+					title: 'Failed to save flow',
+				},
+				loading: {
+					title: 'Saving flow',
+					description: 'Please wait',
+				},
+			}
+		);
 	};
 
 	return (
