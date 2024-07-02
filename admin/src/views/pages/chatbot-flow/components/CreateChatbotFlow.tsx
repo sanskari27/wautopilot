@@ -27,6 +27,7 @@ import {
 	setOptions,
 	setRespondTo,
 	setTrigger,
+	updateChatbotFlow,
 } from '../../../../store/reducers/ChatbotFlowReducer';
 import { SelectElement, TextAreaElement } from './Inputs';
 
@@ -75,25 +76,26 @@ export default function CreateChatBotFlow() {
 
 	const addChatBot = () => {
 		dispatch(setAddingBot(true));
-		const promise = isEditingBot
-			? // ? null
-			  ChatbotFlowServices.createChatbotFlow({
-					device_id: selected_device_id,
-					details,
-			  })
-			: ChatbotFlowServices.createChatbotFlow({
-					device_id: selected_device_id,
-					details,
-			  });
+		const promise =
+			!id || id === 'new'
+				? ChatbotFlowServices.createChatbotFlow({
+						device_id: selected_device_id,
+						details,
+				  })
+				: ChatbotFlowServices.updateChatbotFlow({
+						device_id: selected_device_id,
+						bot_id: id,
+						details,
+				  });
 		toast.promise(promise, {
 			success: (data) => {
-				const acton = isEditingBot ? addChatbotFlow(data) : addChatbotFlow(data);
+				const acton = !id || id === 'new' ? addChatbotFlow(data) : updateChatbotFlow(data);
 				dispatch(acton);
 				dispatch(reset());
-				if (isEditingBot) {
-					navigate(`${NAVIGATION.APP}/${NAVIGATION.CHATBOT_FLOW}`);
-				} else {
+				if (!id || id === 'new') {
 					navigate(`${NAVIGATION.APP}/${NAVIGATION.CHATBOT_FLOW}/update-flow/${data.id}`);
+				} else {
+					navigate(`${NAVIGATION.APP}/${NAVIGATION.CHATBOT_FLOW}`);
 				}
 				return {
 					title: 'Data saved successfully',

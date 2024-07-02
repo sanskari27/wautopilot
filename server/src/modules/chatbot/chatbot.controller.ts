@@ -4,7 +4,11 @@ import COMMON_ERRORS from '../../errors/common-errors';
 import ChatBotService from '../../services/chatbot';
 import CSVHelper from '../../utils/CSVHelper';
 import { Respond, RespondCSV } from '../../utils/ExpressUtils';
-import { CreateBotValidationResult, CreateFlowValidationResult, UpdateFlowValidationResult } from './chatbot.validator';
+import {
+	CreateBotValidationResult,
+	CreateFlowValidationResult,
+	UpdateFlowValidationResult,
+} from './chatbot.validator';
 
 async function createBot(req: Request, res: Response, next: NextFunction) {
 	const {
@@ -133,12 +137,12 @@ async function updateFlow(req: Request, res: Response, next: NextFunction) {
 
 	const data = req.locals.data as UpdateFlowValidationResult;
 
-	const bot = await new ChatBotService(account, device).modifyFlow(id, data);
+	const flow = await new ChatBotService(account, device).modifyFlow(id, data);
 	return Respond({
 		res,
 		status: 200,
 		data: {
-			bot,
+			flow,
 		},
 	});
 }

@@ -49,6 +49,11 @@ const Slice = createSlice({
 		addChatbotFlow: (state, action: PayloadAction<typeof initState.details>) => {
 			state.list.push(action.payload);
 		},
+		updateChatbotFlow: (state, action: PayloadAction<typeof initState.details>) => {
+			state.list = state.list.map((item) =>
+				item.id === action.payload.id ? action.payload : item
+			);
+		},
 		setAddingBot: (state, action: PayloadAction<boolean>) => {
 			state.ui.isAddingBot = action.payload;
 		},
@@ -70,6 +75,7 @@ export const {
 	setOptions,
 	setChatbotFlowDetails,
 	addChatbotFlow,
+	updateChatbotFlow,
 	setAddingBot,
 	setEditingBot,
 	setLoading,

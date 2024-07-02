@@ -47,6 +47,30 @@ export default class ChatbotFlowServices {
 			trigger: data.flow.trigger ?? '',
 		};
 	}
+	static async updateChatbotFlow({
+		device_id,
+		bot_id,
+		details,
+	}: {
+		device_id: string;
+		bot_id: string;
+		details: {
+			name: string;
+			trigger: string;
+			respond_to: string;
+			options: string;
+		};
+	}) {
+		const { data } = await APIInstance.patch(`/${device_id}/chatbot/flows/${bot_id}`, details);
+		return {
+			id: data.flow.bot_id ?? '',
+			name: data.flow.name ?? '',
+			isActive: data.flow.isActive ?? false,
+			options: data.flow.options ?? '',
+			respond_to: data.flow.respond_to ?? '',
+			trigger: data.flow.trigger ?? '',
+		};
+	}
 	static async deleteChatbotFlow({ deviceId, botId }: { deviceId: string; botId: string }) {
 		try {
 			const { data } = await APIInstance.delete(`/${deviceId}/chatbot/flows/${botId}`);
