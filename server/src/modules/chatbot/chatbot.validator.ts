@@ -90,6 +90,8 @@ export type CreateFlowValidationResult = {
 	}[];
 };
 
+export type UpdateFlowValidationResult = Partial<CreateFlowValidationResult>;
+
 export async function CreateBotValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
 		respond_to: z.enum([
@@ -270,6 +272,86 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 				})
 			)
 			.default([]),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function UpdateFlowValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z.object({
+		respond_to: z
+			.enum([BOT_TRIGGER_TO.ALL, BOT_TRIGGER_TO.SAVED_CONTACTS, BOT_TRIGGER_TO.NON_SAVED_CONTACTS])
+			.optional(),
+		trigger: z.string().optional(),
+		options: z
+			.enum([
+				BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE,
+				BOT_TRIGGER_OPTIONS.EXACT_MATCH_CASE,
+				BOT_TRIGGER_OPTIONS.INCLUDES_IGNORE_CASE,
+				BOT_TRIGGER_OPTIONS.INCLUDES_MATCH_CASE,
+			])
+			.optional(),
+
+		name: z.string().optional(),
+		nodes: z
+			.array(
+				z.object({
+					id: z.string(),
+					data: z.any().optional(),
+					position: z.object({
+						x: z.number(),
+						y: z.number(),
+					}),
+					height: z.number(),
+					width: z.number(),
+					type: z.enum([
+						'startNode',
+						'textNode',
+						'imageNode',
+						'audioNode',
+						'videoNode',
+						'documentNode',
+						'buttonNode',
+						'listNode',
+					]),
+				})
+			)
+			.optional(),
+		edges: z
+			.array(
+				z.object({
+					id: z.string(),
+					source: z.string(),
+					target: z.string(),
+					animated: z.boolean().default(true),
+					style: z
+						.object({
+							stroke: z.string().default('#000'),
+						})
+						.optional(),
+					sourceHandle: z.string().optional(),
+					targetHandle: z.string().optional(),
+				})
+			)
+			.optional(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

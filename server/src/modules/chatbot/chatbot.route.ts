@@ -1,7 +1,7 @@
 import express from 'express';
 import { IDValidator } from '../../middleware';
 import Controller from './chatbot.controller';
-import { CreateBotValidator, CreateFlowValidator } from './chatbot.validator';
+import { CreateBotValidator, CreateFlowValidator, UpdateFlowValidator } from './chatbot.validator';
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ router
 	.get(Controller.chatBotFlowDetails)
 	.delete(Controller.deleteFlow)
 	.put(Controller.toggleActiveFlow)
-	.patch(CreateFlowValidator, Controller.updateFlow);
+	.patch(UpdateFlowValidator, Controller.updateFlow);
 
 router.route('/flows').get(Controller.listFlows).post(CreateFlowValidator, Controller.createFlow);
 
