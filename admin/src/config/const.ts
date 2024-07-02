@@ -22,6 +22,7 @@ export const NAVIGATION = {
 	BROADCAST_REPORT: 'campaign-report',
 	PHONEBOOK: 'phonebook',
 	CHATBOT: 'chatbot',
+	CHATBOT_FLOW: 'chat-bot-flow',
 
 	TEMPLATES: 'templates',
 	ADD_TEMPLATE: 'add-template',
@@ -78,7 +79,7 @@ export const MenuItems = [
 	},
 	{
 		icon: RiFlowChart,
-		route: NAVIGATION.DASHBOARD,
+		route: NAVIGATION.CHATBOT_FLOW,
 		title: 'Chatbot Flow',
 	},
 ];

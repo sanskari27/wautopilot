@@ -23,6 +23,8 @@ const MediaPage = lazy(() => import('./views/pages/media'));
 const AddMedia = lazy(() => import('./views/pages/media/add-media'));
 const ChatBot = lazy(() => import('./views/pages/chatbot'));
 const CreateChatBot = lazy(() => import('./views/pages/chatbot/components/CreateChatbot'));
+const ChatbotFlow = lazy(() => import('./views/pages/chatbot-flow'));
+const CreateChatbotFlow = lazy(() => import('./views/pages/chatbot-flow/components/createFlow'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -61,6 +63,9 @@ function App() {
 							<Route path={NAVIGATION.CHATBOT} element={<ChatBot />}>
 								<Route path={':id'} element={<CreateChatBot />} />
 								<Route path={'new'} element={<CreateChatBot />} />
+							</Route>
+							<Route path={NAVIGATION.CHATBOT_FLOW} element={<ChatbotFlow />}>
+								<Route path={'new'} element={<CreateChatbotFlow />} />
 							</Route>
 							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
 						</Route>
