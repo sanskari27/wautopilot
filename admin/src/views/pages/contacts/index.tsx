@@ -77,6 +77,12 @@ const ContactPage = () => {
 	}, [pagination.page, dispatch]);
 
 	const handleContactInput = (contact: Contact) => {
+		if (!contact.name.first_name) {
+			return toast({
+				title: 'First name is required',
+				status: 'warning',
+			});
+		}
 		if (!contact.id) {
 			ContactService.addContact(contact).then((res) => {
 				if (res) {

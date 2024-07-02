@@ -2,7 +2,10 @@ import {
 	Box,
 	Button,
 	Flex,
+	FormControl,
+	FormLabel,
 	HStack,
+	Input,
 	Modal,
 	ModalBody,
 	ModalContent,
@@ -26,6 +29,7 @@ import {
 	removeFile,
 	setError,
 	setFile,
+	setFilename,
 	setSaving,
 } from '../../../store/reducers/MediaReducer';
 import ProgressBar, { ProgressBarHandle } from '../../components/progress-bar';
@@ -41,7 +45,7 @@ export default function AddMedia() {
 
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
-	const { file, uiDetails, size, type, url } = useSelector(
+	const { file, uiDetails, size, type, url, filename } = useSelector(
 		(state: StoreState) => state[StoreNames.MEDIA]
 	);
 
@@ -99,7 +103,7 @@ export default function AddMedia() {
 			return;
 		}
 		dispatch(setSaving(true));
-		toast.promise(MediaService.uploadMedia(selected_device_id, file, onUploadProgress), {
+		toast.promise(MediaService.uploadMedia(selected_device_id, file,filename, onUploadProgress), {
 			success: (res) => {
 				dispatch(addMedia(res));
 				dispatch(setSaving(false));
@@ -171,6 +175,14 @@ export default function AddMedia() {
 							</VStack>
 						)}
 					</Box>
+					<FormControl>
+						<FormLabel>Filename</FormLabel>
+						<Input
+							type='email'
+							value={filename}
+							onChange={(e) => dispatch(setFilename(e.target.value))}
+						/>
+					</FormControl>
 					<ProgressBar ref={progressRef} />
 				</ModalBody>
 

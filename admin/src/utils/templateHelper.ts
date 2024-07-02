@@ -5,3 +5,7 @@ export function countOccurrences(inputString: string) {
 
 	return matches ? matches.length : 0;
 }
+
+export function convertToId(text: string) {
+	return text.replace(/\s/g, '-').toLowerCase();
+}

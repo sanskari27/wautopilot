@@ -44,10 +44,12 @@ export default class MediaService {
 	static async uploadMedia(
 		device_id: string,
 		file: File,
+		filename: string,
 		onUploadProgress: (progress: number) => void
 	) {
 		const formData = new FormData();
 		formData.append('file', file);
+		formData.append('filename', filename);
 		const { data } = await APIInstance.post(`/${device_id}/media`, formData, {
 			headers: {
 				'Content-Type': 'multipart/form-data',

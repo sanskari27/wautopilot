@@ -167,7 +167,8 @@ const TemplateComponentParameter = ({
 						<AttachmentSelectorDialog
 							onConfirm={attachmentSelectorId}
 							ref={attachmentSelectorRef}
-							isMultiSelect={false}
+							selectButtonText='Select'
+							returnType='id'
 						/>
 					</Box>
 				</FormControl>

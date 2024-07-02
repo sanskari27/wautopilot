@@ -27,7 +27,6 @@ export default function Preview({
 			</>
 		);
 	}
-	console.log(data.type);
 
 	if (data.type === 'image') {
 		return <Image src={data.url} aspectRatio={'1/1'} borderRadius='lg' />;

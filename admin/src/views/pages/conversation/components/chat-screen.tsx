@@ -373,7 +373,13 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 				</MenuList>
 			</Menu>
 
-			<AttachmentSelectorDialog ref={attachmentSelectorHandle} onConfirm={sendAttachmentMessage} />
+			<AttachmentSelectorDialog
+				ref={attachmentSelectorHandle}
+				onConfirm={sendAttachmentMessage}
+				returnType='media_id'
+				selectButtonText='Send'
+				isMultiSelect
+			/>
 			<AddMedia
 				ref={addMediaHandle}
 				onConfirm={(media_id) => {

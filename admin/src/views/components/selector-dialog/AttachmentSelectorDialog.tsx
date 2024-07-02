@@ -22,6 +22,7 @@ import { useSelector } from 'react-redux';
 import useFilteredList from '../../../hooks/useFilteredList';
 import MessagesService from '../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../store';
+import { Media } from '../../../store/types/MediaState';
 import { getFileSize } from '../../../utils/file-utils';
 import SearchBar from '../searchBar';
 import Each from '../utils/Each';
@@ -33,13 +34,13 @@ export type AttachmentDialogHandle = {
 
 type Props = {
 	onConfirm: (type: string, ids: string[]) => void;
-	isSelect?: boolean;
-	returnMediaId?: boolean;
+	selectButtonText?: string;
+	returnType: 'id' | 'media_id';
 	isMultiSelect?: boolean;
 };
 
 const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
-	({ onConfirm, isSelect = false, returnMediaId = true, isMultiSelect = true }: Props, ref) => {
+	({ onConfirm, selectButtonText = 'Select', returnType, isMultiSelect = false }: Props, ref) => {
 		const [selected, setSelected] = useState<string[]>([]);
 		const { list } = useSelector((state: StoreState) => state[StoreNames.MEDIA]);
 		const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
@@ -51,7 +52,16 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 		};
 
 		const handleAdd = () => {
-			onConfirm(type, selected);
+			if (returnType === 'media_id') {
+				const mediaIds = list
+					.filter((el) => selected.includes(el.id))
+					.map((el) => el.media_id)
+					.filter(Boolean);
+				onConfirm(type, mediaIds);
+			} else {
+				const ids = selected.filter(Boolean);
+				onConfirm(type, ids);
+			}
 			onClose();
 		};
 
@@ -83,6 +93,23 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 			}
 			return false;
 		});
+
+		const toggleAllSelected = (allSelected: boolean) => {
+			if (allSelected) {
+				setSelected(filtered.map((el) => el.id));
+			} else {
+				setSelected([]);
+			}
+		};
+
+		const addSelected = (media: Media) => {
+			setSelected((prev) => [...prev, media.id]);
+		};
+
+		const removeSelected = (media: Media) => {
+			setSelected((prev) => prev.filter((id) => id !== media.id));
+		};
+
 		return (
 			<Modal isOpen={isOpen} onClose={onClose} size={'5xl'}>
 				<ModalOverlay />
@@ -109,13 +136,7 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 												isChecked={filtered.length === selected.length && selected.length > 0}
 												isIndeterminate={selected.length > 0 && selected.length !== filtered.length}
 												onChange={(e) => {
-													if (!e.target.checked) {
-														setSelected([]);
-													} else {
-														setSelected(
-															filtered.map((el) => (returnMediaId ? el.media_id : el.id))
-														);
-													}
+													toggleAllSelected(e.target.checked);
 												}}
 											/>{' '}
 											Sl no
@@ -133,23 +154,13 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 											<Tr>
 												<Td>
 													<Checkbox
-														isChecked={selected.includes(returnMediaId ? item.media_id : item.id)}
+														isChecked={selected.includes(item.id)}
 														mr={4}
 														onChange={(e) => {
 															if (e.target.checked) {
-																setSelected((prev) =>
-																	returnMediaId
-																		? isMultiSelect
-																			? [...prev, item.media_id]
-																			: [item.media_id]
-																		: [...prev, item.id]
-																);
+																addSelected(item);
 															} else {
-																setSelected((prev) =>
-																	prev.filter(
-																		(i) => i !== (returnMediaId ? item.media_id : item.id)
-																	)
-																);
+																removeSelected(item);
 															}
 														}}
 													/>
@@ -186,11 +197,11 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 								Cancel
 							</Button>
 							<Button
-								isDisabled={!isSelect && selected.length === 0}
+								isDisabled={selected.length === 0 || (isMultiSelect && selected.length <= 1)}
 								colorScheme='green'
 								onClick={handleAdd}
 							>
-								{isSelect ? 'Select' : 'Send'}
+								{selectButtonText}
 							</Button>
 						</Flex>
 					</ModalFooter>

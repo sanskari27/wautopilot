@@ -46,7 +46,7 @@ async function addMedia(req: Request, res: Response, next: NextFunction) {
 		const { data } = await MetaAPI(device.accessToken).get(`/${media_id}`);
 
 		const media = await new MediaService(account, device).addMedia({
-			filename: uploadedFile.filename,
+			filename: req.body.filename || uploadedFile.filename,
 			media_id,
 			media_url: data.url,
 			file_length: Number(data.file_size),

@@ -132,7 +132,7 @@ export default class SchedulerService extends WhatsappLinkService {
 						failed_reason = (err as any).message as string;
 					}
 					failed_at = DateUtils.getMomentNow().toDate();
-					msg.status = MESSAGE_STATUS.FAILED;
+					status = MESSAGE_STATUS.FAILED;
 				}
 			}
 

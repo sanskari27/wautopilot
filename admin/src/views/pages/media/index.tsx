@@ -96,7 +96,7 @@ const MediaPage = () => {
 				</Flex>
 
 				{previewEnabled ? (
-					<Grid alignItems={'flex-start'} templateColumns='repeat(3, 1fr)' gap={6}>
+					<Grid alignItems={'flex-start'} templateColumns='repeat(6, 1fr)' gap={6}>
 						<Each
 							items={list}
 							render={(media) => (

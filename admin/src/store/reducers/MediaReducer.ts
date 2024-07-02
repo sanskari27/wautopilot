@@ -21,6 +21,7 @@ const initialState: MediaState = {
 	size: '',
 	url: '',
 	type: '',
+	filename: '',
 };
 
 const Slice = createSlice({
@@ -77,6 +78,9 @@ const Slice = createSlice({
 		setError: (state, action: PayloadAction<string>) => {
 			state.uiDetails.error = action.payload;
 		},
+		setFilename: (state, action: PayloadAction<string>) => {
+			state.filename = action.payload;
+		},
 	},
 });
 
@@ -91,6 +95,7 @@ export const {
 	setError,
 	removeFile,
 	addMedia,
+	setFilename,
 } = Slice.actions;
 
 export default Slice.reducer;

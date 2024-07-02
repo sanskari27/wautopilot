@@ -124,8 +124,9 @@ export default function StaticMessageInput() {
 				<AttachmentSelectorDialog
 					ref={attachmentSelector}
 					onConfirm={(type, ids) => handleAddMedias({ type, ids })}
-					isSelect={true}
-					returnMediaId={false}
+					selectButtonText='Select'
+					returnType='id'
+					isMultiSelect
 				/>
 			</Wrap>
 			<FormControl>

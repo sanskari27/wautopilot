@@ -10,6 +10,7 @@ export type MediaState = {
 	size: string;
 	url: string;
 	type: string;
+	filename: string;
 };
 
 export type Media = {

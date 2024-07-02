@@ -4,6 +4,7 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
+import 'reactflow/dist/style.css';
 import App from './App.tsx';
 import './index.css';
 import store from './store/store.ts';
