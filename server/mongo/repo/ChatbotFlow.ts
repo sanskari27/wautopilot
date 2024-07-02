@@ -23,6 +23,7 @@ const schema = new mongoose.Schema<IChatBotFlow>(
 			enum: Object.values(BOT_TRIGGER_TO),
 			default: BOT_TRIGGER_TO.ALL,
 		},
+		name: String,
 		trigger: String,
 		options: {
 			type: String,
