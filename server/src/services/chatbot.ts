@@ -2,8 +2,10 @@ import { Types } from 'mongoose';
 import Logger from 'n23-logger';
 import { ConversationMessageDB } from '../../mongo';
 import ChatBotDB, { ChatBotDB_name } from '../../mongo/repo/Chatbot';
+import ChatBotFlowDB from '../../mongo/repo/ChatbotFlow';
 import IAccount from '../../mongo/types/account';
 import IChatBot from '../../mongo/types/chatbot';
+import IChatBotFlow from '../../mongo/types/chatbotflow';
 import IContact from '../../mongo/types/contact';
 import IMedia from '../../mongo/types/media';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
@@ -65,6 +67,43 @@ type CreateBotData = {
 	}[];
 };
 
+type CreateFlowData = {
+	name: string;
+	options: BOT_TRIGGER_OPTIONS;
+	respond_to: BOT_TRIGGER_TO;
+	trigger: string;
+	nodes: {
+		type:
+			| 'startNode'
+			| 'textNode'
+			| 'imageNode'
+			| 'audioNode'
+			| 'videoNode'
+			| 'documentNode'
+			| 'buttonNode'
+			| 'listNode';
+		id: string;
+		position: {
+			x: number;
+			y: number;
+		};
+		height: number;
+		width: number;
+		data?: any;
+	}[];
+	edges: {
+		id: string;
+		source: string;
+		target: string;
+		animated: boolean;
+		style?: {
+			stroke: string;
+		};
+		sourceHandle?: string;
+		targetHandle?: string;
+	}[];
+};
+
 function processDocs(docs: IChatBot[]) {
 	return docs.map((bot) => {
 		return {
@@ -98,6 +137,27 @@ function processDocs(docs: IChatBot[]) {
 				template_body: el.template_body,
 			})),
 			group_respond: bot.group_respond,
+			isActive: bot.active,
+		};
+	});
+}
+
+function processFlowDocs(docs: IChatBotFlow[]) {
+	return docs.map((bot) => {
+		return {
+			bot_id: bot._id as Types.ObjectId,
+			respond_to: bot.respond_to,
+			trigger: bot.trigger,
+			options: bot.options,
+			nodes: bot.nodes.map((node) => ({
+				type: node.node_type,
+				id: node.id,
+				position: node.position,
+				height: node.height,
+				width: node.width,
+				data: node.data,
+			})),
+			edges: bot.edges,
 			isActive: bot.active,
 		};
 	});
@@ -642,6 +702,10 @@ export default class ChatBotService extends WhatsappLinkService {
 			{ linked_to: this.userId, device_id: this.deviceId },
 			{ active: false }
 		);
+		await ChatBotFlowDB.updateMany(
+			{ linked_to: this.userId, device_id: this.deviceId },
+			{ active: false }
+		);
 	}
 
 	public async deleteBot(bot_id: Types.ObjectId) {
@@ -669,5 +733,90 @@ export default class ChatBotService extends WhatsappLinkService {
 			message_type: chat.body.body_type,
 			text: chat.body.text,
 		}));
+	}
+
+	public async allFlows() {
+		const bots = await ChatBotFlowDB.find({
+			linked_to: this.userId,
+			device_id: this.deviceId,
+		});
+		return processFlowDocs(bots);
+	}
+
+	public async chatBotFlowDetails(id: Types.ObjectId) {
+		const bots = await ChatBotFlowDB.find({
+			linked_to: this.userId,
+			device_id: this.deviceId,
+			_id: id,
+		});
+		if (bots.length === 0) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+		return processFlowDocs(bots)[0];
+	}
+
+	public async createFlow(data: CreateFlowData) {
+		const bot = await ChatBotFlowDB.create({
+			...data,
+			linked_to: this.userId,
+			device_id: this.deviceId,
+			nodes: data.nodes.map((node) => ({
+				node_type: node.type,
+				id: node.id,
+				position: node.position,
+				height: node.height,
+				width: node.width,
+				data: node.data,
+			})),
+		});
+
+		return processFlowDocs([bot])[0];
+	}
+
+	public async modifyFlow(id: Types.ObjectId, data: Partial<CreateFlowData>) {
+		await ChatBotFlowDB.updateOne(
+			{ _id: id },
+			{
+				$set: filterUndefinedKeys({
+					...data,
+					nodes: data.nodes?.map((node) => ({
+						node_type: node.type,
+						id: node.id,
+						position: node.position,
+						height: node.height,
+						width: node.width,
+						data: node.data,
+					})),
+				}),
+			}
+		);
+		const bot = await ChatBotFlowDB.findOne({
+			_id: id,
+			linked_to: this.userId,
+			device_id: this.deviceId,
+		});
+		if (!bot) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+
+		return processFlowDocs([bot])[0];
+	}
+
+	public async toggleActiveFlow(id: Types.ObjectId) {
+		const bot = await ChatBotFlowDB.findOne({
+			_id: id,
+			linked_to: this.userId,
+			device_id: this.deviceId,
+		});
+		if (!bot) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+		bot.active = !bot.active;
+		bot.save();
+		return processFlowDocs([bot])[0];
+	}
+
+	public async deleteFlow(bot_id: Types.ObjectId) {
+		await ChatBotFlowDB.deleteOne({ _id: bot_id });
 	}
 }

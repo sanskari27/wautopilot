@@ -53,6 +53,43 @@ export type CreateBotValidationResult = {
 	}[];
 };
 
+export type CreateFlowValidationResult = {
+	name: string;
+	options: BOT_TRIGGER_OPTIONS;
+	respond_to: BOT_TRIGGER_TO;
+	trigger: string;
+	nodes: {
+		type:
+			| 'startNode'
+			| 'textNode'
+			| 'imageNode'
+			| 'audioNode'
+			| 'videoNode'
+			| 'documentNode'
+			| 'buttonNode'
+			| 'listNode';
+		id: string;
+		position: {
+			x: number;
+			y: number;
+		};
+		height: number;
+		width: number;
+		data?: any;
+	}[];
+	edges: {
+		id: string;
+		source: string;
+		target: string;
+		animated: boolean;
+		style?: {
+			stroke: string;
+		};
+		sourceHandle?: string;
+		targetHandle?: string;
+	}[];
+};
+
 export async function CreateBotValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
 		respond_to: z.enum([
@@ -152,6 +189,86 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 					.default([]),
 			})
 			.array()
+			.default([]),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function CreateFlowValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z.object({
+		respond_to: z.enum([
+			BOT_TRIGGER_TO.ALL,
+			BOT_TRIGGER_TO.SAVED_CONTACTS,
+			BOT_TRIGGER_TO.NON_SAVED_CONTACTS,
+		]),
+		trigger: z.string().default(''),
+		options: z.enum([
+			BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE,
+			BOT_TRIGGER_OPTIONS.EXACT_MATCH_CASE,
+			BOT_TRIGGER_OPTIONS.INCLUDES_IGNORE_CASE,
+			BOT_TRIGGER_OPTIONS.INCLUDES_MATCH_CASE,
+		]),
+
+		name: z.string(),
+		nodes: z
+			.array(
+				z.object({
+					id: z.string(),
+					data: z.any().optional(),
+					position: z.object({
+						x: z.number(),
+						y: z.number(),
+					}),
+					height: z.number(),
+					width: z.number(),
+					type: z.enum([
+						'startNode',
+						'textNode',
+						'imageNode',
+						'audioNode',
+						'videoNode',
+						'documentNode',
+						'buttonNode',
+						'listNode',
+					]),
+				})
+			)
+			.default([]),
+		edges: z
+			.array(
+				z.object({
+					id: z.string(),
+					source: z.string(),
+					target: z.string(),
+					animated: z.boolean().default(true),
+					style: z
+						.object({
+							stroke: z.string().default('#000'),
+						})
+						.optional(),
+					sourceHandle: z.string().optional(),
+					targetHandle: z.string().optional(),
+				})
+			)
 			.default([]),
 	});
 
