@@ -153,6 +153,18 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				status: MESSAGE_STATUS.DELIVERED,
 				context: message.context,
 			});
+		} else if (message.interactive && message.interactive.type === 'list_reply') {
+			conversationService.addMessageToConversation(conversation_id, {
+				message_id: msgID,
+				recipient,
+				body: {
+					body_type: 'TEXT',
+					text: message.interactive?.list_reply?.title ?? '',
+				},
+				received_at: timestamp,
+				status: MESSAGE_STATUS.DELIVERED,
+				context: message.context,
+			});
 		} else {
 			conversationService.addMessageToConversation(conversation_id, {
 				message_id: msgID,
