@@ -650,7 +650,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 					await schedulerService.schedule(recipient, messageObject, {
 						scheduler_id: bot._id,
-						scheduler_type: ChatBotDB_name,
+						scheduler_type: 'Lead Nurturing',
 						sendAt: dateGenerator.next(el.after).value,
 						message_type: 'template',
 					});

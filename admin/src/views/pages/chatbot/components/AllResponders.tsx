@@ -1,4 +1,4 @@
-import { EditIcon } from '@chakra-ui/icons';
+import { DownloadIcon, EditIcon } from '@chakra-ui/icons';
 import {
 	Box,
 	IconButton,
@@ -46,6 +46,10 @@ export default function AllResponders() {
 			}
 			dispatch(updateBot(res[0]));
 		});
+	};
+
+	const downloadChatBot = (id: string) => {
+		ChatBotService.downloadChatBot({ deviceId: selected_device_id, botId: id });
 	};
 
 	const handleEditBot = (id: string) => {
@@ -121,11 +125,25 @@ export default function AllResponders() {
 												border='none'
 											/>
 										</Tooltip>
+										<Tooltip label='Download Responder' aria-label='Edit Responder'>
+											<IconButton
+												aria-label='Edit'
+												icon={<DownloadIcon />}
+												color={'blue.400'}
+												onClick={() => downloadChatBot(bot.id)}
+												bgColor={'transparent'}
+												_hover={{
+													bgColor: 'transparent',
+												}}
+												outline='none'
+												border='none'
+											/>
+										</Tooltip>
 										<Tooltip label='Toggle Responder' aria-label='Toggle Responder'>
 											<IconButton
 												aria-label='toggle'
 												icon={bot.isActive ? <PiPause /> : <PiPlay />}
-												color={bot.isActive ? 'blue.400' : 'green.400'}
+												color={bot.isActive ? 'red.400' : 'green.400'}
 												onClick={() => {
 													confirmationAlertRef.current?.open({
 														id: bot.id,

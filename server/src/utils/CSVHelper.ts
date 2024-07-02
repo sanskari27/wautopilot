@@ -90,4 +90,45 @@ export default class CSVHelper {
 
 		return csv;
 	}
+
+	static exportChatbotReport(
+		records: {
+			trigger: string;
+			recipient: string;
+			triggered_at: string;
+			message_type: 'TEXT' | 'MEDIA' | 'CONTACT' | 'LOCATION' | 'UNKNOWN';
+			text: string;
+		}[]
+	): string {
+		const keys = [
+			{
+				value: 'recipient',
+				label: 'Recipient',
+			},
+			{
+				value: 'trigger',
+				label: 'Trigger',
+			},
+			{
+				value: 'message_type',
+				label: 'Respond Type',
+			},
+			{
+				value: 'text',
+				label: 'Body',
+			},
+			{
+				value: 'triggered_at',
+				label: 'Triggered At',
+			},
+		];
+
+		const json2csvParser = new Parser({
+			header: true,
+			fields: keys,
+		});
+		const csv = json2csvParser.parse(records);
+
+		return csv;
+	}
 }

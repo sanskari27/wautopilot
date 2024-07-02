@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import ChatBotService from '../../services/chatbot';
-import { Respond } from '../../utils/ExpressUtils';
+import CSVHelper from '../../utils/CSVHelper';
+import { Respond, RespondCSV } from '../../utils/ExpressUtils';
 import { CreateBotValidationResult, CreateFlowValidationResult } from './chatbot.validator';
 
 async function createBot(req: Request, res: Response, next: NextFunction) {
@@ -87,6 +88,21 @@ async function deleteBot(req: Request, res: Response, next: NextFunction) {
 	return Respond({
 		res,
 		status: 200,
+	});
+}
+
+async function downloadResponses(req: Request, res: Response, next: NextFunction) {
+	const {
+		account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	const responses = await new ChatBotService(account, device).botResponses(id);
+	return RespondCSV({
+		res,
+		filename: `responses-${id}.csv`,
+		data: CSVHelper.exportChatbotReport(responses),
 	});
 }
 
@@ -206,6 +222,7 @@ const Controller = {
 	toggleActiveFlow,
 	deleteFlow,
 	listFlows,
+	downloadResponses,
 	chatBotFlowDetails,
 };
 

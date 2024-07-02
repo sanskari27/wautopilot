@@ -172,6 +172,33 @@ export default class ChatBotService {
 		}
 	}
 
+	static async downloadChatBot({ deviceId, botId }: { deviceId: string; botId: string }) {
+		try {
+			const response = await APIInstance.get(`/${deviceId}/chatbot/${botId}/download-response`, {
+				responseType: 'blob',
+			});
+			const blob = new Blob([response.data]);
+
+			const contentDisposition = response.headers['content-disposition'];
+			const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.*)"/);
+			const filename = filenameMatch ? filenameMatch[1] : 'downloaded-file';
+
+			// Create a temporary link element
+			const downloadLink = document.createElement('a');
+			downloadLink.href = window.URL.createObjectURL(blob);
+			downloadLink.download = filename; // Specify the filename
+
+			// Append the link to the body and trigger the download
+			document.body.appendChild(downloadLink);
+			downloadLink.click();
+
+			// Clean up - remove the link
+			document.body.removeChild(downloadLink);
+		} catch (err) {
+			return [];
+		}
+	}
+
 	static async editChatBot({
 		deviceId,
 		botId,

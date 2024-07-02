@@ -15,6 +15,8 @@ router
 
 router.route('/flows').get(Controller.listFlows).post(CreateFlowValidator, Controller.createFlow);
 
+router.route('/:id/download-response').all(IDValidator).get(Controller.downloadResponses);
+
 router
 	.route('/:id')
 	.all(IDValidator)
