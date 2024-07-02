@@ -46,6 +46,7 @@ const initState: ChatBotState = {
 	ui: {
 		isAddingBot: false,
 		isEditingBot: false,
+		isLoading: true,
 	},
 };
 
@@ -371,6 +372,9 @@ const Slice = createSlice({
 			state.details.nurturing[action.payload.index].template_header =
 				action.payload.template_header;
 		},
+		setChatbotLoading: (state, action: PayloadAction<boolean>) => {
+			state.ui.isLoading = action.payload;
+		},
 	},
 });
 
@@ -421,6 +425,7 @@ export const {
 	setAddingBot,
 	setHeaderMediaId,
 	reset,
+	setChatbotLoading,
 } = Slice.actions;
 
 export default Slice.reducer;

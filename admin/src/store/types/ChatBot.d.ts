@@ -11,6 +11,7 @@ export type ChatBotState = {
 	};
 	template_header_file: File | null;
 	ui: {
+		isLoading: boolean;
 		isAddingBot: boolean;
 		isEditingBot: boolean;
 	};

@@ -13,8 +13,8 @@ import MediaService from '../../../services/media.service';
 import MessagesService from '../../../services/messages.service';
 import TemplateService from '../../../services/template.service';
 import { StoreNames, StoreState } from '../../../store';
-import { setChatBotList } from '../../../store/reducers/ChatBotReducer';
-import { setChatbotFlow } from '../../../store/reducers/ChatbotFlowReducer';
+import { setChatBotList, setChatbotLoading } from '../../../store/reducers/ChatBotReducer';
+import { setChatbotFlow, setLoading } from '../../../store/reducers/ChatbotFlowReducer';
 import { setContactList } from '../../../store/reducers/ContactReducer';
 import { setDashboardList } from '../../../store/reducers/DashboardReducer';
 import {
@@ -97,6 +97,8 @@ const AppPage = () => {
 			dispatch(setMediaFetching(false));
 			dispatch(setTemplateFetching(false));
 			dispatch(setRecipientsLoading(false));
+			dispatch(setLoading(false));
+			dispatch(setChatbotLoading(false));
 		},
 		[dispatch]
 	);

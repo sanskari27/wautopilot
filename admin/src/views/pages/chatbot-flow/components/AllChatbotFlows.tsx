@@ -2,6 +2,7 @@ import { EditIcon } from '@chakra-ui/icons';
 import {
 	Box,
 	IconButton,
+	Skeleton,
 	Table,
 	TableContainer,
 	Tbody,
@@ -27,7 +28,10 @@ import Each from '../../../components/utils/Each';
 export default function AllChatbotFlows() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
-	const { list } = useSelector((state: StoreState) => state[StoreNames.CHATBOT_FLOW]);
+	const {
+		list,
+		ui: { isLoading },
+	} = useSelector((state: StoreState) => state[StoreNames.CHATBOT_FLOW]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const deleteAlertRef = useRef<DeleteAlertHandle>(null);
 	const confirmationAlertRef = useRef<ConfirmationAlertHandle>(null);
@@ -70,75 +74,83 @@ export default function AllChatbotFlows() {
 						</Tr>
 					</Thead>
 					<Tbody>
-						<Each
-							items={list}
-							render={(bot, index) => (
-								<Tr key={index}>
-									<Td>{bot.name}</Td>
-									<Td>
-										{bot.trigger.split('\n').map((trigger, index) => (
-											<Box key={index}>
-												{trigger.length > 20 ? trigger.substring(0, 18) + '...' : trigger}
-											</Box>
-										))}
-									</Td>
-									<Td>{bot.respond_to.split('_').join(' ')}</Td>
-									<Td>{bot.options.split('_').join(' ')}</Td>
-									<Td>
-										<Tooltip label='Delete Responder' aria-label='Delete Responder'>
-											<IconButton
-												aria-label='Delete'
-												icon={<MdDelete />}
-												color={'red.400'}
-												onClick={() => {
-													deleteAlertRef.current?.open(bot.id);
-												}}
-												bgColor={'transparent'}
-												_hover={{
-													bgColor: 'transparent',
-												}}
-												outline='none'
-												border='none'
-											/>
-										</Tooltip>
-										<Tooltip label='Edit Responder' aria-label='Edit Responder'>
-											<IconButton
-												aria-label='Edit'
-												icon={<EditIcon />}
-												color={'yellow.400'}
-												onClick={() => handleEditBot(bot.id)}
-												bgColor={'transparent'}
-												_hover={{
-													bgColor: 'transparent',
-												}}
-												outline='none'
-												border='none'
-											/>
-										</Tooltip>
-										<Tooltip label='Toggle Responder' aria-label='Toggle Responder'>
-											<IconButton
-												aria-label='toggle'
-												icon={bot.isActive ? <PiPause /> : <PiPlay />}
-												color={bot.isActive ? 'red.400' : 'green.400'}
-												onClick={() => {
-													confirmationAlertRef.current?.open({
-														id: bot.id,
-														disclaimer: 'Are you sure you want to change running status?',
-														type: 'TOGGLE_BOT',
-													});
-												}}
-												bgColor={'transparent'}
-												_hover={{
-													bgColor: 'transparent',
-												}}
-												outline='none'
-												border='none'
-											/>
-										</Tooltip>
-									</Td>
-								</Tr>
-							)}
-						/>
+						{isLoading ? (
+							<Tr>
+								<Td colSpan={5}>
+									<Skeleton height={'50px'} width={'100%'} />
+								</Td>
+							</Tr>
+						) : (
+							<Each
+								items={list}
+								render={(bot, index) => (
+									<Tr key={index}>
+										<Td>{bot.name}</Td>
+										<Td>
+											{bot.trigger.split('\n').map((trigger, index) => (
+												<Box key={index}>
+													{trigger.length > 20 ? trigger.substring(0, 18) + '...' : trigger}
+												</Box>
+											))}
+										</Td>
+										<Td>{bot.respond_to.split('_').join(' ')}</Td>
+										<Td>{bot.options.split('_').join(' ')}</Td>
+										<Td>
+											<Tooltip label='Delete Responder' aria-label='Delete Responder'>
+												<IconButton
+													aria-label='Delete'
+													icon={<MdDelete />}
+													color={'red.400'}
+													onClick={() => {
+														deleteAlertRef.current?.open(bot.id);
+													}}
+													bgColor={'transparent'}
+													_hover={{
+														bgColor: 'transparent',
+													}}
+													outline='none'
+													border='none'
+												/>
+											</Tooltip>
+											<Tooltip label='Edit Responder' aria-label='Edit Responder'>
+												<IconButton
+													aria-label='Edit'
+													icon={<EditIcon />}
+													color={'yellow.400'}
+													onClick={() => handleEditBot(bot.id)}
+													bgColor={'transparent'}
+													_hover={{
+														bgColor: 'transparent',
+													}}
+													outline='none'
+													border='none'
+												/>
+											</Tooltip>
+											<Tooltip label='Toggle Responder' aria-label='Toggle Responder'>
+												<IconButton
+													aria-label='toggle'
+													icon={bot.isActive ? <PiPause /> : <PiPlay />}
+													color={bot.isActive ? 'red.400' : 'green.400'}
+													onClick={() => {
+														confirmationAlertRef.current?.open({
+															id: bot.id,
+															disclaimer: 'Are you sure you want to change running status?',
+															type: 'TOGGLE_BOT',
+														});
+													}}
+													bgColor={'transparent'}
+													_hover={{
+														bgColor: 'transparent',
+													}}
+													outline='none'
+													border='none'
+												/>
+											</Tooltip>
+										</Td>
+									</Tr>
+								)}
+							/>
+						)}
 					</Tbody>
 				</Table>
 			</TableContainer>
