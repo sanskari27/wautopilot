@@ -33,8 +33,6 @@ async function dashboardDetails(req: Request, res: Response, next: NextFunction)
 			},
 		});
 	} catch (err) {
-		console.log(err);
-
 		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 	}
 }
