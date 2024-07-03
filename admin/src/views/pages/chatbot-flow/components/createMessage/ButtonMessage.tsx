@@ -19,6 +19,7 @@ import {
 	useBoolean,
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle, useState } from 'react';
+import { randomString } from '../../../../../utils/templateHelper';
 import Each from '../../../../components/utils/Each';
 
 export type ButtonMessageHandle = {
@@ -26,14 +27,25 @@ export type ButtonMessageHandle = {
 };
 
 export type ButtonMessageProps = {
-	onButtonMessageAdded: (text: string, buttons: string[]) => void;
+	onButtonMessageAdded: (
+		text: string,
+		buttons: {
+			id: string;
+			text: string;
+		}[]
+	) => void;
 };
 
 const ButtonMessage = forwardRef<ButtonMessageHandle, ButtonMessageProps>(
 	({ onButtonMessageAdded }: ButtonMessageProps, ref) => {
 		const [isOpen, setOpen] = useBoolean(false);
 		const [text, setText] = useState('');
-		const [buttons, setButtons] = useState<string[]>([]);
+		const [buttons, setButtons] = useState<
+			{
+				id: string;
+				text: string;
+			}[]
+		>([]);
 		const [buttonText, setButtonText] = useState('');
 
 		useImperativeHandle(ref, () => ({
@@ -67,7 +79,7 @@ const ButtonMessage = forwardRef<ButtonMessageHandle, ButtonMessageProps>(
 							position={'relative'}
 							border={'1px solid gray'}
 						>
-							{button}
+							{button.text}
 							<CloseIcon
 								fontSize={'1.25rem'}
 								bgColor={'red'}
@@ -78,7 +90,7 @@ const ButtonMessage = forwardRef<ButtonMessageHandle, ButtonMessageProps>(
 								right={'0.5rem'}
 								top={'0.40rem'}
 								cursor={'pointer'}
-								onClick={() => setButtons(buttons.filter((el) => el !== button))}
+								onClick={() => setButtons(buttons.filter((el) => el.id !== button.id))}
 							/>
 						</Box>
 					)}
@@ -97,7 +109,7 @@ const ButtonMessage = forwardRef<ButtonMessageHandle, ButtonMessageProps>(
 						color={'white'}
 						roundedTop={'2xl'}
 					>
-						Audio Message
+						Buttons Message
 					</ModalHeader>
 					<ModalBody>
 						<Text fontSize={'0.85rem'} marginTop={'0.5rem'}>
@@ -130,7 +142,13 @@ const ButtonMessage = forwardRef<ButtonMessageHandle, ButtonMessageProps>(
 									size='sm'
 									onClick={() => {
 										if (!buttonText) return;
-										setButtons([...buttons, buttonText]);
+										setButtons([
+											...buttons,
+											{
+												id: randomString(),
+												text: buttonText,
+											},
+										]);
 										setButtonText('');
 									}}
 									isDisabled={buttons.length >= 3}

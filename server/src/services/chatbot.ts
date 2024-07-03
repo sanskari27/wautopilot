@@ -963,6 +963,7 @@ export default class ChatBotService extends WhatsappLinkService {
 			return;
 		}
 		let message_id;
+
 		if (
 			node.node_type === 'imageNode' ||
 			node.node_type === 'videoNode' ||

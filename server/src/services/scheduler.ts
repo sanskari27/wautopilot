@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Types } from 'mongoose';
 import { ScheduledMessageDB } from '../../mongo';
 import { BroadcastDB_name } from '../../mongo/repo/Broadcast';
+import { ChatBotFlowDB_name } from '../../mongo/repo/ChatbotFlow';
 import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import MetaAPI from '../config/MetaAPI';
@@ -24,7 +25,6 @@ import ConversationService from './conversation';
 import TemplateService from './templates';
 import UserService from './user';
 import WhatsappLinkService from './whatsappLink';
-import { ChatBotFlowDB_name } from '../../mongo/repo/ChatbotFlow';
 
 export default class SchedulerService extends WhatsappLinkService {
 	public constructor(account: IAccount, whatsappLink: IWhatsappLink) {
@@ -58,7 +58,6 @@ export default class SchedulerService extends WhatsappLinkService {
 			sendAt,
 			message_type,
 		});
-
 		return message._id;
 	}
 

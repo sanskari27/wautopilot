@@ -204,6 +204,28 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 	return res.status(200).send('OK');
 }
 
+async function test() {
+	const waid = '171113502760309';
+	const phone_number_id = '158944380644785';
+
+	const link = await WhatsappLinkDB.findOne({ waid, phoneNumberId: phone_number_id });
+	if (!link) {
+		return;
+	}
+
+	const user = await AccountDB.findOne({ _id: link.linked_to });
+	if (!user) {
+		return;
+	}
+	const chatBotService = new ChatBotService(user, link);
+	chatBotService.checkForFlowKeyword(
+		'916205667548',
+		// 'wamid.HBgMOTE2MjA1NjY3NTQ4FQIAEhgWM0VCMEVBRUZBMkVBNUE0NEUzQjE2MwA=',
+		'asdaaaasdaa'
+	);
+}
+test();
+
 async function razorpayPayment(req: Request, res: Response) {
 	const data = req.body;
 	const digest = crypto

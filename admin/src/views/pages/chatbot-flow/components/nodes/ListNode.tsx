@@ -1,6 +1,5 @@
 import { AbsoluteCenter, Box, Divider } from '@chakra-ui/react';
 import { Handle, Position } from 'reactflow';
-import { convertToId } from '../../../../../utils/templateHelper';
 import Each from '../../../../components/utils/Each';
 
 const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
@@ -12,10 +11,24 @@ export default function ListNode({
 		header: string;
 		body: string;
 		footer: string;
-		sections: { title: string; buttons: string[] }[];
+		sections: {
+			title: string;
+			buttons: {
+				id: string;
+				text: string;
+			}[];
+		}[];
 	};
 }) {
-	function RenderButtons({ buttons }: { sectionIndex: number; buttons: string[] }) {
+	function RenderButtons({
+		buttons,
+	}: {
+		sectionIndex: number;
+		buttons: {
+			id: string;
+			text: string;
+		}[];
+	}) {
 		return (
 			<>
 				<Each
@@ -31,7 +44,7 @@ export default function ListNode({
 								position={'relative'}
 								border={'1px solid gray'}
 							>
-								{button}
+								{button.text}
 							</Box>
 						</>
 					)}
@@ -76,7 +89,7 @@ export default function ListNode({
 								<Handle
 									type='source'
 									position={Position.Right}
-									id={convertToId(button)}
+									id={button.id}
 									style={{ ...dotStyle, bottom: 20 + index * 40 + distanceFromBottom }}
 									isConnectable
 								/>

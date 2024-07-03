@@ -19,6 +19,7 @@ import {
 	useBoolean,
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle, useState } from 'react';
+import { randomString } from '../../../../../utils/templateHelper';
 import Each from '../../../../components/utils/Each';
 
 export type ListMessageHandle = {
@@ -30,7 +31,13 @@ export type ListMessageProps = {
 		header: string;
 		body: string;
 		footer: string;
-		sections: { title: string; buttons: string[] }[];
+		sections: {
+			title: string;
+			buttons: {
+				id: string;
+				text: string;
+			}[];
+		}[];
 	}) => void;
 };
 
@@ -44,7 +51,10 @@ const ListMessage = forwardRef<ListMessageHandle, ListMessageProps>(
 		const [sections, setSections] = useState<
 			{
 				title: string;
-				buttons: string[];
+				buttons: {
+					id: string;
+					text: string;
+				}[];
 			}[]
 		>([]); // [header, body, footer
 
@@ -81,11 +91,23 @@ const ListMessage = forwardRef<ListMessageHandle, ListMessageProps>(
 			if (!newSections[sectionIndex].buttons) {
 				newSections[sectionIndex].buttons = [];
 			}
-			newSections[sectionIndex].buttons.push(buttonText);
+			newSections[sectionIndex].buttons.push({
+				id: randomString(),
+				text: buttonText,
+			});
 			setSections(newSections);
 		}
 
-		function RenderButtons({ sectionIndex, buttons }: { sectionIndex: number; buttons: string[] }) {
+		function RenderButtons({
+			sectionIndex,
+			buttons,
+		}: {
+			sectionIndex: number;
+			buttons: {
+				id: string;
+				text: string;
+			}[];
+		}) {
 			const [buttonText, setButtonText] = useState('');
 
 			return (
@@ -103,7 +125,7 @@ const ListMessage = forwardRef<ListMessageHandle, ListMessageProps>(
 									position={'relative'}
 									border={'1px solid gray'}
 								>
-									{button}
+									{button.text}
 									<CloseIcon
 										fontSize={'1.25rem'}
 										bgColor={'red'}

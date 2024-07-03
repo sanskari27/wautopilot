@@ -53,6 +53,11 @@ type Props = {
 	) => void;
 };
 
+type Button = {
+	id: string;
+	text: string;
+};
+
 export default function CreateFlowComponent({ addNode }: Props) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const textMessageRef = useRef<TextMessageHandle>(null);
@@ -85,7 +90,7 @@ export default function CreateFlowComponent({ addNode }: Props) {
 			data: text,
 		});
 	};
-	const handleButtonElement = (text: string, buttons: string[]) => {
+	const handleButtonElement = (text: string, buttons: Button[]) => {
 		addNode({
 			type: 'BUTTON',
 			data: {
@@ -98,7 +103,7 @@ export default function CreateFlowComponent({ addNode }: Props) {
 		header: string;
 		body: string;
 		footer: string;
-		sections: { title: string; buttons: string[] }[];
+		sections: { title: string; buttons: Button[] }[];
 	}) => {
 		addNode({
 			type: 'LIST',
@@ -110,7 +115,7 @@ export default function CreateFlowComponent({ addNode }: Props) {
 		type: 'IMAGE' | 'AUDIO' | 'VIDEO' | 'DOCUMENT',
 		id: string,
 		caption: string,
-		buttons: string[]
+		buttons: Button[]
 	) => {
 		addNode({
 			type: type,

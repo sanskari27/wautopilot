@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import { Handle, Position } from 'reactflow';
 import { SERVER_URL } from '../../../../../config/const';
 import { StoreNames, StoreState } from '../../../../../store';
-import { convertToId } from '../../../../../utils/templateHelper';
 import Each from '../../../../components/utils/Each';
 import Preview from '../../../media/preview.component';
 
@@ -15,7 +14,10 @@ export default function ImageNode({
 	data: {
 		id: string;
 		caption: string;
-		buttons: string[];
+		buttons: {
+			id: string;
+			text: string;
+		}[];
 	};
 }) {
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
@@ -34,7 +36,7 @@ export default function ImageNode({
 							position={'relative'}
 							border={'1px solid gray'}
 						>
-							{button}
+							{button.text}
 						</Box>
 					</>
 				)}
@@ -49,7 +51,7 @@ export default function ImageNode({
 					<Handle
 						type='source'
 						position={Position.Right}
-						id={convertToId(button)}
+						id={button.id}
 						style={{ ...dotStyle, bottom: 20 + index * 40 }}
 						isConnectable
 					/>

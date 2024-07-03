@@ -8,6 +8,8 @@ import ReactFlow, {
 	BackgroundVariant,
 	Connection,
 	Controls,
+	Node,
+	OnNodesDelete,
 	Panel,
 	addEdge,
 	useEdgesState,
@@ -16,6 +18,7 @@ import ReactFlow, {
 import { NAVIGATION } from '../../../../config/const';
 import ChatbotFlowService from '../../../../services/chatbot-flow.service';
 import { StoreNames, StoreState } from '../../../../store';
+import { randomString } from '../../../../utils/templateHelper';
 import CreateFlowComponent from './CreateFlowComponent';
 import AudioNode from './nodes/AudioNode';
 import ButtonNode from './nodes/ButtonNode';
@@ -38,14 +41,20 @@ export type DocumentNodeDetails = {
 	data: {
 		id: string;
 		caption: string;
-		buttons: string[];
+		buttons: {
+			id: string;
+			text: string;
+		}[];
 	};
 };
 export type ButtonNodeDetails = {
 	type: 'BUTTON';
 	data: {
 		text: string;
-		buttons: string[];
+		buttons: {
+			id: string;
+			text: string;
+		}[];
 	};
 };
 export type ListNodeDetails = {
@@ -54,7 +63,13 @@ export type ListNodeDetails = {
 		header: string;
 		body: string;
 		footer: string;
-		sections: { title: string; buttons: string[] }[];
+		sections: {
+			title: string;
+			buttons: {
+				id: string;
+				text: string;
+			}[];
+		}[];
 	};
 };
 
@@ -70,7 +85,7 @@ const nodeTypes = {
 };
 
 export default function RenderFlow() {
-	const [nodes, setNodes, onNodesChange] = useNodesState([]);
+	const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 	const { id } = useParams();
 	const navigate = useNavigate();
@@ -85,8 +100,8 @@ export default function RenderFlow() {
 			| ButtonNodeDetails
 			| ListNodeDetails
 	) => {
-		const node = {
-			id: String(nodes.length + 1),
+		const node: Node = {
+			id: randomString(),
 			position: { x: 50, y: 50 },
 			data: { label: String(nodes.length + 1) } as {
 				[key: string]:
@@ -133,6 +148,14 @@ export default function RenderFlow() {
 			setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: '#000' } }, eds));
 		},
 		[setEdges]
+	);
+
+	const onNodesDelete: OnNodesDelete = useCallback(
+		(deleted) => {
+			const deletedIds = deleted.map((node) => node.id);
+			setNodes((prev) => prev.filter((node) => !deletedIds.includes(node.id)));
+		},
+		[setNodes]
 	);
 
 	useEffect(() => {
@@ -193,6 +216,7 @@ export default function RenderFlow() {
 				nodeTypes={nodeTypes}
 				onConnect={onConnect}
 				onNodesChange={onNodesChange}
+				onNodesDelete={onNodesDelete}
 				onEdgesChange={onEdgesChange}
 				connectionLineStyle={{
 					strokeDasharray: '5, 5',

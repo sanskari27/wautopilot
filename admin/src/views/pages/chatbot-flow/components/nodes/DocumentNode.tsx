@@ -1,6 +1,5 @@
 import { AbsoluteCenter, Box, Divider } from '@chakra-ui/react';
 import { Handle, Position } from 'reactflow';
-import { convertToId } from '../../../../../utils/templateHelper';
 import Each from '../../../../components/utils/Each';
 import Preview from '../../../media/preview.component';
 
@@ -12,7 +11,10 @@ export default function DocumentNode({
 	data: {
 		id: string;
 		caption: string;
-		buttons: string[];
+		buttons: {
+			id: string;
+			text: string;
+		}[];
 	};
 }) {
 	function RenderButtons() {
@@ -30,7 +32,7 @@ export default function DocumentNode({
 							position={'relative'}
 							border={'1px solid gray'}
 						>
-							{button}
+							{button.text}
 						</Box>
 					</>
 				)}
@@ -45,7 +47,7 @@ export default function DocumentNode({
 					<Handle
 						type='source'
 						position={Position.Right}
-						id={convertToId(button)}
+						id={button.id}
 						style={{ ...dotStyle, bottom: 20 + index * 40 }}
 						isConnectable
 					/>

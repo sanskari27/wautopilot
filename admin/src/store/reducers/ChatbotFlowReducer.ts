@@ -25,7 +25,6 @@ const Slice = createSlice({
 	reducers: {
 		reset: (state) => {
 			state.details = initState.details;
-			state.ui = initState.ui;
 		},
 		setChatbotFlow: (state, action: PayloadAction<typeof initState.list>) => {
 			state.list = action.payload;

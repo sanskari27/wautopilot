@@ -19,6 +19,7 @@ import {
 	useBoolean,
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { randomString } from '../../../../../utils/templateHelper';
 import AttachmentSelectorDialog, {
 	AttachmentDialogHandle,
 } from '../../../../components/selector-dialog/AttachmentSelectorDialog';
@@ -29,7 +30,14 @@ export type VideoMessageHandle = {
 };
 
 export type VideoMessageProps = {
-	onVideoMessageAdded: (id: string, caption: string, buttons: string[]) => void;
+	onVideoMessageAdded: (
+		id: string,
+		caption: string,
+		buttons: {
+			id: string;
+			text: string;
+		}[]
+	) => void;
 };
 
 const VideoMessage = forwardRef<VideoMessageHandle, VideoMessageProps>(
@@ -38,7 +46,12 @@ const VideoMessage = forwardRef<VideoMessageHandle, VideoMessageProps>(
 		const [attachment, setAttachment] = useState('');
 		const [caption, setCaption] = useState('');
 		const attachmentSelectorHandle = useRef<AttachmentDialogHandle>(null);
-		const [buttons, setButtons] = useState<string[]>([]);
+		const [buttons, setButtons] = useState<
+			{
+				id: string;
+				text: string;
+			}[]
+		>([]);
 		const [buttonText, setButtonText] = useState('');
 
 		useImperativeHandle(ref, () => ({
@@ -74,7 +87,7 @@ const VideoMessage = forwardRef<VideoMessageHandle, VideoMessageProps>(
 							position={'relative'}
 							border={'1px solid gray'}
 						>
-							{button}
+							{button.text}
 							<CloseIcon
 								fontSize={'1.25rem'}
 								bgColor={'red'}
@@ -85,7 +98,7 @@ const VideoMessage = forwardRef<VideoMessageHandle, VideoMessageProps>(
 								right={'0.5rem'}
 								top={'0.40rem'}
 								cursor={'pointer'}
-								onClick={() => setButtons(buttons.filter((el) => el !== button))}
+								onClick={() => setButtons(buttons.filter((el) => el.id !== button.id))}
 							/>
 						</Box>
 					)}
@@ -146,7 +159,13 @@ const VideoMessage = forwardRef<VideoMessageHandle, VideoMessageProps>(
 									size='sm'
 									onClick={() => {
 										if (!buttonText) return;
-										setButtons([...buttons, buttonText]);
+										setButtons([
+											...buttons,
+											{
+												id: randomString(),
+												text: buttonText,
+											},
+										]);
 										setButtonText('');
 									}}
 									isDisabled={buttons.length >= 3}

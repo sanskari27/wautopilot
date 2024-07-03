@@ -101,11 +101,7 @@ export default function CreateChatBotFlow() {
 					title: 'Data saved successfully',
 				};
 			},
-			error: (err) => {
-				console.log(err);
-
-				return { title: 'Error Saving Bot' };
-			},
+			error: { title: 'Error Saving Bot' },
 			loading: { title: 'Saving Data', description: 'Please wait' },
 		});
 	};
