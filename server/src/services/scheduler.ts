@@ -24,6 +24,7 @@ import ConversationService from './conversation';
 import TemplateService from './templates';
 import UserService from './user';
 import WhatsappLinkService from './whatsappLink';
+import { ChatBotFlowDB_name } from '../../mongo/repo/ChatbotFlow';
 
 export default class SchedulerService extends WhatsappLinkService {
 	public constructor(account: IAccount, whatsappLink: IWhatsappLink) {
@@ -365,7 +366,7 @@ export default class SchedulerService extends WhatsappLinkService {
 				status,
 			});
 
-			if (addedMessage && msg.scheduler_type === BroadcastDB_name) {
+			if (addedMessage && msg.scheduler_type === ChatBotFlowDB_name) {
 				ChatBotService.updateMessageId(msg.scheduler_id, {
 					prev_id: msg._id,
 					new_id: addedMessage._id,
