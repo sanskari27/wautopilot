@@ -82,7 +82,7 @@ export function extractInteractiveHeader(components: Record<string, any>) {
 	return {
 		header_type: type,
 		header_content_source: 'ID',
-		header_content: header[type].id,
+		header_content: header[header.type].id,
 	};
 }
 
