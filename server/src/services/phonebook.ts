@@ -53,16 +53,34 @@ export default class PhoneBookService extends UserService {
 	public async addRecords(details: Partial<Record>[]) {
 		const docs = await Promise.all(
 			details.map(async (record) => {
-				const doc = await PhoneBookDB.create({
-					...record,
-					phone_number: record.phone_number?.replace(/\D/g, '') ?? '',
+				const existingRecord = await PhoneBookDB.findOne({
+					phone_number: record.phone_number,
 					linked_to: this.userId,
 				});
-
-				return {
-					_id: doc._id,
-					...record,
-				};
+				let doc;
+				if (existingRecord) {
+					doc = await PhoneBookDB.updateOne(
+						{ _id: existingRecord._id },
+						{
+							others: { ...existingRecord.others, ...record.others },
+							phone_number: record.phone_number?.replace(/\D/g, '') ?? '',
+						}
+					);
+					return {
+						_id: existingRecord._id,
+						...record,
+					};
+				} else {
+					doc = await PhoneBookDB.create({
+						...record,
+						phone_number: record.phone_number?.replace(/\D/g, '') ?? '',
+						linked_to: this.userId,
+					});
+					return {
+						_id: doc._id,
+						...record,
+					};
+				}
 			})
 		);
 

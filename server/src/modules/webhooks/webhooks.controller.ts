@@ -98,6 +98,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				context: message.context,
 			});
 			chatBotService.handleMessage(recipient, message.text.body);
+			chatBotService.checkForFlowKeyword(recipient, message.text.body);
 		} else if (
 			message.type === 'image' ||
 			message.type === 'video' ||
@@ -165,6 +166,22 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 				status: MESSAGE_STATUS.DELIVERED,
 				context: message.context,
 			});
+			chatBotService.handleMessage(recipient, message.interactive?.list_reply?.title ?? '');
+			chatBotService.checkForFlowKeyword(recipient, message.interactive?.list_reply?.title ?? '');
+		} else if (message.interactive && message.interactive.type === 'button_reply') {
+			conversationService.addMessageToConversation(conversation_id, {
+				message_id: msgID,
+				recipient,
+				body: {
+					body_type: 'TEXT',
+					text: message.interactive?.button_reply?.title ?? '',
+				},
+				received_at: timestamp,
+				status: MESSAGE_STATUS.DELIVERED,
+				context: message.context,
+			});
+			chatBotService.handleMessage(recipient, message.interactive?.button_reply?.title ?? '');
+			chatBotService.checkForFlowKeyword(recipient, message.interactive?.button_reply?.title ?? '');
 		} else {
 			conversationService.addMessageToConversation(conversation_id, {
 				message_id: msgID,

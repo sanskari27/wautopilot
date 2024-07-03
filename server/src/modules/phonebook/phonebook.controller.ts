@@ -278,7 +278,7 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 		const created = await phoneBookService.addRecords(data);
 
 		const ids = created.map((record) => idValidator(record.id)[1]!);
-		await phoneBookService.setLabels(ids, labels);
+		await phoneBookService.addLabels(ids, labels);
 
 		return Respond({
 			res,

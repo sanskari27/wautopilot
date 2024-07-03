@@ -149,6 +149,7 @@ const AudioMessage = forwardRef<AudioMessageHandle, AudioMessageProps>(
 										setButtons([...buttons, buttonText]);
 										setButtonText('');
 									}}
+									isDisabled={buttons.length >= 3}
 								>
 									+ Add
 								</Button>

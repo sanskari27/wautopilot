@@ -72,3 +72,58 @@ export function extractButtons(components: Record<string, any>[]) {
 		button_data: button.text || button.url || button.phone_number,
 	}));
 }
+
+export function generateHeader(type: 'image' | 'video' | 'document', media_id: string) {
+	return {
+		header: {
+			type: type,
+			[type]: {
+				id: media_id,
+			},
+		},
+	};
+}
+
+export function generateBodyText(text: string) {
+	if (!text) {
+		return {};
+	}
+	return {
+		body: {
+			text: text,
+		},
+	};
+}
+
+export function generateSections(
+	sections: {
+		title: string;
+		buttons: string[];
+	}[]
+) {
+	return sections.map((section) => ({
+		title: section.title,
+		rows: section.buttons.map((button) => ({
+			id: button,
+			title: button,
+		})),
+	}));
+}
+
+export function generateButtons(buttons: string[]) {
+	return buttons.map((button) => ({
+		type: 'reply',
+		reply: {
+			id: button,
+			title: button,
+		},
+	}));
+}
+
+export function generateListBody(data: { [key: string]: string }) {
+	return {
+		...(data.header ? { header: { type: 'text', text: data.header } } : {}),
+		...(data.body ? { body: { text: data.body } } : {}),
+		...(data.footer ? { footer: { text: data.footer } } : {}),
+	};
+}

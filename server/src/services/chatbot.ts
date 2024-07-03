@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import Logger from 'n23-logger';
 import { ConversationMessageDB } from '../../mongo';
 import ChatBotDB, { ChatBotDB_name } from '../../mongo/repo/Chatbot';
-import ChatBotFlowDB from '../../mongo/repo/ChatbotFlow';
+import ChatBotFlowDB, { ChatBotFlowDB_name } from '../../mongo/repo/ChatbotFlow';
 import IAccount from '../../mongo/types/account';
 import IChatBot from '../../mongo/types/chatbot';
 import IChatBotFlow from '../../mongo/types/chatbotflow';
@@ -14,7 +14,15 @@ import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
 import DateUtils from '../utils/DateUtils';
 import { Delay, filterUndefinedKeys } from '../utils/ExpressUtils';
+import {
+	generateBodyText,
+	generateButtons,
+	generateHeader,
+	generateListBody,
+	generateSections,
+} from '../utils/MessageHelper';
 import TimeGenerator from '../utils/TimeGenerator';
+import MediaService from './media';
 import PhoneBookService from './phonebook';
 import SchedulerService from './scheduler';
 import WhatsappLinkService from './whatsappLink';
@@ -819,5 +827,199 @@ export default class ChatBotService extends WhatsappLinkService {
 
 	public async deleteFlow(bot_id: Types.ObjectId) {
 		await ChatBotFlowDB.deleteOne({ _id: bot_id });
+	}
+
+	private async flowsEngaged({
+		message_body,
+		recipient,
+	}: {
+		message_body: string;
+		recipient: string;
+	}) {
+		const phonebook = new PhoneBookService(this.account);
+		const contact = await phonebook.findRecordByPhone(recipient);
+		const bots = await this.allFlows();
+		const activeBots = bots.filter((bot) => bot.isActive);
+
+		return activeBots.filter((bot) => {
+			const is_recipient =
+				bot.respond_to === BOT_TRIGGER_TO.ALL ||
+				(bot.respond_to === BOT_TRIGGER_TO.SAVED_CONTACTS && !!contact) ||
+				(bot.respond_to === BOT_TRIGGER_TO.NON_SAVED_CONTACTS && !contact);
+
+			if (!is_recipient) {
+				return false;
+			}
+
+			if (bot.trigger === '') {
+				return true;
+			}
+			if (bot.options === BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE) {
+				return message_body.toLowerCase() === bot.trigger.toLowerCase();
+			}
+			if (bot.options === BOT_TRIGGER_OPTIONS.EXACT_MATCH_CASE) {
+				return message_body === bot.trigger;
+			}
+
+			if (bot.options === BOT_TRIGGER_OPTIONS.INCLUDES_IGNORE_CASE) {
+				const lowerCaseSentence = bot.trigger.toLowerCase();
+				const lowerCaseParagraph = message_body.toLowerCase();
+
+				// Split the paragraph into words
+				const words_paragraph = lowerCaseParagraph.split(/\s+/);
+				const sentence_paragraph = lowerCaseSentence.split(/\s+/);
+
+				return words_paragraph.some(
+					(_, index, arr) =>
+						arr.slice(index, index + sentence_paragraph.length).join() === sentence_paragraph.join()
+				);
+			}
+			if (bot.options === BOT_TRIGGER_OPTIONS.INCLUDES_MATCH_CASE) {
+				const lowerCaseSentence = bot.trigger;
+				const lowerCaseParagraph = message_body;
+
+				// Split the paragraph into words
+				const words_paragraph = lowerCaseParagraph.split(/\s+/);
+				const sentence_paragraph = lowerCaseSentence.split(/\s+/);
+
+				return words_paragraph.some(
+					(_, index, arr) =>
+						arr.slice(index, index + sentence_paragraph.length).join() === sentence_paragraph.join()
+				);
+			}
+
+			return false;
+		});
+	}
+
+	public async checkForFlowKeyword(recipient: string, text: string) {
+		const botsEngaged = await this.flowsEngaged({ message_body: text, recipient });
+		botsEngaged.forEach(async (bot) => {
+			const nodes = bot.nodes;
+			const edges = bot.edges;
+			const startNode = nodes.find((node) => node.type === 'startNode');
+			if (!startNode) {
+				return;
+			}
+			const connectedEdge = edges.find((edge) => edge.source === startNode.id);
+			if (!connectedEdge) {
+				return;
+			}
+			const nextNode = nodes.find((node) => node.id === connectedEdge.target);
+			if (!nextNode) {
+				return;
+			}
+			this.sendFlowMessage(recipient, bot.bot_id, nextNode.id);
+		});
+	}
+
+	public async handleFlowMessage(recipient: string, text: string) {
+		// const botsEngaged = await this.flowsEngaged({ message_body: text, recipient });
+	}
+
+	public async sendFlowMessage(recipient: string, bot_id: Types.ObjectId, node_id: string) {
+		const schedulerService = new SchedulerService(this.account, this.device);
+		const mediaService = new MediaService(this.account, this.device);
+		const bot = await ChatBotFlowDB.findOne({
+			_id: bot_id,
+			linked_to: this.userId,
+			device_id: this.deviceId,
+		});
+		if (!bot) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+		const node = bot.nodes.find((node) => node.id === node_id);
+		if (!node) {
+			return;
+		}
+		if (
+			node.node_type === 'imageNode' ||
+			node.node_type === 'videoNode' ||
+			node.node_type === 'documentNode' ||
+			node.node_type === 'audioNode'
+		) {
+			let type = node.node_type.replace('Node', '').toLowerCase() as
+				| 'image'
+				| 'video'
+				| 'audio'
+				| 'document';
+			if (type === 'audio') {
+				type = 'document';
+			}
+			const media = await mediaService.getMedia(node.data.id);
+			const msgObj = {
+				messaging_product: 'whatsapp',
+				to: recipient,
+				type: 'interactive',
+				interactive: {
+					type: 'button',
+					...generateHeader(type, media.media_id),
+					...generateBodyText(node.data.caption),
+					action: {
+						buttons: generateButtons(node.data.buttons),
+					},
+				},
+			};
+			await schedulerService.schedule(recipient, msgObj, {
+				scheduler_id: bot_id,
+				scheduler_type: ChatBotFlowDB_name,
+				sendAt: DateUtils.getMomentNow().toDate(),
+				message_type: 'interactive',
+			});
+		} else if (node.node_type === 'buttonNode') {
+			const msgObj = {
+				messaging_product: 'whatsapp',
+				to: recipient,
+				type: 'interactive',
+				interactive: {
+					type: 'button',
+					...generateBodyText(node.data.text),
+					action: {
+						buttons: generateButtons(node.data.buttons),
+					},
+				},
+			};
+			await schedulerService.schedule(recipient, msgObj, {
+				scheduler_id: bot_id,
+				scheduler_type: ChatBotFlowDB_name,
+				sendAt: DateUtils.getMomentNow().toDate(),
+				message_type: 'interactive',
+			});
+		} else if (node.node_type === 'textNode') {
+			const msgObj = {
+				messaging_product: 'whatsapp',
+				to: recipient,
+				type: 'text',
+				text: {
+					body: node.data.text,
+				},
+			};
+			await schedulerService.schedule(recipient, msgObj, {
+				scheduler_id: bot_id,
+				scheduler_type: ChatBotFlowDB_name,
+				sendAt: DateUtils.getMomentNow().toDate(),
+				message_type: 'normal',
+			});
+		} else if (node.node_type === 'listNode') {
+			const msgObj = {
+				messaging_product: 'whatsapp',
+				to: recipient,
+				type: 'interactive',
+				interactive: {
+					type: 'list',
+					...generateListBody(node.data),
+					action: {
+						button: 'Select an option',
+						sections: generateSections(node.data.sections),
+					},
+				},
+			};
+			await schedulerService.schedule(recipient, msgObj, {
+				scheduler_id: bot_id,
+				scheduler_type: ChatBotFlowDB_name,
+				sendAt: DateUtils.getMomentNow().toDate(),
+				message_type: 'interactive',
+			});
+		}
 	}
 }

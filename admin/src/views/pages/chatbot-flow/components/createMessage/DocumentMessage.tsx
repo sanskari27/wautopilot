@@ -144,6 +144,7 @@ const DocumentMessage = forwardRef<DocumentMessageHandle, DocumentMessageProps>(
 										setButtons([...buttons, buttonText]);
 										setButtonText('');
 									}}
+									isDisabled={buttons.length >= 3}
 								>
 									+ Add
 								</Button>

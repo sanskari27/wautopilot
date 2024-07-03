@@ -144,6 +144,7 @@ const ImageMessage = forwardRef<ImageMessageHandle, ImageMessageProps>(
 										setButtons([...buttons, buttonText]);
 										setButtonText('');
 									}}
+									isDisabled={buttons.length >= 3}
 								>
 									+ Add
 								</Button>

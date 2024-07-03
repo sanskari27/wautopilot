@@ -33,7 +33,7 @@ export default class SchedulerService extends WhatsappLinkService {
 			scheduler_id: Types.ObjectId;
 			scheduler_type: string;
 			sendAt: Date;
-			message_type: 'template' | 'normal';
+			message_type: 'template' | 'normal' | 'interactive';
 		}
 	) {
 		const message = await ScheduledMessageDB.create({

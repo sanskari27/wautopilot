@@ -133,6 +133,7 @@ const ButtonMessage = forwardRef<ButtonMessageHandle, ButtonMessageProps>(
 										setButtons([...buttons, buttonText]);
 										setButtonText('');
 									}}
+									isDisabled={buttons.length >= 3}
 								>
 									+ Add
 								</Button>

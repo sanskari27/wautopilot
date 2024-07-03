@@ -149,6 +149,7 @@ const VideoMessage = forwardRef<VideoMessageHandle, VideoMessageProps>(
 										setButtons([...buttons, buttonText]);
 										setButtonText('');
 									}}
+									isDisabled={buttons.length >= 3}
 								>
 									+ Add
 								</Button>
