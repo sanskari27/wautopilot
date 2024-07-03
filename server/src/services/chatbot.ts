@@ -1022,7 +1022,7 @@ export default class ChatBotService extends WhatsappLinkService {
 				to: recipient,
 				type: 'text',
 				text: {
-					body: node.data.text,
+					body: node.data.label,
 				},
 			};
 			message_id = await schedulerService.schedule(recipient, msgObj, {
