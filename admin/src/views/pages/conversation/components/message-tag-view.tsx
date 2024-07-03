@@ -10,10 +10,10 @@ import {
 	Tag,
 	useBoolean,
 } from '@chakra-ui/react';
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { Message } from '../../../../store/types/MessageState';
 import Each from '../../../components/utils/Each';
-import ChatMessage, { ChatMessageHandle } from './chat-message';
+import ChatMessage from './chat-message';
 
 export type MessageTagsViewHandle = {
 	close: () => void;
@@ -23,8 +23,6 @@ export type MessageTagsViewHandle = {
 const initialMessageState: Message[] = [];
 
 const MessageTagsView = forwardRef<MessageTagsViewHandle>((_, ref) => {
-	const messageRefs = useRef<{ [key: string]: ChatMessageHandle | null }>({});
-
 	const [isOpen, setOpen] = useBoolean();
 	const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 	const [labels, setLabels] = useState<string[]>([]);
@@ -46,12 +44,6 @@ const MessageTagsView = forwardRef<MessageTagsViewHandle>((_, ref) => {
 			setOpen.on();
 		},
 	}));
-
-	const scrollToMessage = (id: string) => {
-		if (messageRefs.current[id]) {
-			messageRefs.current[id]?.scrollTo();
-		}
-	};
 
 	const handleLabelsChange = (labels: string[]) => {
 		setSelectedLabels(labels);
@@ -104,11 +96,8 @@ const MessageTagsView = forwardRef<MessageTagsViewHandle>((_, ref) => {
 								<Each
 									items={filteredMessages}
 									render={(item) => (
-										<Flex width={'full'} onClick={() => scrollToMessage(item._id)}>
-											<ChatMessage
-												ref={(ref) => (messageRefs.current[item._id] = ref)}
-												message={item}
-											/>
+										<Flex width={'full'}>
+											<ChatMessage message={item} />
 										</Flex>
 									)}
 								/>
