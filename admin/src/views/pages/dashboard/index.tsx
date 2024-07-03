@@ -72,7 +72,7 @@ export default function Dashboard() {
 					</Flex>
 				</Flex>
 			</Flex>
-			<Flex gap={'1rem'} className='flex-col md:flex-row'>
+			<Flex gap={'1rem'} className='flex-col md:flex-row-reverse'>
 				<Box
 					shadow={'lg'}
 					rounded={'3xl'}
