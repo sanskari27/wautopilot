@@ -17,6 +17,8 @@ export default function TotalConversations() {
 			bgColor={'wheat'}
 			pt={'8%'}
 			flex={1}
+			width={'200px'}
+			maxWidth={'200px'}
 		>
 			<StatLabel>Total Conversations</StatLabel>
 			<StatNumber>{list.length}</StatNumber>

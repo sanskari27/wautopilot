@@ -1,16 +1,32 @@
 import { Box, Flex, Text } from '@chakra-ui/react';
-import NumberHealth from './components/NumberHealth';
+import { useSelector } from 'react-redux';
+import { StoreNames, StoreState } from '../../../store';
+import { getFileSize } from '../../../utils/file-utils';
 import ConversationOverview from './components/OverviewConversation';
 import MessagesOverview from './components/OverviewMessages';
-import PendingMessages from './components/StatsChatbotFlows';
-import Chatbots from './components/StatsChatbots';
-import PhonebookContact from './components/StatsContactsPhonebook';
-import MediaStorage from './components/StatsMediaStorage';
-import TemplateStats from './components/StatsTemplates';
+import StatsTemplate from './components/StatsTemplate';
 import TotalConversations from './components/StatsTotalConversations';
-import WalletBalance from './components/WalletBalance';
 
 export default function Dashboard() {
+	const {
+		user_details: { walletBalance },
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
+
+	const {
+		details: { health, phoneRecords, mediaSize },
+	} = useSelector((state: StoreState) => state[StoreNames.DASHBOARD]);
+
+	const { list: templateList } = useSelector((state: StoreState) => state[StoreNames.TEMPLATES]);
+	const approvedTemplateList = templateList.map((template) => template.status === 'approved');
+
+	const { list: chatbotList } = useSelector((state: StoreState) => state[StoreNames.CHATBOT]);
+	const activeChatbots = chatbotList.filter((chatbot) => chatbot.isActive);
+
+	const { list: chatbotFlows } = useSelector((state: StoreState) => state[StoreNames.CHATBOT_FLOW]);
+	const activeChatbotFlows = chatbotFlows.filter((chatbotFlow) => chatbotFlow.isActive);
+
+	const { list: contactList } = useSelector((state: StoreState) => state[StoreNames.CONTACT]);
+
 	return (
 		<Flex
 			direction={'column'}
@@ -28,19 +44,31 @@ export default function Dashboard() {
 					rounded={'3xl'}
 					p={'1rem'}
 					height={'420px'}
-					className='md:w-3/4 w-full'
+					className='w-full'
 					bgColor={'whitesmoke'}
 				>
 					<ConversationOverview />
 				</Box>
-				<Flex direction={'column'} className='md:w-1/4 w-full' gap={'1rem'}>
+				<Flex direction={'column'} gap={'1rem'}>
 					<Flex gap={'1rem'}>
-						<WalletBalance />
-						<NumberHealth />
+						<StatsTemplate
+							label={'Wallet Balance'}
+							value={'₹' + walletBalance}
+							bgColor={'blue.200'}
+						/>
+						<StatsTemplate
+							label={'Number Health'}
+							value={health}
+							bgColor={`${health.toLocaleLowerCase()}.200`}
+						/>
 					</Flex>
 					<Flex gap={'1rem'}>
 						<TotalConversations />
-						<MediaStorage />
+						<StatsTemplate
+							label={'Media Storage'}
+							value={getFileSize(mediaSize)}
+							bgColor={'thistle'}
+						/>
 					</Flex>
 				</Flex>
 			</Flex>
@@ -50,19 +78,35 @@ export default function Dashboard() {
 					rounded={'3xl'}
 					p={'1rem'}
 					height={'420px'}
-					className='md:w-3/4 w-full'
+					className='w-full'
 					bgColor={'whitesmoke'}
 				>
 					<MessagesOverview />
 				</Box>
-				<Flex direction={'column'} className='md:w-1/4 w-full' gap={'1rem'}>
+				<Flex direction={'column'} gap={'1rem'}>
 					<Flex gap={'1rem'}>
-						<TemplateStats />
-						<PhonebookContact />
+						<StatsTemplate
+							label='Templates(Approved)'
+							value={`${templateList.length.toString()}(${approvedTemplateList.length.toString()})`}
+							bgColor='blue.200'
+						/>
+						<StatsTemplate
+							label='Phonebook/Contacts'
+							value={`${phoneRecords}/${contactList.length.toString()}`}
+							bgColor='blue.200'
+						/>
 					</Flex>
 					<Flex gap={'1rem'}>
-						<Chatbots />
-						<PendingMessages />
+						<StatsTemplate
+							label='Chatbots(Active)'
+							value={`${chatbotList.length.toString()}(${activeChatbots.length.toString()})`}
+							bgColor='turquoise'
+						/>
+						<StatsTemplate
+							label='Flows(Active)'
+							value={`${chatbotFlows.length.toString()}(${activeChatbotFlows.length.toString()})`}
+							bgColor='cornsilk'
+						/>
 					</Flex>
 				</Flex>
 			</Flex>
