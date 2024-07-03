@@ -175,3 +175,7 @@ export function generateListBody(data: { [key: string]: string }) {
 		...(data.footer ? { footer: { text: data.footer } } : {}),
 	};
 }
+
+export function convertToId(text: string) {
+	return text.replace(/\s/g, '-').toLowerCase();
+}

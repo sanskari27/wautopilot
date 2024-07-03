@@ -182,6 +182,11 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 			});
 			chatBotService.handleMessage(recipient, message.interactive?.button_reply?.title ?? '');
 			chatBotService.checkForFlowKeyword(recipient, message.interactive?.button_reply?.title ?? '');
+			chatBotService.continueFlow(
+				recipient,
+				message.context.id,
+				message.interactive?.button_reply?.title ?? ''
+			);
 		} else {
 			conversationService.addMessageToConversation(conversation_id, {
 				message_id: msgID,

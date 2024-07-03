@@ -19,6 +19,7 @@ import {
 	extractTemplateHeader,
 } from '../utils/MessageHelper';
 import BroadcastService from './broadcast';
+import ChatBotService from './chatbot';
 import ConversationService from './conversation';
 import TemplateService from './templates';
 import UserService from './user';
@@ -343,12 +344,6 @@ export default class SchedulerService extends WhatsappLinkService {
 					status = MESSAGE_STATUS.FAILED;
 				}
 			}
-			// Logger.debug({
-			// 	failed_at,
-			// 	failed_reason,
-			// 	status,
-			// 	message_id,
-			// });
 			const header = extractInteractiveHeader(msg.messageObject.interactive);
 			const body = extractInteractiveBody(msg.messageObject.interactive);
 			const footer = extractInteractiveFooter(msg.messageObject.interactive);
@@ -371,9 +366,10 @@ export default class SchedulerService extends WhatsappLinkService {
 			});
 
 			if (addedMessage && msg.scheduler_type === BroadcastDB_name) {
-				BroadcastService.updateBroadcastMessageId(msg.scheduler_id, {
+				ChatBotService.updateMessageId(msg.scheduler_id, {
 					prev_id: msg._id,
 					new_id: addedMessage._id,
+					meta_message_id: message_id,
 				});
 			}
 			msg.remove();

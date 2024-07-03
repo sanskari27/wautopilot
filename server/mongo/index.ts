@@ -2,15 +2,20 @@ import mongoose from 'mongoose';
 export {
 	AccountDB,
 	BroadcastDB,
+	ChatbotDB,
+	ChatbotFlowDB,
 	ContactDB,
 	ConversationDB,
 	ConversationMessageDB,
+	CouponDB,
+	FlowMessagesDB,
 	MediaDB,
 	PhoneBookDB,
 	PlanDB,
 	ScheduledMessageDB,
 	SessionDB,
 	StorageDB,
+	WalletTransactionDB,
 	WhatsappLinkDB,
 } from './repo';
 

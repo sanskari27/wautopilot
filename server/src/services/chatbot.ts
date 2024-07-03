@@ -3,6 +3,7 @@ import Logger from 'n23-logger';
 import { ConversationMessageDB } from '../../mongo';
 import ChatBotDB, { ChatBotDB_name } from '../../mongo/repo/Chatbot';
 import ChatBotFlowDB, { ChatBotFlowDB_name } from '../../mongo/repo/ChatbotFlow';
+import FlowMessageDB from '../../mongo/repo/FlowMessages';
 import IAccount from '../../mongo/types/account';
 import IChatBot from '../../mongo/types/chatbot';
 import IChatBotFlow from '../../mongo/types/chatbotflow';
@@ -15,6 +16,7 @@ import COMMON_ERRORS from '../errors/common-errors';
 import DateUtils from '../utils/DateUtils';
 import { Delay, filterUndefinedKeys } from '../utils/ExpressUtils';
 import {
+	convertToId,
 	generateBodyText,
 	generateButtons,
 	generateHeader,
@@ -913,8 +915,36 @@ export default class ChatBotService extends WhatsappLinkService {
 		});
 	}
 
-	public async handleFlowMessage(recipient: string, text: string) {
-		// const botsEngaged = await this.flowsEngaged({ message_body: text, recipient });
+	public async continueFlow(recipient: string, meta_message_id: string, text: string) {
+		const flowMessage = await FlowMessageDB.findOne({ meta_message_id });
+		if (!flowMessage) {
+			return;
+		}
+
+		const bot = await ChatBotFlowDB.findOne({
+			_id: flowMessage.bot_id,
+			linked_to: this.userId,
+			device_id: this.deviceId,
+		});
+		if (!bot) {
+			return;
+		}
+
+		const node_id = flowMessage.node_id;
+
+		const possibleEdge = bot.edges.find(
+			(edge) => edge.source === node_id && edge.sourceHandle === convertToId(text)
+		);
+		if (!possibleEdge) {
+			return;
+		}
+
+		const targetNode = bot.nodes.find((node) => node.id === possibleEdge.target);
+		if (!targetNode) {
+			return;
+		}
+
+		this.sendFlowMessage(recipient, bot._id, targetNode.id);
 	}
 
 	public async sendFlowMessage(recipient: string, bot_id: Types.ObjectId, node_id: string) {
@@ -932,6 +962,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		if (!node) {
 			return;
 		}
+		let message_id;
 		if (
 			node.node_type === 'imageNode' ||
 			node.node_type === 'videoNode' ||
@@ -960,7 +991,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					},
 				},
 			};
-			await schedulerService.schedule(recipient, msgObj, {
+			message_id = await schedulerService.schedule(recipient, msgObj, {
 				scheduler_id: bot_id,
 				scheduler_type: ChatBotFlowDB_name,
 				sendAt: DateUtils.getMomentNow().toDate(),
@@ -979,7 +1010,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					},
 				},
 			};
-			await schedulerService.schedule(recipient, msgObj, {
+			message_id = await schedulerService.schedule(recipient, msgObj, {
 				scheduler_id: bot_id,
 				scheduler_type: ChatBotFlowDB_name,
 				sendAt: DateUtils.getMomentNow().toDate(),
@@ -994,7 +1025,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					body: node.data.text,
 				},
 			};
-			await schedulerService.schedule(recipient, msgObj, {
+			message_id = await schedulerService.schedule(recipient, msgObj, {
 				scheduler_id: bot_id,
 				scheduler_type: ChatBotFlowDB_name,
 				sendAt: DateUtils.getMomentNow().toDate(),
@@ -1014,12 +1045,48 @@ export default class ChatBotService extends WhatsappLinkService {
 					},
 				},
 			};
-			await schedulerService.schedule(recipient, msgObj, {
+			message_id = await schedulerService.schedule(recipient, msgObj, {
 				scheduler_id: bot_id,
 				scheduler_type: ChatBotFlowDB_name,
 				sendAt: DateUtils.getMomentNow().toDate(),
 				message_type: 'interactive',
 			});
+		} else {
+			return;
 		}
+
+		await FlowMessageDB.create({
+			linked_to: this.userId,
+			device_id: this.deviceId,
+			bot_id,
+			message_id,
+			recipient,
+			node_id,
+		});
+		// recipient, bot_id, node_id, message_id
+	}
+
+	public static async updateMessageId(
+		chatbot_id: Types.ObjectId,
+		{
+			prev_id,
+			new_id,
+			meta_message_id,
+		}: {
+			prev_id: Types.ObjectId;
+			new_id: Types.ObjectId;
+			meta_message_id?: string;
+		}
+	) {
+		await FlowMessageDB.updateOne(
+			{
+				_id: chatbot_id,
+				message_id: prev_id,
+			},
+			{
+				message_id: new_id,
+				meta_message_id,
+			}
+		);
 	}
 }

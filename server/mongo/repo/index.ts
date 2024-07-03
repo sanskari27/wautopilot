@@ -1,12 +1,17 @@
 export { default as AccountDB } from './Account';
 export { default as BroadcastDB } from './Broadcast';
+export { default as ChatbotDB } from './Chatbot';
+export { default as ChatbotFlowDB } from './ChatbotFlow';
 export { default as ContactDB } from './Contact';
 export { default as ConversationDB } from './Conversation';
 export { default as ConversationMessageDB } from './ConversationMessage';
+export { default as CouponDB } from './Coupon';
+export { default as FlowMessagesDB } from './FlowMessages';
 export { default as MediaDB } from './Media';
 export { default as PhoneBookDB } from './PhoneBook';
 export { default as PlanDB } from './Plan';
 export { default as ScheduledMessageDB } from './ScheduledMessage';
 export { default as SessionDB } from './Session';
 export { default as StorageDB } from './Storage';
+export { default as WalletTransactionDB } from './WalletTransaction';
 export { default as WhatsappLinkDB } from './WhatsappLink';
