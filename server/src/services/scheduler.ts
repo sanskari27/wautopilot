@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Types } from 'mongoose';
+import Logger from 'n23-logger';
 import { ScheduledMessageDB } from '../../mongo';
 import { BroadcastDB_name } from '../../mongo/repo/Broadcast';
 import IAccount from '../../mongo/types/account';
@@ -7,6 +8,7 @@ import IWhatsappLink from '../../mongo/types/whatsapplink';
 import MetaAPI from '../config/MetaAPI';
 import { IS_PRODUCTION, MESSAGE_STATUS } from '../config/const';
 import DateUtils from '../utils/DateUtils';
+import { generateRandomID } from '../utils/ExpressUtils';
 import { extractBody, extractButtons, extractFooter, extractHeader } from '../utils/MessageHelper';
 import BroadcastService from './broadcast';
 import ConversationService from './conversation';
@@ -102,6 +104,7 @@ export default class SchedulerService extends WhatsappLinkService {
 			let message_id: string | undefined = undefined;
 
 			if (userService.walletBalance < userService.markupPrice) {
+				message_id = generateRandomID();
 				failed_at = DateUtils.getMomentNow().toDate();
 				failed_reason = 'Insufficient balance';
 				status = MESSAGE_STATUS.FAILED;
@@ -200,6 +203,7 @@ export default class SchedulerService extends WhatsappLinkService {
 			let message_id: string | undefined = undefined;
 
 			if (userService.walletBalance < userService.markupPrice) {
+				message_id = generateRandomID();
 				failed_at = DateUtils.getMomentNow().toDate();
 				failed_reason = 'Insufficient balance';
 				status = MESSAGE_STATUS.FAILED;
@@ -263,6 +267,104 @@ export default class SchedulerService extends WhatsappLinkService {
 				});
 			}
 			msg.remove();
+		});
+	}
+
+	public static async sendScheduledInteractiveMessages() {
+		if (!IS_PRODUCTION) return;
+		let docs;
+		try {
+			docs = await ScheduledMessageDB.find({
+				sendAt: { $lte: new Date() },
+				status: MESSAGE_STATUS.PENDING,
+				message_type: 'interactive',
+			}).populate<{
+				device_id: IWhatsappLink;
+				linked_to: IAccount;
+			}>('device_id linked_to');
+		} catch (err) {
+			return;
+		}
+		const message_ids = docs.map((msg) => msg._id);
+
+		await ScheduledMessageDB.updateMany(
+			{ _id: { $in: message_ids } },
+			{
+				$set: {
+					status: MESSAGE_STATUS.PROCESSING,
+				},
+			}
+		);
+
+		docs.forEach(async (msg) => {
+			// const conversationService = new ConversationService(msg.linked_to, msg.device_id);
+			const userService = new UserService(msg.linked_to);
+
+			// const c_id = await conversationService.createConversation(msg.to);
+
+			let failed_at: Date | undefined = undefined;
+			let failed_reason: string | undefined = undefined;
+			let status = MESSAGE_STATUS.PROCESSING;
+			let message_id: string | undefined = undefined;
+
+			if (userService.walletBalance < userService.markupPrice) {
+				failed_at = DateUtils.getMomentNow().toDate();
+				failed_reason = 'Insufficient balance';
+				status = MESSAGE_STATUS.FAILED;
+			} else {
+				try {
+					const { data } = await MetaAPI(msg.device_id.accessToken).post(
+						`${msg.device_id.phoneNumberId}/messages`,
+						{
+							messaging_product: 'whatsapp',
+							to: msg.to,
+							recipient_type: 'individual',
+							type: 'interactive',
+							interactive: msg.messageObject.interactive,
+						}
+					);
+					message_id = data.messages[0].id;
+					userService.deductCredit(1);
+				} catch (err) {
+					if (axios.isAxiosError(err)) {
+						failed_reason = JSON.stringify(err.response?.data ?? '') as string;
+					} else {
+						failed_reason = (err as any).message as string;
+					}
+					failed_at = DateUtils.getMomentNow().toDate();
+					status = MESSAGE_STATUS.FAILED;
+				}
+			}
+			Logger.debug({
+				failed_at,
+				failed_reason,
+				status,
+				message_id,
+			});
+
+			// const addedMessage = await conversationService.addMessageToConversation(c_id, {
+			// 	recipient: msg.to,
+			// 	message_id: message_id,
+			// 	...(header ? { ...header } : {}),
+			// 	...(body ? { body: { body_type: 'TEXT', text: body } } : {}),
+			// 	...(footer ? { footer_content: footer } : {}),
+			// 	...(buttons ? { buttons } : {}),
+			// 	scheduled_by: {
+			// 		id: msg.scheduler_id,
+			// 		name: msg.scheduler_type,
+			// 	},
+			// 	failed_at,
+			// 	failed_reason,
+			// 	status,
+			// });
+
+			// if (addedMessage && msg.scheduler_type === BroadcastDB_name) {
+			// 	BroadcastService.updateBroadcastMessageId(msg.scheduler_id, {
+			// 		prev_id: msg._id,
+			// 		new_id: addedMessage._id,
+			// 	});
+			// }
+			// msg.remove();
 		});
 	}
 

@@ -117,9 +117,10 @@ export default function (app: Express) {
 		});
 		next();
 	});
-	cron.schedule('*/5 * * * * *', () => {
+	cron.schedule('*/2 * * * * *', () => {
 		SchedulerService.sendScheduledTemplateMessages();
 		SchedulerService.sendScheduledMessages();
+		SchedulerService.sendScheduledInteractiveMessages();
 	});
 	createDir();
 }

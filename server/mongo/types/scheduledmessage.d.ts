@@ -22,7 +22,7 @@ export default interface IScheduledMessage extends Document {
 	createdAt: Date;
 	sendAt: Date;
 
-	message_type: 'normal' | 'template';
+	message_type: 'normal' | 'template' | 'interactive';
 	messageObject: {
 		[key: string]: any;
 	};
