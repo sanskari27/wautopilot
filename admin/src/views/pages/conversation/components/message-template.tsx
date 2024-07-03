@@ -12,7 +12,7 @@ import {
 	Text,
 	useToast,
 } from '@chakra-ui/react';
-import { RefObject, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BiErrorCircle } from 'react-icons/bi';
 import { HiLocationMarker } from 'react-icons/hi';
 import { MdOutlinePermMedia } from 'react-icons/md';
@@ -30,15 +30,7 @@ import Each from '../../../components/utils/Each';
 import Preview from '../../media/preview.component';
 import ChatMessageWrapper from './message-wrapper';
 
-export const TextMessage = ({
-	message,
-	ref,
-	id,
-}: {
-	message: Message;
-	ref: RefObject<HTMLDivElement>;
-	id: string;
-}) => {
+export const TextMessage = ({ message }: { message: Message }) => {
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const [media, setMedia] = useState(initialState);
@@ -101,15 +93,7 @@ export const TextMessage = ({
 	);
 };
 
-export const LocationMessage = ({
-	message,
-	ref,
-	id,
-}: {
-	message: Message;
-	ref: RefObject<HTMLDivElement>;
-	id: string;
-}) => {
+export const LocationMessage = ({ message }: { message: Message }) => {
 	return (
 		<ChatMessageWrapper message={message}>
 			<Link
@@ -146,15 +130,7 @@ const initialState = {
 	loaded: false,
 	size: 0,
 };
-export const MediaMessage = ({
-	message,
-	ref,
-	id,
-}: {
-	message: Message;
-	ref: RefObject<HTMLDivElement>;
-	id: string;
-}) => {
+export const MediaMessage = ({ message }: { message: Message }) => {
 	const toast = useToast();
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const [media, setMedia] = useState(initialState);
@@ -279,15 +255,7 @@ export const MediaMessage = ({
 	);
 };
 
-export const ContactMessage = ({
-	message,
-	ref,
-	id,
-}: {
-	message: Message;
-	ref: RefObject<HTMLDivElement>;
-	id: string;
-}) => {
+export const ContactMessage = ({ message }: { message: Message }) => {
 	const contactDrawerRef = useRef<ContactHandle>(null);
 	return (
 		<Each
@@ -325,15 +293,7 @@ export const ContactMessage = ({
 	);
 };
 
-export const UnknownMessage = ({
-	message,
-	ref,
-	id,
-}: {
-	message: Message;
-	ref: RefObject<HTMLDivElement>;
-	id: string;
-}) => {
+export const UnknownMessage = ({ message }: { message: Message }) => {
 	return (
 		<ChatMessageWrapper message={message}>
 			<HStack>

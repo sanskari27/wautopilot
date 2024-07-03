@@ -280,9 +280,7 @@ export default function CreateChatBot() {
 					title: 'Data saved successfully',
 				};
 			},
-			error: (err) => {
-				return { title: 'Error Saving Bot' };
-			},
+			error: { title: 'Error Saving Bot' },
 			loading: { title: 'Saving Data', description: 'Please wait' },
 		});
 	};

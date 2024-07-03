@@ -925,7 +925,7 @@ export default class ChatBotService extends WhatsappLinkService {
 			linked_to: this.userId,
 			device_id: this.deviceId,
 		});
-		if (!bot) {
+		if (!bot || !bot.active) {
 			return;
 		}
 
