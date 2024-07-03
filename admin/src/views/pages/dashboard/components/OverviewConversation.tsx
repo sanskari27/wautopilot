@@ -39,7 +39,6 @@ export default function ConversationOverview() {
 				height='400px'
 				data={chartData()}
 				options={{
-					title: 'Conversation Overview',
 					hAxis: { titleTextStyle: { color: '#333' } },
 					vAxis: { minValue: 0 },
 					chartArea: { width: '90%', height: '60%' },
