@@ -97,9 +97,9 @@ const Conversation = () => {
 
 		socket.on('message_new', (msg) => {
 			dispatch(addMessage(msg));
-			if (msg.received_at) {
-				MessagesService.markRead(selected_device_id, msg.message_id);
-			}
+			// if (msg.received_at) {
+			// 	MessagesService.markRead(selected_device_id, msg.message_id);
+			// }
 		});
 
 		socket.on('message_updated', (msg) => {

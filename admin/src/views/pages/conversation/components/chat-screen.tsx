@@ -87,12 +87,12 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 				dispatch(setMessageLabels(data.messageLabels));
 				dispatch(setMessagesLoading(false));
 
-				for (const msg of data.messages) {
-					if (msg.received_at) {
-						MessagesService.markRead(selected_device_id, msg.message_id);
-						break;
-					}
-				}
+				// for (const msg of data.messages) {
+				// 	if (msg.received_at) {
+				// 		MessagesService.markRead(selected_device_id, msg.message_id);
+				// 		break;
+				// 	}
+				// }
 			}
 		);
 	}, [dispatch, selected_device_id, selected_recipient]);

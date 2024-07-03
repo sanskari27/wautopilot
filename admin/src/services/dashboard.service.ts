@@ -19,7 +19,7 @@ export class DashboardService {
 					data.messages.map((message: any) => {
 						return {
 							month: message.month ?? 0,
-							year: message.year ?? 0,
+							day: message.day ?? 0,
 							count: message.count ?? 0,
 						};
 					}) ?? [],

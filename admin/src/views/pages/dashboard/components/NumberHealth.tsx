@@ -1,29 +1,28 @@
-import { Flex, Text } from '@chakra-ui/react';
+import { Box, Stat, StatLabel, StatNumber } from '@chakra-ui/react';
 import { useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
 
 export default function NumberHealth() {
-	const { health } = useSelector((state: StoreState) => state[StoreNames.DASHBOARD]);
+	const {
+		details: { health },
+		ui: { isLoading },
+	} = useSelector((state: StoreState) => state[StoreNames.DASHBOARD]);
 
-	console.log(health);
+	if (isLoading) {
+		return <Box>Loading</Box>;
+	}
 
 	return (
-		<Flex
-			direction={'column'}
-			alignItems={'center'}
-			justifyContent={'center'}
+		<Stat
 			shadow={'lg'}
 			rounded={'3xl'}
 			height={'200px'}
-			backgroundColor={'lightskyblue'}
 			textAlign={'center'}
+			bgColor={`${health.toLowerCase()}.300`}
+			pt={'12%'}
 		>
-			<Text fontSize={'1.5rem'} color={'darkslateblue'}>
-				Number Health
-			</Text>
-			<Text fontSize={'2.5rem'} color={'steelblue'}>
-				{health}
-			</Text>
-		</Flex>
+			<StatLabel>Number Health</StatLabel>
+			<StatNumber color={`${health.toLowerCase()}.700`}>{health}</StatNumber>
+		</Stat>
 	);
 }

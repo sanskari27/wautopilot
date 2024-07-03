@@ -1,4 +1,4 @@
-import { Flex, Text } from '@chakra-ui/react';
+import { Stat, StatLabel, StatNumber } from '@chakra-ui/react';
 import { useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
 
@@ -8,22 +8,16 @@ export default function WalletBalance() {
 	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	return (
-		<Flex
-			direction={'column'}
-			alignItems={'center'}
-			justifyContent={'center'}
+		<Stat
 			shadow={'lg'}
 			rounded={'3xl'}
 			height={'200px'}
-			backgroundColor={'lightskyblue'}
 			textAlign={'center'}
+			bgColor={'blue.200'}
+			pt={'12%'}
 		>
-			<Text fontSize={'1.5rem'} color={'darkslateblue'}>
-				Wallet Balance
-			</Text>
-			<Text fontSize={'2.5rem'} color={'steelblue'}>
-				₹{walletBalance}
-			</Text>
-		</Flex>
+			<StatLabel>Wallet Balance</StatLabel>
+			<StatNumber>₹{walletBalance}</StatNumber>
+		</Stat>
 	);
 }
