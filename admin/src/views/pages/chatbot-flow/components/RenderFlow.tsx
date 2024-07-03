@@ -115,6 +115,13 @@ export default function RenderFlow() {
 
 		if (details.type === 'START') {
 			node.type = 'startNode';
+			const startNodeExists = nodes.some((n) => n.type === 'startNode');
+			if (startNodeExists) {
+				return toast({
+					title: 'Start flow already exists.',
+					status: 'warning',
+				});
+			}
 		} else if (details.type === 'TEXT') {
 			node.type = 'textNode';
 			node.data = { label: details.data };
