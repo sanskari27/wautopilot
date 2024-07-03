@@ -1,4 +1,4 @@
-export function extractHeader(
+export function extractTemplateHeader(
 	components: Record<string, any>[],
 	componentsMsg: Record<string, any>[]
 ) {
@@ -34,7 +34,7 @@ export function extractHeader(
 	return null;
 }
 
-export function extractBody(
+export function extractTemplateBody(
 	components: Record<string, any>[],
 	componentsMsg: Record<string, any>[]
 ) {
@@ -53,7 +53,7 @@ export function extractBody(
 	}, (body.text as string) ?? '');
 }
 
-export function extractFooter(components: Record<string, any>[]) {
+export function extractTemplateFooter(components: Record<string, any>[]) {
 	const footer = components.find((component) => component.type === 'FOOTER');
 	if (!footer) {
 		return null;
@@ -61,7 +61,7 @@ export function extractFooter(components: Record<string, any>[]) {
 	return footer.text;
 }
 
-export function extractButtons(components: Record<string, any>[]) {
+export function extractTemplateButtons(components: Record<string, any>[]) {
 	const buttons = components.find((component) => component.type === 'BUTTONS');
 	if (!buttons || buttons.buttons.length === 0) {
 		return null;
@@ -70,6 +70,54 @@ export function extractButtons(components: Record<string, any>[]) {
 		button_type: button.type,
 		button_content: button.text,
 		button_data: button.text || button.url || button.phone_number,
+	}));
+}
+
+export function extractInteractiveHeader(components: Record<string, any>) {
+	const header = components.header;
+	if (!header) {
+		return null;
+	}
+	const type = header.type.toUpperCase();
+	return {
+		header_type: type,
+		header_content_source: 'ID',
+		header_content: header[type].id,
+	};
+}
+
+export function extractInteractiveBody(components: Record<string, any>) {
+	const body = components.body;
+	if (!body) {
+		return null;
+	}
+
+	return body.text;
+}
+
+export function extractInteractiveFooter(components: Record<string, any>) {
+	const footer = components.footer;
+	if (!footer) {
+		return null;
+	}
+
+	return footer.text;
+}
+
+export function extractInteractiveButtons(components: Record<string, any>) {
+	const buttons =
+		(components.action.buttons as {
+			type: string;
+			reply: {
+				id: string;
+				title: string;
+			};
+		}[]) ?? [];
+
+	return buttons.map((button) => ({
+		button_type: 'QUICK_REPLY' as 'QUICK_REPLY' | 'URL' | 'PHONE_NUMBER',
+		button_content: button.reply.title,
+		button_data: button.reply.id,
 	}));
 }
 

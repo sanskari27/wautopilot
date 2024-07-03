@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { Types } from 'mongoose';
-import Logger from 'n23-logger';
 import { ScheduledMessageDB } from '../../mongo';
 import { BroadcastDB_name } from '../../mongo/repo/Broadcast';
 import IAccount from '../../mongo/types/account';
@@ -9,7 +8,16 @@ import MetaAPI from '../config/MetaAPI';
 import { IS_PRODUCTION, MESSAGE_STATUS } from '../config/const';
 import DateUtils from '../utils/DateUtils';
 import { generateRandomID } from '../utils/ExpressUtils';
-import { extractBody, extractButtons, extractFooter, extractHeader } from '../utils/MessageHelper';
+import {
+	extractInteractiveBody,
+	extractInteractiveButtons,
+	extractInteractiveFooter,
+	extractInteractiveHeader,
+	extractTemplateBody,
+	extractTemplateButtons,
+	extractTemplateFooter,
+	extractTemplateHeader,
+} from '../utils/MessageHelper';
 import BroadcastService from './broadcast';
 import ConversationService from './conversation';
 import TemplateService from './templates';
@@ -93,10 +101,10 @@ export default class SchedulerService extends WhatsappLinkService {
 			}
 
 			const c_id = await conversationService.createConversation(msg.to);
-			const header = extractHeader(template.components, msg.messageObject.components);
-			const body = extractBody(template.components, msg.messageObject.components);
-			const footer = extractFooter(template.components);
-			const buttons = extractButtons(template.components);
+			const header = extractTemplateHeader(template.components, msg.messageObject.components);
+			const body = extractTemplateBody(template.components, msg.messageObject.components);
+			const footer = extractTemplateFooter(template.components);
+			const buttons = extractTemplateButtons(template.components);
 
 			let failed_at: Date | undefined = undefined;
 			let failed_reason: string | undefined = undefined;
@@ -297,10 +305,10 @@ export default class SchedulerService extends WhatsappLinkService {
 		);
 
 		docs.forEach(async (msg) => {
-			// const conversationService = new ConversationService(msg.linked_to, msg.device_id);
+			const conversationService = new ConversationService(msg.linked_to, msg.device_id);
 			const userService = new UserService(msg.linked_to);
 
-			// const c_id = await conversationService.createConversation(msg.to);
+			const c_id = await conversationService.createConversation(msg.to);
 
 			let failed_at: Date | undefined = undefined;
 			let failed_reason: string | undefined = undefined;
@@ -335,36 +343,40 @@ export default class SchedulerService extends WhatsappLinkService {
 					status = MESSAGE_STATUS.FAILED;
 				}
 			}
-			Logger.debug({
-				failed_at,
-				failed_reason,
-				status,
-				message_id,
-			});
-
-			// const addedMessage = await conversationService.addMessageToConversation(c_id, {
-			// 	recipient: msg.to,
-			// 	message_id: message_id,
-			// 	...(header ? { ...header } : {}),
-			// 	...(body ? { body: { body_type: 'TEXT', text: body } } : {}),
-			// 	...(footer ? { footer_content: footer } : {}),
-			// 	...(buttons ? { buttons } : {}),
-			// 	scheduled_by: {
-			// 		id: msg.scheduler_id,
-			// 		name: msg.scheduler_type,
-			// 	},
+			// Logger.debug({
 			// 	failed_at,
 			// 	failed_reason,
 			// 	status,
+			// 	message_id,
 			// });
+			const header = extractInteractiveHeader(msg.messageObject.interactive);
+			const body = extractInteractiveBody(msg.messageObject.interactive);
+			const footer = extractInteractiveFooter(msg.messageObject.interactive);
+			const buttons = extractInteractiveButtons(msg.messageObject.interactive);
 
-			// if (addedMessage && msg.scheduler_type === BroadcastDB_name) {
-			// 	BroadcastService.updateBroadcastMessageId(msg.scheduler_id, {
-			// 		prev_id: msg._id,
-			// 		new_id: addedMessage._id,
-			// 	});
-			// }
-			// msg.remove();
+			const addedMessage = await conversationService.addMessageToConversation(c_id, {
+				recipient: msg.to,
+				message_id: message_id,
+				...(header ? { ...header } : {}),
+				...(body ? { body: { body_type: 'TEXT', text: body } } : {}),
+				...(footer ? { footer_content: footer } : {}),
+				...(buttons ? { buttons } : {}),
+				scheduled_by: {
+					id: msg.scheduler_id,
+					name: msg.scheduler_type,
+				},
+				failed_at,
+				failed_reason,
+				status,
+			});
+
+			if (addedMessage && msg.scheduler_type === BroadcastDB_name) {
+				BroadcastService.updateBroadcastMessageId(msg.scheduler_id, {
+					prev_id: msg._id,
+					new_id: addedMessage._id,
+				});
+			}
+			msg.remove();
 		});
 	}
 
