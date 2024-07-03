@@ -50,7 +50,6 @@ const Slice = createSlice({
 		},
 		setPhonebookList: (state, action: PayloadAction<PhonebookState['list']>) => {
 			state.list = action.payload;
-			state.selected = [];
 		},
 		selectPhonebook: (state, action: PayloadAction<string>) => {
 			state.details =
@@ -145,6 +144,7 @@ const Slice = createSlice({
 		},
 		setMaxPage: (state, action: PayloadAction<number>) => {
 			state.pagination.maxPage = action.payload;
+			state.pagination.page = Math.min(state.pagination.page, state.pagination.maxPage);
 		},
 		nextPage: (state) => {
 			state.pagination.page = Math.min(state.pagination.page + 1, state.pagination.maxPage);
@@ -161,14 +161,26 @@ const Slice = createSlice({
 		setCSVLabels: (state, action: PayloadAction<string[]>) => {
 			state.csv.labels = action.payload;
 		},
+		setLabels: (state, action: PayloadAction<string[]>) => {
+			state.labels = action.payload;
+		},
 		addSelected: (state, action: PayloadAction<string>) => {
 			state.selected.push(action.payload);
 		},
 		removeSelected: (state, action: PayloadAction<string>) => {
 			state.selected = state.selected.filter((id) => id !== action.payload);
 		},
-		setLabels: (state, action: PayloadAction<string[]>) => {
-			state.labels = action.payload;
+		clearSelection: (state) => {
+			state.selected = [];
+		},
+		setSelected: (state, action: PayloadAction<string[]>) => {
+			state.selected = action.payload;
+		},
+		addSelectedList: (state, action: PayloadAction<string[]>) => {
+			state.selected = [...state.selected, ...action.payload];
+		},
+		removeSelectedList: (state, action: PayloadAction<string[]>) => {
+			state.selected = state.selected.filter((item) => !action.payload.includes(item));
 		},
 	},
 });
@@ -206,7 +218,11 @@ export const {
 	addLabelInput,
 	setLabels,
 	addPhonebookRecord,
+	clearSelection,
 	updatePhonebookRecord,
+	addSelectedList,
+	removeSelectedList,
+	setSelected,
 } = Slice.actions;
 
 export default Slice.reducer;

@@ -51,40 +51,54 @@ export default class PhoneBookService extends UserService {
 	}
 
 	public async addRecords(details: Partial<Record>[]) {
-		const docs = await Promise.all(
-			details.map(async (record) => {
-				const existingRecord = await PhoneBookDB.findOne({
-					phone_number: record.phone_number,
-					linked_to: this.userId,
-				});
-				let doc;
-				if (existingRecord) {
-					doc = await PhoneBookDB.updateOne(
-						{ _id: existingRecord._id },
-						{
-							others: { ...existingRecord.others, ...record.others },
-							phone_number: record.phone_number?.replace(/\D/g, '') ?? '',
-						}
-					);
-					return {
-						_id: existingRecord._id,
-						...record,
-					};
-				} else {
-					doc = await PhoneBookDB.create({
-						...record,
-						phone_number: record.phone_number?.replace(/\D/g, '') ?? '',
-						linked_to: this.userId,
-					});
-					return {
-						_id: doc._id,
-						...record,
-					};
-				}
-			})
+		const phoneNumbers = details.map((record) => record.phone_number);
+		const existingRecords = await PhoneBookDB.find({
+			phone_number: { $in: phoneNumbers },
+			linked_to: this.userId,
+		});
+
+		// Step 2: Create a map of existing records by phone number
+		const existingRecordsMap = new Map(
+			existingRecords.map((record) => [record.phone_number, record])
 		);
 
-		return processPhonebookDocs(docs);
+		const updateOperations = [];
+		const insertRecords = [];
+
+		for (const record of details) {
+			const existingRecord = record.phone_number
+				? existingRecordsMap.get(record.phone_number)
+				: null;
+
+			if (existingRecord) {
+				updateOperations.push({
+					updateOne: {
+						filter: { _id: existingRecord._id },
+						update: {
+							$set: {
+								phone_number: record.phone_number?.replace(/\D/g, '') ?? '',
+								others: { ...existingRecord.others, ...record.others },
+							},
+							$addToSet: { labels: { $each: record.labels ?? [] } },
+						},
+					},
+				});
+			} else {
+				insertRecords.push({
+					...record,
+					phone_number: record.phone_number?.replace(/\D/g, '') ?? '',
+					linked_to: this.userId,
+				});
+			}
+		}
+
+		if (updateOperations.length > 0) {
+			await PhoneBookDB.bulkWrite(updateOperations as any[]);
+		}
+
+		if (insertRecords.length > 0) {
+			await PhoneBookDB.insertMany(insertRecords);
+		}
 	}
 
 	public async fetchRecords(
@@ -110,7 +124,7 @@ export default class PhoneBookService extends UserService {
 			linked_to: this.userId,
 			...(labels.length > 0 ? { labels: { $in: labels } } : {}),
 		})
-			.sort({ createdAt: -1 })
+			.sort({ createdAt: -1, _id: 1 })
 			.skip((page - 1) * limit)
 			.limit(limit);
 		return processPhonebookDocs(records);

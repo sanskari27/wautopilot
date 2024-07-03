@@ -272,20 +272,32 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 			return {
 				...rest,
 				salutation: prefix,
-				labels: tags.split(','),
+				labels: [...labels, ...(tags ?? '').split(',')].filter(Boolean),
 			};
 		});
-		const created = await phoneBookService.addRecords(data);
 
-		const ids = created.map((record) => idValidator(record.id)[1]!);
-		await phoneBookService.addLabels(ids, labels);
+		const uniqueDataMap = new Map();
+
+		data.forEach((record) => {
+			const key = record.phone_number; // Use the appropriate unique key
+			if (!uniqueDataMap.has(key)) {
+				uniqueDataMap.set(key, record);
+			} else {
+				// Optional: Merge labels if duplicate entries exist
+				const existingRecord = uniqueDataMap.get(key);
+				existingRecord.labels = [...new Set([...existingRecord.labels, ...record.labels])];
+				uniqueDataMap.set(key, existingRecord);
+			}
+		});
+
+		// Convert the Map back to an array
+		const uniqueData = Array.from(uniqueDataMap.values());
+
+		phoneBookService.addRecords(uniqueData);
 
 		return Respond({
 			res,
 			status: 200,
-			data: {
-				records: created,
-			},
 		});
 	} catch (err: unknown) {
 		if (err instanceof CustomError) {

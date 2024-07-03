@@ -29,14 +29,18 @@ import useFilterLabels from '../../../hooks/useFilterLabels';
 import PhoneBookService from '../../../services/phonebook.service';
 import {
 	addSelected,
+	addSelectedList,
+	clearSelection,
 	nextPage,
 	prevPage,
 	removeSelected,
+	removeSelectedList,
 	selectPhonebook,
 	setFetching,
 	setLabels,
 	setMaxPage,
 	setPhonebookList,
+	setSelected,
 } from '../../../store/reducers/PhonebookReducer';
 import { PhonebookRecord } from '../../../store/types/PhonebookState';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
@@ -88,6 +92,10 @@ export default function Phonebook() {
 			cancelToken.abort();
 		};
 	}, [pagination.page, labels, dispatch]);
+
+	useEffect(() => {
+		dispatch(clearSelection());
+	}, [labels, dispatch]);
 
 	const handleExport = () => {
 		toast.promise(PhoneBookService.export(labels), {
@@ -158,6 +166,43 @@ export default function Phonebook() {
 			},
 		});
 	};
+
+	const toggleAllSelected = (allSelected: boolean) => {
+		if (allSelected) {
+			dispatch(addSelectedList(filtered.map((el) => el.id)));
+		} else {
+			dispatch(removeSelectedList(filtered.map((el) => el.id)));
+		}
+	};
+	const handleAllSelected = () => {
+		toast.promise(
+			APIInstance.get(`/phonebook`, {
+				params: {
+					page: 1,
+					limit: 99999999,
+					labels: labels.join(','),
+				},
+			}),
+			{
+				success: ({ data }) => {
+					const res = data.records as PhonebookRecord[];
+					dispatch(setSelected(res.map((item) => item.id)));
+					return {
+						title: `Selected ${data.totalRecords} records`,
+					};
+				},
+				error: {
+					title: 'Failed to select all records',
+				},
+				loading: {
+					title: 'loading...',
+				},
+			}
+		);
+	};
+
+	const allChecked = filtered.every((item) => selected.includes(item.id));
+	const allIntermediate = filtered.some((item) => selected.includes(item.id));
 
 	return (
 		<Box padding={'1rem'}>
@@ -253,11 +298,32 @@ export default function Phonebook() {
 					/>
 				</Flex>
 			</Flex>
+			<Flex
+				justifyContent={'space-between'}
+				hidden={selected.length === 0}
+				px={'1.75rem'}
+				fontWeight={'medium'}
+			>
+				<Flex cursor={'pointer'} textDecoration={'underline'} onClick={handleAllSelected}>
+					Select all records
+				</Flex>
+				<Text textAlign={'right'}>{selected.length} records selected</Text>
+			</Flex>
 			<TableContainer width={'full'} border={'1px dashed gray'} rounded={'2xl'}>
 				<Table variant='striped' colorScheme='gray'>
 					<Thead>
 						<Tr>
-							<Th>S.No.</Th>
+							<Th>
+								<Checkbox
+									colorScheme='green'
+									isChecked={allChecked}
+									isIndeterminate={!allChecked && allIntermediate}
+									onChange={(e) => {
+										toggleAllSelected(e.target.checked);
+									}}
+								/>{' '}
+								S.No.
+							</Th>
 							<Th>Prefix</Th>
 							<Th>Name</Th>
 							<Th>Phone</Th>
