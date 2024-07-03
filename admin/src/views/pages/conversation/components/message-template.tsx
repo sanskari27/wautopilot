@@ -47,7 +47,7 @@ export const TextMessage = ({ message }: { message: Message }) => {
 		if (!inView) return;
 		MessagesService.getMedia(selected_device_id, message.header_content).then((data) => {
 			setMedia({
-				...initialState,
+				showPreview: true,
 				loaded: true,
 				mimeType: data.mime_type,
 				url: data.url,
@@ -68,7 +68,7 @@ export const TextMessage = ({ message }: { message: Message }) => {
 			{showHeader ? (
 				headerIsMedia ? (
 					<Center width={'98%'} mx={'auto'} ref={inViewRef}>
-						<Box hidden={!media.loaded}>
+						<Box hidden={!media.loaded} width={'300px'} mx={'auto'}>
 							<Preview
 								data={{
 									url:
