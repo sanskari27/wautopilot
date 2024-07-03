@@ -1080,7 +1080,7 @@ export default class ChatBotService extends WhatsappLinkService {
 	) {
 		await FlowMessageDB.updateOne(
 			{
-				_id: chatbot_id,
+				bot_id: chatbot_id,
 				message_id: prev_id,
 			},
 			{
