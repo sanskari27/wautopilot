@@ -26,7 +26,7 @@ import {
 	useDisclosure,
 	useToast,
 } from '@chakra-ui/react';
-import { ReactNode, RefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { ReactNode, forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { BiCheckDouble, BiLink } from 'react-icons/bi';
 import { CgTimer } from 'react-icons/cg';
 import { FaReply } from 'react-icons/fa';
@@ -40,29 +40,33 @@ import { Message } from '../../../../store/types/MessageState';
 import LabelFilter from '../../../components/labelFilter';
 import Each from '../../../components/utils/Each';
 
-const ChatMessageWrapper = ({
-	message,
-	children,
-	ref,
-	id,
-}: {
-	message: Message;
-	children: ReactNode;
-	ref: RefObject<HTMLDivElement>;
-	id: string;
-}) => {
+const ChatMessageWrapper = ({ message, children }: { message: Message; children: ReactNode }) => {
+	const toast = useToast();
 	const assignMessageLabelsRef = useRef<AssignMessageLabelsHandle>(null);
 	const isMe = !!message.received_at;
+
+	const scrollToContext = () => {
+		if (!message.context || !message.context.id) return;
+		const context = document.getElementById(message.context.id);
+		if (!context) {
+			toast({
+				title: 'Message not found',
+				description: 'Message might have been deleted or not found in the conversation',
+				status: 'error',
+			});
+			return;
+		}
+		context?.scrollIntoView({ behavior: 'smooth' });
+	};
+
 	return (
 		<>
 			<Flex
 				direction={'column'}
-				key={message._id}
 				className='max-w-[80%] md:max-w-[45%]'
 				marginBottom={'1rem'}
 				alignSelf={isMe ? 'flex-start' : 'flex-end'}
-				ref={ref}
-				id={id}
+				id={message.message_id}
 			>
 				<Flex
 					direction={'column'}
@@ -104,6 +108,19 @@ const ChatMessageWrapper = ({
 						</MenuList>
 						<AssignMessageLabelsDialog ref={assignMessageLabelsRef} />
 					</Menu>
+					{message.context.id ? (
+						<Flex
+							borderLeft={isMe ? '2px solid green' : '2px solid white'}
+							paddingLeft={'0.5rem'}
+							paddingY={'0.25rem'}
+							cursor={'pointer'}
+							onClick={scrollToContext}
+						>
+							<Text fontSize={'sm'} color={'gray.500'}>
+								Show context
+							</Text>
+						</Flex>
+					) : null}
 					{children}
 					{message.buttons.length > 0 && (
 						<>

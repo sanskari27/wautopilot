@@ -72,7 +72,7 @@ export const TextMessage = ({
 	const headerIsText = message.header_type === 'TEXT';
 
 	return (
-		<ChatMessageWrapper id={id} ref={ref} message={message}>
+		<ChatMessageWrapper message={message}>
 			{showHeader ? (
 				headerIsMedia ? (
 					<Center width={'98%'} mx={'auto'} ref={inViewRef}>
@@ -111,7 +111,7 @@ export const LocationMessage = ({
 	id: string;
 }) => {
 	return (
-		<ChatMessageWrapper id={id} ref={ref} message={message}>
+		<ChatMessageWrapper message={message}>
 			<Link
 				href={`https://www.google.com/maps/search/?q=${message.body?.location?.latitude ?? ''},${
 					message.body?.location?.longitude ?? ''
@@ -202,7 +202,7 @@ export const MediaMessage = ({
 	};
 
 	return (
-		<ChatMessageWrapper id={id} ref={ref} message={message}>
+		<ChatMessageWrapper message={message}>
 			{!message.body?.media_id ? (
 				<Text textAlign={'center'} color={'red.500'} my={'0.5rem'}>
 					No Preview Available
@@ -299,7 +299,7 @@ export const ContactMessage = ({
 			items={message.body?.contacts ?? []}
 			render={(contact, index) => (
 				<>
-					<ChatMessageWrapper id={id} ref={ref} message={message}>
+					<ChatMessageWrapper message={message}>
 						<Box>
 							<HStack key={index} direction={'column'} gap={2}>
 								<Avatar size={'sm'} name={contact.name?.formatted_name} />
@@ -340,7 +340,7 @@ export const UnknownMessage = ({
 	id: string;
 }) => {
 	return (
-		<ChatMessageWrapper id={id} ref={ref} message={message}>
+		<ChatMessageWrapper message={message}>
 			<HStack>
 				<Icon as={BiErrorCircle} color={'gray.500'} fontSize={'2rem'} />
 				<Box>
