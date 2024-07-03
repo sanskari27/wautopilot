@@ -168,6 +168,11 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 			});
 			chatBotService.handleMessage(recipient, message.interactive?.list_reply?.title ?? '');
 			chatBotService.checkForFlowKeyword(recipient, message.interactive?.list_reply?.title ?? '');
+			chatBotService.continueFlow(
+				recipient,
+				message.context.id,
+				message.interactive?.list_reply?.id ?? ''
+			);
 		} else if (message.interactive && message.interactive.type === 'button_reply') {
 			conversationService.addMessageToConversation(conversation_id, {
 				message_id: msgID,

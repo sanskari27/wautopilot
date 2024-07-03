@@ -171,7 +171,12 @@ const ImageMessage = forwardRef<ImageMessageHandle, ImageMessageProps>(
 						</InputGroup>
 					</ModalBody>
 					<ModalFooter marginTop={'0'}>
-						<Button colorScheme='blue' width={'full'} onClick={handleSave} disabled={!attachment}>
+						<Button
+							colorScheme='blue'
+							width={'full'}
+							onClick={handleSave}
+							disabled={!attachment || !caption}
+						>
 							Save
 						</Button>
 					</ModalFooter>

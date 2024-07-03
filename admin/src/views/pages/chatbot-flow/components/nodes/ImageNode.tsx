@@ -48,16 +48,13 @@ export default function ImageNode({
 			<Each
 				items={buttons}
 				render={(button, index) => (
-					<>
-						<Handle
-							type='source'
-							position={Position.Right}
-							id={button.id}
-							style={{ ...dotStyle, bottom: (buttons.length - index) * 40 }}
-							isConnectable
-						/>
-						{index}
-					</>
+					<Handle
+						type='source'
+						position={Position.Right}
+						id={button.id}
+						style={{ ...dotStyle, bottom: -25 + (buttons.length - index) * 40 }}
+						isConnectable
+					/>
 				)}
 			/>
 		);

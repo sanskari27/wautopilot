@@ -176,7 +176,12 @@ const AudioMessage = forwardRef<AudioMessageHandle, AudioMessageProps>(
 						</InputGroup>
 					</ModalBody>
 					<ModalFooter marginTop={'0'}>
-						<Button colorScheme='green' width={'full'} onClick={handleSave} disabled={!attachment}>
+						<Button
+							colorScheme='green'
+							width={'full'}
+							onClick={handleSave}
+							disabled={!attachment || !caption}
+						>
 							Save
 						</Button>
 					</ModalFooter>
