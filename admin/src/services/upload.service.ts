@@ -51,8 +51,6 @@ export default class UploadService {
 			document.body.appendChild(link);
 			link.click();
 		} catch (err) {
-			console.log(err);
-
 			//ignore
 		}
 	}

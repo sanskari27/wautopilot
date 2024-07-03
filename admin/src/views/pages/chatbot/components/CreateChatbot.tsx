@@ -281,8 +281,6 @@ export default function CreateChatBot() {
 				};
 			},
 			error: (err) => {
-				console.log(err);
-
 				return { title: 'Error Saving Bot' };
 			},
 			loading: { title: 'Saving Data', description: 'Please wait' },

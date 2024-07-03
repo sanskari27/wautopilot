@@ -46,7 +46,7 @@ export default function ButtonNode({
 						type='source'
 						position={Position.Right}
 						id={button.id}
-						style={{ ...dotStyle, bottom: 20 + index * 40 }}
+						style={{ ...dotStyle, bottom: -20 + (buttons.length - index) * 40 }}
 						isConnectable
 					/>
 				)}

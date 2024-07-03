@@ -185,7 +185,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 			chatBotService.continueFlow(
 				recipient,
 				message.context.id,
-				message.interactive?.button_reply?.title ?? ''
+				message.interactive?.button_reply?.id ?? ''
 			);
 		} else {
 			conversationService.addMessageToConversation(conversation_id, {

@@ -146,24 +146,29 @@ export function generateBodyText(text: string) {
 export function generateSections(
 	sections: {
 		title: string;
-		buttons: string[];
+		buttons: { id: string; text: string }[];
 	}[]
 ) {
 	return sections.map((section) => ({
 		title: section.title,
-		rows: section.buttons.map((button) => ({
-			id: button,
-			title: button,
+		rows: section.buttons.map((button: { id: string; text: string }) => ({
+			id: button.id,
+			title: button.text,
 		})),
 	}));
 }
 
-export function generateButtons(buttons: string[]) {
+export function generateButtons(
+	buttons: {
+		id: string;
+		text: string;
+	}[]
+) {
 	return buttons.map((button) => ({
 		type: 'reply',
 		reply: {
-			id: button,
-			title: button,
+			id: button.id,
+			title: button.text,
 		},
 	}));
 }

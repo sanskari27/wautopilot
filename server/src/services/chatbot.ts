@@ -16,7 +16,6 @@ import COMMON_ERRORS from '../errors/common-errors';
 import DateUtils from '../utils/DateUtils';
 import { Delay, filterUndefinedKeys } from '../utils/ExpressUtils';
 import {
-	convertToId,
 	generateBodyText,
 	generateButtons,
 	generateHeader,
@@ -915,7 +914,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		});
 	}
 
-	public async continueFlow(recipient: string, meta_message_id: string, text: string) {
+	public async continueFlow(recipient: string, meta_message_id: string, button_id: string) {
 		const flowMessage = await FlowMessageDB.findOne({ meta_message_id });
 		if (!flowMessage) {
 			return;
@@ -933,7 +932,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		const node_id = flowMessage.node_id;
 
 		const possibleEdge = bot.edges.find(
-			(edge) => edge.source === node_id && edge.sourceHandle === convertToId(text)
+			(edge) => edge.source === node_id && edge.sourceHandle === button_id
 		);
 		if (!possibleEdge) {
 			return;

@@ -137,7 +137,6 @@ export default function RenderFlow() {
 			node.type = 'listNode';
 			node.data = details.data;
 		}
-
 		setNodes((prev) => {
 			return [...prev, node];
 		});

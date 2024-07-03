@@ -182,11 +182,6 @@ export const MediaMessage = ({
 	}, [message.body?.media_id, selected_device_id, inView]);
 
 	const handleDownload = () => {
-		console.log(
-			getFileType(media.mimeType),
-			`${SERVER_URL}${selected_device_id}/uploads/download-meta-media/${message.body?.media_id}`
-		);
-		return;
 		if (!selected_device_id || !message.body?.media_id) {
 			return;
 		}
