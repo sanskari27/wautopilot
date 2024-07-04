@@ -5,7 +5,7 @@ import { CustomError } from '../../errors';
 export type FAQValidationResult = {
 	title: string;
 	info: string;
-};
+}[];
 
 export type TestimonialsValidationResult = {
 	title: string;
