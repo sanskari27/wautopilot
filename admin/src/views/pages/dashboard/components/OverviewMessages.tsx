@@ -19,7 +19,7 @@ export default function MessagesOverview() {
 
 		return [keys, ...data];
 	};
-	const currentMonth = getMonth(new Date().getMonth() + 1);
+	const currentMonth = getMonth(new Date().getMonth() + 1, true);
 
 	if (isLoading) {
 		return <div>Loading...</div>;
