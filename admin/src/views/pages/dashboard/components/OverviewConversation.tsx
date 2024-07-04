@@ -25,7 +25,7 @@ export default function ConversationOverview() {
 	return (
 		<Box>
 			<Text textAlign={'center'} fontSize={'1.25rem'} fontWeight={'medium'}>
-				Conversations
+				Conversations Started per month
 			</Text>
 			<Chart
 				chartType='AreaChart'
