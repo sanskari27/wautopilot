@@ -46,8 +46,7 @@ const CreateFAQDialog = forwardRef<FAQHandle, CreateFAQDialogProps>(({ onConfirm
 
 	const onClose = () => {
 		setIsOpen(false);
-		dispatch(setTitle(''));
-		dispatch(setInfo(''));
+		dispatch(setFAQDetails({ title: '', info: '' }));
 	};
 
 	const handleSave = () => {

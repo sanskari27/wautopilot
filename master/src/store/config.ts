@@ -3,4 +3,5 @@ export enum StoreNames {
 	USER = 'user',
 	COUPON = 'coupon',
 	FAQ='faq',
+	TESTIMONIAL='testimonial',
 }

@@ -12,6 +12,7 @@ import ExtrasService from './services/extras.service';
 import { listAdmins, setAdminLoading } from './store/reducers/AdminReducer';
 import { setCouponFetching, setCouponList } from './store/reducers/CouponReducer';
 import { setFAQList, setFAQLoading } from './store/reducers/FAQReducer';
+import { setTestimonialList, setTestimonialLoading } from './store/reducers/TestimonialReducer';
 import { setIsAuthenticated } from './store/reducers/UserReducers';
 import AppNavbar from './views/components/navbar/AppNavbar';
 import NavigationDrawer from './views/components/navbar/NavigationDrawer';
@@ -43,6 +44,13 @@ function App() {
 				dispatch(setFAQList(res));
 			})
 			.finally(() => dispatch(setFAQLoading(false)));
+		ExtrasService.getTestimonials()
+			.then((res) => {
+				dispatch(setTestimonialList(res));
+			})
+			.finally(() => {
+				dispatch(setTestimonialLoading(false));
+			});
 	}, [dispatch]);
 
 	return (

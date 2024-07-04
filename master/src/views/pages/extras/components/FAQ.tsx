@@ -135,7 +135,7 @@ export default function FAQPage() {
 											setSelectedFAQ([]);
 										}
 									}}
-									isChecked={selectedFAQ.length === list.length}
+									isChecked={selectedFAQ.length === list.length && list.length > 0}
 									isIndeterminate={selectedFAQ.length > 0 && selectedFAQ.length < list.length}
 								/>
 								Sl. no.

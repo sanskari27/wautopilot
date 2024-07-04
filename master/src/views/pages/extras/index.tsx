@@ -1,5 +1,6 @@
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react';
 import FAQPage from './components/FAQ';
+import TestimonialsPage from './components/Testimonials';
 
 export default function ExtrasPage() {
 	return (
@@ -7,7 +8,7 @@ export default function ExtrasPage() {
 			<Text fontSize={'xl'} fontWeight={'bold'}>
 				Extras
 			</Text>
-			<Tabs isFitted variant='enclosed'>
+			<Tabs isFitted variant='enclosed' colorScheme='green'>
 				<TabList mb='1em'>
 					<Tab>FAQ</Tab>
 					<Tab>Testimonials</Tab>
@@ -17,7 +18,7 @@ export default function ExtrasPage() {
 						<FAQPage />
 					</TabPanel>
 					<TabPanel>
-						<p>two!</p>
+						<TestimonialsPage />
 					</TabPanel>
 				</TabPanels>
 			</Tabs>
