@@ -116,14 +116,20 @@ const SettingsDrawer = forwardRef<SettingsDrawerHandle>((_, ref) => {
 					handlePayment(res.razorpay_options, res.transaction_id);
 					setMoney((prev) => ({ ...prev, amount: '' }));
 					setAddMoneySection.off();
+					return;
 				}
+				toast({
+					title: 'Server error. Please try again later.',
+					status: 'error',
+				});
 			})
 			.catch((err) => {
 				toast({
 					title: err.message,
 					status: 'error',
 				});
-			}).finally(() => {
+			})
+			.finally(() => {
 				setMoney((prev) => ({ ...prev, isPaymentProcessing: false }));
 			});
 	};
