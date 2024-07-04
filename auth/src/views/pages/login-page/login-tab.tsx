@@ -15,7 +15,7 @@ import {
 	startUserAuthenticating,
 	stopUserAuthenticating,
 } from '../../../store/reducers/UserReducers';
-import PasswordInput from './password-input';
+import PasswordInput from '../../components/password-input';
 
 function LoginTab() {
 	const recaptchaRef = useRef<ReCAPTCHA>(null);

@@ -10,10 +10,12 @@ const initialState: UserState = {
 		resettingPassword: false,
 	},
 	email: '',
+	newEmail: '',
 	name: '',
 	phone: '',
 	accessLevel: 20,
 	password: '',
+	newPassword: '',
 	confirmPassword: '',
 	error: {
 		message: '',
@@ -57,6 +59,10 @@ const Slice = createSlice({
 			state.error = initialState.error;
 			state.email = action.payload;
 		},
+		setNewEmail: (state, action: PayloadAction<string>) => {
+			state.error = initialState.error;
+			state.newEmail = action.payload;
+		},
 		setName: (state, action: PayloadAction<string>) => {
 			state.error = initialState.error;
 			state.name = action.payload;
@@ -64,6 +70,10 @@ const Slice = createSlice({
 		setPassword: (state, action: PayloadAction<string>) => {
 			state.error = initialState.error;
 			state.password = action.payload;
+		},
+		setNewPassword: (state, action: PayloadAction<string>) => {
+			state.error = initialState.error;
+			state.newPassword = action.payload;
 		},
 		setPhone: (state, action: PayloadAction<string>) => {
 			state.error = initialState.error;
@@ -83,6 +93,7 @@ export const {
 	reset,
 	setConfirmPassword,
 	setEmail,
+	setNewEmail,
 	setPassword,
 	setError,
 	startUserAuthenticating,
@@ -91,6 +102,7 @@ export const {
 	setName,
 	setPhone,
 	startResettingPassword,
+	setNewPassword,
 	stopResettingPassword,
 	stopUserLoading,
 } = Slice.actions;

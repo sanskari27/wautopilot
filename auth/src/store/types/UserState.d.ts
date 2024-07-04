@@ -1,7 +1,9 @@
 export type UserState = {
 	uiDetails: UserUIDetails;
 	email: string;
+	newEmail: string;
 	password: string;
+	newPassword:string;
 	name: string;
 	phone: string;
 	confirmPassword: string;

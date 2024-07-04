@@ -50,13 +50,20 @@ export default class AuthService {
 		}
 	}
 
-	static async registerUser(name: string, phone: string, email: string, accessLevel: UserLevel) {
+	static async registerUser(
+		name: string,
+		phone: string,
+		email: string,
+		password: string,
+		accessLevel: UserLevel
+	) {
 		try {
 			const data = await APIInstance.post(`/sessions/register`, {
 				name,
 				phone,
 				email,
 				accessLevel,
+				password,
 			});
 			return data;
 		} catch (err) {

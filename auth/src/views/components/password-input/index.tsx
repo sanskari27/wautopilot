@@ -1,6 +1,16 @@
-import { FormControl, FormLabel, IconButton, Input, InputGroup, InputProps, InputRightElement, useDisclosure, useMergeRefs } from "@chakra-ui/react";
-import { forwardRef, useRef } from "react";
-import { HiEye, HiEyeOff } from "react-icons/hi";
+import {
+	FormControl,
+	FormLabel,
+	IconButton,
+	Input,
+	InputGroup,
+	InputProps,
+	InputRightElement,
+	useDisclosure,
+	useMergeRefs,
+} from '@chakra-ui/react';
+import { forwardRef, useRef } from 'react';
+import { HiEye, HiEyeOff } from 'react-icons/hi';
 
 const PasswordInput = forwardRef<
 	HTMLInputElement,
@@ -10,7 +20,7 @@ const PasswordInput = forwardRef<
 >((props, ref) => {
 	const { isOpen, onToggle } = useDisclosure();
 	const inputRef = useRef<HTMLInputElement>(null);
-
+    
 	const mergeRef = useMergeRefs(inputRef, ref);
 	const onClickReveal = () => {
 		onToggle();
