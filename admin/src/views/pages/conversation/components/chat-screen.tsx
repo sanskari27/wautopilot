@@ -73,6 +73,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 		pagination.current.loadMore = true;
 		pagination.current.page = 1;
 		dispatch(setMessagesLoading(true));
+		dispatch(setMessageList([]));
 		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id, {
 			page: 1,
 		}).then((data) => {
@@ -91,10 +92,12 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 			return;
 		}
 		pagination.current.page++;
+		dispatch(setMessagesLoading(true));
 		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id, {
 			page: pagination.current.page,
 		}).then((data) => {
 			dispatch(addMessageList(data.messages));
+			dispatch(setMessagesLoading(false));
 			if (data.messages.length < 50) {
 				pagination.current.loadMore = false;
 			}
@@ -152,6 +155,11 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 				alignItems={'end'}
 				direction={'column'}
 			>
+				{messagesLoading && (
+					<Text width={'full'} textAlign={'center'} fontSize={'lg'}>
+						loading...
+					</Text>
+				)}
 				<Flex
 					className='flex-col-reverse'
 					width={'full'}
@@ -159,13 +167,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 					padding={'1rem'}
 					height={'full'}
 				>
-					{messagesLoading ? (
-						<Text textAlign={'center'} fontSize={'lg'}>
-							Loading Chats...
-						</Text>
-					) : (
-						<MessagesList list={messageList} onLastReached={loadMore} />
-					)}
+					<MessagesList list={messageList} onLastReached={loadMore} />
 				</Flex>
 				<MessageBox />
 			</Flex>
