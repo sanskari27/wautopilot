@@ -2,6 +2,7 @@ import { Box, Text } from '@chakra-ui/react';
 import { Chart } from 'react-google-charts';
 import { useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
+import { getFormattedDate, getMonth } from '../../../../utils/date-utils';
 
 export default function MessagesOverview() {
 	const {
@@ -13,11 +14,12 @@ export default function MessagesOverview() {
 		if (messages.length === 0) return [];
 		const keys = ['DAY', 'COUNT'];
 		const data = messages.map((message) => {
-			return [message.day, message.count];
+			return [getFormattedDate(message.day), message.count];
 		});
 
 		return [keys, ...data];
 	};
+	const currentMonth = getMonth(new Date().getMonth() + 1);
 
 	if (isLoading) {
 		return <div>Loading...</div>;
@@ -26,7 +28,7 @@ export default function MessagesOverview() {
 	return (
 		<Box>
 			<Text textAlign={'center'} fontSize={'1.25rem'} fontWeight={'medium'}>
-				Messages sent this month
+				Messages sent in {currentMonth}
 			</Text>
 			<Chart
 				chartType='AreaChart'

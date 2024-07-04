@@ -1,30 +1,25 @@
-export const getMonth = (month: number) => {
-	switch (month) {
-		case 1:
-			return 'Jan';
-		case 2:
-			return 'Feb';
-		case 3:
-			return 'Mar';
-		case 4:
-			return 'Apr';
-		case 5:
-			return 'May';
-		case 6:
-			return 'Jun';
-		case 7:
-			return 'Jul';
-		case 8:
-			return 'Aug';
-		case 9:
-			return 'Sept';
-		case 10:
-			return 'Oct';
-		case 11:
-			return 'Nov';
-		case 12:
-			return 'Dec';
-		default:
-			return '';
+export const getMonth = (month: number, fullName = false) => {
+	const MONTHS = {
+		'1': 'January',
+		'2': 'February',
+		'3': 'March',
+		'4': 'April',
+		'5': 'May',
+		'6': 'June',
+		'7': 'July',
+		'8': 'August',
+		'9': 'September',
+		'10': 'October',
+		'11': 'November',
+		'12': 'December',
+	};
+	if (month < 1 || month > 12) {
+		return '';
 	}
+	const name = MONTHS[month.toString() as keyof typeof MONTHS];
+	return fullName ? name! : name!.substring(0, 3);
+};
+
+export const getFormattedDate = (date: number) => {
+	return date < 10 ? `0${date}` : date.toString();
 };
