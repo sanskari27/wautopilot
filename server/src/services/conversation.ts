@@ -463,6 +463,10 @@ export default class ConversationService extends WhatsappLinkService {
 		const start = DateUtils.getMomentNow().startOf('month').toDate();
 		const end = DateUtils.getMomentNow().endOf('month').toDate();
 
+		const daysInMonth = DateUtils.getMomentNow().daysInMonth();
+
+		const allDaysInMonth = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
 		const docs = await ConversationMessageDB.aggregate([
 			{
 				$match: {
@@ -478,7 +482,6 @@ export default class ConversationService extends WhatsappLinkService {
 				$group: {
 					_id: {
 						$dayOfMonth: '$sent_at',
-						// $year: '$sent_at',
 					},
 					month: {
 						$first: {
@@ -492,10 +495,16 @@ export default class ConversationService extends WhatsappLinkService {
 			},
 		]);
 
-		return docs.map((doc) => ({
-			day: doc._id,
-			month: doc.month,
-			count: doc.count,
+		// Convert aggregation results into a map for easier lookup
+		const docsMap = new Map(docs.map((doc) => [doc._id, doc.count]));
+
+		// Create the final result array, ensuring each day is accounted for
+		const result = allDaysInMonth.map((day) => ({
+			day,
+			month: DateUtils.getMomentNow().month() + 1, // Month is 0-indexed in Moment.js
+			count: docsMap.get(day) || 0,
 		}));
+
+		return result;
 	}
 }

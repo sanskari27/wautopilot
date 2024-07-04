@@ -3,6 +3,7 @@ import SessionRoute from './auth/auth.route';
 import ChatBotRoute from './chatbot/chatbot.route';
 import ContactsRoute from './contacts/contacts.route';
 import CouponRoute from './coupon/coupon.route';
+import ExtrasRoute from './extras/extras.route';
 import MediaRoute from './media/media.route';
 import MessageRoute from './message/message.route';
 import OverviewRoute from './overview/overview.route';
@@ -38,6 +39,7 @@ router.use('/:device_id/chatbot', VerifySession, VerifyDevice, ChatBotRoute);
 router.use('/:device_id/media', VerifySession, VerifyDevice, MediaRoute);
 router.use('/:device_id/uploads', VerifySession, VerifyDevice, UploadsRoute);
 router.use('/users', VerifySession, UsersRoute);
+router.use('/extras', ExtrasRoute);
 router.use('/webhooks', WebhooksRoute);
 
 router
