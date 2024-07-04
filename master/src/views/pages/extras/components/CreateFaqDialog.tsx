@@ -16,27 +16,30 @@ import {
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
-import { setInfo, setTitle } from '../../../../store/reducers/FAQReducer';
+import { setFAQDetails, setInfo, setTitle } from '../../../../store/reducers/FAQReducer';
 
 export type FAQHandle = {
-	open(): void;
+	open(details: { title: string; info: string }, index?: number): void;
 };
 
 type CreateFAQDialogProps = {
-	onConfirm: (details: { title: string; info: string }) => void;
+	onConfirm: (details: { title: string; info: string }, index?: number) => void;
 };
 
 const CreateFAQDialog = forwardRef<FAQHandle, CreateFAQDialogProps>(({ onConfirm }, ref) => {
 	const dispatch = useDispatch();
 	const toast = useToast();
 	const [isOpen, setIsOpen] = useState(false);
+	const [index, setIndex] = useState<number | undefined>(undefined);
 
 	const {
 		details: { info, title },
 	} = useSelector((state: StoreState) => state[StoreNames.FAQ]);
 
 	useImperativeHandle(ref, () => ({
-		open() {
+		open(details: { title: string; info: string }, index?: number) {
+			setIndex(index);
+			dispatch(setFAQDetails(details));
 			setIsOpen(true);
 		},
 	}));
@@ -55,7 +58,7 @@ const CreateFAQDialog = forwardRef<FAQHandle, CreateFAQDialogProps>(({ onConfirm
 				status: 'error',
 			});
 
-		onConfirm({ title, info });
+		onConfirm({ title, info }, index);
 		setIsOpen(false);
 	};
 

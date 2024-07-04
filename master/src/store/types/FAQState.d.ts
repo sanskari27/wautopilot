@@ -5,6 +5,7 @@ export type FAQState = {
 		isLoading: boolean;
 		isEditing: boolean;
 		isAdding: boolean;
+		isDeleting: boolean;
 	};
 };
 

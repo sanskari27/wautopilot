@@ -1,5 +1,5 @@
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react';
-import FAQ from './components/FAQ';
+import FAQPage from './components/FAQ';
 
 export default function ExtrasPage() {
 	return (
@@ -14,7 +14,7 @@ export default function ExtrasPage() {
 				</TabList>
 				<TabPanels>
 					<TabPanel>
-						<FAQ />
+						<FAQPage />
 					</TabPanel>
 					<TabPanel>
 						<p>two!</p>

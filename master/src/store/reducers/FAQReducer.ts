@@ -12,6 +12,7 @@ const initialState: FAQState = {
 		isLoading: true,
 		isEditing: false,
 		isAdding: false,
+		isDeleting: false,
 	},
 };
 

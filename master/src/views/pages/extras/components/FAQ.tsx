@@ -20,11 +20,12 @@ import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ExtrasService from '../../../../services/extras.service';
 import { StoreNames, StoreState } from '../../../../store';
-import { setFAQList } from '../../../../store/reducers/FAQReducer';
+import { setFAQAdding, setFAQList } from '../../../../store/reducers/FAQReducer';
+import { FAQ } from '../../../../store/types/FAQState';
 import Each from '../../../components/utils/Each';
 import CreateFAQDialog, { FAQHandle } from './CreateFaqDialog';
 
-export default function FAQ() {
+export default function FAQPage() {
 	const FAQDialogRef = useRef<FAQHandle>(null);
 
 	const dispatch = useDispatch();
@@ -34,7 +35,8 @@ export default function FAQ() {
 
 	const {
 		list,
-		ui: { isLoading },
+		details,
+		ui: { isLoading, isAdding },
 	} = useSelector((state: StoreState) => state[StoreNames.FAQ]);
 
 	const handleDeleteFAQ = () => {
@@ -59,13 +61,30 @@ export default function FAQ() {
 		});
 	};
 
-	const handleFAQSave = (details: { title: string; info: string }) => {
-		const promise = ExtrasService.createFAQs([...list, details]);
+	const handleFAQSave = (details: { title: string; info: string }, index?: number) => {
+		let promise;
+		let newList: FAQ[] = [];
+		dispatch(setFAQAdding(true));
+		if (index !== undefined) {
+			newList = list.map((item, i) => {
+				if (i === index) {
+					return details;
+				}
+				return item;
+			});
+			promise = ExtrasService.createFAQs(newList);
+		} else {
+			promise = ExtrasService.createFAQs([...list, details]);
+		}
 
 		toast.promise(promise, {
 			loading: { title: 'Creating FAQ' },
 			success: () => {
-				dispatch(setFAQList([...list, details]));
+				if (index !== undefined) {
+					dispatch(setFAQList(newList));
+				} else {
+					dispatch(setFAQList([...list, details]));
+				}
 				return {
 					title: 'FAQ Created',
 					status: 'success',
@@ -77,6 +96,7 @@ export default function FAQ() {
 				};
 			},
 		});
+		dispatch(setFAQAdding(false));
 	};
 
 	return (
@@ -95,7 +115,8 @@ export default function FAQ() {
 					colorScheme='green'
 					variant={'outline'}
 					leftIcon={<AddIcon />}
-					onClick={() => FAQDialogRef.current?.open()}
+					onClick={() => FAQDialogRef.current?.open(details)}
+					isDisabled={isAdding}
 				>
 					Create FAQ
 				</Button>
@@ -104,7 +125,7 @@ export default function FAQ() {
 				<Table>
 					<Thead>
 						<Tr>
-							<Th width={'10%'}>
+							<Th width={'5%'}>
 								<Checkbox
 									mr={'0.5rem'}
 									onChange={(e) => {
@@ -119,7 +140,7 @@ export default function FAQ() {
 								/>
 								Sl. no.
 							</Th>
-							<Th width={'40%'}>Title</Th>
+							<Th width={'45%'}>Title</Th>
 							<Th width={'50%'}>Info</Th>
 						</Tr>
 					</Thead>
@@ -159,8 +180,20 @@ export default function FAQ() {
 											/>
 											{list.indexOf(item) + 1}
 										</Td>
-										<Td>{item.title}</Td>
-										<Td>{item.info}</Td>
+										<Td
+											cursor={'pointer'}
+											onClick={() => FAQDialogRef.current?.open(item, index)}
+											whiteSpace={'pre-wrap'}
+										>
+											{item.title}
+										</Td>
+										<Td
+											cursor={'pointer'}
+											onClick={() => FAQDialogRef.current?.open(item, index)}
+											whiteSpace={'pre-wrap'}
+										>
+											{item.info}
+										</Td>
 									</Tr>
 								)}
 							/>
