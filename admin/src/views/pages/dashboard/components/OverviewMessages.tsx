@@ -2,17 +2,6 @@ import { Box, Text } from '@chakra-ui/react';
 import { Chart } from 'react-google-charts';
 import { useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
-import { getMonth } from '../../../../utils/date-utils';
-
-// export const data = [
-// 	['Year', 'Sales', 'Expenses'],
-// 	['2013', 1000, 400],
-// 	['2014', 1170, 460],
-// 	['2015', 660, 1120],
-// 	['2017', 1030, 540],
-// 	['2018', 1050, 540],
-// 	['2019', 100, 1040],
-// ];
 
 export default function MessagesOverview() {
 	const {
@@ -24,7 +13,7 @@ export default function MessagesOverview() {
 		if (messages.length === 0) return [];
 		const keys = ['DAY', 'COUNT'];
 		const data = messages.map((message) => {
-			return [message.day + ' ' + getMonth(message.month), message.count];
+			return [message.day, message.count];
 		});
 
 		return [keys, ...data];
