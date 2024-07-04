@@ -1,3 +1,4 @@
+import { MdOutlineWeb } from 'react-icons/md';
 import { RiAdminFill, RiCoupon2Fill } from 'react-icons/ri';
 
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -86,6 +87,7 @@ export const NAVIGATION = {
 
 	ADMINS: '/admins',
 	COUPONS: '/coupons',
+	EXTRAS: '/webpage',
 };
 
 export const MenuItems = [
@@ -103,6 +105,11 @@ export const MenuItems = [
 		icon: RiCoupon2Fill,
 		route: NAVIGATION.COUPONS,
 		title: 'Coupons',
+	},
+	{
+		icon: MdOutlineWeb,
+		route: NAVIGATION.EXTRAS,
+		title: 'Extras',
 	},
 ];
 

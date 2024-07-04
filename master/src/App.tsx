@@ -8,14 +8,17 @@ import { useDispatch } from 'react-redux';
 import AdminsService from './services/admin.service';
 import AuthService from './services/auth.service';
 import CouponService from './services/coupon.service';
+import ExtrasService from './services/extras.service';
 import { listAdmins, setAdminLoading } from './store/reducers/AdminReducer';
 import { setCouponFetching, setCouponList } from './store/reducers/CouponReducer';
+import { setFAQList, setFAQLoading } from './store/reducers/FAQReducer';
 import { setIsAuthenticated } from './store/reducers/UserReducers';
 import AppNavbar from './views/components/navbar/AppNavbar';
 import NavigationDrawer from './views/components/navbar/NavigationDrawer';
 
 const AdminPage = lazy(() => import('./views/pages/admin'));
 const CouponPage = lazy(() => import('./views/pages/coupons'));
+const ExtrasPage = lazy(() => import('./views/pages/extras'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -35,6 +38,11 @@ function App() {
 				dispatch(setCouponList(res));
 			})
 			.finally(() => dispatch(setCouponFetching(false)));
+		ExtrasService.getFAQs()
+			.then((res) => {
+				dispatch(setFAQList(res));
+			})
+			.finally(() => dispatch(setFAQLoading(false)));
 	}, [dispatch]);
 
 	return (
@@ -50,6 +58,7 @@ function App() {
 						<Routes>
 							<Route path={NAVIGATION.ADMINS} element={<AdminPage />} />
 							<Route path={NAVIGATION.COUPONS} element={<CouponPage />} />
+							<Route path={NAVIGATION.EXTRAS} element={<ExtrasPage />} />
 							<Route path='*' element={<Navigate to={NAVIGATION.ADMINS} />} />
 						</Routes>
 					</Suspense>
