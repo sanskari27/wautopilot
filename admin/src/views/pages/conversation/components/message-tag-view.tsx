@@ -11,23 +11,22 @@ import {
 	useBoolean,
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import { Message } from '../../../../store/types/MessageState';
+import { useSelector } from 'react-redux';
+import { StoreNames, StoreState } from '../../../../store';
 import Each from '../../../components/utils/Each';
-import ChatMessage from './chat-message';
+import { Message } from './message-template';
 
 export type MessageTagsViewHandle = {
 	close: () => void;
-	open: (message: Message[], messageLabels: string[]) => void;
+	open: () => void;
 };
-
-const initialMessageState: Message[] = [];
 
 const MessageTagsView = forwardRef<MessageTagsViewHandle>((_, ref) => {
 	const [isOpen, setOpen] = useBoolean();
 	const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
-	const [labels, setLabels] = useState<string[]>([]);
-
-	const [messages, setMessages] = useState<Message[]>(initialMessageState);
+	const { messageList: messages, messageLabels: labels } = useSelector(
+		(state: StoreState) => state[StoreNames.MESSAGES]
+	);
 
 	const onClose = () => {
 		setSelectedLabels([]);
@@ -38,9 +37,7 @@ const MessageTagsView = forwardRef<MessageTagsViewHandle>((_, ref) => {
 		close: () => {
 			onClose();
 		},
-		open: (messages: Message[], messageLabels: string[]) => {
-			setMessages(messages);
-			setLabels(messageLabels);
+		open: () => {
 			setOpen.on();
 		},
 	}));
@@ -97,7 +94,7 @@ const MessageTagsView = forwardRef<MessageTagsViewHandle>((_, ref) => {
 									items={filteredMessages}
 									render={(item) => (
 										<Flex width={'full'}>
-											<ChatMessage message={item} />
+											<Message message={item} />
 										</Flex>
 									)}
 								/>

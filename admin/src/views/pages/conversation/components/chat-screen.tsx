@@ -42,9 +42,8 @@ import AttachmentSelectorDialog, {
 import ContactSelectorDialog, {
 	ContactSelectorHandle,
 } from '../../../components/selector-dialog/ContactSelectorDialog';
-import Each from '../../../components/utils/Each';
+import { default as MessagesList } from './MessagesList';
 import AddMedia, { AddMediaHandle } from './add-media';
-import ChatMessage from './chat-message';
 import MessageTagsView, { MessageTagsViewHandle } from './message-tag-view';
 
 type ChatScreenProps = {
@@ -53,7 +52,6 @@ type ChatScreenProps = {
 
 const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 	const dispatch = useDispatch();
-	const toast = useToast();
 
 	const messageTaggingRef = useRef<MessageTagsViewHandle>(null);
 
@@ -62,9 +60,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 
 	const {
 		messageList,
-		messageLabels,
-		uiDetails: { messagesLoading, isMessageSending },
-		message: { textMessage },
+		uiDetails: { messagesLoading },
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
 
 	// const timeStamp = selected_recipient.expiration_timestamp
@@ -72,51 +68,18 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 	// 	: null;
 	// const currentTime = new Date();
 
-	const handleMessageInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		e.target.style.height = '5px';
-		e.target.style.height = e.target.scrollHeight + 'px';
-	};
-
 	useEffect(() => {
+		if (!selected_device_id || !selected_recipient) return;
 		dispatch(setMessagesLoading(true));
-		if (!selected_device_id) return;
 		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id).then(
 			(data) => {
 				dispatch(removeUnreadConversation(selected_recipient._id));
 				dispatch(setMessageList(data.messages));
 				dispatch(setMessageLabels(data.messageLabels));
 				dispatch(setMessagesLoading(false));
-
-				// for (const msg of data.messages) {
-				// 	if (msg.received_at) {
-				// 		MessagesService.markRead(selected_device_id, msg.message_id);
-				// 		break;
-				// 	}
-				// }
 			}
 		);
 	}, [dispatch, selected_device_id, selected_recipient]);
-
-	const sendTextMessage = () => {
-		if (!textMessage) return;
-		dispatch(setMessageSending(true));
-		MessagesService.sendConversationMessage(selected_device_id, selected_recipient._id, {
-			type: 'text',
-			text: textMessage,
-		}).then((data) => {
-			dispatch(setMessageSending(false));
-			if (!data) {
-				return toast({
-					title: 'Error',
-					description: 'Failed to send message',
-					status: 'error',
-					duration: 5000,
-					isClosable: true,
-				});
-			}
-			dispatch(setTextMessage(''));
-		});
-	};
 
 	return (
 		<>
@@ -151,7 +114,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 								<MenuList>
 									<MenuItem
 										onClick={() => {
-											messageTaggingRef.current?.open(messageList, messageLabels);
+											messageTaggingRef.current?.open();
 										}}
 									>
 										View Messages Tags
@@ -181,37 +144,80 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 							Loading Chats...
 						</Text>
 					) : (
-						<Each items={messageList} id='_id' render={(item) => <ChatMessage message={item} />} />
+						<MessagesList list={messageList} />
 					)}
 				</Flex>
-				<HStack bg={'white'} width={'full'} p={'0.5rem'} alignItems={'flex-end'}>
-					<AttachmentSelectorPopover>
-						<Icon as={AttachmentIcon} bgColor={'transparent'} />
-					</AttachmentSelectorPopover>
-					<Textarea
-						onInput={handleMessageInput}
-						maxHeight={'150px'}
-						minHeight={'40px'}
-						height={'40px'}
-						resize={'none'}
-						value={textMessage}
-						onChange={(e) => dispatch(setTextMessage(e.target.value))}
-						placeholder='Type a message'
-					/>
-					<Button
-						colorScheme='green'
-						px={'1rem'}
-						onClick={sendTextMessage}
-						isLoading={isMessageSending}
-					>
-						<Icon as={BiSend} />
-					</Button>
-				</HStack>
+				<MessageBox />
 			</Flex>
 			<MessageTagsView ref={messageTaggingRef} />
 		</>
 	);
 };
+
+function MessageBox() {
+	const toast = useToast();
+	const dispatch = useDispatch();
+
+	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
+
+	const {
+		uiDetails: { isMessageSending },
+		message: { textMessage },
+	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
+
+	const sendTextMessage = () => {
+		if (!textMessage) return;
+		dispatch(setMessageSending(true));
+		MessagesService.sendConversationMessage(selected_device_id, selected_recipient._id, {
+			type: 'text',
+			text: textMessage,
+		}).then((data) => {
+			dispatch(setMessageSending(false));
+			if (!data) {
+				return toast({
+					title: 'Error',
+					description: 'Failed to send message',
+					status: 'error',
+					duration: 5000,
+					isClosable: true,
+				});
+			}
+			dispatch(setTextMessage(''));
+		});
+	};
+
+	const handleMessageInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		e.target.style.height = '5px';
+		e.target.style.height = e.target.scrollHeight + 'px';
+	};
+	return (
+		<HStack bg={'white'} width={'full'} p={'0.5rem'} alignItems={'flex-end'}>
+			<AttachmentSelectorPopover>
+				<Icon as={AttachmentIcon} bgColor={'transparent'} />
+			</AttachmentSelectorPopover>
+
+			<Textarea
+				onInput={handleMessageInput}
+				maxHeight={'150px'}
+				minHeight={'40px'}
+				height={'40px'}
+				resize={'none'}
+				value={textMessage}
+				onChange={(e) => dispatch(setTextMessage(e.target.value))}
+				placeholder='Type a message'
+			/>
+			<Button
+				colorScheme='green'
+				px={'1rem'}
+				onClick={sendTextMessage}
+				isLoading={isMessageSending}
+			>
+				<Icon as={BiSend} />
+			</Button>
+		</HStack>
+	);
+}
 
 const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 	const dispatch = useDispatch();

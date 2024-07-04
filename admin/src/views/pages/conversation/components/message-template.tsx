@@ -12,7 +12,7 @@ import {
 	Text,
 	useToast,
 } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { BiErrorCircle } from 'react-icons/bi';
 import { HiLocationMarker } from 'react-icons/hi';
 import { MdOutlinePermMedia } from 'react-icons/md';
@@ -23,14 +23,41 @@ import MessagesService from '../../../../services/messages.service';
 import UploadService from '../../../../services/upload.service';
 import { StoreNames, StoreState } from '../../../../store';
 import { Contact } from '../../../../store/types/ContactState';
-import { Message } from '../../../../store/types/MessageState';
+import { Message as TMessage } from '../../../../store/types/MessageState';
 import { getFileSize, getFileType } from '../../../../utils/file-utils';
 import ContactDrawer, { ContactHandle } from '../../../components/contact-drawer';
 import Each from '../../../components/utils/Each';
 import Preview from '../../media/preview.component';
 import ChatMessageWrapper from './message-wrapper';
 
-export const TextMessage = ({ message }: { message: Message }) => {
+type MessageProps = {
+	message: TMessage;
+};
+
+export const Message = memo(({ message }: MessageProps) => {
+	if (message.body?.body_type === 'TEXT') {
+		return <TextMessage message={message} />;
+	}
+
+	if (message.body?.body_type === 'LOCATION') {
+		return <LocationMessage message={message} />;
+	}
+
+	if (message.body?.body_type === 'MEDIA') {
+		return <MediaMessage message={message} />;
+	}
+
+	if (message.body?.body_type === 'CONTACT') {
+		return <ContactMessage message={message} />;
+	}
+
+	if (message.body?.body_type === 'UNKNOWN') {
+		return <UnknownMessage message={message} />;
+	}
+	return <></>;
+});
+
+const TextMessage = ({ message }: { message: TMessage }) => {
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const [media, setMedia] = useState(initialState);
@@ -93,7 +120,7 @@ export const TextMessage = ({ message }: { message: Message }) => {
 	);
 };
 
-export const LocationMessage = ({ message }: { message: Message }) => {
+const LocationMessage = ({ message }: { message: TMessage }) => {
 	return (
 		<ChatMessageWrapper message={message}>
 			<Link
@@ -130,7 +157,7 @@ const initialState = {
 	loaded: false,
 	size: 0,
 };
-export const MediaMessage = ({ message }: { message: Message }) => {
+const MediaMessage = ({ message }: { message: TMessage }) => {
 	const toast = useToast();
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const [media, setMedia] = useState(initialState);
@@ -255,7 +282,7 @@ export const MediaMessage = ({ message }: { message: Message }) => {
 	);
 };
 
-export const ContactMessage = ({ message }: { message: Message }) => {
+const ContactMessage = ({ message }: { message: TMessage }) => {
 	const contactDrawerRef = useRef<ContactHandle>(null);
 	return (
 		<Each
@@ -293,7 +320,7 @@ export const ContactMessage = ({ message }: { message: Message }) => {
 	);
 };
 
-export const UnknownMessage = ({ message }: { message: Message }) => {
+const UnknownMessage = ({ message }: { message: TMessage }) => {
 	return (
 		<ChatMessageWrapper message={message}>
 			<HStack>
