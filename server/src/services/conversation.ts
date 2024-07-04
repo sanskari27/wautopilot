@@ -423,6 +423,17 @@ export default class ConversationService extends WhatsappLinkService {
 		const start = DateUtils.getMomentNow().subtract(12, 'months').startOf('month').toDate();
 		const end = DateUtils.getMomentNow().endOf('month').toDate();
 
+		const allMonths = [];
+		let currentMonth = new Date(start);
+		while (currentMonth <= end) {
+			allMonths.push({
+				month: currentMonth.getMonth() + 1, // Months are 0-indexed in JavaScript Date
+				year: currentMonth.getFullYear(),
+				count: 0,
+			});
+			currentMonth.setMonth(currentMonth.getMonth() + 1);
+		}
+
 		const docs = await ConversationDB.aggregate([
 			{
 				$match: {
@@ -437,13 +448,8 @@ export default class ConversationService extends WhatsappLinkService {
 			{
 				$group: {
 					_id: {
-						$month: '$createdAt',
-						// $year: '$createdAt',
-					},
-					year: {
-						$first: {
-							$year: '$createdAt',
-						},
+						month: { $month: '$createdAt' },
+						year: { $year: '$createdAt' },
 					},
 					count: {
 						$sum: 1,
@@ -452,11 +458,19 @@ export default class ConversationService extends WhatsappLinkService {
 			},
 		]);
 
-		return docs.map((doc) => ({
-			month: doc._id,
-			year: doc.year,
-			count: doc.count,
-		}));
+		// Convert docs to a map for easy lookup
+		const docsMap = new Map(docs.map((doc) => [`${doc._id.year}-${doc._id.month}`, doc.count]));
+
+		// Merge the results with all months
+		const result = allMonths.map((month) => {
+			const key = `${month.year}-${month.month}`;
+			return {
+				month: month.month,
+				year: month.year,
+				count: docsMap.get(key) || 0,
+			};
+		});
+		return result;
 	}
 
 	public async dailySentMessages() {

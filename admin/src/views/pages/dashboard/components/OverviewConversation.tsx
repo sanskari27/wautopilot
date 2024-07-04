@@ -9,17 +9,11 @@ export default function ConversationOverview() {
 		details: { conversations },
 		ui: { isLoading },
 	} = useSelector((state: StoreState) => state[StoreNames.DASHBOARD]);
-	const { list } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 
 	const chartData = () => {
 		if (conversations.length === 0) return [];
 		const keys = ['MONTH', 'COUNT'];
-		const data = conversations.map((conversation) => {
-			return [
-				getMonth(conversation.month) + ' ' + conversation.year,
-				list.length - conversation.count,
-			];
-		});
+		const data = conversations.map((c) => [`${getMonth(c.month)} ${c.year}`, c.count]);
 
 		return [keys, ...data];
 	};
