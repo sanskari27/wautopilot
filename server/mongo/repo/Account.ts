@@ -2,11 +2,14 @@ import { randomBytes, scrypt } from 'crypto';
 import mongoose from 'mongoose';
 import { UserLevel } from '../../src/config/const';
 import IAccount from '../types/account';
-import { PlanDB_name } from './Plan';
 
 export const AccountDB_name = 'Account';
 
 const schema = new mongoose.Schema<IAccount>({
+	parent: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: AccountDB_name,
+	},
 	name: {
 		type: String,
 	},
@@ -29,15 +32,6 @@ const schema = new mongoose.Schema<IAccount>({
 	markupPrice: {
 		type: Number,
 		default: 0.03,
-	},
-
-	subscription: {
-		plan_id: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: PlanDB_name,
-		},
-		start_date: Date,
-		end_date: Date,
 	},
 	walletBalance: {
 		type: Number,

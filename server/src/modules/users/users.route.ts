@@ -23,4 +23,6 @@ router
 
 router.route('/admins').all(VerifyMinLevel(UserLevel.Master)).get(Controller.getAdmins);
 
+router.route('/agents').all(VerifyMinLevel(UserLevel.Admin)).get(Controller.getAgents).post(Controller.createAgent);
+
 export default router;

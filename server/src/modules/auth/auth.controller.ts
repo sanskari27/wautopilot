@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import { StorageDB } from '../../../mongo';
-import { Cookie, REFRESH_SECRET } from '../../config/const';
+import { Cookie, REFRESH_SECRET, UserLevel } from '../../config/const';
 import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import { sendPasswordResetEmail } from '../../provider/email';
@@ -114,12 +114,12 @@ async function resetPassword(req: Request, res: Response, next: NextFunction) {
 }
 
 async function register(req: Request, res: Response, next: NextFunction) {
-	const { email, name, phone, accessLevel } = req.locals.data as RegisterValidationResult;
+	const { email, name, phone, password } = req.locals.data as RegisterValidationResult;
 	try {
-		await UserService.register(email, {
+		await UserService.register(email, password, {
 			name,
 			phone,
-			level: accessLevel,
+			level: UserLevel.Admin,
 		});
 
 		return Respond({

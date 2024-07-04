@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 import { Types } from 'mongoose';
-import { AccountDB, PlanDB, SessionDB, StorageDB } from '../../mongo';
+import { AccountDB, PlanDB, SessionDB, StorageDB, SubscriptionDetailsDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import { UserLevel } from '../config/const';
 import { AUTH_ERRORS, CustomError, PAYMENT_ERRORS } from '../errors';
@@ -8,7 +8,7 @@ import COMMON_ERRORS from '../errors/common-errors';
 import { sendLoginCredentialsEmail } from '../provider/email';
 import { IDType } from '../types';
 import DateUtils from '../utils/DateUtils';
-import { generateNewPassword } from '../utils/ExpressUtils';
+import { idValidator } from '../utils/ExpressUtils';
 import SessionService from './session';
 
 type SessionDetails = {
@@ -79,54 +79,82 @@ export default class UserService {
 	}
 
 	async getDetails() {
-		const isSubscribed =
-			this._account.subscription &&
-			this._account.subscription.end_date &&
-			DateUtils.getMoment(this._account.subscription.end_date).isAfter(DateUtils.getMomentNow());
+		const details = {
+			name: this._account.name,
+			email: this._account.email,
+			phone: this._account.phone,
+			isSubscribed: false,
+			subscription_expiry: '',
+			walletBalance: this._account.walletBalance ?? 0,
+			no_of_devices: 0,
+			plan_id: '',
+		};
+		if (this._level < UserLevel.Admin) {
+			return details;
+		}
 
-		const subscription_expiry = this._account.subscription?.end_date
-			? DateUtils.getMoment(this._account.subscription.end_date).format('YYYY-MM-DD')
+		const subscription = (await SubscriptionDetailsDB.findOne({
+			user: this._user_id,
+		}))!;
+
+		const isSubscribed =
+			!!subscription.plan_id &&
+			subscription.end_date &&
+			DateUtils.getMoment(subscription.end_date).isAfter(DateUtils.getMomentNow());
+
+		const subscription_expiry = subscription.end_date
+			? DateUtils.getMoment(subscription.end_date).format('YYYY-MM-DD')
 			: '';
 
 		let no_of_devices = 0;
 
 		if (isSubscribed) {
-			const plan = await PlanDB.findById(this._account.subscription!.plan_id);
+			const plan = await PlanDB.findById(subscription.plan_id);
 			no_of_devices = plan?.no_of_devices ?? 0;
 		}
-		return {
-			name: this._account.name,
-			email: this._account.email,
-			phone: this._account.phone,
-			isSubscribed,
-			subscription_expiry,
-			walletBalance: this._account.walletBalance.toFixed(2),
-			no_of_devices,
-		};
+		details.isSubscribed = isSubscribed;
+		details.subscription_expiry = subscription_expiry;
+		details.no_of_devices = no_of_devices;
+		details.plan_id = subscription.plan_id?.toString() ?? '';
+
+		return details;
+	}
+
+	public get walletBalance() {
+		return this._account.walletBalance;
+	}
+
+	public get markupPrice() {
+		return this._account.markupPrice;
 	}
 
 	static async register(
 		email: string,
+		password: string,
 		opts: {
 			name?: string;
 			phone?: string;
 			level: UserLevel;
+			linked_to?: Types.ObjectId;
 		}
 	) {
 		try {
-			const password = generateNewPassword();
-			await AccountDB.create({
+			const user = await AccountDB.create({
 				email,
 				password,
 				name: opts.name,
 				phone: opts.phone,
 				userLevel: opts.level,
-				subscription: {
-					plan_id: '6671deb40994d39d3f22a34e',
-					start_date: DateUtils.getMomentNow().toDate(),
-					end_date: DateUtils.getMomentNow().add(7, 'days').toDate(),
-				},
+				parent: opts.linked_to,
 			});
+			if (opts.level >= UserLevel.Admin) {
+				SubscriptionDetailsDB.create({
+					user,
+					plan_id: idValidator('6671deb40994d39d3f22a34e')[1],
+					start_date: DateUtils.toDate(),
+					end_date: DateUtils.getMomentNow().add(7, 'days').toDate(),
+				}).catch(() => {});
+			}
 
 			sendLoginCredentialsEmail(email, email, password);
 		} catch (err) {
@@ -184,14 +212,6 @@ export default class UserService {
 		return this._account;
 	}
 
-	public get walletBalance() {
-		return this._account.walletBalance;
-	}
-
-	public get markupPrice() {
-		return this._account.markupPrice;
-	}
-
 	public async setMarkupPrice(rate: number) {
 		if (rate < 0) {
 			throw new CustomError(COMMON_ERRORS.INVALID_FIELDS);
@@ -212,7 +232,6 @@ export default class UserService {
 		if (amount < 0) {
 			throw new CustomError(PAYMENT_ERRORS.INVALID_AMOUNT);
 		}
-		this._account.walletBalance += amount;
 		await AccountDB.updateOne(
 			{
 				_id: this._user_id,
@@ -230,17 +249,15 @@ export default class UserService {
 			return;
 		}
 
-		this._account.walletBalance -= this._account.markupPrice * numberOfMessages;
-		await AccountDB.updateOne(
+		await AccountDB.updateOne({ _id: this._user_id }, [
 			{
-				_id: this._user_id,
-			},
-			{
-				$inc: {
-					walletBalance: -1 * (this._account.markupPrice * numberOfMessages),
+				$set: {
+					walletBalance: {
+						$subtract: ['$walletBalance', { $multiply: ['$markupPrice', numberOfMessages] }],
+					},
 				},
-			}
-		);
+			},
+		]);
 	}
 
 	public async extendSubscription(date: string) {
@@ -252,13 +269,13 @@ export default class UserService {
 
 		const _date = DateUtils.getMoment(date, 'YYYY-MM-DD').toDate();
 
-		await AccountDB.updateOne(
+		await SubscriptionDetailsDB.updateOne(
 			{
-				_id: this._user_id,
+				user: this._user_id,
 			},
 			{
 				$set: {
-					'subscription.end_date': _date,
+					end_date: _date,
 				},
 			}
 		);
@@ -272,27 +289,27 @@ export default class UserService {
 
 		const _date = DateUtils.getMoment(date, 'YYYY-MM-DD').toDate();
 
-		await AccountDB.updateOne(
+		await SubscriptionDetailsDB.updateOne(
 			{
-				_id: this._user_id,
+				user: this._user_id,
 			},
 			{
 				$set: {
-					'subscription.plan_id': plan_id,
-					'subscription.end_date': _date,
+					plan_id: plan_id,
+					end_date: _date,
 				},
 			}
 		);
 	}
 
 	public async removePlan() {
-		await AccountDB.updateOne(
+		await SubscriptionDetailsDB.updateOne(
 			{
 				_id: this._user_id,
 			},
 			{
 				$set: {
-					subscription: undefined,
+					plan_id: undefined,
 				},
 			}
 		);
@@ -303,10 +320,61 @@ export default class UserService {
 			throw new CustomError(AUTH_ERRORS.PERMISSION_DENIED);
 		}
 
-		const users = await AccountDB.find({
-			userLevel: {
-				$gte: UserLevel.Admin,
+		const users = await AccountDB.aggregate([
+			{
+				$match: {
+					userLevel: {
+						$gte: UserLevel.Admin,
+					},
+				},
 			},
+			{
+				$lookup: {
+					from: SubscriptionDetailsDB.collection.name, // The name of the collection to join
+					localField: '_id', // Field from the input documents
+					foreignField: 'user', // Field from the documents of the "from" collection
+					as: 'details', // The name of the new array field to add to the input documents
+				},
+			},
+			{
+				$unwind: {
+					path: '$details', // Unwind the joined documents
+					preserveNullAndEmptyArrays: true, // Include documents that do not have a match
+				},
+			},
+		]);
+
+		return users.map((user) => {
+			const subscription = user.details;
+			const isSubscribed =
+				!!subscription.plan_id &&
+				subscription.end_date &&
+				DateUtils.getMoment(subscription.end_date).isAfter(DateUtils.getMomentNow());
+
+			const subscription_expiry = subscription.end_date
+				? DateUtils.getMoment(subscription.end_date).format('YYYY-MM-DD')
+				: '';
+
+			return {
+				id: user._id,
+				name: user.name ?? '',
+				email: user.email ?? '',
+				phone: user.phone ?? '',
+				isSubscribed,
+				plan_id: subscription.plan_id ?? '',
+				markup: user.markupPrice ?? 0,
+				subscription_expiry: subscription_expiry,
+			};
+		});
+	}
+	public async getAgents() {
+		if (this._level < UserLevel.Admin) {
+			throw new CustomError(AUTH_ERRORS.PERMISSION_DENIED);
+		}
+
+		const users = await AccountDB.find({
+			userLevel: UserLevel.Agent,
+			parent: this._user_id,
 		});
 
 		return users.map((user) => {
@@ -315,12 +383,6 @@ export default class UserService {
 				name: user.name ?? '',
 				email: user.email ?? '',
 				phone: user.phone ?? '',
-				isSubscribed:
-					user.subscription &&
-					DateUtils.getMoment(user.subscription.end_date).isAfter(DateUtils.getMomentNow()),
-				plan_id: user.subscription?.plan_id ?? '',
-				markup: user.markupPrice ?? 0,
-				subscription_expiry: user.subscription?.end_date ?? '',
 			};
 		});
 	}

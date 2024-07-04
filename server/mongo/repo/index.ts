@@ -11,6 +11,7 @@ export { default as MediaDB } from './Media';
 export { default as PhoneBookDB } from './PhoneBook';
 export { default as PlanDB } from './Plan';
 export { default as ScheduledMessageDB } from './ScheduledMessage';
+export { default as SubscriptionDetailsDB } from './SubscriptionDetails';
 export { default as SessionDB } from './Session';
 export { default as StorageDB } from './Storage';
 export { default as WalletTransactionDB } from './WalletTransaction';

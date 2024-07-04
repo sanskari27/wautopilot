@@ -167,7 +167,7 @@ const SettingsDrawer = forwardRef<SettingsDrawerHandle>((_, ref) => {
 								color={'rgb(21 143 255)'}
 								mb={'1rem'}
 							>
-								<Text>Balance : ₹{user_details.walletBalance}</Text>
+								<Text>Balance : ₹{user_details.walletBalance.toFixed(2)}</Text>
 							</Box>
 						</HStack>
 						<Flex direction={'column'} gap={'0.5rem'}>

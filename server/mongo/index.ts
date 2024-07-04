@@ -15,6 +15,7 @@ export {
 	ScheduledMessageDB,
 	SessionDB,
 	StorageDB,
+	SubscriptionDetailsDB,
 	WalletTransactionDB,
 	WhatsappLinkDB,
 } from './repo';

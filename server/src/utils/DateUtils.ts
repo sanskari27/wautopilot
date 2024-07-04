@@ -20,6 +20,10 @@ const getMonthYear = () => {
 	return moment().format('YYYY-MM');
 };
 
+const toDate = () => {
+	return moment().toDate();
+};
+
 const dateTime = () => {
 	return moment().format('YYYY-MM-DD HH:mm:ss');
 };
@@ -110,6 +114,7 @@ export default {
 	dateTime,
 	isValid,
 	now,
+	toDate,
 	format,
 	getMoment,
 	getMomentNow,

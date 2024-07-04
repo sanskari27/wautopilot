@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import { CustomError } from '../../errors';
+import { UserLevel } from '../../config/const';
+import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import { UserService } from '../../services';
 import { Respond } from '../../utils/ExpressUtils';
-import { UpgradePlanValidationResult } from './users.validator';
+import { CreateAgentValidationResult, UpgradePlanValidationResult } from './users.validator';
 export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
 export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
@@ -75,11 +76,51 @@ async function setMarkupPrice(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function createAgent(req: Request, res: Response, next: NextFunction) {
+	const { email, name, phone, password } = req.locals.data as CreateAgentValidationResult;
+	try {
+		await UserService.register(email, password, {
+			name,
+			phone,
+			level: UserLevel.Agent,
+			linked_to: req.locals.user.userId,
+		});
+
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				email,
+				name,
+				phone,
+			},
+		});
+	} catch (err) {
+		return next(new CustomError(AUTH_ERRORS.USER_ALREADY_EXISTS));
+	}
+}
+
+async function getAgents(req: Request, res: Response, next: NextFunction) {
+	try {
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				list: await req.locals.user.getAgents(),
+			},
+		});
+	} catch (err) {
+		return next(new CustomError(AUTH_ERRORS.PERMISSION_DENIED));
+	}
+}
+
 const Controller = {
 	getAdmins,
 	extendSubscription,
 	upgradePlan,
 	setMarkupPrice,
+	getAgents,
+	createAgent,
 };
 
 export default Controller;

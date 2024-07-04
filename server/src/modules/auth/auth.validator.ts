@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
-import { UserLevel } from '../../config/const';
 import { CustomError } from '../../errors';
 
 export type LoginValidationResult = {
@@ -12,7 +11,7 @@ export type LoginValidationResult = {
 
 export type RegisterValidationResult = {
 	email: string;
-	accessLevel: UserLevel;
+	password: string;
 	name: string;
 	phone: string;
 };
@@ -64,7 +63,7 @@ export async function RegisterAccountValidator(req: Request, res: Response, next
 		name: z.string(),
 		phone: z.string(),
 		email: z.string().email(),
-		accessLevel: z.nativeEnum(UserLevel).default(UserLevel.Admin),
+		password: z.string().min(6),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
