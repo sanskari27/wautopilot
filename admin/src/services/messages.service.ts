@@ -26,10 +26,23 @@ export default class MessagesService {
 		}
 	}
 
-	static async fetchConversationMessages(deviceId: string, recipientId: string) {
+	static async fetchConversationMessages(
+		deviceId: string,
+		recipientId: string,
+		pagination: {
+			page: number;
+			limit?: number;
+		}
+	) {
 		try {
 			const { data } = await APIInstance.get(
-				`/${deviceId}/message/conversations/${recipientId}/messages`
+				`/${deviceId}/message/conversations/${recipientId}/messages`,
+				{
+					params: {
+						page: pagination.page,
+						limit: pagination.limit || 50,
+					},
+				}
 			);
 			return {
 				messageLabels: data.labels ?? [],

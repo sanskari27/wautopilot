@@ -110,6 +110,10 @@ const Conversation = () => {
 			dispatch(addUnreadConversation(conversation_id));
 		});
 
+		socket.on('message_updated', (msg) => {
+			dispatch(updateMessage({ messageId: msg._id, message: msg }));
+		});
+
 		return () => {
 			socket.disconnect();
 		};
