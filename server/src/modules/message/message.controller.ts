@@ -298,9 +298,14 @@ async function fetchConversationMessages(req: Request, res: Response, next: Next
 		id,
 		device: { device },
 	} = req.locals;
+	const page = parseInt((req.query.page as string) ?? 1);
+	const limit = parseInt((req.query.limit as string) ?? 50);
 
 	const conversationService = new ConversationService(account, device);
-	const messages = await conversationService.fetchConversationMessages(id);
+	const messages = await conversationService.fetchConversationMessages(id, {
+		page,
+		limit,
+	});
 	const labels = await conversationService.fetchMessagesLabels(id);
 
 	return Respond({

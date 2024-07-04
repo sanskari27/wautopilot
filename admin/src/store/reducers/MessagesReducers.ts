@@ -40,6 +40,9 @@ const Slice = createSlice({
 		setMessageList: (state, action: PayloadAction<typeof initialState.messageList>) => {
 			state.messageList = action.payload;
 		},
+		addMessageList: (state, action: PayloadAction<typeof initialState.messageList>) => {
+			state.messageList.push(...action.payload);
+		},
 		addMessage: (state, action: PayloadAction<(typeof initialState.messageList)[0]>) => {
 			const includes = state.messageList.some((msg) => msg._id === action.payload._id);
 			if (!includes) {
@@ -128,6 +131,7 @@ const Slice = createSlice({
 
 export const {
 	setMessageList,
+	addMessageList,
 	setMessagesLoading,
 	reset,
 	setTextMessage,

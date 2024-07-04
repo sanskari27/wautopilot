@@ -21,18 +21,15 @@ import { FaFile, FaHeadphones, FaUpload, FaVideo } from 'react-icons/fa';
 import { FaPhotoFilm } from 'react-icons/fa6';
 import { MdContacts } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { io } from 'socket.io-client';
-import { SERVER_URL } from '../../../../config/const';
 import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
-	addMessage,
+	addMessageList,
 	setMessageLabels,
 	setMessageList,
 	setMessageSending,
 	setMessagesLoading,
 	setTextMessage,
-	updateMessage,
 } from '../../../../store/reducers/MessagesReducers';
 import { removeUnreadConversation } from '../../../../store/reducers/RecipientReducer';
 import { Contact } from '../../../../store/types/ContactState';
@@ -54,7 +51,10 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 	const dispatch = useDispatch();
 
 	const messageTaggingRef = useRef<MessageTagsViewHandle>(null);
-
+	const pagination = useRef({
+		page: 1,
+		loadMore: true,
+	});
 	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
@@ -70,16 +70,36 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 
 	useEffect(() => {
 		if (!selected_device_id || !selected_recipient) return;
+		pagination.current.loadMore = true;
+		pagination.current.page = 1;
 		dispatch(setMessagesLoading(true));
-		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id).then(
-			(data) => {
-				dispatch(removeUnreadConversation(selected_recipient._id));
-				dispatch(setMessageList(data.messages));
-				dispatch(setMessageLabels(data.messageLabels));
-				dispatch(setMessagesLoading(false));
+		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id, {
+			page: 1,
+		}).then((data) => {
+			dispatch(removeUnreadConversation(selected_recipient._id));
+			dispatch(setMessageList(data.messages));
+			dispatch(setMessageLabels(data.messageLabels));
+			dispatch(setMessagesLoading(false));
+			if (data.messages.length < 50) {
+				pagination.current.loadMore = false;
 			}
-		);
+		});
 	}, [dispatch, selected_device_id, selected_recipient]);
+
+	const loadMore = () => {
+		if (!pagination.current.loadMore) {
+			return;
+		}
+		pagination.current.page++;
+		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id, {
+			page: pagination.current.page,
+		}).then((data) => {
+			dispatch(addMessageList(data.messages));
+			if (data.messages.length < 50) {
+				pagination.current.loadMore = false;
+			}
+		});
+	};
 
 	return (
 		<>
@@ -144,7 +164,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 							Loading Chats...
 						</Text>
 					) : (
-						<MessagesList list={messageList} />
+						<MessagesList list={messageList} onLastReached={loadMore} />
 					)}
 				</Flex>
 				<MessageBox />
@@ -231,40 +251,6 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 		message: { attachment_id, contactCard },
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
 	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
-
-	useEffect(() => {
-		dispatch(setMessagesLoading(true));
-		if (!selected_device_id) return;
-		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id).then(
-			(data) => {
-				dispatch(setMessageList(data.messages));
-				dispatch(setMessageLabels(data.messageLabels));
-				dispatch(setMessagesLoading(false));
-			}
-		);
-	}, [dispatch, selected_device_id, selected_recipient]);
-
-	useEffect(() => {
-		const socket = io(SERVER_URL + 'conversation');
-
-		socket.on('connect', () => {
-			socket.emit('join_conversation', selected_recipient._id);
-		});
-
-		socket.on('disconnect', () => {});
-
-		socket.on('message_new', (msg) => {
-			dispatch(addMessage(msg));
-		});
-
-		socket.on('message_updated', (msg) => {
-			dispatch(updateMessage({ messageId: msg._id, message: msg }));
-		});
-
-		return () => {
-			socket.disconnect();
-		};
-	}, [selected_recipient._id, dispatch]);
 
 	const sendAttachmentMessage = (type: string, attachments: string[]) => {
 		if (attachments.length === 0) return;

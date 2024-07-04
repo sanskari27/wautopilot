@@ -367,12 +367,24 @@ export default class ConversationService extends WhatsappLinkService {
 		return processConversationDocs(docs);
 	}
 
-	public async fetchConversationMessages(conversation_id: Types.ObjectId) {
+	public async fetchConversationMessages(
+		conversation_id: Types.ObjectId,
+		opts: {
+			page: number;
+			limit: number;
+		} = {
+			page: 1,
+			limit: 50,
+		}
+	) {
 		const docs = await ConversationMessageDB.find({
 			linked_to: this.userId,
 			device_id: this.deviceId,
 			conversation_id,
-		}).sort({ createdAt: -1 });
+		})
+			.sort({ createdAt: -1 })
+			.skip((opts.page - 1) * opts.limit)
+			.limit(opts.limit);
 
 		const _docs = docs.sort(
 			(a, b) =>
