@@ -14,6 +14,7 @@ export default function Dashboard() {
 
 	const {
 		details: { health, phoneRecords, mediaSize },
+		ui: { isLoading },
 	} = useSelector((state: StoreState) => state[StoreNames.DASHBOARD]);
 
 	const { list: templateList } = useSelector((state: StoreState) => state[StoreNames.TEMPLATES]);
@@ -52,19 +53,22 @@ export default function Dashboard() {
 				<Flex direction={'column'} gap={'1rem'}>
 					<Flex gap={'1rem'}>
 						<StatsTemplate
+							isLoading={isLoading}
 							label={'Wallet Balance'}
 							value={'₹' + walletBalance}
 							bgColor={'blue.200'}
 						/>
 						<StatsTemplate
+							isLoading={isLoading}
 							label={'Number Health'}
 							value={health}
-							bgColor={`${health.toLocaleLowerCase()}.200`}
+							bgColor={isLoading ? 'green.200' : `${health.toLocaleLowerCase()}.200`}
 						/>
 					</Flex>
 					<Flex gap={'1rem'}>
 						<TotalConversations />
 						<StatsTemplate
+							isLoading={isLoading}
 							label={'Media Storage'}
 							value={getFileSize(mediaSize)}
 							bgColor={'thistle'}
@@ -86,11 +90,13 @@ export default function Dashboard() {
 				<Flex direction={'column'} gap={'1rem'}>
 					<Flex gap={'1rem'}>
 						<StatsTemplate
+							isLoading={isLoading}
 							label='Templates(Approved)'
 							value={`${templateList.length.toString()}(${approvedTemplateList.length.toString()})`}
 							bgColor='blue.200'
 						/>
 						<StatsTemplate
+							isLoading={isLoading}
 							label='Phonebook/Contacts'
 							value={`${phoneRecords}/${contactList.length.toString()}`}
 							bgColor='blue.200'
@@ -98,11 +104,13 @@ export default function Dashboard() {
 					</Flex>
 					<Flex gap={'1rem'}>
 						<StatsTemplate
+							isLoading={isLoading}
 							label='Chatbots(Active)'
 							value={`${chatbotList.length.toString()}(${activeChatbots.length.toString()})`}
 							bgColor='turquoise'
 						/>
 						<StatsTemplate
+							isLoading={isLoading}
 							label='Flows(Active)'
 							value={`${chatbotFlows.length.toString()}(${activeChatbotFlows.length.toString()})`}
 							bgColor='cornsilk'
