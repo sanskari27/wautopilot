@@ -123,6 +123,8 @@ const SettingsDrawer = forwardRef<SettingsDrawerHandle>((_, ref) => {
 					title: err.message,
 					status: 'error',
 				});
+			}).finally(() => {
+				setMoney((prev) => ({ ...prev, isPaymentProcessing: false }));
 			});
 	};
 
