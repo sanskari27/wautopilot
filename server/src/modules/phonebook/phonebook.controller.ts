@@ -50,8 +50,8 @@ async function addRecords(req: Request, res: Response, next: NextFunction) {
 }
 
 async function records(req: Request, res: Response, next: NextFunction) {
-	const page = req.query.page ? parseInt(req.query.page as string) : 1;
-	const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+	const page = req.query.page ? parseInt(req.query.page as string) || 1 : 1;
+	const limit = req.query.limit ? parseInt(req.query.limit as string) || 20 : 20;
 	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];
 	try {
 		const phoneBookService = new PhoneBookService(req.locals.account);
@@ -72,6 +72,8 @@ async function records(req: Request, res: Response, next: NextFunction) {
 			},
 		});
 	} catch (err) {
+		console.log(err);
+
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
