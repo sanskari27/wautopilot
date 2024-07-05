@@ -291,4 +291,49 @@ export default class MessagesService {
 			return false;
 		}
 	}
+
+	static async buttonResponseReport({
+		deviceId,
+		campaignId,
+		exportCSV,
+	}: {
+		deviceId: string;
+		campaignId: string;
+		exportCSV?: boolean;
+	}) {
+		if (!exportCSV) {
+			const { data } = await APIInstance.get(`/${deviceId}/message/button-responses/${campaignId}`);
+			return data.responses as {
+				button_text: string;
+				recipient: string;
+				responseAt: string;
+				name: string;
+				email: string;
+			}[];
+		} else {
+			const response = await APIInstance.get(
+				`/${deviceId}/message/button-responses/${campaignId}/download`,
+				{
+					responseType: 'blob',
+				}
+			);
+			const blob = new Blob([response.data]);
+
+			const contentDisposition = response.headers['content-disposition'];
+			const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.*)"/);
+			const filename = filenameMatch ? filenameMatch[1] : 'Button Response Report.csv';
+
+			// Create a temporary link element
+			const downloadLink = document.createElement('a');
+			downloadLink.href = window.URL.createObjectURL(blob);
+			downloadLink.download = filename; // Specify the filename
+
+			// Append the link to the body and trigger the download
+			document.body.appendChild(downloadLink);
+			downloadLink.click();
+
+			// Clean up - remove the link
+			document.body.removeChild(downloadLink);
+		}
+	}
 }

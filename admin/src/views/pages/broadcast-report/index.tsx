@@ -17,6 +17,8 @@ import {
 } from '@chakra-ui/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate, useOutlet } from 'react-router-dom';
+import { NAVIGATION } from '../../../config/const';
 import useFilteredList from '../../../hooks/useFilteredList';
 import MessagesService from '../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../store';
@@ -34,10 +36,12 @@ export type ScheduledBroadcast = {
 };
 
 export default function BroadcastReport() {
+	const navigate = useNavigate();
 	const [list, setList] = useState<ScheduledBroadcast[]>([]);
 	const [campaignLoading, setCampaignLoading] = useBoolean(true);
 	const deleteAlertRef = useRef<DeleteAlertHandle>(null);
 	const toast = useToast();
+	const outlet = useOutlet();
 
 	const [selectedBroadcast, setSelectedBroadcast] = useState<string[]>([]);
 
@@ -114,6 +118,9 @@ export default function BroadcastReport() {
 	};
 
 	const { filtered } = useFilteredList(list, { name: 1 });
+	if (outlet) {
+		return outlet;
+	}
 
 	return (
 		<Flex direction={'column'} padding={'1rem'} justifyContent={'start'}>
@@ -213,12 +220,72 @@ export default function BroadcastReport() {
 										/>
 										{index + 1}.
 									</Td>
-									<Td className='whitespace-break-spaces'>{broadcast.name}</Td>
-									<Td className='whitespace-break-spaces'>{broadcast.description}</Td>
-									<Td textAlign={'center'}>{broadcast.createdAt}</Td>
-									<Td textColor={'green'}>{broadcast.sent}</Td>
-									<Td textColor={'yellow.500'}>{broadcast.pending}</Td>
-									<Td textColor={'red.400'}>{broadcast.failed}</Td>
+									<Td
+										onClick={() =>
+											navigate(
+												`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
+											)
+										}
+										cursor={'pointer'}
+										className='whitespace-break-spaces'
+									>
+										{broadcast.name}
+									</Td>
+									<Td
+										onClick={() =>
+											navigate(
+												`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
+											)
+										}
+										cursor={'pointer'}
+										className='whitespace-break-spaces'
+									>
+										{broadcast.description}
+									</Td>
+									<Td
+										onClick={() =>
+											navigate(
+												`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
+											)
+										}
+										cursor={'pointer'}
+										textAlign={'center'}
+									>
+										{broadcast.createdAt}
+									</Td>
+									<Td
+										onClick={() =>
+											navigate(
+												`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
+											)
+										}
+										cursor={'pointer'}
+										textColor={'green'}
+									>
+										{broadcast.sent}
+									</Td>
+									<Td
+										onClick={() =>
+											navigate(
+												`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
+											)
+										}
+										cursor={'pointer'}
+										textColor={'yellow.500'}
+									>
+										{broadcast.pending}
+									</Td>
+									<Td
+										onClick={() =>
+											navigate(
+												`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
+											)
+										}
+										cursor={'pointer'}
+										textColor={'red.400'}
+									>
+										{broadcast.failed}
+									</Td>
 									<Td>
 										{broadcast.isPaused ? (
 											<Button

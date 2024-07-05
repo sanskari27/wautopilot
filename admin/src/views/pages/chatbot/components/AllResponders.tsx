@@ -15,6 +15,7 @@ import {
 import { useRef } from 'react';
 import { MdDelete } from 'react-icons/md';
 import { PiPause, PiPlay } from 'react-icons/pi';
+import { TbReportSearch } from 'react-icons/tb';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { NAVIGATION } from '../../../../config/const';
@@ -161,6 +162,23 @@ export default function AllResponders() {
 															disclaimer: 'Are you sure you want to change running status?',
 															type: 'TOGGLE_BOT',
 														});
+													}}
+													bgColor={'transparent'}
+													_hover={{
+														bgColor: 'transparent',
+													}}
+													outline='none'
+													border='none'
+												/>
+											</Tooltip>
+											<Tooltip label='Download Responses' aria-label='Toggle Responder'>
+												<IconButton
+													aria-label='toggle'
+													icon={<TbReportSearch />}
+													onClick={() => {
+														navigate(
+															`${NAVIGATION.APP}/${NAVIGATION.CHATBOT}/button-report/${bot.id}`
+														);
 													}}
 													bgColor={'transparent'}
 													_hover={{

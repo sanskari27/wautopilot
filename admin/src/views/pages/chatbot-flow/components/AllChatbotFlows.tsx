@@ -24,6 +24,7 @@ import { removeBot, updateBot } from '../../../../store/reducers/ChatBotReducer'
 import ConfirmationAlert, { ConfirmationAlertHandle } from '../../../components/confirmation-alert';
 import DeleteAlert, { DeleteAlertHandle } from '../../../components/delete-alert';
 import Each from '../../../components/utils/Each';
+import { TbReportSearch } from 'react-icons/tb';
 
 export default function AllChatbotFlows() {
 	const dispatch = useDispatch();
@@ -137,6 +138,23 @@ export default function AllChatbotFlows() {
 															disclaimer: 'Are you sure you want to change running status?',
 															type: 'TOGGLE_BOT',
 														});
+													}}
+													bgColor={'transparent'}
+													_hover={{
+														bgColor: 'transparent',
+													}}
+													outline='none'
+													border='none'
+												/>
+											</Tooltip>
+											<Tooltip label='Download Responses' aria-label='Toggle Responder'>
+												<IconButton
+													aria-label='toggle'
+													icon={<TbReportSearch />}
+													onClick={() => {
+														navigate(
+															`${NAVIGATION.APP}/${NAVIGATION.CHATBOT_FLOW}/button-report/${bot.id}`
+														);
 													}}
 													bgColor={'transparent'}
 													_hover={{

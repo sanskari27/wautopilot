@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import { NAVIGATION } from './config/const';
 
@@ -30,6 +30,7 @@ const CreateChatbotFlow = lazy(
 );
 const RecurringPage = lazy(() => import('./views/pages/recurring'));
 const CreateRecurring = lazy(() => import('./views/pages/recurring/CreateRecurring'));
+const ButtonResponseReport = lazy(() => import('./views/components/button-report'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -63,26 +64,31 @@ function App() {
 							<Route path={NAVIGATION.TEMPLATES} element={<Templates />} />
 							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
 							<Route path={NAVIGATION.RECURRING} element={<RecurringPage />}>
-								<Route path={':id'} element={<CreateRecurring />} />
+								<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
 								<Route path={'new'} element={<CreateRecurring />} />
+								<Route path={':id'} element={<CreateRecurring />} />
 							</Route>
-							<Route path={NAVIGATION.BROADCAST_REPORT} element={<BroadcastReport />} />
+							<Route path={NAVIGATION.BROADCAST_REPORT} element={<BroadcastReport />}>
+								<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
+							</Route>
 							<Route path={NAVIGATION.CONTACT} element={<ContactPage />} />
 							<Route path={NAVIGATION.INBOX} element={<Conversation />} />
 							<Route path={NAVIGATION.CHATBOT} element={<ChatBot />}>
-								<Route path={':id'} element={<CreateChatBot />} />
 								<Route path={'new'} element={<CreateChatBot />} />
+								<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
+								<Route path={':id'} element={<CreateChatBot />} />
 							</Route>
 							<Route path={NAVIGATION.CHATBOT_FLOW} element={<ChatbotFlow />}>
 								<Route path={'update-flow/:id'} element={<RenderFlow />} />
+								<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
 								<Route path={':id'} element={<CreateChatbotFlow />} />
 							</Route>
 							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
 						</Route>
-						{/* <Route
+						<Route
 							path='*'
 							element={<Navigate to={NAVIGATION.APP + '/' + NAVIGATION.DASHBOARD} />}
-						/> */}
+						/>
 					</Routes>
 				</Suspense>
 			</Router>
