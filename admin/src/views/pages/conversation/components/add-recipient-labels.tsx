@@ -46,7 +46,6 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 		recipient: '',
 		profile_name: '',
 		origin: '',
-		expiration_timestamp: '',
 		labels: [],
 	});
 
@@ -60,7 +59,6 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 			recipient: '',
 			profile_name: '',
 			origin: '',
-			expiration_timestamp: '',
 			labels: [],
 		});
 		setOpen.off();
@@ -78,7 +76,6 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 					recipient: recipient.recipient,
 					profile_name: recipient.profile_name,
 					origin: recipient.origin,
-					expiration_timestamp: recipient.expiration_timestamp,
 					labels: recipient.labels,
 				};
 			});

@@ -10,7 +10,6 @@ type Item = {
 	recipient: string;
 	profile_name: string;
 	origin: string;
-	expiration_timestamp: string;
 	labels: string[];
 };
 
