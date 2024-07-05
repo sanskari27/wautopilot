@@ -15,7 +15,10 @@ import COMMON_ERRORS from '../errors/common-errors';
 import DateUtils from '../utils/DateUtils';
 import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import TimeGenerator from '../utils/TimeGenerator';
+import ConversationService from './conversation';
+import PhoneBookService from './phonebook';
 import SchedulerService from './scheduler';
+import UserService from './user';
 import WhatsappLinkService from './whatsappLink';
 
 type Broadcast = {
@@ -570,5 +573,50 @@ export default class BroadcastService extends WhatsappLinkService {
 				},
 			}
 		);
+	}
+
+	public static async sendRecursiveBroadcastMessages() {
+		// const recurringBroadcasts = await RecurringBroadcastDB.find({
+		// 	status: BROADCAST_STATUS.ACTIVE,
+		// }).populate<{
+		// 	device_id: IWhatsappLink;
+		// 	linked_to: IAccount;
+		// }>('device_id linked_to');
+
+		// const today = DateUtils.getDate('YYYY-MM-DD');
+
+		// recurringBroadcasts.forEach(async (broadcast) => {
+		// 	const phoneBook = new PhoneBookService(broadcast.linked_to);
+		// 	const conversationService = new ConversationService(broadcast.linked_to, broadcast.device_id);
+		// 	const userService = new UserService(broadcast.linked_to);
+
+		// 	const recipients = (
+		// 		await phoneBook.fetchRecords({
+		// 			page: 1,
+		// 			limit: 99999999,
+		// 			labels: broadcast.labels,
+		// 		})
+		// 	)
+		// 		.filter((record) => {
+		// 			if (!record.phone_number) {
+		// 				return false;
+		// 			}
+		// 			if (
+		// 				broadcast.wish_from === 'birthday' &&
+		// 				DateUtils.getMoment(record.birthday).format('YYYY-MM-DD') === today
+		// 			) {
+		// 				return true;
+		// 			} else if (
+		// 				broadcast.wish_from === 'anniversary' &&
+		// 				DateUtils.getMoment(record.anniversary).format('YYYY-MM-DD') === today
+		// 			) {
+		// 				return true;
+		// 			}
+		// 			return false;
+		// 		})
+		// 		.map((record) => record.phone_number);
+
+		// 	// const labels =
+		// });
 	}
 }

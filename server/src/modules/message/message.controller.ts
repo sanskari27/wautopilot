@@ -311,11 +311,14 @@ async function scheduleRecurringBroadcast(req: Request, res: Response, next: Nex
 	try {
 		const broadcastService = new BroadcastService(account, device);
 
-		await broadcastService.scheduleRecurring(data);
+		const details = await broadcastService.scheduleRecurring(data);
 
 		return Respond({
 			res,
 			status: 200,
+			data: {
+				details,
+			},
 		});
 	} catch (err) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));

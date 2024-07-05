@@ -174,7 +174,7 @@ export default class SchedulerService extends WhatsappLinkService {
 		});
 	}
 
-	public static async sendScheduledMessages() {
+	public static async sendScheduledNormalMessages() {
 		if (!IS_PRODUCTION) return;
 		let docs;
 		try {

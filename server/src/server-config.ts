@@ -9,6 +9,7 @@ import routes from './modules';
 import Logger from 'n23-logger';
 import { IS_PRODUCTION, IS_WINDOWS, Path } from './config/const';
 import { CustomError } from './errors';
+import BroadcastService from './services/broadcast';
 import SchedulerService from './services/scheduler';
 
 const allowlist = [
@@ -119,8 +120,13 @@ export default function (app: Express) {
 	});
 	cron.schedule('*/2 * * * * *', () => {
 		SchedulerService.sendScheduledTemplateMessages();
-		SchedulerService.sendScheduledMessages();
+		SchedulerService.sendScheduledNormalMessages();
 		SchedulerService.sendScheduledInteractiveMessages();
+	});
+
+	//0 0 * * *
+	cron.schedule('30 0 * * *', function () {
+		BroadcastService.sendRecursiveBroadcastMessages();
 	});
 	createDir();
 }
