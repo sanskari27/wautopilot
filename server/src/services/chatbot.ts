@@ -6,7 +6,7 @@ import ChatBotFlowDB, { ChatBotFlowDB_name } from '../../mongo/repo/ChatbotFlow'
 import FlowMessageDB from '../../mongo/repo/FlowMessages';
 import IAccount from '../../mongo/types/account';
 import IChatBot from '../../mongo/types/chatbot';
-import IChatBotFlow from '../../mongo/types/chatbotFlow';
+import IChatBotFlow from '../../mongo/types/chatbotFlows';
 import IContact from '../../mongo/types/contact';
 import IMedia from '../../mongo/types/media';
 import IWhatsappLink from '../../mongo/types/whatsappLinks';
