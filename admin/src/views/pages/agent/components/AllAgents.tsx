@@ -9,7 +9,6 @@ import {
 	Thead,
 	Tr,
 } from '@chakra-ui/react';
-import { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
 import {
@@ -19,12 +18,10 @@ import {
 	selectAll,
 } from '../../../../store/reducers/AgentReducer';
 import Each from '../../../components/utils/Each';
-import CreateAgentDialog, { AgentDialogHandle } from './CreateAgentdialog';
+import AgentContextMenu from './AgentContextMenu';
 
 export default function AllAgents() {
 	const dispatch = useDispatch();
-
-	const CreateAgentDialogRef = useRef<AgentDialogHandle>(null);
 
 	const {
 		list,
@@ -91,7 +88,9 @@ export default function AllAgents() {
 										</Td>
 										<Td>{agent.name}</Td>
 										<Td>{agent.phone}</Td>
-										<Td></Td>
+										<Td>
+											<AgentContextMenu agent={agent} />
+										</Td>
 									</Tr>
 								)}
 							/>
@@ -99,7 +98,6 @@ export default function AllAgents() {
 					</Tbody>
 				</Table>
 			</TableContainer>
-			<CreateAgentDialog ref={CreateAgentDialogRef} />
 		</>
 	);
 }

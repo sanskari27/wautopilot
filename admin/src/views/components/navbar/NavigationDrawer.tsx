@@ -5,12 +5,13 @@ import { MdSettings } from 'react-icons/md';
 import { TbLogout2 } from 'react-icons/tb';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { MenuItems, WEBPAGE_URL } from '../../../config/const';
+import { MenuItems, NAVIGATION, WEBPAGE_URL } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
 import DevicesDialog, { DevicesHandle } from '../devices';
 import SettingsDrawer, { SettingsDrawerHandle } from '../settings-dialog';
 import Each from '../utils/Each';
+import { FaUserSecret } from 'react-icons/fa';
 
 function isActiveTab(tab: string, path: string): boolean {
 	if (path.includes(tab)) return true;
@@ -28,6 +29,7 @@ export default function NavigationDrawer({
 		toggle: () => void;
 	};
 }) {
+	const navigate = useNavigate();
 	const DevicesRef = useRef<DevicesHandle>(null);
 	const settingsDrawer = useRef<SettingsDrawerHandle>(null);
 
@@ -108,6 +110,21 @@ export default function NavigationDrawer({
 							<Text fontSize={'sm'} whiteSpace={'nowrap'}>
 								{deviceList.find((device) => device.id === selected_device_id)?.verifiedName ??
 									'No Devices'}
+							</Text>
+						</Flex>
+						<Flex
+							className={`cursor-pointer overflow-hidden
+										transition-all duration-300 ease-in-out`}
+							padding={'0.45rem'}
+							rounded={'lg'}
+							gap={'0.5rem'}
+							onClick={() => navigate(`${NAVIGATION.AGENT}`)}
+							width={'full'}
+							alignItems={'center'}
+						>
+							<Icon as={FaUserSecret} width={5} height={5} />
+							<Text ml={'0.5rem'} fontSize={'sm'} whiteSpace={'nowrap'}>
+								Agents
 							</Text>
 						</Flex>
 						<Flex

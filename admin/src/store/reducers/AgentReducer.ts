@@ -24,9 +24,6 @@ const Slice = createSlice({
 		setAgentList: (state, action: PayloadAction<typeof initState.list>) => {
 			state.list = action.payload;
 		},
-		setAgentDetails: (state, action: PayloadAction<typeof initState.details>) => {
-			state.details = action.payload;
-		},
 		selectAll: (state) => {
 			state.selectedAgent = state.list.map((record) => record.id);
 		},
@@ -57,6 +54,21 @@ const Slice = createSlice({
 		addAgent: (state, action: PayloadAction<typeof initState.details>) => {
 			state.list.push(action.payload);
 		},
+		setAgentDetails: (state, action: PayloadAction<string>) => {
+			const agent = state.list.find((record) => record.id === action.payload);
+			if (agent) {
+				state.details = agent;
+			}
+		},
+		removeAgent: (state, action: PayloadAction<string>) => {
+			state.list = state.list.filter((record) => record.id !== action.payload);
+		},
+		updateAgent: (state, action: PayloadAction<typeof initState.details>) => {
+			const index = state.list.findIndex((record) => record.id === action.payload.id);
+			if (index !== -1) {
+				state.list[index] = action.payload;
+			}
+		},
 	},
 });
 
@@ -73,6 +85,8 @@ export const {
 	setAgentPhone,
 	setAgentPassword,
 	addAgent,
+	removeAgent,
+	updateAgent,
 } = Slice.actions;
 
 export default Slice.reducer;

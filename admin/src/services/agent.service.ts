@@ -47,4 +47,8 @@ export default class AgentService {
 			//ignore
 		}
 	}
+
+	static async deleteAgent(agentId: string) {
+		APIInstance.delete(`/users/agents/${agentId}`);
+	}
 }

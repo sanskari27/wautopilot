@@ -11,87 +11,93 @@ import {
 	ModalOverlay,
 	useToast,
 } from '@chakra-ui/react';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { NAVIGATION } from '../../../../config/const';
 import AgentService from '../../../../services/agent.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
+	addAgent,
 	setAgentDetails,
 	setAgentEmail,
 	setAgentName,
 	setAgentPassword,
 	setAgentPhone,
+	updateAgent,
 } from '../../../../store/reducers/AgentReducer';
 import PasswordInput from '../../../components/password-input';
 
-export type AgentDialogHandle = {
-	open: (agent?: { id: string; name: string; email: string; phone: string }) => void;
-};
-
-const CreateAgentDialog = forwardRef<AgentDialogHandle>((_, ref) => {
+const CreateAgentDialog = () => {
 	const dispatch = useDispatch();
 	const toast = useToast();
+	const navigate = useNavigate();
+	const { id } = useParams();
 
 	const {
-		details: { email, id, name, phone, password },
+		details: { email, name, phone, password },
 	} = useSelector((state: StoreState) => state[StoreNames.AGENT]);
 
-	const [isOpen, setIsOpen] = useState(false);
-
-	useImperativeHandle(ref, () => ({
-		open: (agent?: { id: string; name: string; email: string; phone: string }) => {
-			if (agent) {
-				dispatch(setAgentDetails(agent));
-			}
-			setIsOpen(true);
-		},
-	}));
-
 	const handleClose = () => {
-		setIsOpen(false);
-		dispatch(setAgentDetails({ id: '', name: '', email: '', phone: '', password: '' }));
+		navigate(`${NAVIGATION.APP}/${NAVIGATION.AGENT}`);
 	};
 
 	const handleSave = () => {
-		if (!name || !email || !phone || !password) {
+		if (!name || !email || !phone) {
 			toast({
 				title: 'All fields are required',
 				status: 'error',
 			});
 			return;
 		}
-		if (password.length < 6) {
-			toast({
-				title: 'Password must be at least 6 characters',
-				status: 'error',
-			});
-			return;
-		}
+
 		let promise;
 		if (id) {
-			promise = AgentService.updateAgent({ id, name, email, phone, password });
+			promise = AgentService.updateAgent({ id, name, email, phone, password: '000000' });
 		} else {
+			if (!password || password.length < 6) {
+				toast({
+					title: 'Password must be at least 6 characters',
+					status: 'error',
+				});
+				return;
+			}
 			promise = AgentService.createAgent({ name, email, phone, password });
 		}
 
 		toast.promise(promise, {
 			loading: { title: 'Saving...' },
 			success: (data) => {
-				dispatch(setAgentDetails(data));
+				if (!id) {
+					dispatch(addAgent(data));
+				} else {
+					dispatch(updateAgent({ id, ...data }));
+				}
 				handleClose();
 				return {
 					title: 'Agent saved successfully',
 				};
 			},
-			error: { title: 'Error saving agent' },
+			error: { title: 'Email already exist' },
 		});
 	};
 
+	useEffect(() => {
+		if (id) {
+			dispatch(setAgentDetails(id));
+		} else {
+			dispatch(setAgentName(''));
+			dispatch(setAgentEmail(''));
+			dispatch(setAgentPhone(''));
+			dispatch(setAgentPassword(''));
+		}
+	}, [dispatch, id]);
+
 	return (
-		<Modal isOpen={isOpen} onClose={handleClose}>
+		<Modal isOpen={true} onClose={handleClose}>
 			<ModalOverlay />
 			<ModalContent>
-				<ModalHeader>Create Agent</ModalHeader>
+				<ModalHeader>{id ? 'Edit' : 'Create'} Agent</ModalHeader>
 				<ModalBody>
 					<FormControl mb={'1rem'}>
 						<FormLabel m={0}>Name</FormLabel>
@@ -117,13 +123,15 @@ const CreateAgentDialog = forwardRef<AgentDialogHandle>((_, ref) => {
 							onChange={(e) => dispatch(setAgentPhone(e.target.value))}
 						/>
 					</FormControl>
-					<FormControl mb={'1rem'}>
-						<PasswordInput
-							value={password}
-							onChange={(e) => dispatch(setAgentPassword(e.target.value))}
-							placeholder='*********'
-						/>
-					</FormControl>
+					{!id && (
+						<FormControl mb={'1rem'}>
+							<PasswordInput
+								value={password}
+								onChange={(e) => dispatch(setAgentPassword(e.target.value))}
+								placeholder='*********'
+							/>
+						</FormControl>
+					)}
 				</ModalBody>
 				<ModalFooter>
 					<Button colorScheme='red' variant={'outline'} mr={3} onClick={handleClose}>
@@ -136,6 +144,6 @@ const CreateAgentDialog = forwardRef<AgentDialogHandle>((_, ref) => {
 			</ModalContent>
 		</Modal>
 	);
-});
+};
 
 export default CreateAgentDialog;

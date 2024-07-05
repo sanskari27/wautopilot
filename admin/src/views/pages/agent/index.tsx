@@ -1,11 +1,13 @@
 import { AddIcon } from '@chakra-ui/icons';
 import { Button, Flex, HStack, Text } from '@chakra-ui/react';
-import { useRef } from 'react';
+import { useNavigate, useOutlet } from 'react-router-dom';
+import { NAVIGATION } from '../../../config/const';
 import AllAgents from './components/AllAgents';
-import CreateAgentDialog, { AgentDialogHandle } from './components/CreateAgentdialog';
 
 export default function AgentPage() {
-	const CreateAgentDialogRef = useRef<AgentDialogHandle>(null);
+	const outlet = useOutlet();
+	const navigate = useNavigate();
+
 	return (
 		<Flex
 			direction={'column'}
@@ -19,7 +21,7 @@ export default function AgentPage() {
 					Agents
 				</Text>
 				<Button
-					onClick={() => CreateAgentDialogRef.current?.open()}
+					onClick={() => navigate(`${NAVIGATION.APP}/${NAVIGATION.AGENT}/new`)}
 					variant='outline'
 					size={'sm'}
 					colorScheme='green'
@@ -29,7 +31,7 @@ export default function AgentPage() {
 				</Button>
 			</HStack>
 			<AllAgents />
-			<CreateAgentDialog ref={CreateAgentDialogRef} />
+			{outlet}
 		</Flex>
 	);
 }
