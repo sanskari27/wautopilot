@@ -31,7 +31,7 @@ async function broadcastReport(req: Request, res: Response, next: NextFunction) 
 	try {
 		const broadcastService = new BroadcastService(account, device);
 
-		const reports = await broadcastService.fetchReports();
+		const reports = await broadcastService.fetchBroadcastReports();
 
 		return Respond({
 			res,

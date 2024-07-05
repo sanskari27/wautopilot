@@ -6,6 +6,7 @@ import {
 	ScheduledMessageDB,
 } from '../../mongo';
 import { BroadcastDB_name } from '../../mongo/repo/Broadcast';
+import { RecurringBroadcastDB_name } from '../../mongo/repo/RecurringBroadcast';
 import IAccount from '../../mongo/types/account';
 import IRecurringBroadcast from '../../mongo/types/recurringBroadcast';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
@@ -15,10 +16,8 @@ import COMMON_ERRORS from '../errors/common-errors';
 import DateUtils from '../utils/DateUtils';
 import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import TimeGenerator from '../utils/TimeGenerator';
-import ConversationService from './conversation';
 import PhoneBookService from './phonebook';
 import SchedulerService from './scheduler';
-import UserService from './user';
 import WhatsappLinkService from './whatsappLink';
 
 type Broadcast = {
@@ -69,6 +68,15 @@ type ScheduledBroadcastOptions = {
 	endTime: string;
 	daily_messages_count: number;
 };
+const bodyParametersList = [
+	'first_name',
+	'last_name',
+	'middle_name',
+	'phone_number',
+	'email',
+	'birthday',
+	'anniversary',
+];
 
 function processRecurringDocs(docs: IRecurringBroadcast[]) {
 	return docs.map((doc) => ({
@@ -177,10 +185,137 @@ export default class BroadcastService extends WhatsappLinkService {
 	}
 
 	async rescheduleRecurringBroadcast(id: Types.ObjectId) {
-		//TODO
+		const broadcast = await RecurringBroadcastDB.findById(id).populate<{
+			device_id: IWhatsappLink;
+			linked_to: IAccount;
+		}>('device_id linked_to');
+		if (!broadcast) {
+			return;
+		}
+		const today = DateUtils.getDate('YYYY-MM-DD');
+
+		const phoneBook = new PhoneBookService(broadcast.linked_to);
+		const schedulerService = new SchedulerService(broadcast.linked_to, broadcast.device_id);
+
+		const template_name = broadcast.template_name;
+		const header = broadcast.template_header;
+		const body = broadcast.template_body;
+		const recipients = (
+			await phoneBook.fetchRecords({
+				page: 1,
+				limit: 99999999,
+				labels: broadcast.labels,
+			})
+		).filter((record) => {
+			if (!record.phone_number) {
+				return false;
+			}
+			if (
+				broadcast.wish_from === 'birthday' &&
+				DateUtils.getMoment(record.birthday).format('YYYY-MM-DD') === today
+			) {
+				return true;
+			} else if (
+				broadcast.wish_from === 'anniversary' &&
+				DateUtils.getMoment(record.anniversary).format('YYYY-MM-DD') === today
+			) {
+				return true;
+			}
+			return false;
+		});
+
+		const timeGenerator = new TimeGenerator({
+			startDate: today,
+			startTime: broadcast.startTime,
+			endTime: broadcast.endTime,
+			daily_count: 99999999,
+		});
+
+		const formattedMessages = recipients.map((fields) => {
+			let headers = [] as Record<string, unknown>[];
+
+			if (header) {
+				const object = {
+					...(header.media_id ? { id: header.media_id } : header.link ? { link: header.link } : {}),
+				};
+
+				headers = [
+					{
+						type: 'HEADER',
+						parameters:
+							header.type !== 'TEXT'
+								? [
+										{
+											type: header.type,
+											[header.type.toLowerCase()]: object,
+										},
+								  ]
+								: [],
+					},
+				];
+			}
+
+			return {
+				to: fields.phone_number,
+				messageObject: {
+					template_name,
+					to: fields.phone_number,
+					components: [
+						{
+							type: 'BODY',
+							parameters: body.map((b) => {
+								if (b.variable_from === 'custom_text') {
+									return {
+										type: 'text',
+										text: b.custom_text,
+									};
+								} else {
+									if (!fields) {
+										return {
+											type: 'text',
+											text: b.fallback_value,
+										};
+									}
+
+									const fieldVal = (
+										bodyParametersList.includes(b.phonebook_data)
+											? fields[b.phonebook_data as keyof typeof fields]
+											: fields.others[b.phonebook_data]
+									) as string;
+
+									if (typeof fieldVal === 'string') {
+										return {
+											type: 'text',
+											text: fieldVal || b.fallback_value,
+										};
+									}
+									// const field = fields[]
+									return {
+										type: 'text',
+										text: b.fallback_value,
+									};
+								}
+							}),
+						},
+						...headers,
+					],
+				},
+			};
+		});
+
+		formattedMessages.forEach(({ messageObject, to }) => {
+			const sendAt = timeGenerator.next(5).value;
+
+			schedulerService.schedule(to, messageObject, {
+				scheduler_id: broadcast._id,
+				scheduler_type: RecurringBroadcastDB_name,
+				sendAt,
+				message_type: 'template',
+			});
+		});
 	}
 
-	public async fetchReports() {
+	public async fetchBroadcastReports() {
 		const campaigns = await BroadcastDB.aggregate([
 			{ $match: { linked_to: this.account._id, device_id: this.deviceId } },
 			{
@@ -576,47 +711,139 @@ export default class BroadcastService extends WhatsappLinkService {
 	}
 
 	public static async sendRecursiveBroadcastMessages() {
-		// const recurringBroadcasts = await RecurringBroadcastDB.find({
-		// 	status: BROADCAST_STATUS.ACTIVE,
-		// }).populate<{
-		// 	device_id: IWhatsappLink;
-		// 	linked_to: IAccount;
-		// }>('device_id linked_to');
+		const recurringBroadcasts = await RecurringBroadcastDB.find({
+			status: BROADCAST_STATUS.ACTIVE,
+		}).populate<{
+			device_id: IWhatsappLink;
+			linked_to: IAccount;
+		}>('device_id linked_to');
 
-		// const today = DateUtils.getDate('YYYY-MM-DD');
+		const today = DateUtils.getDate('YYYY-MM-DD');
 
-		// recurringBroadcasts.forEach(async (broadcast) => {
-		// 	const phoneBook = new PhoneBookService(broadcast.linked_to);
-		// 	const conversationService = new ConversationService(broadcast.linked_to, broadcast.device_id);
-		// 	const userService = new UserService(broadcast.linked_to);
+		recurringBroadcasts.forEach(async (broadcast) => {
+			const phoneBook = new PhoneBookService(broadcast.linked_to);
+			const schedulerService = new SchedulerService(broadcast.linked_to, broadcast.device_id);
 
-		// 	const recipients = (
-		// 		await phoneBook.fetchRecords({
-		// 			page: 1,
-		// 			limit: 99999999,
-		// 			labels: broadcast.labels,
-		// 		})
-		// 	)
-		// 		.filter((record) => {
-		// 			if (!record.phone_number) {
-		// 				return false;
-		// 			}
-		// 			if (
-		// 				broadcast.wish_from === 'birthday' &&
-		// 				DateUtils.getMoment(record.birthday).format('YYYY-MM-DD') === today
-		// 			) {
-		// 				return true;
-		// 			} else if (
-		// 				broadcast.wish_from === 'anniversary' &&
-		// 				DateUtils.getMoment(record.anniversary).format('YYYY-MM-DD') === today
-		// 			) {
-		// 				return true;
-		// 			}
-		// 			return false;
-		// 		})
-		// 		.map((record) => record.phone_number);
+			const template_name = broadcast.template_name;
+			const header = broadcast.template_header;
+			const body = broadcast.template_body;
+			const recipients = (
+				await phoneBook.fetchRecords({
+					page: 1,
+					limit: 99999999,
+					labels: broadcast.labels,
+				})
+			).filter((record) => {
+				if (!record.phone_number) {
+					return false;
+				}
+				if (
+					broadcast.wish_from === 'birthday' &&
+					DateUtils.getMoment(record.birthday).format('YYYY-MM-DD') === today
+				) {
+					return true;
+				} else if (
+					broadcast.wish_from === 'anniversary' &&
+					DateUtils.getMoment(record.anniversary).format('YYYY-MM-DD') === today
+				) {
+					return true;
+				}
+				return false;
+			});
 
-		// 	// const labels =
-		// });
+			const timeGenerator = new TimeGenerator({
+				startDate: today,
+				startTime: broadcast.startTime,
+				endTime: broadcast.endTime,
+				daily_count: 99999999,
+			});
+
+			const formattedMessages = recipients.map((fields) => {
+				let headers = [] as Record<string, unknown>[];
+
+				if (header) {
+					const object = {
+						...(header.media_id
+							? { id: header.media_id }
+							: header.link
+							? { link: header.link }
+							: {}),
+					};
+
+					headers = [
+						{
+							type: 'HEADER',
+							parameters:
+								header.type !== 'TEXT'
+									? [
+											{
+												type: header.type,
+												[header.type.toLowerCase()]: object,
+											},
+									  ]
+									: [],
+						},
+					];
+				}
+
+				return {
+					to: fields.phone_number,
+					messageObject: {
+						template_name,
+						to: fields.phone_number,
+						components: [
+							{
+								type: 'BODY',
+								parameters: body.map((b) => {
+									if (b.variable_from === 'custom_text') {
+										return {
+											type: 'text',
+											text: b.custom_text,
+										};
+									} else {
+										if (!fields) {
+											return {
+												type: 'text',
+												text: b.fallback_value,
+											};
+										}
+
+										const fieldVal = (
+											bodyParametersList.includes(b.phonebook_data)
+												? fields[b.phonebook_data as keyof typeof fields]
+												: fields.others[b.phonebook_data]
+										) as string;
+
+										if (typeof fieldVal === 'string') {
+											return {
+												type: 'text',
+												text: fieldVal || b.fallback_value,
+											};
+										}
+										// const field = fields[]
+										return {
+											type: 'text',
+											text: b.fallback_value,
+										};
+									}
+								}),
+							},
+							...headers,
+						],
+					},
+				};
+			});
+
+			formattedMessages.forEach(({ messageObject, to }) => {
+				const sendAt = timeGenerator.next(5).value;
+
+				schedulerService.schedule(to, messageObject, {
+					scheduler_id: broadcast._id,
+					scheduler_type: RecurringBroadcastDB_name,
+					sendAt,
+					message_type: 'template',
+				});
+			});
+		});
 	}
 }
