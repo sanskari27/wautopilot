@@ -28,7 +28,7 @@ import {
 } from '../../../../store/reducers/AgentReducer';
 import PasswordInput from '../../../components/password-input';
 
-const CreateAgentDialog = () => {
+const AgentDetailsDialog = () => {
 	const dispatch = useDispatch();
 	const toast = useToast();
 	const navigate = useNavigate();
@@ -146,4 +146,4 @@ const CreateAgentDialog = () => {
 	);
 };
 
-export default CreateAgentDialog;
+export default AgentDetailsDialog;
