@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { BOT_TRIGGER_OPTIONS, BOT_TRIGGER_TO } from '../../src/config/const';
-import IChatBotFlow from '../types/chatbotflow';
+import IChatBotFlow from '../types/chatbotFlow';
 import { AccountDB_name } from './Account';
 import { WhatsappLinkDB_name } from './WhatsappLink';
 

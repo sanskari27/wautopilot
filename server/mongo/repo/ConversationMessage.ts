@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { MESSAGE_STATUS } from '../../src/config/const';
-import IConversationMessage from '../types/conversationmessage';
+import IConversationMessage from '../types/conversationMessage';
 import { AccountDB_name } from './Account';
 import { WhatsappLinkDB_name } from './WhatsappLink';
 

@@ -2,8 +2,8 @@ import { Types } from 'mongoose';
 import { ConversationDB, ConversationMessageDB, PhoneBookDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import IConversation from '../../mongo/types/conversation';
-import IConversationMessage from '../../mongo/types/conversationmessage';
-import IWhatsappLink from '../../mongo/types/whatsapplink';
+import IConversationMessage from '../../mongo/types/conversationMessage';
+import IWhatsappLink from '../../mongo/types/whatsappLink';
 import { MESSAGE_STATUS } from '../config/const';
 import SocketServer from '../socket';
 import DateUtils from '../utils/DateUtils';
@@ -429,6 +429,15 @@ export default class ConversationService extends WhatsappLinkService {
 				},
 			}
 		);
+	}
+
+	public async getConversationMessageByMetaId(message_id: string) {
+		const doc = await ConversationMessageDB.findOne({
+			linked_to: this.userId,
+			device_id: this.deviceId,
+			message_id,
+		});
+		return doc;
 	}
 
 	public async monthlyStartedConversations() {

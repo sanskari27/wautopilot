@@ -1,6 +1,9 @@
 import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
+import { Types } from 'mongoose';
 import { AccountDB, WhatsappLinkDB } from '../../../mongo';
+import IAccount from '../../../mongo/types/account';
+import IWhatsappLink from '../../../mongo/types/whatsappLink';
 import {
 	MESSAGE_STATUS,
 	META_VERIFY_STRING,
@@ -8,6 +11,7 @@ import {
 	RAZORPAY_WEBHOOK_SECRET,
 } from '../../config/const';
 import BroadcastService from '../../services/broadcast';
+import ButtonResponseService from '../../services/buttonResponse';
 import ChatBotService from '../../services/chatbot';
 import ConversationService from '../../services/conversation';
 import DateUtils from '../../utils/DateUtils';
@@ -42,7 +46,6 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		return res.status(400).send("Resource doesn't exist");
 	}
 	const conversationService = new ConversationService(user, link);
-	const chatBotService = new ChatBotService(user, link);
 	const contact = data.contacts?.[0] ?? {
 		wa_id: '',
 		profile: {
@@ -71,139 +74,24 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		}
 	} else {
 		const message = data.messages[0];
-		const msgID = message.id;
+		const meta_message_id = message.id;
 		const recipient = message.from;
-		const timestamp = DateUtils.fromUnixTime(message.timestamp).toDate();
 		if (data.contacts && data.contacts.length > 0) {
 			conversationService.updateConversationDetails(contact.wa_id, {
 				profile_name: contact.profile.name,
 			});
 		}
 
-		const conversation_id = await conversationService.createConversation(
-			recipient,
-			contact.profile.name
-		);
+		const c_id = await conversationService.createConversation(recipient, contact.profile.name);
 
-		if (message.type === 'text') {
-			conversationService.addMessageToConversation(conversation_id, {
-				message_id: msgID,
-				recipient,
-				body: {
-					body_type: 'TEXT',
-					text: message.text.body,
-				},
-				received_at: timestamp,
-				status: MESSAGE_STATUS.DELIVERED,
-				context: message.context,
-			});
-			chatBotService.handleMessage(recipient, message.text.body);
-			chatBotService.checkForFlowKeyword(recipient, message.text.body);
-		} else if (
-			message.type === 'image' ||
-			message.type === 'video' ||
-			message.type === 'document' ||
-			message.type === 'audio'
-		) {
-			conversationService.addMessageToConversation(conversation_id, {
-				message_id: msgID,
-				recipient,
-				body: {
-					body_type: 'MEDIA',
-					media_id: message[message.type].id,
-					caption: message[message.type].caption,
-				},
-				received_at: timestamp,
-				status: MESSAGE_STATUS.DELIVERED,
-				context: message.context,
-			});
-		} else if (message.contacts && message.contacts.length > 0) {
-			conversationService.addMessageToConversation(conversation_id, {
-				message_id: msgID,
-				recipient,
-				body: {
-					body_type: 'CONTACT',
-					contacts: message.contacts,
-				},
-				received_at: timestamp,
-				status: MESSAGE_STATUS.DELIVERED,
-				context: message.context,
-			});
-		} else if (message.type === 'button') {
-			conversationService.addMessageToConversation(conversation_id, {
-				message_id: msgID,
-				recipient,
-				body: {
-					body_type: 'TEXT',
-					text: message.button.text,
-				},
-				received_at: timestamp,
-				status: MESSAGE_STATUS.DELIVERED,
-				context: message.context,
-			});
-			chatBotService.handleMessage(recipient, message.button.text);
-		} else if (message.location) {
-			conversationService.addMessageToConversation(conversation_id, {
-				message_id: msgID,
-				recipient,
-				body: {
-					body_type: 'LOCATION',
-					location: message.location,
-				},
-				received_at: timestamp,
-				status: MESSAGE_STATUS.DELIVERED,
-				context: message.context,
-			});
-		} else if (message.interactive && message.interactive.type === 'list_reply') {
-			conversationService.addMessageToConversation(conversation_id, {
-				message_id: msgID,
-				recipient,
-				body: {
-					body_type: 'TEXT',
-					text: message.interactive?.list_reply?.title ?? '',
-				},
-				received_at: timestamp,
-				status: MESSAGE_STATUS.DELIVERED,
-				context: message.context,
-			});
-			chatBotService.handleMessage(recipient, message.interactive?.list_reply?.title ?? '');
-			chatBotService.checkForFlowKeyword(recipient, message.interactive?.list_reply?.title ?? '');
-			chatBotService.continueFlow(
-				recipient,
-				message.context.id,
-				message.interactive?.list_reply?.id ?? ''
-			);
-		} else if (message.interactive && message.interactive.type === 'button_reply') {
-			conversationService.addMessageToConversation(conversation_id, {
-				message_id: msgID,
-				recipient,
-				body: {
-					body_type: 'TEXT',
-					text: message.interactive?.button_reply?.title ?? '',
-				},
-				received_at: timestamp,
-				status: MESSAGE_STATUS.DELIVERED,
-				context: message.context,
-			});
-			chatBotService.handleMessage(recipient, message.interactive?.button_reply?.title ?? '');
-			chatBotService.checkForFlowKeyword(recipient, message.interactive?.button_reply?.title ?? '');
-			chatBotService.continueFlow(
-				recipient,
-				message.context.id,
-				message.interactive?.button_reply?.id ?? ''
-			);
-		} else {
-			conversationService.addMessageToConversation(conversation_id, {
-				message_id: msgID,
-				recipient,
-				body: {
-					body_type: 'UNKNOWN',
-				},
-				received_at: timestamp,
-				status: MESSAGE_STATUS.DELIVERED,
-				context: message.context,
-			});
-		}
+		processIncomingMessage({
+			user,
+			link,
+			message,
+			conversation_id: c_id,
+			meta_message_id: meta_message_id,
+			recipient,
+		});
 	}
 
 	return res.status(200).send('OK');
@@ -267,3 +155,148 @@ const Controller = {
 };
 
 export default Controller;
+
+function processIncomingMessage(details: {
+	message: any;
+	user: IAccount;
+	link: IWhatsappLink;
+	conversation_id: Types.ObjectId;
+	meta_message_id: string;
+	recipient: string;
+}) {
+	const { message, user, link, conversation_id, meta_message_id, recipient } = details;
+	const conversationService = new ConversationService(user, link);
+	const chatBotService = new ChatBotService(user, link);
+	const buttonResponseService = new ButtonResponseService(user, link);
+	const timestamp = DateUtils.fromUnixTime(message.timestamp).toDate();
+
+	if (message.type === 'text') {
+		conversationService.addMessageToConversation(conversation_id, {
+			message_id: meta_message_id,
+			recipient,
+			body: {
+				body_type: 'TEXT',
+				text: message.text.body,
+			},
+			received_at: timestamp,
+			status: MESSAGE_STATUS.DELIVERED,
+			context: message.context,
+		});
+		chatBotService.handleMessage(recipient, message.text.body);
+		chatBotService.checkForFlowKeyword(recipient, message.text.body);
+	} else if (
+		message.type === 'image' ||
+		message.type === 'video' ||
+		message.type === 'document' ||
+		message.type === 'audio'
+	) {
+		conversationService.addMessageToConversation(conversation_id, {
+			message_id: meta_message_id,
+			recipient,
+			body: {
+				body_type: 'MEDIA',
+				media_id: message[message.type].id,
+				caption: message[message.type].caption,
+			},
+			received_at: timestamp,
+			status: MESSAGE_STATUS.DELIVERED,
+			context: message.context,
+		});
+	} else if (message.contacts && message.contacts.length > 0) {
+		conversationService.addMessageToConversation(conversation_id, {
+			message_id: meta_message_id,
+			recipient,
+			body: {
+				body_type: 'CONTACT',
+				contacts: message.contacts,
+			},
+			received_at: timestamp,
+			status: MESSAGE_STATUS.DELIVERED,
+			context: message.context,
+		});
+	} else if (message.type === 'button') {
+		conversationService.addMessageToConversation(conversation_id, {
+			message_id: meta_message_id,
+			recipient,
+			body: {
+				body_type: 'TEXT',
+				text: message.button.text,
+			},
+			received_at: timestamp,
+			status: MESSAGE_STATUS.DELIVERED,
+			context: message.context,
+		});
+		chatBotService.handleMessage(recipient, message.button.text);
+		buttonResponseService.createResponse({
+			button_text: message.button.text,
+			recipient,
+			meta_message_id: meta_message_id,
+			responseAt: timestamp,
+		});
+	} else if (message.location) {
+		conversationService.addMessageToConversation(conversation_id, {
+			message_id: meta_message_id,
+			recipient,
+			body: {
+				body_type: 'LOCATION',
+				location: message.location,
+			},
+			received_at: timestamp,
+			status: MESSAGE_STATUS.DELIVERED,
+			context: message.context,
+		});
+	} else if (message.interactive && message.interactive.type === 'list_reply') {
+		conversationService.addMessageToConversation(conversation_id, {
+			message_id: meta_message_id,
+			recipient,
+			body: {
+				body_type: 'TEXT',
+				text: message.interactive?.list_reply?.title ?? '',
+			},
+			received_at: timestamp,
+			status: MESSAGE_STATUS.DELIVERED,
+			context: message.context,
+		});
+		chatBotService.handleMessage(recipient, message.interactive?.list_reply?.title ?? '');
+		chatBotService.checkForFlowKeyword(recipient, message.interactive?.list_reply?.title ?? '');
+		chatBotService.continueFlow(
+			recipient,
+			message.context.id,
+			message.interactive?.list_reply?.id ?? ''
+		);
+	} else if (message.interactive && message.interactive.type === 'button_reply') {
+		const button_reply = message.interactive.button_reply;
+		conversationService.addMessageToConversation(conversation_id, {
+			message_id: meta_message_id,
+			recipient,
+			body: {
+				body_type: 'TEXT',
+				text: button_reply.title ?? '',
+			},
+			received_at: timestamp,
+			status: MESSAGE_STATUS.DELIVERED,
+			context: message.context,
+		});
+		chatBotService.handleMessage(recipient, button_reply?.title ?? '');
+		chatBotService.checkForFlowKeyword(recipient, button_reply?.title ?? '');
+		chatBotService.continueFlow(recipient, message.context.id, button_reply.id ?? '');
+		buttonResponseService.createResponse({
+			button_id: button_reply.id,
+			button_text: button_reply.title,
+			recipient,
+			meta_message_id: meta_message_id,
+			responseAt: timestamp,
+		});
+	} else {
+		conversationService.addMessageToConversation(conversation_id, {
+			message_id: meta_message_id,
+			recipient,
+			body: {
+				body_type: 'UNKNOWN',
+			},
+			received_at: timestamp,
+			status: MESSAGE_STATUS.DELIVERED,
+			context: message.context,
+		});
+	}
+}

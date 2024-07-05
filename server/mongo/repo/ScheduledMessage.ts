@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { MESSAGE_STATUS } from '../../src/config/const';
-import { default as IScheduledMessage } from '../types/scheduledmessage';
+import { default as IScheduledMessage } from '../types/scheduledMessage';
 import { AccountDB_name } from './Account';
 import { WhatsappLinkDB_name } from './WhatsappLink';
 

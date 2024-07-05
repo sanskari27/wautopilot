@@ -1,5 +1,6 @@
 export { default as AccountDB } from './Account';
 export { default as BroadcastDB } from './Broadcast';
+export { default as ButtonResponseDB } from './ButtonResponse';
 export { default as ChatbotDB } from './Chatbot';
 export { default as ChatbotFlowDB } from './ChatbotFlow';
 export { default as ContactDB } from './Contact';

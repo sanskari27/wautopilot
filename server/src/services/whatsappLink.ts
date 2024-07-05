@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import { WhatsappLinkDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
-import IWhatsappLink from '../../mongo/types/whatsapplink';
+import IWhatsappLink from '../../mongo/types/whatsappLink';
 import MetaAPI from '../config/MetaAPI';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';

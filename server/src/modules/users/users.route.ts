@@ -2,7 +2,7 @@ import express from 'express';
 import { UserLevel } from '../../config/const';
 import { IDValidator, VerifyMinLevel } from '../../middleware';
 import Controller from './users.controller';
-import { UpgradePlanValidator } from './users.validator';
+import { CreateAgentValidator, UpgradePlanValidator } from './users.validator';
 
 const router = express.Router();
 
@@ -23,6 +23,12 @@ router
 
 router.route('/admins').all(VerifyMinLevel(UserLevel.Master)).get(Controller.getAdmins);
 
-router.route('/agents').all(VerifyMinLevel(UserLevel.Admin)).get(Controller.getAgents).post(Controller.createAgent);
+router.route('/agents/:id').all(VerifyMinLevel(UserLevel.Admin)).post(Controller.removeAgent);
+
+router
+	.route('/agents')
+	.all(VerifyMinLevel(UserLevel.Admin))
+	.get(Controller.getAgents)
+	.post(CreateAgentValidator, Controller.createAgent);
 
 export default router;

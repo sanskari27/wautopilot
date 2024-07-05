@@ -100,6 +100,24 @@ async function createAgent(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function updateAgent(req: Request, res: Response, next: NextFunction) {
+	const data = req.locals.data as CreateAgentValidationResult;
+	const { id, user } = req.locals;
+	try {
+		const details = await user.updateAgentDetails(id, data);
+
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				...details,
+			},
+		});
+	} catch (err) {
+		return next(new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR));
+	}
+}
+
 async function getAgents(req: Request, res: Response, next: NextFunction) {
 	try {
 		return Respond({
@@ -114,6 +132,16 @@ async function getAgents(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function removeAgent(req: Request, res: Response, next: NextFunction) {
+	const { id, user } = req.locals;
+	user.removeAgent(id);
+
+	return Respond({
+		res,
+		status: 200,
+	});
+}
+
 const Controller = {
 	getAdmins,
 	extendSubscription,
@@ -121,6 +149,8 @@ const Controller = {
 	setMarkupPrice,
 	getAgents,
 	createAgent,
+	updateAgent,
+	removeAgent,
 };
 
 export default Controller;

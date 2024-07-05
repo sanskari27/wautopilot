@@ -8,7 +8,7 @@ import COMMON_ERRORS from '../errors/common-errors';
 import { sendLoginCredentialsEmail } from '../provider/email';
 import { IDType } from '../types';
 import DateUtils from '../utils/DateUtils';
-import { idValidator } from '../utils/ExpressUtils';
+import { filterUndefinedKeys, idValidator } from '../utils/ExpressUtils';
 import SessionService from './session';
 
 type SessionDetails = {
@@ -76,6 +76,22 @@ export default class UserService {
 
 	getUser() {
 		return this._account;
+	}
+
+	async updateDetails(opts: { name?: string; email?: string; phone?: string }) {
+		const update: any = filterUndefinedKeys(opts);
+
+		await AccountDB.updateOne(
+			{
+				_id: this._user_id,
+			},
+			update
+		);
+		return {
+			name: update.name ?? this._account.name,
+			email: update.email ?? this._account.email,
+			phone: update.phone ?? this._account.phone,
+		};
 	}
 
 	async getDetails() {
@@ -384,6 +400,43 @@ export default class UserService {
 				email: user.email ?? '',
 				phone: user.phone ?? '',
 			};
+		});
+	}
+
+	async updateAgentDetails(
+		id: Types.ObjectId,
+		opts: { name?: string; email?: string; phone?: string }
+	) {
+		const update: any = filterUndefinedKeys(opts);
+
+		await AccountDB.updateOne(
+			{
+				_id: id,
+				parent: this._user_id,
+			},
+			update
+		);
+
+		const user = await AccountDB.findOne({
+			_id: id,
+			parent: this._user_id,
+		});
+
+		if (!user) {
+			throw new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR);
+		}
+
+		return {
+			name: user.name ?? '',
+			email: user.email ?? '',
+			phone: user.phone ?? '',
+		};
+	}
+
+	async removeAgent(id: Types.ObjectId) {
+		await AccountDB.deleteOne({
+			_id: id,
+			parent: this._user_id,
 		});
 	}
 }

@@ -6,10 +6,10 @@ import ChatBotFlowDB, { ChatBotFlowDB_name } from '../../mongo/repo/ChatbotFlow'
 import FlowMessageDB from '../../mongo/repo/FlowMessages';
 import IAccount from '../../mongo/types/account';
 import IChatBot from '../../mongo/types/chatbot';
-import IChatBotFlow from '../../mongo/types/chatbotflow';
+import IChatBotFlow from '../../mongo/types/chatbotFlow';
 import IContact from '../../mongo/types/contact';
 import IMedia from '../../mongo/types/media';
-import IWhatsappLink from '../../mongo/types/whatsapplink';
+import IWhatsappLink from '../../mongo/types/whatsappLink';
 import { BOT_TRIGGER_OPTIONS, BOT_TRIGGER_TO } from '../config/const';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';

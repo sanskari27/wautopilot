@@ -7,8 +7,8 @@ import {
 } from '../../mongo';
 import { BroadcastDB_name } from '../../mongo/repo/Broadcast';
 import IAccount from '../../mongo/types/account';
-import IRecurringBroadcast from '../../mongo/types/recurringbroadcast';
-import IWhatsappLink from '../../mongo/types/whatsapplink';
+import IRecurringBroadcast from '../../mongo/types/recurringBroadcast';
+import IWhatsappLink from '../../mongo/types/whatsappLink';
 import { BROADCAST_STATUS, MESSAGE_STATUS } from '../config/const';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
@@ -222,11 +222,7 @@ export default class BroadcastService extends WhatsappLinkService {
 						$sum: {
 							$cond: {
 								if: {
-									$and: [
-										{ $ne: ['$conversationMessages.status', MESSAGE_STATUS.PROCESSING] },
-										{ $ne: ['$conversationMessages.status', MESSAGE_STATUS.FAILED] },
-										{ $ne: ['$conversationMessages.status', MESSAGE_STATUS.PENDING] },
-									],
+									$and: [{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.SENT] }],
 								},
 								then: 1,
 								else: 0,

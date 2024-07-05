@@ -4,7 +4,7 @@ import { ScheduledMessageDB } from '../../mongo';
 import { BroadcastDB_name } from '../../mongo/repo/Broadcast';
 import { ChatBotFlowDB_name } from '../../mongo/repo/ChatbotFlow';
 import IAccount from '../../mongo/types/account';
-import IWhatsappLink from '../../mongo/types/whatsapplink';
+import IWhatsappLink from '../../mongo/types/whatsappLink';
 import MetaAPI from '../config/MetaAPI';
 import { IS_PRODUCTION, MESSAGE_STATUS } from '../config/const';
 import DateUtils from '../utils/DateUtils';

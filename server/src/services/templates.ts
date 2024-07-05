@@ -1,5 +1,5 @@
 import IAccount from '../../mongo/types/account';
-import IWhatsappLink from '../../mongo/types/whatsapplink';
+import IWhatsappLink from '../../mongo/types/whatsappLink';
 import MetaAPI from '../config/MetaAPI';
 import {
 	BodyTemplate,
