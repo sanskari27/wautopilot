@@ -177,4 +177,13 @@ export default class AuthService {
 			return '';
 		}
 	}
+
+	static async serviceAccount(id: string) {
+		try {
+			await APIInstance.post(`/sessions/service-account/${id}`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
 }

@@ -9,6 +9,7 @@ import { WhatsappLinkCreateValidationResult } from './whatsappLink.validator';
 
 async function getAllLinkedDevices(req: Request, res: Response, next: NextFunction) {
 	try {
+		//TODO: Implement for agents too
 		const devices = await WhatsappLinkService.fetchRecords(req.locals.serviceAccount._id);
 
 		return Respond({

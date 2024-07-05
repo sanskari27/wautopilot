@@ -4,6 +4,7 @@ import { RiContactsBook2Line, RiFlowChart } from 'react-icons/ri';
 import { TbMessage2Plus, TbReportSearch, TbTemplate } from 'react-icons/tb';
 
 export const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+export const AGENT_URL = import.meta.env.VITE_AGENT_URL;
 export const WEBPAGE_URL = import.meta.env.VITE_WEBPAGE_URL;
 export const DATA_LOADED_DELAY = import.meta.env.VITE_DATA_LOADED_DELAY;
 export const AUTH_URL = import.meta.env.VITE_AUTH_URL;
