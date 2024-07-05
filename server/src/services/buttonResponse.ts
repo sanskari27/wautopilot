@@ -41,18 +41,20 @@ export default class ButtonResponseService extends WhatsappLinkService {
 			context_meta_message_id
 		);
 		if (!message) return;
-		await ButtonResponseDB.create({
-			linked_to: this.userId,
-			device_id: this.deviceId,
-			button_id,
-			button_text,
-			recipient,
-			meta_message_id: context_meta_message_id,
-			message_id: message._id,
-			responseAt,
-			scheduler_id: message.scheduled_by.id,
-			scheduler_name: message.scheduled_by.name,
-		});
+		try {
+			await ButtonResponseDB.create({
+				linked_to: this.userId,
+				device_id: this.deviceId,
+				button_id,
+				button_text,
+				recipient,
+				meta_message_id: context_meta_message_id,
+				message_id: message._id,
+				responseAt,
+				scheduler_id: message.scheduled_by.id,
+				scheduler_name: message.scheduled_by.name,
+			});
+		} catch (e) {}
 	}
 
 	public async getResponses(id: Types.ObjectId) {

@@ -17,7 +17,11 @@ const schema = new mongoose.Schema<IButtonResponse>(
 			ref: WhatsappLinkDB_name,
 			required: true,
 		},
-		button_id: String,
+		button_id: {
+			type: String,
+			unique: true,
+			sparse: true,
+		},
 		button_text: {
 			type: String,
 			required: true,
