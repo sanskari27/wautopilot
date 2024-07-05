@@ -31,8 +31,9 @@ router
 
 router
 	.route('/agents')
-	.all(VerifyMinLevel(UserLevel.Admin))
+	.all(VerifyMinLevel(UserLevel.Agent))
 	.get(Controller.getAgents)
+	.all(VerifyMinLevel(UserLevel.Admin))
 	.post(CreateAgentValidator, Controller.createAgent);
 
 export default router;

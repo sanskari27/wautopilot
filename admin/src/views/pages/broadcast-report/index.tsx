@@ -20,7 +20,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate, useOutlet } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
 import useFilteredList from '../../../hooks/useFilteredList';
-import MessagesService from '../../../services/messages.service';
+import BroadcastService from '../../../services/broadcast.service';
 import { StoreNames, StoreState } from '../../../store';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 
@@ -57,7 +57,7 @@ export default function BroadcastReport() {
 	// }, []);
 
 	const fetchBroadcast = useCallback(() => {
-		MessagesService.broadcastReport(selected_device_id)
+		BroadcastService.broadcastReport(selected_device_id)
 			.then(setList)
 			.finally(() => {
 				setCampaignLoading.off();
@@ -70,7 +70,7 @@ export default function BroadcastReport() {
 
 	const deleteCampaign = async () => {
 		const promises = selectedBroadcast.map(async (campaign) => {
-			await MessagesService.deleteBroadcast(selected_device_id, campaign);
+			await BroadcastService.deleteBroadcast(selected_device_id, campaign);
 		});
 		toast.promise(Promise.all(promises), {
 			success: () => {
@@ -108,7 +108,7 @@ export default function BroadcastReport() {
 			return;
 		}
 		const promises = selectedBroadcast.map(async (id) =>
-			MessagesService.downloadBroadcast(selected_device_id, id)
+			BroadcastService.downloadBroadcast(selected_device_id, id)
 		);
 		toast.promise(Promise.all(promises), {
 			success: { title: 'Downloaded successfully' },
@@ -292,7 +292,7 @@ export default function BroadcastReport() {
 												size={'sm'}
 												colorScheme='green'
 												onClick={() => {
-													MessagesService.resumeBroadcast(
+													BroadcastService.resumeBroadcast(
 														selected_device_id,
 														broadcast.broadcast_id
 													).then(() => {
@@ -307,7 +307,7 @@ export default function BroadcastReport() {
 												size={'sm'}
 												colorScheme='red'
 												onClick={() => {
-													MessagesService.pauseBroadcast(
+													BroadcastService.pauseBroadcast(
 														selected_device_id,
 														broadcast.broadcast_id
 													).then(() => {
@@ -322,7 +322,7 @@ export default function BroadcastReport() {
 												size={'sm'}
 												colorScheme='orange'
 												onClick={() => {
-													MessagesService.resendFailedBroadcast(
+													BroadcastService.resendFailedBroadcast(
 														selected_device_id,
 														broadcast.broadcast_id
 													).then(() => {

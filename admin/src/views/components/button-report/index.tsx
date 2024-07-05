@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
 import Chart from 'react-google-charts';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import MessagesService from '../../../services/messages.service';
+import BroadcastService from '../../../services/broadcast.service';
 import { StoreNames, StoreState } from '../../../store';
 import Each from '../utils/Each';
 
@@ -67,7 +67,7 @@ export default function ButtonResponse() {
 			});
 		} else {
 			toast.promise(
-				MessagesService.buttonResponseReport({ deviceId: selected_device_id, campaignId }),
+				BroadcastService.buttonResponseReport({ deviceId: selected_device_id, campaignId }),
 				{
 					loading: { title: 'Loading...' },
 					success: (res) => {
@@ -85,7 +85,7 @@ export default function ButtonResponse() {
 	const handleExport = () => {
 		if (!campaignId) return;
 		toast.promise(
-			MessagesService.buttonResponseReport({
+			BroadcastService.buttonResponseReport({
 				deviceId: selected_device_id,
 				campaignId,
 				exportCSV: true,
@@ -119,7 +119,6 @@ export default function ButtonResponse() {
 
 		return [['Text', 'Count', { role: 'style' }], ...barGraphData];
 	}
-	console.log(getData());
 
 	return (
 		<Flex direction={'column'} padding={'1rem'} justifyContent={'start'}>

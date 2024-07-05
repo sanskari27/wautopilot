@@ -1,5 +1,6 @@
 import express from 'express';
 import SessionRoute from './auth/auth.route';
+import BroadcastRoute from './broadcast/broadcast.route';
 import ChatBotRoute from './chatbot/chatbot.route';
 import ContactsRoute from './contacts/contacts.route';
 import CouponRoute from './coupon/coupon.route';
@@ -34,6 +35,7 @@ router.use('/payment', VerifySession, PaymentRoute);
 
 router.use('/:device_id/overview', VerifySession, VerifyDevice, OverviewRoute);
 router.use('/:device_id/template', VerifySession, VerifyDevice, TemplateRoute);
+router.use('/:device_id/broadcast', VerifySession, VerifyDevice, BroadcastRoute);
 router.use('/:device_id/message', VerifySession, VerifyDevice, MessageRoute);
 router.use('/:device_id/chatbot', VerifySession, VerifyDevice, ChatBotRoute);
 router.use('/:device_id/media', VerifySession, VerifyDevice, MediaRoute);

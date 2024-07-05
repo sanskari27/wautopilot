@@ -127,7 +127,7 @@ async function getAgents(req: Request, res: Response, next: NextFunction) {
 			res,
 			status: 200,
 			data: {
-				list: await req.locals.user.getAgents(),
+				list: await req.locals.serviceUser.getAgents(),
 			},
 		});
 	} catch (err) {

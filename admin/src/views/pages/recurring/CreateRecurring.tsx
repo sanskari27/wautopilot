@@ -12,8 +12,8 @@ import {
 	TagRightIcon,
 	Text,
 	Textarea,
-	useToast,
 	Wrap,
+	useToast,
 } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -61,7 +61,6 @@ const CreateRecurring = () => {
 	const { all_labels } = useFetchLabels();
 
 	useEffect(() => {
-		console.log(id);
 		if (id) {
 			dispatch(setRecurring(id));
 		} else {
@@ -263,11 +262,8 @@ const CreateRecurring = () => {
 			? RecurringService.editRecurring({ deviceId: selected_device_id, details })
 			: RecurringService.createRecurring({ deviceId: selected_device_id, details });
 
-		console.log(isEditingRecurring);
-
 		toast.promise(promise, {
 			success: (data) => {
-				console.log(data);
 				isEditingRecurring
 					? dispatch(editRecurring(details))
 					: dispatch(addRecurringMessage(data[0]));
@@ -278,8 +274,7 @@ const CreateRecurring = () => {
 					title: 'Data saved successfully',
 				};
 			},
-			error: (err) => {
-				console.log(err);
+			error: () => {
 				return { title: 'Error Saving Bot' };
 			},
 			loading: { title: 'Saving Data', description: 'Please wait' },

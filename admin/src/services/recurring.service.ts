@@ -35,7 +35,7 @@ const validateRecurringResult = (list: Recurring[]) => {
 export default class RecurringService {
 	static async getRecurringList({ deviceId }: { deviceId: string }) {
 		try {
-			const { data } = await APIInstance.get(`/${deviceId}/message/recurring-broadcast`);
+			const { data } = await APIInstance.get(`/${deviceId}/broadcast/recurring`);
 			return validateRecurringResult(data.list);
 		} catch (err) {
 			//ignore
@@ -77,7 +77,7 @@ export default class RecurringService {
 		if (details.template_header?.type === '') {
 			delete details.template_header;
 		}
-		const { data } = await APIInstance.post(`/${deviceId}/message/recurring-broadcast`, details);
+		const { data } = await APIInstance.post(`/${deviceId}/broadcast/recurring`, details);
 		return validateRecurringResult([data.details]);
 	}
 
@@ -114,7 +114,7 @@ export default class RecurringService {
 			delete details.template_header;
 		}
 		const { data } = await APIInstance.put(
-			`/${deviceId}/message/recurring-broadcast/${details.id}`,
+			`/${deviceId}/broadcast/recurring/${details.id}`,
 			details
 		);
 		return validateRecurringResult([data]);
@@ -127,7 +127,7 @@ export default class RecurringService {
 		deviceId: string;
 		recurringId: string;
 	}) {
-		await APIInstance.post(`/${deviceId}/message/recurring-broadcast/${recurringId}/toggle`);
+		await APIInstance.post(`/${deviceId}/broadcast/recurring/${recurringId}/toggle`);
 	}
 
 	static async deleteRecurring({
@@ -137,7 +137,7 @@ export default class RecurringService {
 		deviceId: string;
 		recurringId: string;
 	}) {
-		await APIInstance.delete(`/${deviceId}/message/recurring-broadcast/${recurringId}`);
+		await APIInstance.delete(`/${deviceId}/broadcast/recurring/${recurringId}`);
 	}
 
 	static async rescheduleRecurring({
@@ -147,7 +147,7 @@ export default class RecurringService {
 		deviceId: string;
 		recurringId: string;
 	}) {
-		await APIInstance.post(`/${deviceId}/message/recurring-broadcast/${recurringId}/reschedule`);
+		await APIInstance.post(`/${deviceId}/broadcast/recurring/${recurringId}/reschedule`);
 	}
 
 	static async downloadRecurring({
@@ -158,9 +158,7 @@ export default class RecurringService {
 		recurringId: string;
 	}) {
 		try {
-			const response = await APIInstance.get(
-				`/${deviceId}/message/recurring-broadcast/${recurringId}`
-			);
+			const response = await APIInstance.get(`/${deviceId}/broadcast/recurring/${recurringId}`);
 			const blob = new Blob([response.data]);
 
 			const contentDisposition = response.headers['content-disposition'];

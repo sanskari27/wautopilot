@@ -384,10 +384,6 @@ export default class UserService {
 		});
 	}
 	public async getAgents() {
-		if (this._level < UserLevel.Admin) {
-			throw new CustomError(AUTH_ERRORS.PERMISSION_DENIED);
-		}
-
 		const users = await AccountDB.find({
 			userLevel: UserLevel.Agent,
 			parent: this._user_id,

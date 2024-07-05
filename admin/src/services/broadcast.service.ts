@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import APIInstance from '../config/APIInstance';
 import { Contact } from '../store/types/ContactState';
+import { ScheduledBroadcast } from '../views/pages/broadcast-report';
 
-export default class MessagesService {
+export default class BroadcastService {
 	static async fetchAllConversation(deviceId: string, label_filter: string[] = []) {
 		try {
-			const { data } = await APIInstance.get(`/${deviceId}/message/conversations`, {
+			const { data } = await APIInstance.get(`/${deviceId}/broadcast/conversations`, {
 				params: {
 					labels: label_filter.join(','),
 				},
@@ -35,7 +36,7 @@ export default class MessagesService {
 	) {
 		try {
 			const { data } = await APIInstance.get(
-				`/${deviceId}/message/conversations/${recipientId}/messages`,
+				`/${deviceId}/broadcast/conversations/${recipientId}/messages`,
 				{
 					params: {
 						page: pagination.page,
@@ -181,7 +182,7 @@ export default class MessagesService {
 	) {
 		try {
 			await APIInstance.post(
-				`/${deviceId}/message/conversations/${recipientId}/send-message`,
+				`/${deviceId}/broadcast/conversations/${recipientId}/send-message`,
 				message
 			);
 			return true;
@@ -201,9 +202,80 @@ export default class MessagesService {
 		}
 	}
 
+	static async broadcastReport(deviceId: string) {
+		try {
+			const { data } = await APIInstance.get(`/${deviceId}/broadcast/broadcast/reports`);
+			return data.reports as ScheduledBroadcast[];
+		} catch (err) {
+			return [];
+		}
+	}
+
+	static async pauseBroadcast(deviceId: string, broadcastId: string) {
+		try {
+			await APIInstance.post(`/${deviceId}/broadcast/broadcast/${broadcastId}/pause`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	static async resumeBroadcast(deviceId: string, broadcastId: string) {
+		try {
+			await APIInstance.post(`/${deviceId}/broadcast/broadcast/${broadcastId}/resume`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	static async deleteBroadcast(deviceId: string, broadcastId: string) {
+		try {
+			await APIInstance.post(`/${deviceId}/broadcast/broadcast/${broadcastId}/delete`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	static async resendFailedBroadcast(deviceId: string, broadcastId: string) {
+		try {
+			await APIInstance.post(`/${deviceId}/broadcast/broadcast/${broadcastId}/resend`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	static async downloadBroadcast(deviceId: string, broadcastId: string) {
+		const response = await APIInstance.get(
+			`/${deviceId}/broadcast/broadcast/${broadcastId}/download`,
+			{
+				responseType: 'blob',
+			}
+		);
+		const blob = new Blob([response.data]);
+
+		const contentDisposition = response.headers['content-disposition'];
+		const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.*)"/);
+		const filename = filenameMatch ? filenameMatch[1] : 'Broadcast Report.csv';
+
+		// Create a temporary link element
+		const downloadLink = document.createElement('a');
+		downloadLink.href = window.URL.createObjectURL(blob);
+		downloadLink.download = filename; // Specify the filename
+
+		// Append the link to the body and trigger the download
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+
+		// Clean up - remove the link
+		document.body.removeChild(downloadLink);
+	}
+
 	static async assignMessageLabels(deviceId: string, messageId: string, labels: string[]) {
 		try {
-			await APIInstance.post(`/${deviceId}/message/message/${messageId}/assign-labels`, {
+			await APIInstance.post(`/${deviceId}/broadcast/broadcast/${messageId}/assign-labels`, {
 				labels,
 			});
 			return true;
@@ -213,10 +285,57 @@ export default class MessagesService {
 	}
 	static async markRead(deviceId: string, message_id: string) {
 		try {
-			await APIInstance.post(`/${deviceId}/message/mark-read/${message_id}`);
+			await APIInstance.post(`/${deviceId}/broadcast/mark-read/${message_id}`);
 			return true;
 		} catch (err) {
 			return false;
+		}
+	}
+
+	static async buttonResponseReport({
+		deviceId,
+		campaignId,
+		exportCSV,
+	}: {
+		deviceId: string;
+		campaignId: string;
+		exportCSV?: boolean;
+	}) {
+		if (!exportCSV) {
+			const { data } = await APIInstance.get(
+				`/${deviceId}/broadcast/${campaignId}/button-responses`
+			);
+			return data.responses as {
+				button_text: string;
+				recipient: string;
+				responseAt: string;
+				name: string;
+				email: string;
+			}[];
+		} else {
+			const response = await APIInstance.get(
+				`/${deviceId}/broadcast/${campaignId}/button-responses?exportCSV=true`,
+				{
+					responseType: 'blob',
+				}
+			);
+			const blob = new Blob([response.data]);
+
+			const contentDisposition = response.headers['content-disposition'];
+			const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.*)"/);
+			const filename = filenameMatch ? filenameMatch[1] : 'Button Response Report.csv';
+
+			// Create a temporary link element
+			const downloadLink = document.createElement('a');
+			downloadLink.href = window.URL.createObjectURL(blob);
+			downloadLink.download = filename; // Specify the filename
+
+			// Append the link to the body and trigger the download
+			document.body.appendChild(downloadLink);
+			downloadLink.click();
+
+			// Clean up - remove the link
+			document.body.removeChild(downloadLink);
 		}
 	}
 }
