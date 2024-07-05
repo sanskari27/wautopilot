@@ -17,13 +17,13 @@ type CreateResponse = {
 function processDocs(docs: any[]) {
 	return docs.map((doc) => {
 		return {
-			button_id: doc.button_id as string,
-			button_text: doc.button_text as string,
-			recipient: doc.recipient as string,
-			responseAt: DateUtils.getMoment(doc.responseAt).format('YYYY-MM-DD') as string,
-			name: doc.name as string,
-			email: doc.email as string,
-			address: doc.address as string,
+			button_id: (doc.button_id as string) ?? '',
+			button_text: (doc.button_text as string) ?? '',
+			recipient: (doc.recipient as string) ?? '',
+			responseAt: (DateUtils.getMoment(doc.responseAt).format('YYYY-MM-DD') as string) ?? '',
+			name: (doc.name as string) ?? '',
+			email: (doc.email as string) ?? '',
+			address: (doc.address as string) ?? '',
 		};
 	});
 }
