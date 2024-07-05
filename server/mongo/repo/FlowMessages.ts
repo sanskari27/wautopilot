@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import IFlowMessage from '../types/flowMessage';
+import IFlowMessage from '../types/flowMessages';
 import { AccountDB_name } from './Account';
 import { WhatsappLinkDB_name } from './WhatsappLink';
 

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { BROADCAST_STATUS } from '../../src/config/const';
-import IRecurringBroadcast from '../types/recurringBroadcast';
+import IRecurringBroadcast from '../types/recurringBroadcasts';
 import { AccountDB_name } from './Account';
 import { WhatsappLinkDB_name } from './WhatsappLink';
 

@@ -1,6 +1,6 @@
 import { ButtonResponseDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
-import IWhatsappLink from '../../mongo/types/whatsappLink';
+import IWhatsappLink from '../../mongo/types/whatsappLinks';
 import ConversationService from './conversation';
 import WhatsappLinkService from './whatsappLink';
 

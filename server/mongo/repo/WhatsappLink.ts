@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import IWhatsappLink from '../types/whatsappLink';
+import IWhatsappLink from '../types/whatsappLinks';
 import { AccountDB_name } from './Account';
 
 export const WhatsappLinkDB_name = 'WhatsappLink';

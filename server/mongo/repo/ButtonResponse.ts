@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import IButtonResponse from '../types/buttonResponse';
+import IButtonResponse from '../types/buttonResponses';
 import { AccountDB_name } from './Account';
 import { WhatsappLinkDB_name } from './WhatsappLink';
 

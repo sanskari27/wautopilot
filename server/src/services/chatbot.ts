@@ -9,7 +9,7 @@ import IChatBot from '../../mongo/types/chatbot';
 import IChatBotFlow from '../../mongo/types/chatbotFlow';
 import IContact from '../../mongo/types/contact';
 import IMedia from '../../mongo/types/media';
-import IWhatsappLink from '../../mongo/types/whatsappLink';
+import IWhatsappLink from '../../mongo/types/whatsappLinks';
 import { BOT_TRIGGER_OPTIONS, BOT_TRIGGER_TO } from '../config/const';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
