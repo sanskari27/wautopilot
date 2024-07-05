@@ -80,7 +80,35 @@ export default class ButtonResponseService extends WhatsappLinkService {
 			},
 			{
 				$addFields: {
-					name: '$phonebook.name',
+					name: {
+						$concat: [
+							{
+								$cond: {
+									if: { $ne: ['$phonebook.first_name', ''] },
+									then: '$phonebook.first_name',
+									else: '',
+								},
+							},
+							{
+								$cond: {
+									if: { $ne: ['$phonebook.middle_name', ''] },
+									then: {
+										$concat: [' ', '$phonebook.middle_name'],
+									},
+									else: '',
+								},
+							},
+							{
+								$cond: {
+									if: { $ne: ['$phonebook.last_name', ''] },
+									then: {
+										$concat: [' ', '$phonebook.last_name'],
+									},
+									else: '',
+								},
+							},
+						],
+					},
 					email: '$phonebook.email',
 				},
 			},
