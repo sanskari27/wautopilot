@@ -41,6 +41,7 @@ router
 router
 	.route('/recurring-broadcast')
 	.all(CreateRecurringValidator)
+	.get(Controller.listRecurringBroadcasts)
 	.post(Controller.scheduleRecurringBroadcast);
 
 router

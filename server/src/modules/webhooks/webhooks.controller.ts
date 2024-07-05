@@ -230,7 +230,7 @@ function processIncomingMessage(details: {
 		buttonResponseService.createResponse({
 			button_text: message.button.text,
 			recipient,
-			meta_message_id: meta_message_id,
+			context_meta_message_id: message.context.id,
 			responseAt: timestamp,
 		});
 	} else if (message.location) {
@@ -284,7 +284,7 @@ function processIncomingMessage(details: {
 			button_id: button_reply.id,
 			button_text: button_reply.title,
 			recipient,
-			meta_message_id: meta_message_id,
+			context_meta_message_id: message.context.id,
 			responseAt: timestamp,
 		});
 	} else {

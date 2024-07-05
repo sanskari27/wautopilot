@@ -8,7 +8,7 @@ type CreateResponse = {
 	button_id?: string;
 	button_text: string;
 	recipient: string;
-	meta_message_id: string;
+	context_meta_message_id: string;
 	responseAt: Date;
 };
 
@@ -20,8 +20,11 @@ export default class ButtonResponseService extends WhatsappLinkService {
 	}
 
 	public async createResponse(details: CreateResponse) {
-		const { button_id, button_text, recipient, meta_message_id, responseAt } = details;
-		const message = await this.conversationService.getConversationMessageByMetaId(meta_message_id);
+		const { button_id, button_text, recipient, context_meta_message_id, responseAt } = details;
+		if (!context_meta_message_id) return;
+		const message = await this.conversationService.getConversationMessageByMetaId(
+			context_meta_message_id
+		);
 		if (!message) return;
 		await ButtonResponseDB.create({
 			linked_to: this.userId,
@@ -29,7 +32,7 @@ export default class ButtonResponseService extends WhatsappLinkService {
 			button_id,
 			button_text,
 			recipient,
-			meta_message_id,
+			meta_message_id: context_meta_message_id,
 			message_id: message._id,
 			responseAt,
 			scheduler_id: message.scheduled_by.id,
