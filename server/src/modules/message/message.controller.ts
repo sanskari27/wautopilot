@@ -3,6 +3,7 @@ import MetaAPI from '../../config/MetaAPI';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import BroadcastService from '../../services/broadcast';
+import ButtonResponseService from '../../services/buttonResponse';
 import ConversationService from '../../services/conversation';
 import PhoneBookService from '../../services/phonebook';
 import CSVHelper from '../../utils/CSVHelper';
@@ -580,6 +581,33 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 	});
 }
 
+async function buttonResponses(req: Request, res: Response, next: NextFunction) {
+	const {
+		account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	const export_csv = req.query.export_csv === 'true';
+
+	const responses = await new ButtonResponseService(account, device).getResponses(id);
+
+	if (export_csv) {
+		return RespondCSV({
+			res,
+			filename: `responses-${id}.csv`,
+			data: CSVHelper.exportButtonResponseReport(responses),
+		});
+	}
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			responses,
+		},
+	});
+}
+
 const Controller = {
 	sendTemplateMessage,
 	broadcastReport,
@@ -599,6 +627,7 @@ const Controller = {
 	toggleRecurringBroadcast,
 	deleteRecurringBroadcast,
 	rescheduleRecurringBroadcast,
+	buttonResponses,
 };
 
 export default Controller;

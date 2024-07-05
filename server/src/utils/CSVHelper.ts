@@ -131,4 +131,51 @@ export default class CSVHelper {
 
 		return csv;
 	}
+
+	static exportButtonResponseReport(
+		records: {
+			button_id: string;
+			button_text: string;
+			recipient: string;
+			responseAt: string;
+			name: string;
+			email: string;
+			address: string;
+		}[]
+	): string {
+		const keys = [
+			{
+				value: 'name',
+				label: 'Name',
+			},
+			{
+				value: 'email',
+				label: 'Email',
+			},
+			{
+				value: 'address',
+				label: 'Address',
+			},
+			{
+				value: 'recipient',
+				label: 'Phone Number',
+			},
+			{
+				value: 'button_text',
+				label: 'Button Text',
+			},
+			{
+				value: 'responseAt',
+				label: 'Response At',
+			},
+		];
+
+		const json2csvParser = new Parser({
+			header: true,
+			fields: keys,
+		});
+		const csv = json2csvParser.parse(records);
+
+		return csv;
+	}
 }

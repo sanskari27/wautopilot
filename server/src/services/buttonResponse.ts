@@ -1,6 +1,8 @@
-import { ButtonResponseDB } from '../../mongo';
+import { Types } from 'mongoose';
+import { ButtonResponseDB, PhoneBookDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
+import DateUtils from '../utils/DateUtils';
 import ConversationService from './conversation';
 import WhatsappLinkService from './whatsappLink';
 
@@ -11,6 +13,20 @@ type CreateResponse = {
 	context_meta_message_id: string;
 	responseAt: Date;
 };
+
+function processDocs(docs: any[]) {
+	return docs.map((doc) => {
+		return {
+			button_id: doc.button_id as string,
+			button_text: doc.button_text as string,
+			recipient: doc.recipient as string,
+			responseAt: DateUtils.getMoment(doc.responseAt).format('YYYY-MM-DD') as string,
+			name: doc.name as string,
+			email: doc.email as string,
+			address: doc.address as string,
+		};
+	});
+}
 
 export default class ButtonResponseService extends WhatsappLinkService {
 	private conversationService: ConversationService;
@@ -38,5 +54,52 @@ export default class ButtonResponseService extends WhatsappLinkService {
 			scheduler_id: message.scheduled_by.id,
 			scheduler_name: message.scheduled_by.name,
 		});
+	}
+
+	public async getResponses(id: Types.ObjectId) {
+		const docs = await ButtonResponseDB.aggregate([
+			{
+				$match: {
+					linked_to: this.userId,
+					device_id: this.deviceId,
+					scheduler_id: id,
+				},
+			},
+			{
+				$lookup: {
+					from: PhoneBookDB.collection.name,
+					localField: 'recipient',
+					foreignField: 'phone_number',
+					as: 'phonebook',
+				},
+			},
+			{
+				$unwind: {
+					path: '$phonebook',
+					preserveNullAndEmptyArrays: true,
+				},
+			},
+			{
+				$addFields: {
+					name: '$phonebook.name',
+					email: '$phonebook.email',
+					address: '$phonebook.address',
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					button_id: 1,
+					button_text: 1,
+					recipient: 1,
+					responseAt: 1,
+					name: 1,
+					email: 1,
+					address: 1,
+				},
+			},
+		]);
+
+		return processDocs(docs);
 	}
 }

@@ -32,7 +32,6 @@ router
 	.all(IDValidator)
 	.post(Controller.toggleRecurringBroadcast);
 
-
 router
 	.route('/recurring-broadcast/:id')
 	.all(IDValidator)
@@ -61,5 +60,7 @@ router
 router.route('/mark-read/:message_id').post(Controller.markRead);
 
 router.route('/conversations').get(Controller.fetchConversations);
+
+router.route('/button-responses/:id').all(IDValidator).get(Controller.buttonResponses);
 
 export default router;
