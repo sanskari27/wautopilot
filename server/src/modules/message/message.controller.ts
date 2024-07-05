@@ -38,11 +38,12 @@ async function fetchConversationMessages(req: Request, res: Response, next: Next
 		limit,
 	});
 	const labels = await conversationService.fetchMessagesLabels(id);
+	const expiry = await conversationService.fetchConversationExpiry(id);
 
 	return Respond({
 		res,
 		status: 200,
-		data: { messages, labels },
+		data: { messages, labels, expiry },
 	});
 }
 

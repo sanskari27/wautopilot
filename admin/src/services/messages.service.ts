@@ -31,6 +31,7 @@ export default class MessagesService {
 		pagination: {
 			page: number;
 			limit?: number;
+			signal?: AbortSignal;
 		}
 	) {
 		try {
@@ -41,6 +42,7 @@ export default class MessagesService {
 						page: pagination.page,
 						limit: pagination.limit || 50,
 					},
+					signal: pagination.signal,
 				}
 			);
 			return {
@@ -136,11 +138,13 @@ export default class MessagesService {
 						},
 					};
 				}),
+				expiry: data.expiry as number | 'EXPIRED',
 			};
 		} catch (err) {
 			return {
 				messageLabels: [],
 				messages: [],
+				expiry: 'EXPIRED' as number | 'EXPIRED',
 			};
 		}
 	}

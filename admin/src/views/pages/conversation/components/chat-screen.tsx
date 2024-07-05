@@ -10,11 +10,12 @@ import {
 	MenuButton,
 	MenuItem,
 	MenuList,
+	Tag,
 	Text,
 	Textarea,
 	useToast,
 } from '@chakra-ui/react';
-import { ReactNode, useEffect, useRef } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { BiArrowBack, BiSend } from 'react-icons/bi';
 import { CiMenuKebab } from 'react-icons/ci';
 import { FaFile, FaHeadphones, FaUpload, FaVideo } from 'react-icons/fa';
@@ -31,7 +32,7 @@ import {
 	setMessagesLoading,
 	setTextMessage,
 } from '../../../../store/reducers/MessagesReducers';
-import { removeUnreadConversation } from '../../../../store/reducers/RecipientReducer';
+import { removeUnreadConversation, setExpiry } from '../../../../store/reducers/RecipientReducer';
 import { Contact } from '../../../../store/types/ContactState';
 import AttachmentSelectorDialog, {
 	AttachmentDialogHandle,
@@ -70,21 +71,28 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 
 	useEffect(() => {
 		if (!selected_device_id || !selected_recipient) return;
+		const abortController = new AbortController();
 		pagination.current.loadMore = true;
 		pagination.current.page = 1;
 		dispatch(setMessagesLoading(true));
 		dispatch(setMessageList([]));
 		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id, {
 			page: 1,
+			signal: abortController.signal,
 		}).then((data) => {
 			dispatch(removeUnreadConversation(selected_recipient._id));
 			dispatch(setMessageList(data.messages));
+			dispatch(setExpiry(data.expiry));
 			dispatch(setMessageLabels(data.messageLabels));
 			dispatch(setMessagesLoading(false));
 			if (data.messages.length < 50) {
 				pagination.current.loadMore = false;
 			}
 		});
+
+		return () => {
+			abortController.abort();
+		};
 	}, [dispatch, selected_device_id, selected_recipient]);
 
 	const loadMore = () => {
@@ -117,11 +125,11 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 				</HStack>
 				<HStack>
 					<Flex alignItems={'center'}>
-						{/* {timeStamp && timeStamp < currentTime ? (
-							<Tag colorScheme='green'>Active</Tag>
-						) : (
-							<Tag colorScheme='red'>Expired</Tag>
-						)} */}
+						{selected_recipient.expiry && (
+							<ExpiryCountdown
+								timeLeft={selected_recipient.expiry === 'EXPIRED' ? 0 : selected_recipient.expiry}
+							/>
+						)}
 						{messagesLoading ? null : (
 							<Menu>
 								<MenuButton m={0} p={0} as={Button} variant={'unstyled'}>
@@ -381,6 +389,34 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 				}}
 			/>
 			<ContactSelectorDialog ref={contactDialogHandle} onConfirm={sendContactMessage} />
+		</>
+	);
+};
+
+const ExpiryCountdown = ({ timeLeft }: { timeLeft: number }) => {
+	const [_timeLeft, setTimeLeft] = useState(timeLeft);
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setTimeLeft((prev) => prev - 1);
+		}, 1000);
+		return () => clearInterval(interval);
+	}, []);
+
+	const formatTime = (time: number) => {
+		const hours = Math.floor(time / 3600);
+		const minutes = Math.floor((time % 3600) / 60);
+		const seconds = time % 60;
+		return `${hours > 0 ? hours + 'h ' : ''}${minutes > 0 ? minutes + 'm ' : ''}${seconds}s`;
+	};
+
+	return (
+		<>
+			{_timeLeft <= 0 ? (
+				<Tag colorScheme='red'>Expired</Tag>
+			) : (
+				<Tag colorScheme='green'>Expires In :- {formatTime(_timeLeft)} </Tag>
+			)}
 		</>
 	);
 };

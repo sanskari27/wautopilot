@@ -395,6 +395,23 @@ export default class ConversationService extends WhatsappLinkService {
 		return processConversationMessages(_docs);
 	}
 
+	public async fetchConversationExpiry(id: Types.ObjectId) {
+		const doc = await ConversationMessageDB.find({
+			linked_to: this.userId,
+			device_id: this.deviceId,
+			conversation_id: id,
+			received_at: { $exists: true },
+		})
+			.sort({ createdAt: -1 })
+			.limit(1);
+
+		if (doc.length === 0) return 'EXPIRED';
+		const time = DateUtils.getMoment(doc[0].received_at).add(24, 'hours');
+		const time_diff = time.diff(DateUtils.getMomentNow(), 'seconds');
+		if (time_diff < 0) return 'EXPIRED';
+		return time_diff;
+	}
+
 	public async fetchMessagesLabels(id: Types.ObjectId) {
 		const records = await ConversationMessageDB.find({
 			linked_to: this.userId,

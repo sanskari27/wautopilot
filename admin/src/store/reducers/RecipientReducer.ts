@@ -18,8 +18,8 @@ const initialState: RecipientsState = {
 		recipient: '',
 		profile_name: '',
 		origin: '',
-		expiration_timestamp: '',
 		labels: [],
+		expiry: 'EXPIRED',
 	},
 };
 
@@ -88,6 +88,9 @@ const Slice = createSlice({
 				(item) => item !== action.payload
 			);
 		},
+		setExpiry: (state, action: PayloadAction<'EXPIRED' | number>) => {
+			state.selected_recipient.expiry = action.payload;
+		},
 	},
 });
 
@@ -101,6 +104,7 @@ export const {
 	addUnreadConversation,
 	removeUnreadConversation,
 	setLabelFilter,
+	setExpiry,
 } = Slice.actions;
 
 export default Slice.reducer;

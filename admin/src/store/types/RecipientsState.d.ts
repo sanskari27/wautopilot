@@ -16,6 +16,6 @@ export type Recipient = {
 	recipient: string;
 	profile_name: string;
 	origin: string;
-	expiration_timestamp: string;
 	labels: string[];
+	expiry?: number | 'EXPIRED';
 };
