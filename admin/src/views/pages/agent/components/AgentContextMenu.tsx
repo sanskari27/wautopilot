@@ -39,7 +39,7 @@ export default function AgentContextMenu({ agent }: { agent: Agent }) {
 					Actions
 				</MenuButton>
 				<MenuList>
-					<MenuItem>View</MenuItem>
+					<MenuItem >Service account</MenuItem>
 					<MenuItem onClick={() => handleEditAgent()}>Edit</MenuItem>
 					<MenuItem onClick={() => deleteAlertRef.current?.open(agent.id)}>Delete</MenuItem>
 				</MenuList>
