@@ -133,23 +133,25 @@ export default function ButtonResponse() {
 					</Button>
 				</Flex>
 			</Flex>
-			<Flex className='flex-col md:flex-row'>
-				<Box flex={1}>
-					<Chart chartType='ColumnChart' width='100%' height='400px' data={getData()} />
-				</Box>
-				<Box flex={1}>
-					<Chart
-						chartType='PieChart'
-						width='100%'
-						height='400px'
-						data={getData()}
-						options={{ is3D: true }}
-					/>
-				</Box>
-			</Flex>
-			<Text textAlign={'center'} fontWeight={'medium'}>
-				Visual comparison of the number of times each button was clicked by the recipients.
-			</Text>
+			<Box hidden={buttonResponse.length === 0}>
+				<Flex className='flex-col md:flex-row'>
+					<Box flex={1}>
+						<Chart chartType='ColumnChart' width='100%' height='400px' data={getData()} />
+					</Box>
+					<Box flex={1}>
+						<Chart
+							chartType='PieChart'
+							width='100%'
+							height='400px'
+							data={getData()}
+							options={{ is3D: true }}
+						/>
+					</Box>
+				</Flex>
+				<Text textAlign={'center'} fontWeight={'medium'}>
+					Visual comparison of the number of times each button was clicked by the recipients.
+				</Text>
+			</Box>
 			<TableContainer marginTop={'1rem'}>
 				<Table variant={'striped'}>
 					<Thead>
