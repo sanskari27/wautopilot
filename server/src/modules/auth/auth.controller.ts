@@ -140,12 +140,16 @@ async function validateAuth(req: Request, res: Response, next: NextFunction) {
 
 async function details(req: Request, res: Response, next: NextFunction) {
 	const { user } = req.locals;
+	const details = await user.getDetails();
 
 	return Respond({
 		res,
 		status: 200,
 		data: {
-			account: await user.getDetails(),
+			account: {
+				...details,
+				walletBalance: details.walletBalance.toFixed(2),
+			},
 		},
 	});
 }
