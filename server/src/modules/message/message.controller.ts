@@ -348,7 +348,7 @@ async function updateRecurringBroadcast(req: Request, res: Response, next: NextF
 	}
 }
 
-async function pauseRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
+async function toggleRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
 	const {
 		account,
 		device: { device },
@@ -358,28 +358,7 @@ async function pauseRecurringBroadcast(req: Request, res: Response, next: NextFu
 	try {
 		const broadcastService = new BroadcastService(account, device);
 
-		await broadcastService.pauseRecurringBroadcast(id);
-
-		return Respond({
-			res,
-			status: 200,
-		});
-	} catch (err) {
-		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
-	}
-}
-
-async function resumeRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
-	const {
-		account,
-		device: { device },
-		id,
-	} = req.locals;
-
-	try {
-		const broadcastService = new BroadcastService(account, device);
-
-		await broadcastService.resumeRecurringBroadcast(id);
+		await broadcastService.toggleRecurringBroadcast(id);
 
 		return Respond({
 			res,
@@ -614,8 +593,7 @@ const Controller = {
 	listRecurringBroadcasts,
 	scheduleRecurringBroadcast,
 	updateRecurringBroadcast,
-	pauseRecurringBroadcast,
-	resumeRecurringBroadcast,
+	toggleRecurringBroadcast,
 	deleteRecurringBroadcast,
 	rescheduleRecurringBroadcast,
 };

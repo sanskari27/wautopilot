@@ -28,14 +28,10 @@ router
 	.post(Controller.rescheduleRecurringBroadcast);
 
 router
-	.route('/recurring-broadcast/:id/pause')
+	.route('/recurring-broadcast/:id/toggle')
 	.all(IDValidator)
-	.post(Controller.pauseRecurringBroadcast);
+	.post(Controller.toggleRecurringBroadcast);
 
-router
-	.route('/recurring-broadcast/:id/resume')
-	.all(IDValidator)
-	.post(Controller.resumeRecurringBroadcast);
 
 router
 	.route('/recurring-broadcast/:id')
