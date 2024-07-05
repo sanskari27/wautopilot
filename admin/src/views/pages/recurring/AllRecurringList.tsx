@@ -1,4 +1,4 @@
-import { EditIcon } from '@chakra-ui/icons';
+import { DownloadIcon, EditIcon } from '@chakra-ui/icons';
 import {
 	IconButton,
 	Skeleton,
@@ -82,6 +82,21 @@ export default function AllRecurringList() {
 		});
 	};
 
+	const handleDownload = (id: string) => {
+		const promise = RecurringService.downloadRecurring({
+			deviceId: selected_device_id,
+			recurringId: id,
+		});
+
+		toast.promise(promise, {
+			success: {
+				title: 'Recurring report downloaded successfully',
+			},
+			error: { title: 'Failed to download Recurring report' },
+			loading: { title: 'Downloading Recurring report...' },
+		});
+	};
+
 	const handleEditBot = (id: string) => {
 		navigate(`${NAVIGATION.APP}/${NAVIGATION.RECURRING}/${id}`);
 	};
@@ -133,7 +148,7 @@ export default function AllRecurringList() {
 										<Td>{recurring.wish_from}</Td>
 										<Td>{recurring.delay} Days</Td>
 										<Td>
-											<Tooltip label='Delete Responder' aria-label='Delete Responder'>
+											<Tooltip label='Delete Recurring' aria-label='Delete Responder'>
 												<IconButton
 													aria-label='Delete'
 													icon={<MdDelete />}
@@ -149,7 +164,7 @@ export default function AllRecurringList() {
 													border='none'
 												/>
 											</Tooltip>
-											<Tooltip label='Edit Responder' aria-label='Edit Responder'>
+											<Tooltip label='Edit Recurring' aria-label='Edit Responder'>
 												<IconButton
 													aria-label='Edit'
 													icon={<EditIcon />}
@@ -163,7 +178,7 @@ export default function AllRecurringList() {
 													border='none'
 												/>
 											</Tooltip>
-											<Tooltip label='Toggle Responder' aria-label='Toggle Responder'>
+											<Tooltip label='Toggle Recurring' aria-label='Toggle Responder'>
 												<IconButton
 													aria-label='toggle'
 													icon={recurring.active === 'ACTIVE' ? <PiPause /> : <PiPlay />}
@@ -183,11 +198,24 @@ export default function AllRecurringList() {
 													border='none'
 												/>
 											</Tooltip>
-											<Tooltip label='Reschedule Responder' aria-label='Toggle Responder'>
+											<Tooltip label='Reschedule Recurring' aria-label='Toggle Responder'>
 												<IconButton
 													aria-label='toggle'
 													icon={<MdScheduleSend color='gray' />}
 													onClick={() => handleReschedule(recurring.id)}
+													bgColor={'transparent'}
+													_hover={{
+														bgColor: 'transparent',
+													}}
+													outline='none'
+													border='none'
+												/>
+											</Tooltip>
+											<Tooltip label='Download Report' aria-label='Toggle Responder'>
+												<IconButton
+													aria-label='toggle'
+													icon={<DownloadIcon color='blueviolet' />}
+													onClick={() => handleDownload(recurring.id)}
 													bgColor={'transparent'}
 													_hover={{
 														bgColor: 'transparent',
