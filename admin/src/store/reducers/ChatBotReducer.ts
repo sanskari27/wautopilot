@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { countOccurrences } from '../../utils/templateHelper';
 import { StoreNames } from '../config';
-import { ChatBotState } from '../types/ChatBot';
+import { ChatBotState } from '../types/ChatBotState';
 import { Template } from '../types/TemplateState';
 
 const initState: ChatBotState = {

@@ -175,8 +175,8 @@ export default function CreateChatBot() {
 		headerMediaId,
 		body,
 	}: {
-		headerLink: string;
-		headerFile: File | null;
+		headerLink?: string;
+		headerFile?: File | null;
 		headerMediaId: string;
 		body?: {
 			index: number;

@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import { NAVIGATION } from './config/const';
 
@@ -28,6 +28,8 @@ const RenderFlow = lazy(() => import('./views/pages/chatbot-flow/components/Rend
 const CreateChatbotFlow = lazy(
 	() => import('./views/pages/chatbot-flow/components/CreateChatbotFlow')
 );
+const RecurringPage = lazy(() => import('./views/pages/recurring'));
+const CreateRecurring = lazy(() => import('./views/pages/recurring/CreateRecurring'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -60,6 +62,10 @@ function App() {
 							</Route>
 							<Route path={NAVIGATION.TEMPLATES} element={<Templates />} />
 							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
+							<Route path={NAVIGATION.RECURRING} element={<RecurringPage />}>
+								<Route path={':id'} element={<CreateRecurring />} />
+								<Route path={'new'} element={<CreateRecurring />} />
+							</Route>
 							<Route path={NAVIGATION.BROADCAST_REPORT} element={<BroadcastReport />} />
 							<Route path={NAVIGATION.CONTACT} element={<ContactPage />} />
 							<Route path={NAVIGATION.INBOX} element={<Conversation />} />
@@ -73,10 +79,10 @@ function App() {
 							</Route>
 							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
 						</Route>
-						<Route
+						{/* <Route
 							path='*'
 							element={<Navigate to={NAVIGATION.APP + '/' + NAVIGATION.DASHBOARD} />}
-						/>
+						/> */}
 					</Routes>
 				</Suspense>
 			</Router>

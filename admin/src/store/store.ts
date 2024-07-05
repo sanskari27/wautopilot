@@ -11,6 +11,7 @@ import { default as MediaReducer } from './reducers/MediaReducer';
 import MessagesReducers from './reducers/MessagesReducers';
 import { default as PhonebookReducer } from './reducers/PhonebookReducer';
 import RecipientReducer from './reducers/RecipientReducer';
+import RecurringReducer from './reducers/RecurringReducer';
 import { default as TemplateReducer } from './reducers/TemplateReducer';
 import UserReducers from './reducers/UserReducers';
 
@@ -28,6 +29,7 @@ const store = configureStore({
 		[StoreNames.CHATBOT]: ChatBotReducer,
 		[StoreNames.DASHBOARD]: DashboardReducer,
 		[StoreNames.CHATBOT_FLOW]: ChatbotFlowReducer,
+		[StoreNames.RECURRING]: RecurringReducer,
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({

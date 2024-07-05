@@ -1,4 +1,4 @@
-import { BiBot, BiConversation } from 'react-icons/bi';
+import { BiBot, BiCake, BiConversation } from 'react-icons/bi';
 import { MdContacts, MdOutlineDashboard, MdOutlinePermMedia } from 'react-icons/md';
 import { RiContactsBook2Line, RiFlowChart } from 'react-icons/ri';
 import { TbMessage2Plus, TbReportSearch, TbTemplate } from 'react-icons/tb';
@@ -28,6 +28,8 @@ export const NAVIGATION = {
 	ADD_TEMPLATE: 'add-template',
 	EDIT_TEMPLATE: 'edit-template',
 
+	RECURRING: 'recurring',
+
 	MEDIA: 'media',
 };
 
@@ -51,6 +53,11 @@ export const MenuItems = [
 		icon: TbMessage2Plus,
 		route: NAVIGATION.BROADCAST,
 		title: 'Broadcast',
+	},
+	{
+		icon: BiCake,
+		route: NAVIGATION.RECURRING,
+		title: 'Recurring',
 	},
 	{
 		icon: TbReportSearch,

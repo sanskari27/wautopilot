@@ -12,4 +12,5 @@ export enum StoreNames {
 	CHATBOT = 'chatbot',
 	DASHBOARD = 'dashboard',
 	CHATBOT_FLOW = 'chatbot-flow',
+	RECURRING= 'recurring',
 }

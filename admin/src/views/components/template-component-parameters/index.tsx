@@ -32,8 +32,8 @@ const bodyParametersList = [
 
 type Props = {
 	components: Record<string, any>[];
-	headerLink: string;
-	headerFile: File | null;
+	headerLink?: string;
+	headerFile?: File | null;
 	headerMediaId: string;
 	body: {
 		custom_text: string;
@@ -46,8 +46,8 @@ type Props = {
 		headerMediaId,
 		body,
 	}: {
-		headerLink: string;
-		headerFile: File | null;
+		headerLink?: string;
+		headerFile?: File | null;
 		headerMediaId: string;
 		body?: {
 			index: number;
@@ -185,7 +185,7 @@ const TemplateComponentParameter = ({
 										value={parameter.custom_text}
 										onChange={(e) =>
 											handleTemplateDetailsChange({
-												headerLink,
+												headerLink: headerLink,
 												headerFile,
 												headerMediaId,
 												body: {

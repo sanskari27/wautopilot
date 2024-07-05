@@ -11,6 +11,7 @@ import { DashboardService } from '../../../services/dashboard.service';
 import DeviceService from '../../../services/device.service';
 import MediaService from '../../../services/media.service';
 import MessagesService from '../../../services/messages.service';
+import RecurringService from '../../../services/recurring.service';
 import TemplateService from '../../../services/template.service';
 import { StoreNames, StoreState } from '../../../store';
 import { setChatBotList, setChatbotLoading } from '../../../store/reducers/ChatBotReducer';
@@ -24,6 +25,7 @@ import {
 } from '../../../store/reducers/DevicesReducers';
 import { setMediaFetching, setMediaList } from '../../../store/reducers/MediaReducer';
 import { setRecipientsList, setRecipientsLoading } from '../../../store/reducers/RecipientReducer';
+import { setRecurringList } from '../../../store/reducers/RecurringReducer';
 import { setTemplateFetching, setTemplatesList } from '../../../store/reducers/TemplateReducer';
 import {
 	setIsAuthenticated,
@@ -82,6 +84,7 @@ const AppPage = () => {
 					ChatBotService.listChatBots({ deviceId: selected_device_id }),
 					DashboardService.getDashboardData(selected_device_id),
 					ChatbotFlowService.listChatBots({ deviceId: selected_device_id }),
+					RecurringService.getRecurringList({ deviceId: selected_device_id }),
 				];
 
 				const results = await Promise.all(promises);
@@ -91,6 +94,7 @@ const AppPage = () => {
 				dispatch(setChatBotList(results[3]));
 				dispatch(setDashboardList(results[4]));
 				dispatch(setChatbotFlow(results[5]));
+				dispatch(setRecurringList(results[6]));
 			} catch (e) {
 				return;
 			}
