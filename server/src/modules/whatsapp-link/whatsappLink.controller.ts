@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import MetaAPI from '../../config/MetaAPI';
+import { UserLevel } from '../../config/const';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import WhatsappLinkService from '../../services/whatsappLink';
@@ -8,7 +9,7 @@ import { WhatsappLinkCreateValidationResult } from './whatsappLink.validator';
 
 async function getAllLinkedDevices(req: Request, res: Response, next: NextFunction) {
 	try {
-		const devices = await WhatsappLinkService.fetchRecords(req.locals.account._id);
+		const devices = await WhatsappLinkService.fetchRecords(req.locals.serviceAccount._id);
 
 		return Respond({
 			res,
@@ -22,14 +23,20 @@ async function getAllLinkedDevices(req: Request, res: Response, next: NextFuncti
 	}
 }
 async function linkDevice(req: Request, res: Response, next: NextFunction) {
-	const { account } = req.locals;
+	const {
+		user: { userId, userLevel },
+	} = req.locals;
 	const data = req.locals.data as WhatsappLinkCreateValidationResult;
 	const { phoneNumberId, waid, code } = data;
 	let { accessToken } = data;
 
+	if (userLevel < UserLevel.Admin) {
+		return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
+	}
+
 	const userDetails = await req.locals.user.getDetails();
 
-	const devices = await WhatsappLinkService.fetchRecords(account._id);
+	const devices = await WhatsappLinkService.fetchRecords(userId);
 
 	if (devices.length >= userDetails.no_of_devices) {
 		return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
@@ -56,7 +63,7 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 	}
 
 	try {
-		const device = await WhatsappLinkService.addRecord(account._id, {
+		const device = await WhatsappLinkService.addRecord(userId, {
 			phoneNumberId,
 			waid,
 			accessToken,
@@ -73,7 +80,7 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 	}
 }
 async function removeDevice(req: Request, res: Response, next: NextFunction) {
-	const { id, account } = req.locals;
+	const { id, serviceAccount: account } = req.locals;
 
 	try {
 		await WhatsappLinkService.deleteRecord(account._id, id);
@@ -89,7 +96,7 @@ async function removeDevice(req: Request, res: Response, next: NextFunction) {
 async function fetchMessageHealth(req: Request, res: Response, next: NextFunction) {
 	const {
 		device: { device },
-		account,
+		serviceAccount: account,
 	} = req.locals;
 
 	try {

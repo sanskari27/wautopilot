@@ -8,7 +8,7 @@ import { UserService } from '../../services';
 import { Respond, generateRandomID } from '../../utils/ExpressUtils';
 
 async function startSubscription(req: Request, res: Response, next: NextFunction) {
-	const { account } = req.locals;
+	const { serviceAccount: account } = req.locals;
 	try {
 		const contact = await RazorpayProvider.customers.createCustomer({
 			name: account.name,
@@ -58,7 +58,7 @@ async function startSubscription(req: Request, res: Response, next: NextFunction
 }
 
 async function verifyToken(req: Request, res: Response, next: NextFunction) {
-	const { account } = req.locals;
+	const { serviceAccount: account } = req.locals;
 	try {
 		const contact = await RazorpayProvider.customers.createCustomer({
 			name: account.name,
@@ -97,7 +97,7 @@ async function verifyToken(req: Request, res: Response, next: NextFunction) {
 }
 
 async function addMoney(req: Request, res: Response, next: NextFunction) {
-	const { account } = req.locals;
+	const { serviceAccount: account } = req.locals;
 	try {
 		const contact = await RazorpayProvider.customers.createCustomer({
 			name: account.name,

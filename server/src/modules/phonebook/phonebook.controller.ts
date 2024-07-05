@@ -15,7 +15,7 @@ import {
 
 async function getAllLabels(req: Request, res: Response, next: NextFunction) {
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.account);
+		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
 		const labels = await phoneBookService.getAllLabels();
 
 		return Respond({
@@ -26,6 +26,8 @@ async function getAllLabels(req: Request, res: Response, next: NextFunction) {
 			},
 		});
 	} catch (err) {
+		console.log(err);
+
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
@@ -34,7 +36,7 @@ async function addRecords(req: Request, res: Response, next: NextFunction) {
 	const { records } = req.locals.data as RecordsValidationResult;
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.account);
+		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
 		const created = await phoneBookService.addRecords(records);
 
 		return Respond({
@@ -54,7 +56,7 @@ async function records(req: Request, res: Response, next: NextFunction) {
 	const limit = req.query.limit ? parseInt(req.query.limit as string) || 20 : 20;
 	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.account);
+		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
 		const records = await phoneBookService.fetchRecords({
 			page,
 			limit,
@@ -80,7 +82,7 @@ async function records(req: Request, res: Response, next: NextFunction) {
 
 async function exportRecords(req: Request, res: Response, next: NextFunction) {
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.account);
+		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
 		const records = await phoneBookService.fetchRecords({
 			page: 1,
 			limit: 9999999,
@@ -111,7 +113,7 @@ async function updateRecords(req: Request, res: Response, next: NextFunction) {
 	const id = req.locals.id;
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.account);
+		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
 		const created = await phoneBookService.updateRecord(id, data);
 
 		return Respond({
@@ -130,7 +132,7 @@ async function deleteRecords(req: Request, res: Response, next: NextFunction) {
 	const id = req.locals.id;
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.account);
+		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
 		await phoneBookService.deleteRecord([id]);
 
 		return Respond({
@@ -149,7 +151,7 @@ async function deleteMultiple(req: Request, res: Response, next: NextFunction) {
 	const { ids } = req.locals.data as MultiDeleteValidationResult;
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.account);
+		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
 		await phoneBookService.deleteRecord(ids);
 
 		return Respond({
@@ -173,7 +175,7 @@ async function setLabelsByPhone(req: Request, res: Response, next: NextFunction)
 	}
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.account);
+		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
 		const doc = await phoneBookService.findRecordByPhone(phone_number);
 		if (!doc) {
 			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
@@ -197,7 +199,7 @@ async function setLabels(req: Request, res: Response, next: NextFunction) {
 	const { labels, ids } = req.locals.data as SetLabelValidationResult;
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.account);
+		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
 		await phoneBookService.setLabels(ids, labels);
 
 		return Respond({
@@ -216,7 +218,7 @@ async function addLabels(req: Request, res: Response, next: NextFunction) {
 	const { labels, ids } = req.locals.data as SetLabelValidationResult;
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.account);
+		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
 		await phoneBookService.addLabels(ids, labels);
 
 		return Respond({
@@ -235,7 +237,7 @@ async function removeLabels(req: Request, res: Response, next: NextFunction) {
 	const { labels, ids } = req.locals.data as SetLabelValidationResult;
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.account);
+		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
 		await phoneBookService.removeLabels(ids, labels);
 
 		return Respond({
@@ -268,7 +270,7 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 			return next(new CustomError(COMMON_ERRORS.ERROR_PARSING_CSV));
 		}
 
-		const phoneBookService = new PhoneBookService(req.locals.account);
+		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
 		const data = parsed_csv.map((record) => {
 			const { prefix, tags, ...rest } = record;
 			return {

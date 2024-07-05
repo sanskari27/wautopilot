@@ -79,6 +79,9 @@ async function setMarkupPrice(req: Request, res: Response, next: NextFunction) {
 async function createAgent(req: Request, res: Response, next: NextFunction) {
 	const { email, name, phone, password } = req.locals.data as CreateAgentValidationResult;
 	try {
+		if (req.locals.user.userLevel < UserLevel.Admin) {
+			return next(new CustomError(AUTH_ERRORS.PERMISSION_DENIED));
+		}
 		await UserService.register(email, password, {
 			name,
 			phone,

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { JwtPayload, verify } from 'jsonwebtoken';
-import { StorageDB } from '../../../mongo';
+import { AccountDB, StorageDB } from '../../../mongo';
 import { Cookie, REFRESH_SECRET, UserLevel } from '../../config/const';
 import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
@@ -48,31 +48,47 @@ async function login(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
-async function switchAccount(req: Request, res: Response, next: NextFunction) {
-	const { id } = req.locals;
+async function serviceAccount(req: Request, res: Response, next: NextFunction) {
+	const { id, user } = req.locals;
+	let authToken: string, refreshToken: string;
 
 	try {
-		const { authToken, refreshToken } = await UserService.loginById(id);
+		if (user.userLevel === UserLevel.Agent) {
+			return next(new CustomError(AUTH_ERRORS.PERMISSION_DENIED));
+		} else if (user.userLevel === UserLevel.Admin) {
+			const agent = await AccountDB.findOne({
+				parent: user.userId,
+				role: UserLevel.Agent,
+				_id: id,
+			});
 
-		setCookie(res, {
-			key: Cookie.Auth,
-			value: authToken,
-			expires: JWT_EXPIRE_TIME,
-		});
+			if (!agent) {
+				return next(new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR));
+			}
+		}
 
-		setCookie(res, {
-			key: Cookie.Refresh,
-			value: refreshToken,
-			expires: SESSION_EXPIRE_TIME,
-		});
-
-		return Respond({
-			res,
-			status: 200,
-		});
+		const { authToken: a, refreshToken: r } = await UserService.loginById(id);
+		authToken = a;
+		refreshToken = r;
 	} catch (err) {
 		return next(new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR));
 	}
+
+	setCookie(res, {
+		key: Cookie.Auth,
+		value: authToken,
+		expires: JWT_EXPIRE_TIME,
+	});
+
+	setCookie(res, {
+		key: Cookie.Refresh,
+		value: refreshToken,
+		expires: SESSION_EXPIRE_TIME,
+	});
+	return Respond({
+		res,
+		status: 200,
+	});
 }
 
 async function forgotPassword(req: Request, res: Response, next: NextFunction) {
@@ -173,7 +189,7 @@ async function logout(req: Request, res: Response, next: NextFunction) {
 const Controller = {
 	validateAuth,
 	login,
-	switchAccount,
+	serviceAccount,
 	forgotPassword,
 	resetPassword,
 	register,

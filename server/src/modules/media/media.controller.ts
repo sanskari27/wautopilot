@@ -12,7 +12,7 @@ import FileUtils from '../../utils/FileUtils';
 
 async function addMedia(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 	const fileUploadOptions: SingleFileUploadOptions = {
@@ -69,7 +69,7 @@ async function addMedia(req: Request, res: Response, next: NextFunction) {
 
 async function downloadMedia(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -91,7 +91,7 @@ async function downloadMedia(req: Request, res: Response, next: NextFunction) {
 
 async function deleteMedia(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -121,7 +121,7 @@ async function deleteMedia(req: Request, res: Response, next: NextFunction) {
 
 async function mediaById(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -142,7 +142,7 @@ async function mediaById(req: Request, res: Response, next: NextFunction) {
 
 async function listMedia(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 

@@ -15,8 +15,8 @@ router.route('/validate-auth').all(VerifySession).get(Controller.validateAuth);
 router.route('/details').all(VerifySession).get(Controller.details);
 router
 	.route('/service-account/:id')
-	.all(VerifySession, VerifyMinLevel(UserLevel.Master), IDValidator)
-	.post(Controller.switchAccount);
+	.all(VerifySession, VerifyMinLevel(UserLevel.Admin), IDValidator)
+	.post(Controller.serviceAccount);
 
 router.route('/login').all(LoginAccountValidator).post(Controller.login);
 router.route('/register').all(RegisterAccountValidator).post(Controller.register);

@@ -417,7 +417,11 @@ export default class BroadcastService extends WhatsappLinkService {
 						$sum: {
 							$cond: {
 								if: {
-									$and: [{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.SENT] }],
+									$or: [
+										{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.SENT] },
+										{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.READ] },
+										{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.DELIVERED] },
+									],
 								},
 								then: 1,
 								else: 0,

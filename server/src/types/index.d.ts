@@ -26,7 +26,8 @@ export interface LocalVariables {
 	query: any;
 	data: any;
 	id: IDType;
-	account: IAccount;
+	serviceAccount: IAccount;
+	serviceUser: UserService;
 	user: UserService;
 	device: WhatsappLinkService;
 	plan: IPlan;

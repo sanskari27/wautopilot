@@ -12,7 +12,7 @@ import {
 
 async function createBot(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -30,7 +30,7 @@ async function createBot(req: Request, res: Response, next: NextFunction) {
 
 async function updateBot(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -49,7 +49,7 @@ async function updateBot(req: Request, res: Response, next: NextFunction) {
 
 async function listBots(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -66,7 +66,7 @@ async function listBots(req: Request, res: Response, next: NextFunction) {
 
 async function toggleActive(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -83,7 +83,7 @@ async function toggleActive(req: Request, res: Response, next: NextFunction) {
 
 async function deleteBot(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -97,7 +97,7 @@ async function deleteBot(req: Request, res: Response, next: NextFunction) {
 
 async function downloadResponses(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -112,7 +112,7 @@ async function downloadResponses(req: Request, res: Response, next: NextFunction
 
 async function createFlow(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -130,7 +130,7 @@ async function createFlow(req: Request, res: Response, next: NextFunction) {
 
 async function updateFlow(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -149,7 +149,7 @@ async function updateFlow(req: Request, res: Response, next: NextFunction) {
 
 async function listFlows(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -166,7 +166,7 @@ async function listFlows(req: Request, res: Response, next: NextFunction) {
 
 async function chatBotFlowDetails(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 	try {
@@ -186,7 +186,7 @@ async function chatBotFlowDetails(req: Request, res: Response, next: NextFunctio
 
 async function toggleActiveFlow(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -203,7 +203,7 @@ async function toggleActiveFlow(req: Request, res: Response, next: NextFunction)
 
 async function deleteFlow(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;

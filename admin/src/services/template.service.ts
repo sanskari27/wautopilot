@@ -20,7 +20,7 @@ export default class TemplateService {
 	}
 	static async fetchTemplate(device_id: string, template_id: string) {
 		try {
-			const { data } = await APIInstance.get(`/${device_id}//template${template_id}`);
+			const { data } = await APIInstance.get(`/${device_id}/template/${template_id}`);
 
 			return data.template as {
 				id: string;

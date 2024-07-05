@@ -8,7 +8,7 @@ import { CreateCouponValidationResult } from './coupon.validator';
 async function addCoupon(req: Request, res: Response, next: NextFunction) {
 	const data = req.locals.data as CreateCouponValidationResult;
 	try {
-		const coupon = await new CouponService(req.locals.account).addCoupon(data);
+		const coupon = await new CouponService(req.locals.serviceAccount).addCoupon(data);
 
 		return Respond({
 			res,
@@ -28,7 +28,10 @@ async function addCoupon(req: Request, res: Response, next: NextFunction) {
 async function updateCoupon(req: Request, res: Response, next: NextFunction) {
 	const data = req.locals.data as CreateCouponValidationResult;
 	try {
-		const coupon = await new CouponService(req.locals.account).updateCoupon(req.locals.id, data);
+		const coupon = await new CouponService(req.locals.serviceAccount).updateCoupon(
+			req.locals.id,
+			data
+		);
 
 		return Respond({
 			res,
@@ -46,7 +49,7 @@ async function updateCoupon(req: Request, res: Response, next: NextFunction) {
 }
 
 async function deleteCoupon(req: Request, res: Response, next: NextFunction) {
-	const { id, account } = req.locals;
+	const { id, serviceAccount: account } = req.locals;
 
 	try {
 		await new CouponService(account).delete(id);
@@ -60,7 +63,7 @@ async function deleteCoupon(req: Request, res: Response, next: NextFunction) {
 }
 
 async function couponByCode(req: Request, res: Response, next: NextFunction) {
-	const { account } = req.locals;
+	const { serviceAccount: account } = req.locals;
 	const { code } = req.params;
 	if (!code || typeof code !== 'string') {
 		return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
@@ -81,7 +84,7 @@ async function couponByCode(req: Request, res: Response, next: NextFunction) {
 }
 
 async function listCoupons(req: Request, res: Response, next: NextFunction) {
-	const { account } = req.locals;
+	const { serviceAccount: account } = req.locals;
 
 	const list = await new CouponService(account).listCoupons();
 	return Respond({

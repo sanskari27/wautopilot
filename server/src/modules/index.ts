@@ -48,7 +48,7 @@ router
 	.post(async function (req, res, next) {
 		const key = generateRandomID();
 
-		SocketServer.getInstance().addConversationKey(key, req.locals.user.userId.toString());
+		SocketServer.getInstance().addConversationKey(key, req.locals.serviceUser.userId.toString());
 		Respond({
 			res,
 			status: 200,

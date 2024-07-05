@@ -10,7 +10,7 @@ import { Respond } from '../../utils/ExpressUtils';
 
 async function dashboardDetails(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 	try {

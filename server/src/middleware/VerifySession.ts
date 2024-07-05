@@ -1,6 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 import { JwtPayload, verify } from 'jsonwebtoken';
-import { Cookie, JWT_SECRET, REFRESH_SECRET, SESSION_EXPIRE_TIME } from '../config/const';
+import {
+	Cookie,
+	JWT_SECRET,
+	REFRESH_SECRET,
+	SESSION_EXPIRE_TIME,
+	UserLevel,
+} from '../config/const';
 import { CustomError } from '../errors';
 import AUTH_ERRORS from '../errors/auth-errors';
 import { SessionService, UserService } from '../services';
@@ -15,7 +21,14 @@ export default async function VerifySession(req: Request, res: Response, next: N
 			const session = await SessionService.findSessionById(decoded.id);
 
 			req.locals.user = await UserService.findById(session.userId);
-			req.locals.account = req.locals.user.account;
+			if (req.locals.user.userLevel >= UserLevel.Admin) {
+				req.locals.serviceUser = req.locals.user;
+				req.locals.serviceAccount = req.locals.serviceUser.account;
+			} else if (req.locals.user.userLevel === UserLevel.Agent) {
+				const parent = req.locals.user.account.parent;
+				req.locals.serviceUser = await UserService.findById(parent!);
+				req.locals.serviceAccount = req.locals.serviceUser.account;
+			}
 
 			setCookie(res, {
 				key: Cookie.Auth,
@@ -36,7 +49,14 @@ export default async function VerifySession(req: Request, res: Response, next: N
 			const session = await SessionService.findSessionByRefreshToken(decoded.id);
 
 			req.locals.user = await UserService.findById(session.userId);
-			req.locals.account = req.locals.user.account;
+			if (req.locals.user.userLevel === UserLevel.Admin) {
+				req.locals.serviceUser = req.locals.user;
+				req.locals.serviceAccount = req.locals.serviceUser.account;
+			} else if (req.locals.user.userLevel === UserLevel.Agent) {
+				const parent = req.locals.user.account.parent;
+				req.locals.serviceUser = await UserService.findById(parent!);
+				req.locals.serviceAccount = req.locals.serviceUser.account;
+			}
 
 			setCookie(res, {
 				key: Cookie.Auth,
@@ -54,7 +74,7 @@ export default async function VerifySession(req: Request, res: Response, next: N
 
 export function VerifyMinLevel(level: number) {
 	function validator(req: Request, res: Response, next: NextFunction) {
-		if (req.locals.user && req.locals.user.userLevel >= level) {
+		if (req.locals.serviceUser && req.locals.serviceUser.userLevel >= level) {
 			return next();
 		}
 

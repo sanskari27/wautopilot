@@ -26,7 +26,7 @@ const bodyParametersList = [
 
 async function broadcastReport(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 	try {
@@ -49,7 +49,7 @@ async function broadcastReport(req: Request, res: Response, next: NextFunction) 
 async function pauseBroadcast(req: Request, res: Response, next: NextFunction) {
 	const {
 		id,
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -69,7 +69,7 @@ async function pauseBroadcast(req: Request, res: Response, next: NextFunction) {
 async function resumeBroadcast(req: Request, res: Response, next: NextFunction) {
 	const {
 		id,
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -89,7 +89,7 @@ async function resumeBroadcast(req: Request, res: Response, next: NextFunction) 
 async function resendBroadcast(req: Request, res: Response, next: NextFunction) {
 	const {
 		id,
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -109,7 +109,7 @@ async function resendBroadcast(req: Request, res: Response, next: NextFunction) 
 async function downloadBroadcast(req: Request, res: Response, next: NextFunction) {
 	const {
 		id,
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -130,7 +130,7 @@ async function downloadBroadcast(req: Request, res: Response, next: NextFunction
 async function deleteBroadcast(req: Request, res: Response, next: NextFunction) {
 	const {
 		id,
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -161,7 +161,7 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 	} = req.locals.data as CreateBroadcastValidationResult;
 
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -282,7 +282,7 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 
 async function listRecurringBroadcasts(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -305,7 +305,7 @@ async function scheduleRecurringBroadcast(req: Request, res: Response, next: Nex
 	const data = req.locals.data as CreateRecurringValidationResult;
 
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -330,7 +330,7 @@ async function updateRecurringBroadcast(req: Request, res: Response, next: NextF
 	const data = req.locals.data as CreateRecurringValidationResult;
 
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -351,7 +351,7 @@ async function updateRecurringBroadcast(req: Request, res: Response, next: NextF
 
 async function toggleRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -375,7 +375,7 @@ async function toggleRecurringBroadcast(req: Request, res: Response, next: NextF
 
 async function fetchRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -397,7 +397,7 @@ async function fetchRecurringBroadcast(req: Request, res: Response, next: NextFu
 
 async function deleteRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -418,7 +418,7 @@ async function deleteRecurringBroadcast(req: Request, res: Response, next: NextF
 
 async function rescheduleRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -440,7 +440,7 @@ async function rescheduleRecurringBroadcast(req: Request, res: Response, next: N
 async function fetchConversations(req: Request, res: Response, next: NextFunction) {
 	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 
@@ -456,7 +456,7 @@ async function fetchConversations(req: Request, res: Response, next: NextFunctio
 
 async function fetchConversationMessages(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		id,
 		device: { device },
 	} = req.locals;
@@ -479,7 +479,7 @@ async function fetchConversationMessages(req: Request, res: Response, next: Next
 
 async function markRead(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 	const message_id = req.params.message_id;
@@ -509,7 +509,7 @@ async function markRead(req: Request, res: Response, next: NextFunction) {
 
 async function assignLabelToMessage(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;
@@ -529,13 +529,14 @@ async function assignLabelToMessage(req: Request, res: Response, next: NextFunct
 
 async function sendMessageToConversation(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount,
+		serviceUser,
 		id,
 		device: { device },
 	} = req.locals;
 	const data = req.locals.data as SendMessageValidationResult;
 
-	const conversationService = new ConversationService(account, device);
+	const conversationService = new ConversationService(serviceAccount, device);
 	const recipient = await conversationService.findRecipientByConversation(id);
 	if (!recipient) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
@@ -592,7 +593,7 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 				  }
 				: {}),
 		});
-		req.locals.user.deductCredit(1);
+		serviceUser.deductCredit(1);
 	} catch (err) {
 		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 	}
@@ -605,7 +606,7 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 
 async function buttonResponses(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 		id,
 	} = req.locals;

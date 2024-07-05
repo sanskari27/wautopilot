@@ -8,7 +8,7 @@ import { TemplateRemoveValidationResult } from './template.validator';
 
 async function addTemplate(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 	try {
@@ -30,7 +30,7 @@ async function addTemplate(req: Request, res: Response, next: NextFunction) {
 
 async function editTemplate(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 	try {
@@ -55,7 +55,7 @@ async function editTemplate(req: Request, res: Response, next: NextFunction) {
 async function deleteTemplate(req: Request, res: Response, next: NextFunction) {
 	const { id, name } = req.locals.data as TemplateRemoveValidationResult;
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 	try {
@@ -76,7 +76,7 @@ async function deleteTemplate(req: Request, res: Response, next: NextFunction) {
 }
 async function fetchTemplates(req: Request, res: Response, next: NextFunction) {
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 	try {
@@ -98,7 +98,7 @@ async function fetchTemplates(req: Request, res: Response, next: NextFunction) {
 async function fetchTemplate(req: Request, res: Response, next: NextFunction) {
 	const id = req.params.id;
 	const {
-		account,
+		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 	try {
