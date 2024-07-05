@@ -5,7 +5,7 @@ import { Contact } from '../store/types/ContactState';
 export default class MessagesService {
 	static async fetchAllConversation(deviceId: string, label_filter: string[] = []) {
 		try {
-			const { data } = await APIInstance.get(`/${deviceId}/message/conversations`, {
+			const { data } = await APIInstance.get(`/${deviceId}/conversation`, {
 				params: {
 					labels: label_filter.join(','),
 				},
@@ -36,7 +36,7 @@ export default class MessagesService {
 	) {
 		try {
 			const { data } = await APIInstance.get(
-				`/${deviceId}/message/conversations/${recipientId}/messages`,
+				`/${deviceId}/conversation/${recipientId}/messages`,
 				{
 					params: {
 						page: pagination.page,
@@ -185,7 +185,7 @@ export default class MessagesService {
 	) {
 		try {
 			await APIInstance.post(
-				`/${deviceId}/message/conversations/${recipientId}/send-message`,
+				`/${deviceId}/conversation/${recipientId}/send-message`,
 				message
 			);
 			return true;
@@ -207,7 +207,7 @@ export default class MessagesService {
 
 	static async assignMessageLabels(deviceId: string, messageId: string, labels: string[]) {
 		try {
-			await APIInstance.post(`/${deviceId}/message/message/${messageId}/assign-labels`, {
+			await APIInstance.post(`/${deviceId}/conversation/message/${messageId}/assign-labels`, {
 				labels,
 			});
 			return true;
@@ -217,7 +217,7 @@ export default class MessagesService {
 	}
 	static async markRead(deviceId: string, message_id: string) {
 		try {
-			await APIInstance.post(`/${deviceId}/message/mark-read/${message_id}`);
+			await APIInstance.post(`/${deviceId}/mark-read/${message_id}`);
 			return true;
 		} catch (err) {
 			return false;

@@ -1,4 +1,5 @@
 import { BiBot, BiCake, BiConversation } from 'react-icons/bi';
+import { FaUserSecret } from 'react-icons/fa';
 import { MdContacts, MdOutlineDashboard, MdOutlinePermMedia } from 'react-icons/md';
 import { RiContactsBook2Line, RiFlowChart } from 'react-icons/ri';
 import { TbMessage2Plus, TbReportSearch, TbTemplate } from 'react-icons/tb';
@@ -17,6 +18,7 @@ export const NAVIGATION = {
 	ADD_DEVICE: 'add-device',
 	INBOX: 'inbox',
 	CONTACT: 'contact',
+	AGENT: 'agent',
 
 	BROADCAST: 'broadcast',
 	BROADCAST_REPORT: 'campaign-report',
@@ -38,6 +40,11 @@ export const MenuItems = [
 		icon: MdOutlineDashboard,
 		route: NAVIGATION.DASHBOARD,
 		title: 'Dashboard',
+	},
+	{
+		icon: FaUserSecret,
+		route: NAVIGATION.AGENT,
+		title: 'Agent',
 	},
 	{
 		icon: RiContactsBook2Line,

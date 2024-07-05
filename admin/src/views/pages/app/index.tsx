@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useOutlet } from 'react-router-dom';
 import APIInstance from '../../../config/APIInstance';
 import { AUTH_URL, NAVIGATION } from '../../../config/const';
+import AgentService from '../../../services/agent.service';
 import AuthService from '../../../services/auth.service';
 import ChatbotFlowService from '../../../services/chatbot-flow.service';
 import ChatBotService from '../../../services/chatbot.service';
@@ -14,6 +15,7 @@ import MessagesService from '../../../services/messages.service';
 import RecurringService from '../../../services/recurring.service';
 import TemplateService from '../../../services/template.service';
 import { StoreNames, StoreState } from '../../../store';
+import { setAgentList } from '../../../store/reducers/AgentReducer';
 import { setChatBotList, setChatbotLoading } from '../../../store/reducers/ChatBotReducer';
 import { setChatbotFlow, setLoading } from '../../../store/reducers/ChatbotFlowReducer';
 import { setContactList } from '../../../store/reducers/ContactReducer';
@@ -60,10 +62,11 @@ const AppPage = () => {
 		try {
 			AuthService.userDetails().then((user) => user && dispatch(setUserDetails(user)));
 
-			const promises = [APIInstance.get(`/contacts`)];
+			const promises = [APIInstance.get(`/contacts`), AgentService.getAgent()];
 
 			const results = await Promise.all(promises);
 			dispatch(setContactList(results[0].data.contacts as Contact[]));
+			dispatch(setAgentList(results[1]));
 		} catch (e) {
 			return;
 		}

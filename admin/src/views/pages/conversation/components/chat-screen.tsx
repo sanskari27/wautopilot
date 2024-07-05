@@ -403,6 +403,10 @@ const ExpiryCountdown = ({ timeLeft }: { timeLeft: number }) => {
 		return () => clearInterval(interval);
 	}, []);
 
+	useEffect(() => {
+		setTimeLeft(timeLeft);
+	}, [timeLeft]);
+
 	const formatTime = (time: number) => {
 		const hours = Math.floor(time / 3600);
 		const minutes = Math.floor((time % 3600) / 60);

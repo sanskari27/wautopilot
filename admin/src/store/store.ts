@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import { StoreNames } from './config';
+import AgentReducer from './reducers/AgentReducer';
 import { default as BroadcastReducer } from './reducers/BroadcastReducer';
 import ChatBotReducer from './reducers/ChatBotReducer';
 import ChatbotFlowReducer from './reducers/ChatbotFlowReducer';
@@ -30,6 +31,7 @@ const store = configureStore({
 		[StoreNames.DASHBOARD]: DashboardReducer,
 		[StoreNames.CHATBOT_FLOW]: ChatbotFlowReducer,
 		[StoreNames.RECURRING]: RecurringReducer,
+		[StoreNames.AGENT]: AgentReducer,
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({
