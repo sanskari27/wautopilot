@@ -23,7 +23,6 @@ function processDocs(docs: any[]) {
 			responseAt: (DateUtils.getMoment(doc.responseAt).format('YYYY-MM-DD') as string) ?? '',
 			name: (doc.name as string) ?? '',
 			email: (doc.email as string) ?? '',
-			address: (doc.address as string) ?? '',
 		};
 	});
 }
@@ -83,7 +82,6 @@ export default class ButtonResponseService extends WhatsappLinkService {
 				$addFields: {
 					name: '$phonebook.name',
 					email: '$phonebook.email',
-					address: '$phonebook.address',
 				},
 			},
 			{
@@ -95,7 +93,6 @@ export default class ButtonResponseService extends WhatsappLinkService {
 					responseAt: 1,
 					name: 1,
 					email: 1,
-					address: 1,
 				},
 			},
 		]);

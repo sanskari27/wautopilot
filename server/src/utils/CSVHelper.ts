@@ -140,7 +140,6 @@ export default class CSVHelper {
 			responseAt: string;
 			name: string;
 			email: string;
-			address: string;
 		}[]
 	): string {
 		const keys = [
@@ -151,10 +150,6 @@ export default class CSVHelper {
 			{
 				value: 'email',
 				label: 'Email',
-			},
-			{
-				value: 'address',
-				label: 'Address',
 			},
 			{
 				value: 'recipient',
