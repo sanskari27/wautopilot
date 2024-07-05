@@ -82,7 +82,7 @@ async function createAgent(req: Request, res: Response, next: NextFunction) {
 		if (req.locals.user.userLevel < UserLevel.Admin) {
 			return next(new CustomError(AUTH_ERRORS.PERMISSION_DENIED));
 		}
-		await UserService.register(email, password, {
+		const id = await UserService.register(email, password, {
 			name,
 			phone,
 			level: UserLevel.Agent,
@@ -93,6 +93,7 @@ async function createAgent(req: Request, res: Response, next: NextFunction) {
 			res,
 			status: 200,
 			data: {
+				id,
 				email,
 				name,
 				phone,

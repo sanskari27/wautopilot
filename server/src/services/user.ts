@@ -173,6 +173,7 @@ export default class UserService {
 			}
 
 			sendLoginCredentialsEmail(email, email, password);
+			return user._id;
 		} catch (err) {
 			throw new CustomError(AUTH_ERRORS.USER_ALREADY_EXISTS);
 		}
