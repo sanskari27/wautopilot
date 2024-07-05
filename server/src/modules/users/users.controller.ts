@@ -104,10 +104,14 @@ async function createAgent(req: Request, res: Response, next: NextFunction) {
 }
 
 async function updateAgent(req: Request, res: Response, next: NextFunction) {
-	const data = req.locals.data as CreateAgentValidationResult;
+	const { email, name, phone } = req.locals.data as CreateAgentValidationResult;
 	const { id, user } = req.locals;
 	try {
-		const details = await user.updateAgentDetails(id, data);
+		const details = await user.updateAgentDetails(id, {
+			email,
+			name,
+			phone,
+		});
 
 		return Respond({
 			res,

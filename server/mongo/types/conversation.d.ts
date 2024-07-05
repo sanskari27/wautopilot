@@ -11,9 +11,9 @@ export default interface IConversation extends Document {
 	meta_conversation_id: string;
 	messages: Types.ObjectId[];
 
-	expiration_timestamp: Date;
 	origin: string;
 
 	last_message_at: Date;
 	createdAt: Date;
+	assigned_to: Types.ObjectId;
 }

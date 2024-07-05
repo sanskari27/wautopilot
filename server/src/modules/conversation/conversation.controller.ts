@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import MetaAPI from '../../config/MetaAPI';
+import { UserLevel } from '../../config/const';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import ConversationService from '../../services/conversation';
@@ -10,11 +11,13 @@ async function fetchConversations(req: Request, res: Response, next: NextFunctio
 	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];
 	const {
 		serviceAccount: account,
+		user,
 		device: { device },
 	} = req.locals;
 
 	const conversationService = new ConversationService(account, device);
-	const conversations = await conversationService.fetchConversations(labels);
+	const opts = user.userLevel === UserLevel.Agent ? { agent_id: user.userId } : {};
+	const conversations = await conversationService.fetchConversations(labels, opts);
 
 	return Respond({
 		res,

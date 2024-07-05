@@ -20,7 +20,6 @@ function processConversationDocs(
 		_id: doc._id,
 		recipient: doc.recipient,
 		profile_name: doc.profile_name ?? '',
-		expiration_timestamp: doc.expiration_timestamp,
 		origin: doc.origin ?? '',
 		labels: doc.labels ?? [],
 	}));
@@ -266,7 +265,12 @@ export default class ConversationService extends WhatsappLinkService {
 		);
 	}
 
-	public async fetchConversations(labels: string[] = []) {
+	public async fetchConversations(
+		labels: string[] = [],
+		opts?: {
+			agent_id?: Types.ObjectId;
+		}
+	) {
 		const phoneBookService = new PhoneBookService(this.account);
 		const _recipients = await phoneBookService.fetchRecords({
 			page: 1,
@@ -282,6 +286,7 @@ export default class ConversationService extends WhatsappLinkService {
 					linked_to: this.userId,
 					device_id: this.deviceId,
 					...(labels.length > 0 ? { recipient: { $in: recipients } } : {}),
+					...(opts?.agent_id ? { assigned_to: opts.agent_id } : {}),
 				},
 			},
 			{
@@ -560,7 +565,18 @@ export default class ConversationService extends WhatsappLinkService {
 		return result;
 	}
 
-	public async assignConversationToAgent(conversation_id: Types.ObjectId, agent_id: Types.ObjectId) {
-		
+	public async assignConversationToAgent(c_id: Types.ObjectId, agent_id: Types.ObjectId) {
+		await ConversationDB.updateOne(
+			{
+				linked_to: this.userId,
+				device_id: this.deviceId,
+				_id: c_id,
+			},
+			{
+				$set: {
+					assigned_to: agent_id,
+				},
+			}
+		);
 	}
 }

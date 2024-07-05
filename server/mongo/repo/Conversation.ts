@@ -31,7 +31,7 @@ const schema = new mongoose.Schema<IConversation>(
 				ref: ConversationMessageDB_name,
 			},
 		],
-		expiration_timestamp: Date,
+		assigned_to: mongoose.Schema.Types.ObjectId,
 		origin: String,
 		last_message_at: Date,
 	},
