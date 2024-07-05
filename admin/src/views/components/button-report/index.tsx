@@ -178,6 +178,13 @@ export default function ButtonResponse() {
 								</Tr>
 							)}
 						/>
+						{buttonResponse.length === 0 && (
+							<Tr>
+								<Td colSpan={6}>
+									<Text textAlign={'center'}>No data available</Text>
+								</Td>
+							</Tr>
+						)}
 					</Tbody>
 				</Table>
 			</TableContainer>
