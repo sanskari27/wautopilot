@@ -1,5 +1,5 @@
 import express from 'express';
-import { IDValidator } from '../../middleware';
+import { AgentValidator, IDValidator } from '../../middleware';
 import Controller from './conversation.controller';
 import { LabelValidator, SendMessageValidator } from './conversation.validator';
 
@@ -18,10 +18,10 @@ router
 	.post(Controller.assignLabelToMessage);
 router.route('/mark-read/:message_id').post(Controller.markRead);
 
-// router
-// 	.route('/:id/assign-agent/:agent_id')
-// 	.all(IDValidator, AgentValidator)
-// 	.post(Controller.assignConversationToAgent);
+router
+	.route('/:id/assign-agent/:agent_id')
+	.all(IDValidator, AgentValidator)
+	.post(Controller.assignConversationToAgent);
 
 router.route('/').get(Controller.fetchConversations);
 
