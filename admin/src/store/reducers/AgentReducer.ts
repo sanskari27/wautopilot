@@ -9,7 +9,7 @@ const initState: AgentState = {
 		name: '',
 		email: '',
 		phone: '',
-        password: '',
+		password: '',
 	},
 	selectedAgent: [],
 	ui: {
@@ -51,9 +51,12 @@ const Slice = createSlice({
 		setAgentPhone: (state, action: PayloadAction<string>) => {
 			state.details.phone = action.payload;
 		},
-        setPassword: (state, action: PayloadAction<string>) => {
-            state.details.password = action.payload;
-        }
+		setAgentPassword: (state, action: PayloadAction<string>) => {
+			state.details.password = action.payload;
+		},
+		addAgent: (state, action: PayloadAction<typeof initState.details>) => {
+			state.list.push(action.payload);
+		},
 	},
 });
 
@@ -68,6 +71,8 @@ export const {
 	setAgentEmail,
 	setAgentName,
 	setAgentPhone,
+	setAgentPassword,
+	addAgent,
 } = Slice.actions;
 
 export default Slice.reducer;

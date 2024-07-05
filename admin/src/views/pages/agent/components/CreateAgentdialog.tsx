@@ -19,8 +19,10 @@ import {
 	setAgentDetails,
 	setAgentEmail,
 	setAgentName,
+	setAgentPassword,
 	setAgentPhone,
 } from '../../../../store/reducers/AgentReducer';
+import PasswordInput from '../../../components/password-input';
 
 export type AgentDialogHandle = {
 	open: (agent?: { id: string; name: string; email: string; phone: string }) => void;
@@ -31,7 +33,7 @@ const CreateAgentDialog = forwardRef<AgentDialogHandle>((_, ref) => {
 	const toast = useToast();
 
 	const {
-		details: { email, id, name, phone },
+		details: { email, id, name, phone, password },
 	} = useSelector((state: StoreState) => state[StoreNames.AGENT]);
 
 	const [isOpen, setIsOpen] = useState(false);
@@ -45,18 +47,38 @@ const CreateAgentDialog = forwardRef<AgentDialogHandle>((_, ref) => {
 		},
 	}));
 
+	const handleClose = () => {
+		setIsOpen(false);
+		dispatch(setAgentDetails({ id: '', name: '', email: '', phone: '', password: '' }));
+	};
+
 	const handleSave = () => {
+		if (!name || !email || !phone || !password) {
+			toast({
+				title: 'All fields are required',
+				status: 'error',
+			});
+			return;
+		}
+		if (password.length < 6) {
+			toast({
+				title: 'Password must be at least 6 characters',
+				status: 'error',
+			});
+			return;
+		}
 		let promise;
 		if (id) {
-			promise = AgentService.createAgent({ name, email, phone });
+			promise = AgentService.updateAgent({ id, name, email, phone, password });
 		} else {
-			promise = AgentService.updateAgent({ id, name, email, phone });
+			promise = AgentService.createAgent({ name, email, phone, password });
 		}
 
 		toast.promise(promise, {
 			loading: { title: 'Saving...' },
 			success: (data) => {
-				console.log(data);
+				dispatch(setAgentDetails(data));
+				handleClose();
 				return {
 					title: 'Agent saved successfully',
 				};
@@ -66,7 +88,7 @@ const CreateAgentDialog = forwardRef<AgentDialogHandle>((_, ref) => {
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+		<Modal isOpen={isOpen} onClose={handleClose}>
 			<ModalOverlay />
 			<ModalContent>
 				<ModalHeader>Create Agent</ModalHeader>
@@ -95,9 +117,16 @@ const CreateAgentDialog = forwardRef<AgentDialogHandle>((_, ref) => {
 							onChange={(e) => dispatch(setAgentPhone(e.target.value))}
 						/>
 					</FormControl>
+					<FormControl mb={'1rem'}>
+						<PasswordInput
+							value={password}
+							onChange={(e) => dispatch(setAgentPassword(e.target.value))}
+							placeholder='*********'
+						/>
+					</FormControl>
 				</ModalBody>
 				<ModalFooter>
-					<Button colorScheme='red' variant={'outline'} mr={3} onClick={() => setIsOpen(false)}>
+					<Button colorScheme='red' variant={'outline'} mr={3} onClick={handleClose}>
 						Close
 					</Button>
 					<Button colorScheme={'green'} onClick={handleSave}>
