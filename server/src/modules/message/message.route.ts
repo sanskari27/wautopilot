@@ -23,6 +23,11 @@ router
 	.post(Controller.sendTemplateMessage);
 
 router
+	.route('/recurring-broadcast/:id/reschedule')
+	.all(IDValidator)
+	.post(Controller.rescheduleRecurringBroadcast);
+
+router
 	.route('/recurring-broadcast/:id/pause')
 	.all(IDValidator)
 	.post(Controller.pauseRecurringBroadcast);
