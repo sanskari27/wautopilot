@@ -4,7 +4,7 @@ import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import ConversationService from '../../services/conversation';
 import { Respond } from '../../utils/ExpressUtils';
-import { SendMessageValidationResult } from './message.validator';
+import { SendMessageValidationResult } from './conversation.validator';
 
 async function fetchConversations(req: Request, res: Response, next: NextFunction) {
 	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];

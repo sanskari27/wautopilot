@@ -26,6 +26,7 @@ export interface LocalVariables {
 	query: any;
 	data: any;
 	id: IDType;
+	agent_id: IDType;
 	serviceAccount: IAccount;
 	serviceUser: UserService;
 	user: UserService;
