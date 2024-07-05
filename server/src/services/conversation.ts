@@ -559,4 +559,8 @@ export default class ConversationService extends WhatsappLinkService {
 
 		return result;
 	}
+
+	public async assignConversationToAgent(conversation_id: Types.ObjectId, agent_id: Types.ObjectId) {
+		
+	}
 }

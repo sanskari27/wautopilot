@@ -174,9 +174,27 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 	});
 }
 
+async function assignConversationToAgent(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount: account,
+		device: { device },
+		id,
+		agent_id,
+	} = req.locals;
+
+	const conversationService = new ConversationService(account, device);
+	await conversationService.assignConversationToAgent(id, agent_id);
+
+	return Respond({
+		res,
+		status: 200,
+	});
+}
+
 const Controller = {
 	fetchConversations,
 	fetchConversationMessages,
+	assignConversationToAgent,
 	markRead,
 	assignLabelToMessage,
 	sendMessageToConversation,
