@@ -134,36 +134,35 @@ export default class BroadcastService extends WhatsappLinkService {
 	}
 
 	async toggleRecurringBroadcast(id: Types.ObjectId) {
-		try {
-			const campaign = await RecurringBroadcastDB.findById(id);
-			if (!campaign) {
-				return;
-			}
-			campaign.status =
-				campaign.status === BROADCAST_STATUS.ACTIVE
-					? BROADCAST_STATUS.PAUSED
-					: BROADCAST_STATUS.ACTIVE;
-			await campaign.save();
-			if (campaign.status === BROADCAST_STATUS.ACTIVE) {
-				await ScheduledMessageDB.updateMany(
-					{ scheduler_id: id, status: MESSAGE_STATUS.PENDING },
-					{
-						$set: {
-							status: MESSAGE_STATUS.PAUSED,
-						},
-					}
-				);
-			} else {
-				await ScheduledMessageDB.updateMany(
-					{ scheduler_id: id, status: MESSAGE_STATUS.PAUSED },
-					{
-						$set: {
-							status: MESSAGE_STATUS.PENDING,
-						},
-					}
-				);
-			}
-		} catch (err) {}
+		const campaign = await RecurringBroadcastDB.findById(id);
+		if (!campaign) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+		campaign.status =
+			campaign.status === BROADCAST_STATUS.ACTIVE
+				? BROADCAST_STATUS.PAUSED
+				: BROADCAST_STATUS.ACTIVE;
+		await campaign.save();
+		if (campaign.status === BROADCAST_STATUS.ACTIVE) {
+			await ScheduledMessageDB.updateMany(
+				{ scheduler_id: id, status: MESSAGE_STATUS.PENDING },
+				{
+					$set: {
+						status: MESSAGE_STATUS.PAUSED,
+					},
+				}
+			);
+		} else {
+			await ScheduledMessageDB.updateMany(
+				{ scheduler_id: id, status: MESSAGE_STATUS.PAUSED },
+				{
+					$set: {
+						status: MESSAGE_STATUS.PENDING,
+					},
+				}
+			);
+		}
+		return campaign.status;
 	}
 
 	async deleteRecurringBroadcast(id: Types.ObjectId) {

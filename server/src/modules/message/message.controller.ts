@@ -358,11 +358,14 @@ async function toggleRecurringBroadcast(req: Request, res: Response, next: NextF
 	try {
 		const broadcastService = new BroadcastService(account, device);
 
-		await broadcastService.toggleRecurringBroadcast(id);
+		const status = await broadcastService.toggleRecurringBroadcast(id);
 
 		return Respond({
 			res,
 			status: 200,
+			data: {
+				status,
+			},
 		});
 	} catch (err) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
