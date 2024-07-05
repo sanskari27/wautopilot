@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import ISubscriptionDetails from '../types/subscriptionsDetails';
+import ISubscriptionDetails from '../types/subscriptionsDetail';
 import { AccountDB_name } from './Account';
 import { PlanDB_name } from './Plan';
 

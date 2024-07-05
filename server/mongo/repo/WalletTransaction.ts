@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import IWalletTransaction from '../types/walletTransactions';
+import IWalletTransaction from '../types/walletTransaction';
 import { AccountDB_name } from './Account';
 
 export const WalletTransactionDB_name = 'WalletTransaction';

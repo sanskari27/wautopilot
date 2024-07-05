@@ -7,8 +7,8 @@ import {
 } from '../../mongo';
 import { BroadcastDB_name } from '../../mongo/repo/Broadcast';
 import IAccount from '../../mongo/types/account';
-import IRecurringBroadcast from '../../mongo/types/recurringBroadcasts';
-import IWhatsappLink from '../../mongo/types/whatsappLinks';
+import IRecurringBroadcast from '../../mongo/types/recurringBroadcast';
+import IWhatsappLink from '../../mongo/types/whatsappLink';
 import { BROADCAST_STATUS, MESSAGE_STATUS } from '../config/const';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';

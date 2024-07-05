@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
 import { AccountDB, WhatsappLinkDB } from '../../../mongo';
 import IAccount from '../../../mongo/types/account';
-import IWhatsappLink from '../../../mongo/types/whatsappLinks';
+import IWhatsappLink from '../../../mongo/types/whatsappLink';
 import {
 	MESSAGE_STATUS,
 	META_VERIFY_STRING,

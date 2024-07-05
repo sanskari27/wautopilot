@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import { MediaDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import IMedia from '../../mongo/types/media';
-import IWhatsappLink from '../../mongo/types/whatsappLinks';
+import IWhatsappLink from '../../mongo/types/whatsappLink';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
 import WhatsappLinkService from './whatsappLink';
