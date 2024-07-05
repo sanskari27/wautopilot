@@ -23,7 +23,11 @@ router
 
 router.route('/admins').all(VerifyMinLevel(UserLevel.Master)).get(Controller.getAdmins);
 
-router.route('/agents/:id').all(VerifyMinLevel(UserLevel.Admin)).post(Controller.removeAgent);
+router
+	.route('/agents/:id')
+	.all(VerifyMinLevel(UserLevel.Admin), IDValidator)
+	.post(CreateAgentValidator, Controller.updateAgent)
+	.delete(Controller.removeAgent);
 
 router
 	.route('/agents')

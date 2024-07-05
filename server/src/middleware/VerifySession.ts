@@ -49,7 +49,7 @@ export default async function VerifySession(req: Request, res: Response, next: N
 			const session = await SessionService.findSessionByRefreshToken(decoded.id);
 
 			req.locals.user = await UserService.findById(session.userId);
-			if (req.locals.user.userLevel === UserLevel.Admin) {
+			if (req.locals.user.userLevel >= UserLevel.Admin) {
 				req.locals.serviceUser = req.locals.user;
 				req.locals.serviceAccount = req.locals.serviceUser.account;
 			} else if (req.locals.user.userLevel === UserLevel.Agent) {
