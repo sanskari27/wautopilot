@@ -57,8 +57,8 @@ const NurtureTemplateMessage = forwardRef<NurtureMessageHandle>((_, ref) => {
 		body,
 		headerFile,
 	}: {
-		headerLink: string;
-		headerFile: File | null;
+		headerLink?: string;
+		headerFile?: File | null;
 		headerMediaId: string;
 		body?: {
 			index: number;
@@ -68,9 +68,13 @@ const NurtureTemplateMessage = forwardRef<NurtureMessageHandle>((_, ref) => {
 			fallback_value: string;
 		};
 	}) => {
-		dispatch(setNurturingTemplateHeaderLink({ index: nurturingIndex, link: headerLink }));
+		if (headerLink) {
+			dispatch(setNurturingTemplateHeaderLink({ index: nurturingIndex, link: headerLink }));
+		}
 		dispatch(setNurturingTemplateHeaderMediaId({ index: nurturingIndex, media_id: headerMediaId }));
-		setNurturingHeaderFile(headerFile);
+		if (headerFile) {
+			setNurturingHeaderFile(headerFile);
+		}
 		if (body) dispatch(setNurturingTemplateBody({ index: nurturingIndex, body: body }));
 	};
 
