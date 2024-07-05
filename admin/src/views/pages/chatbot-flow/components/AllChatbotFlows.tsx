@@ -15,6 +15,7 @@ import {
 import { useRef } from 'react';
 import { MdDelete } from 'react-icons/md';
 import { PiPause, PiPlay } from 'react-icons/pi';
+import { TbReportSearch } from 'react-icons/tb';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { NAVIGATION } from '../../../../config/const';
@@ -24,7 +25,6 @@ import { removeBot, updateBot } from '../../../../store/reducers/ChatBotReducer'
 import ConfirmationAlert, { ConfirmationAlertHandle } from '../../../components/confirmation-alert';
 import DeleteAlert, { DeleteAlertHandle } from '../../../components/delete-alert';
 import Each from '../../../components/utils/Each';
-import { TbReportSearch } from 'react-icons/tb';
 
 export default function AllChatbotFlows() {
 	const dispatch = useDispatch();
@@ -147,7 +147,7 @@ export default function AllChatbotFlows() {
 													border='none'
 												/>
 											</Tooltip>
-											<Tooltip label='Download Responses' aria-label='Toggle Responder'>
+											<Tooltip label='Button Click Report' aria-label='Toggle Responder'>
 												<IconButton
 													aria-label='toggle'
 													icon={<TbReportSearch />}

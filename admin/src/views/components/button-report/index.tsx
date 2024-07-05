@@ -1,4 +1,5 @@
 import {
+	Box,
 	Button,
 	Flex,
 	Table,
@@ -12,11 +13,35 @@ import {
 	useToast,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
+import Chart from 'react-google-charts';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import MessagesService from '../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../store';
 import Each from '../utils/Each';
+
+const COLORS = [
+	'#FF6633',
+	'#FF33FF',
+	'#FFFF99',
+	'#00B3E6',
+	'#FFB399',
+	'#3366E6',
+	'#E6B333',
+	'#999966',
+	'#99FF99',
+	'#B34D4D',
+	'#809900',
+	'#E6B3B3',
+	'#80B300',
+	'#6680B3',
+	'#66991A',
+	'#FF99E6',
+	'#CCFF1A',
+	'#FF1A66',
+	'#33FFCC',
+	'#E6331A',
+];
 
 export default function ButtonResponse() {
 	const toast = useToast();
@@ -77,6 +102,24 @@ export default function ButtonResponse() {
 			}
 		);
 	};
+	const mappedData = buttonResponse.reduce((acc, item) => {
+		if (acc.has(item.button_text)) {
+			acc.set(item.button_text, acc.get(item.button_text)! + 1);
+		} else {
+			acc.set(item.button_text, 1);
+		}
+		return acc;
+	}, new Map<string, number>());
+
+	function getData() {
+		const barGraphData = [...mappedData.keys()].reduce((acc, key, index) => {
+			acc.push([key, mappedData.get(key)!, COLORS[index % COLORS.length]]);
+			return acc;
+		}, [] as [string, number, string][]);
+
+		return [['Text', 'Count', { role: 'style' }], ...barGraphData];
+	}
+	console.log(getData());
 
 	return (
 		<Flex direction={'column'} padding={'1rem'} justifyContent={'start'}>
@@ -90,6 +133,23 @@ export default function ButtonResponse() {
 					</Button>
 				</Flex>
 			</Flex>
+			<Flex className='flex-col md:flex-row'>
+				<Box flex={1}>
+					<Chart chartType='ColumnChart' width='100%' height='400px' data={getData()} />
+				</Box>
+				<Box flex={1}>
+					<Chart
+						chartType='PieChart'
+						width='100%'
+						height='400px'
+						data={getData()}
+						options={{ is3D: true }}
+					/>
+				</Box>
+			</Flex>
+			<Text textAlign={'center'} fontWeight={'medium'}>
+				Visual comparison of the number of times each button was clicked by the recipients.
+			</Text>
 			<TableContainer marginTop={'1rem'}>
 				<Table variant={'striped'}>
 					<Thead>

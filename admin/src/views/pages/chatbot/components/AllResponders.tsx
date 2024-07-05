@@ -171,7 +171,7 @@ export default function AllResponders() {
 													border='none'
 												/>
 											</Tooltip>
-											<Tooltip label='Download Responses' aria-label='Toggle Responder'>
+											<Tooltip label='Button Click Report' aria-label='Toggle Responder'>
 												<IconButton
 													aria-label='toggle'
 													icon={<TbReportSearch />}
