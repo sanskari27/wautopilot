@@ -10,9 +10,10 @@ import {
 	Thead,
 	Tooltip,
 	Tr,
+	useToast,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { MdDelete } from 'react-icons/md';
+import { MdDelete, MdScheduleSend } from 'react-icons/md';
 import { PiPause, PiPlay } from 'react-icons/pi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +28,7 @@ import Each from '../../components/utils/Each';
 export default function AllRecurringList() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
+	const toast = useToast();
 	const {
 		list,
 		ui: { isLoading },
@@ -36,21 +38,48 @@ export default function AllRecurringList() {
 	const confirmationAlertRef = useRef<ConfirmationAlertHandle>(null);
 
 	const deleteBot = (id: string) => {
-		RecurringService.deleteRecurring({ deviceId: selected_device_id, recurringId: id }).then(
-			(res) => {
-				if (!res) return;
+		const promise = RecurringService.deleteRecurring({
+			deviceId: selected_device_id,
+			recurringId: id,
+		});
+		toast.promise(promise, {
+			success: () => {
 				dispatch(removeRecurring(id));
-			}
-		);
+				return { title: 'Recurring deleted successfully', status: 'success' };
+			},
+			error: { title: 'Failed to delete Recurring' },
+			loading: { title: 'Deleting Recurring...' },
+		});
 	};
 
 	const toggleBot = (id: string) => {
-		RecurringService.toggleRecurring({ deviceId: selected_device_id, recurringId: id }).then(
-			(res) => {
-				if (!res) return;
+		const promise = RecurringService.toggleRecurring({
+			deviceId: selected_device_id,
+			recurringId: id,
+		});
+		toast.promise(promise, {
+			success: () => {
 				dispatch(toggleRecurring(id));
-			}
-		);
+				return { title: 'Recurring toggled successfully', status: 'success' };
+			},
+			error: { title: 'Failed to toggle Recurring' },
+			loading: { title: 'Toggling Recurring...' },
+		});
+	};
+
+	const handleReschedule = (id: string) => {
+		const promise = RecurringService.rescheduleRecurring({
+			deviceId: selected_device_id,
+			recurringId: id,
+		});
+
+		toast.promise(promise, {
+			success: {
+				title: 'Recurring rescheduled successfully',
+			},
+			error: { title: 'Failed to reschedule Recurring' },
+			loading: { title: 'Rescheduling Recurring...' },
+		});
 	};
 
 	const handleEditBot = (id: string) => {
@@ -154,6 +183,19 @@ export default function AllRecurringList() {
 													border='none'
 												/>
 											</Tooltip>
+											<Tooltip label='Reschedule Responder' aria-label='Toggle Responder'>
+												<IconButton
+													aria-label='toggle'
+													icon={<MdScheduleSend color='gray' />}
+													onClick={() => handleReschedule(recurring.id)}
+													bgColor={'transparent'}
+													_hover={{
+														bgColor: 'transparent',
+													}}
+													outline='none'
+													border='none'
+												/>
+											</Tooltip>
 										</Td>
 									</Tr>
 								)}
@@ -162,7 +204,7 @@ export default function AllRecurringList() {
 					</Tbody>
 				</Table>
 			</TableContainer>
-			<DeleteAlert type={'Responder'} ref={deleteAlertRef} onConfirm={deleteBot} />
+			<DeleteAlert type={'Recurring Message'} ref={deleteAlertRef} onConfirm={deleteBot} />
 			<ConfirmationAlert ref={confirmationAlertRef} onConfirm={toggleBot} disclaimer='' />
 		</>
 	);

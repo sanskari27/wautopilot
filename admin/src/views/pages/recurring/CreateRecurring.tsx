@@ -61,6 +61,7 @@ const CreateRecurring = () => {
 	const { all_labels } = useFetchLabels();
 
 	useEffect(() => {
+		console.log(id);
 		if (id) {
 			dispatch(setRecurring(id));
 		} else {
@@ -262,8 +263,11 @@ const CreateRecurring = () => {
 			? RecurringService.editRecurring({ deviceId: selected_device_id, details })
 			: RecurringService.createRecurring({ deviceId: selected_device_id, details });
 
+		console.log(isEditingRecurring);
+
 		toast.promise(promise, {
 			success: (data) => {
+				console.log(data);
 				isEditingRecurring
 					? dispatch(editRecurring(details))
 					: dispatch(addRecurringMessage(data[0]));

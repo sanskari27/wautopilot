@@ -78,7 +78,7 @@ export default class RecurringService {
 			delete details.template_header;
 		}
 		const { data } = await APIInstance.post(`/${deviceId}/message/recurring-broadcast`, details);
-		return validateRecurringResult([data]);
+		return validateRecurringResult([data.details]);
 	}
 
 	static async editRecurring({
@@ -127,12 +127,7 @@ export default class RecurringService {
 		deviceId: string;
 		recurringId: string;
 	}) {
-		try {
-			await APIInstance.post(`/${deviceId}/message/recurring-broadcast/${recurringId}/toggle`);
-			return true;
-		} catch (err) {
-			return false;
-		}
+		await APIInstance.post(`/${deviceId}/message/recurring-broadcast/${recurringId}/toggle`);
 	}
 
 	static async deleteRecurring({
@@ -142,11 +137,16 @@ export default class RecurringService {
 		deviceId: string;
 		recurringId: string;
 	}) {
-		try {
-			await APIInstance.delete(`/${deviceId}/message/recurring-broadcast/${recurringId}`);
-			return true;
-		} catch (err) {
-			return false;
-		}
+		await APIInstance.delete(`/${deviceId}/message/recurring-broadcast/${recurringId}`);
+	}
+
+	static async rescheduleRecurring({
+		deviceId,
+		recurringId,
+	}: {
+		deviceId: string;
+		recurringId: string;
+	}) {
+		await APIInstance.post(`/${deviceId}/message/recurring-broadcast/${recurringId}/reschedule`);
 	}
 }
