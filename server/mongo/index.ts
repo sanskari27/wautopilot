@@ -12,6 +12,7 @@ export {
 	MediaDB,
 	PhoneBookDB,
 	PlanDB,
+	RecurringBroadcastDB,
 	ScheduledMessageDB,
 	SessionDB,
 	StorageDB,

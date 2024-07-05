@@ -3,6 +3,7 @@ import { IDValidator } from '../../middleware';
 import Controller from './message.controller';
 import {
 	CreateBroadcastValidator,
+	CreateRecurringValidator,
 	LabelValidator,
 	SendMessageValidator,
 } from './message.validator';
@@ -20,6 +21,27 @@ router
 	.route('/broadcast/send-broadcast')
 	.all(CreateBroadcastValidator)
 	.post(Controller.sendTemplateMessage);
+
+router
+	.route('/recurring-broadcast/:id/pause')
+	.all(IDValidator)
+	.post(Controller.pauseRecurringBroadcast);
+
+router
+	.route('/recurring-broadcast/:id/resume')
+	.all(IDValidator)
+	.post(Controller.resumeRecurringBroadcast);
+
+router
+	.route('/recurring-broadcast/:id')
+	.all(IDValidator)
+	.delete(Controller.deleteRecurringBroadcast)
+	.put(CreateRecurringValidator, Controller.updateRecurringBroadcast);
+
+router
+	.route('/recurring-broadcast')
+	.all(CreateRecurringValidator)
+	.post(Controller.scheduleRecurringBroadcast);
 
 router
 	.route('/conversations/:id/messages')

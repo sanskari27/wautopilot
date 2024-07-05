@@ -1,10 +1,19 @@
 import { Types } from 'mongoose';
-import { BroadcastDB, ConversationMessageDB, ScheduledMessageDB } from '../../mongo';
+import {
+	BroadcastDB,
+	ConversationMessageDB,
+	RecurringBroadcastDB,
+	ScheduledMessageDB,
+} from '../../mongo';
 import { BroadcastDB_name } from '../../mongo/repo/Broadcast';
 import IAccount from '../../mongo/types/account';
+import IRecurringBroadcast from '../../mongo/types/recurringbroadcast';
 import IWhatsappLink from '../../mongo/types/whatsapplink';
 import { BROADCAST_STATUS, MESSAGE_STATUS } from '../config/const';
+import { CustomError } from '../errors';
+import COMMON_ERRORS from '../errors/common-errors';
 import DateUtils from '../utils/DateUtils';
+import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import TimeGenerator from '../utils/TimeGenerator';
 import SchedulerService from './scheduler';
 import WhatsappLinkService from './whatsappLink';
@@ -22,6 +31,30 @@ type Broadcast = {
 	}[];
 };
 
+type RecurringBroadcast = {
+	name: string;
+	description: string;
+	wish_from: string;
+	labels: string[];
+	template_id: string;
+	template_name: string;
+	template_header?: {
+		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+		link?: string | undefined;
+		media_id?: string | undefined;
+		text?: string | undefined;
+	};
+	template_body: {
+		custom_text: string;
+		phonebook_data: string;
+		variable_from: 'custom_text' | 'phonebook_data';
+		fallback_value: string;
+	}[];
+	delay: number;
+	startTime: string;
+	endTime: string;
+};
+
 type InstantBroadcastOptions = {
 	broadcast_type: 'instant';
 };
@@ -34,9 +67,114 @@ type ScheduledBroadcastOptions = {
 	daily_messages_count: number;
 };
 
+function processRecurringDocs(docs: IRecurringBroadcast[]) {
+	return docs.map((doc) => ({
+		id: doc._id,
+		name: doc.name,
+		description: doc.description,
+		wish_from: doc.wish_from,
+		status: doc.status,
+		labels: doc.labels,
+		template_id: doc.template_id,
+		template_name: doc.template_name,
+		template_header: doc.template_header,
+		template_body: doc.template_body,
+		delay: doc.delay,
+		startTime: doc.startTime,
+		endTime: doc.endTime,
+	}));
+}
+
 export default class BroadcastService extends WhatsappLinkService {
 	public constructor(account: IAccount, whatsappLink: IWhatsappLink) {
 		super(account, whatsappLink);
+	}
+
+	public async listRecurringBroadcasts() {
+		const docs = await RecurringBroadcastDB.find({
+			linked_to: this.account._id,
+			device_id: this.deviceId,
+		});
+		return processRecurringDocs(docs);
+	}
+
+	public async scheduleRecurring(details: RecurringBroadcast) {
+		const doc = await RecurringBroadcastDB.create({
+			...details,
+			linked_to: this.account._id,
+			device_id: this.deviceId,
+		});
+		return processRecurringDocs([doc])[0];
+	}
+
+	public async updateRecurringBroadcast(id: Types.ObjectId, details: Partial<RecurringBroadcast>) {
+		await RecurringBroadcastDB.updateOne(
+			{ _id: id },
+			{
+				$set: filterUndefinedKeys(details),
+			}
+		);
+
+		const doc = await RecurringBroadcastDB.findById(id);
+		if (!doc) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+		return processRecurringDocs([doc])[0];
+	}
+
+	public async pauseRecurringBroadcast(id: Types.ObjectId) {
+		try {
+			const campaign = await RecurringBroadcastDB.findById(id);
+			if (!campaign) {
+				return;
+			}
+			campaign.status = BROADCAST_STATUS.PAUSED;
+			await campaign.save();
+			await ScheduledMessageDB.updateMany(
+				{ scheduler_id: id, status: MESSAGE_STATUS.PENDING },
+				{
+					$set: {
+						status: MESSAGE_STATUS.PAUSED,
+					},
+				}
+			);
+		} catch (err) {}
+	}
+
+	async resumeRecurringBroadcast(id: Types.ObjectId) {
+		try {
+			const campaign = await RecurringBroadcastDB.findById(id);
+			if (!campaign) {
+				return;
+			}
+			campaign.status = BROADCAST_STATUS.ACTIVE;
+			await campaign.save();
+			await ScheduledMessageDB.updateMany(
+				{ scheduler_id: id, status: MESSAGE_STATUS.PAUSED },
+				{
+					$set: {
+						status: MESSAGE_STATUS.PENDING,
+					},
+				}
+			);
+		} catch (err) {}
+	}
+
+	async deleteRecurringBroadcast(id: Types.ObjectId) {
+		try {
+			const campaign = await RecurringBroadcastDB.findById(id);
+			if (!campaign) {
+				return;
+			}
+			await ScheduledMessageDB.deleteMany({ scheduler_id: id });
+			await campaign.delete();
+		} catch (err) {
+			return;
+		}
+	}
+
+	async rescheduleRecurringBroadcast(id: Types.ObjectId) {
+		//TODO
 	}
 
 	public async fetchReports() {

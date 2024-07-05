@@ -7,7 +7,11 @@ import ConversationService from '../../services/conversation';
 import PhoneBookService from '../../services/phonebook';
 import CSVHelper from '../../utils/CSVHelper';
 import { Respond, RespondCSV } from '../../utils/ExpressUtils';
-import { CreateBroadcastValidationResult, SendMessageValidationResult } from './message.validator';
+import {
+	CreateBroadcastValidationResult,
+	CreateRecurringValidationResult,
+	SendMessageValidationResult,
+} from './message.validator';
 
 const bodyParametersList = [
 	'first_name',
@@ -275,6 +279,156 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 	}
 }
 
+async function listRecurringBroadcasts(req: Request, res: Response, next: NextFunction) {
+	const {
+		account,
+		device: { device },
+	} = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(account, device);
+
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				list: await broadcastService.listRecurringBroadcasts(),
+			},
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
+async function scheduleRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
+	const data = req.locals.data as CreateRecurringValidationResult;
+
+	const {
+		account,
+		device: { device },
+	} = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(account, device);
+
+		await broadcastService.scheduleRecurring(data);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
+async function updateRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
+	const data = req.locals.data as CreateRecurringValidationResult;
+
+	const {
+		account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(account, device);
+
+		await broadcastService.updateRecurringBroadcast(id, data);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
+async function pauseRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
+	const {
+		account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(account, device);
+
+		await broadcastService.pauseRecurringBroadcast(id);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
+async function resumeRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
+	const {
+		account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(account, device);
+
+		await broadcastService.resumeRecurringBroadcast(id);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
+async function deleteRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
+	const {
+		account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(account, device);
+
+		await broadcastService.deleteRecurringBroadcast(id);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
+async function rescheduleRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
+	const {
+		account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(account, device);
+
+		await broadcastService.rescheduleRecurringBroadcast(id);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 async function fetchConversations(req: Request, res: Response, next: NextFunction) {
 	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];
 	const {
@@ -454,6 +608,13 @@ const Controller = {
 	markRead,
 	assignLabelToMessage,
 	sendMessageToConversation,
+	listRecurringBroadcasts,
+	scheduleRecurringBroadcast,
+	updateRecurringBroadcast,
+	pauseRecurringBroadcast,
+	resumeRecurringBroadcast,
+	deleteRecurringBroadcast,
+	rescheduleRecurringBroadcast,
 };
 
 export default Controller;
