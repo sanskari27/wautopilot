@@ -35,6 +35,7 @@ router
 router
 	.route('/recurring-broadcast/:id')
 	.all(IDValidator)
+	.get(Controller.fetchRecurringBroadcast)
 	.delete(Controller.deleteRecurringBroadcast)
 	.put(CreateRecurringValidator, Controller.updateRecurringBroadcast);
 

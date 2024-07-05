@@ -373,6 +373,28 @@ async function toggleRecurringBroadcast(req: Request, res: Response, next: NextF
 	}
 }
 
+async function fetchRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
+	const {
+		account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	try {
+		const broadcastService = new BroadcastService(account, device);
+
+		const details = await broadcastService.fetchRecurringReport(id);
+
+		return RespondCSV({
+			res,
+			filename: `recurring-${id}`,
+			data: CSVHelper.exportBroadcastReport(details),
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 async function deleteRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
 	const {
 		account,
@@ -628,6 +650,7 @@ const Controller = {
 	deleteRecurringBroadcast,
 	rescheduleRecurringBroadcast,
 	buttonResponses,
+	fetchRecurringBroadcast,
 };
 
 export default Controller;

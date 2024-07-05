@@ -309,6 +309,69 @@ export default class BroadcastService extends WhatsappLinkService {
 		});
 	}
 
+	async fetchRecurringReport(id: Types.ObjectId) {
+		const recurringBroadcast = await RecurringBroadcastDB.findOne({
+			_id: id,
+			linked_to: this.account._id,
+			device_id: this.deviceId,
+		});
+
+		if (!recurringBroadcast) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+
+		const sentDocs = await ConversationMessageDB.find({
+			scheduled_by: {
+				id: id,
+				name: RecurringBroadcastDB_name,
+			},
+		});
+
+		const sentMessages = sentDocs.map((doc) => ({
+			to: doc.recipient,
+			status: doc.status,
+			sendAt: DateUtils.format(doc.sendAt, 'DD-MM-YYYY HH:mm'),
+			text: doc.body?.body_type === 'TEXT' ? doc.body.text : '',
+			template_name: recurringBroadcast.template_name,
+			sent_at: DateUtils.format(doc.sent_at, 'DD-MM-YYYY HH:mm'),
+			read_at: doc.read_at ? DateUtils.format(doc.read_at, 'DD-MM-YYYY HH:mm') : '',
+			delivered_at: doc.delivered_at ? DateUtils.format(doc.delivered_at, 'DD-MM-YYYY HH:mm') : '',
+			failed_at: doc.failed_at ? DateUtils.format(doc.failed_at, 'DD-MM-YYYY HH:mm') : '',
+			failed_reason: doc.failed_reason,
+			description: recurringBroadcast.description,
+			createdAt: doc.createdAt,
+		}));
+
+		const scheduledDocs = await ScheduledMessageDB.find({
+			scheduler_id: id,
+			status: MESSAGE_STATUS.PENDING,
+		});
+
+		const scheduledMessages = scheduledDocs.map((doc) => ({
+			to: doc.to,
+			status: doc.status,
+			sendAt: DateUtils.format(doc.sendAt, 'DD-MM-YYYY HH:mm'),
+			text: '',
+			template_name: recurringBroadcast.template_name,
+			sent_at: DateUtils.format(doc.sent_at, 'DD-MM-YYYY HH:mm'),
+			read_at: doc.read_at ? DateUtils.format(doc.read_at, 'DD-MM-YYYY HH:mm') : '',
+			delivered_at: doc.delivered_at ? DateUtils.format(doc.delivered_at, 'DD-MM-YYYY HH:mm') : '',
+			failed_at: doc.failed_at ? DateUtils.format(doc.failed_at, 'DD-MM-YYYY HH:mm') : '',
+			failed_reason: doc.failed_reason,
+			description: recurringBroadcast.description,
+			createdAt: doc.createdAt,
+		}));
+
+		const allMessages = [...sentMessages, ...scheduledMessages];
+		return allMessages.sort((a, b) =>
+			DateUtils.getMoment(a.sendAt, 'DD-MM-YYYY HH:mm').isAfter(
+				DateUtils.getMoment(b.sendAt, 'DD-MM-YYYY HH:mm')
+			)
+				? 1
+				: -1
+		);
+	}
+
 	public async fetchBroadcastReports() {
 		const campaigns = await BroadcastDB.aggregate([
 			{ $match: { linked_to: this.account._id, device_id: this.deviceId } },
