@@ -314,7 +314,7 @@ export default class BroadcastService {
 			}[];
 		} else {
 			const response = await APIInstance.get(
-				`/${deviceId}/broadcast/${campaignId}/button-responses?exportCSV=true`,
+				`/${deviceId}/broadcast/${campaignId}/button-responses?export_csv=true`,
 				{
 					responseType: 'blob',
 				}
