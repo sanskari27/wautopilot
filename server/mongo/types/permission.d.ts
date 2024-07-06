@@ -4,9 +4,9 @@ export default interface IPermission extends Document {
 	_id: Types.ObjectId;
 	linked_to: Types.ObjectId;
 
-	assigned_broadcast_labels: string[];
+	assigned_labels: string[];
 	view_broadcast_reports: boolean;
-	assigned_phonebook_labels: string[];
+	create_broadcast: boolean;
 	create_phonebook: boolean;
 	update_phonebook: boolean;
 	delete_phonebook: boolean;

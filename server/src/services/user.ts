@@ -434,9 +434,9 @@ export default class UserService {
 				email: user.email ?? '',
 				phone: user.phone ?? '',
 				permissions: {
-					assigned_broadcast_labels: user.permissions.assigned_broadcast_labels ?? [],
+					assigned_labels: user.permissions.assigned_labels ?? [],
 					view_broadcast_reports: user.permissions.view_broadcast_reports ?? false,
-					assigned_phonebook_labels: user.permissions.assigned_phonebook_labels ?? [],
+					create_broadcast: user.permissions.create_broadcast ?? false,
 					create_phonebook: user.permissions.create_phonebook ?? false,
 					update_phonebook: user.permissions.update_phonebook ?? false,
 					delete_phonebook: user.permissions.delete_phonebook ?? false,
@@ -489,9 +489,8 @@ export default class UserService {
 	async assignPermissions(
 		id: Types.ObjectId,
 		opts: {
-			assigned_broadcast_labels?: string[];
+			assigned_labels?: string[];
 			view_broadcast_reports?: boolean;
-			assigned_phonebook_labels?: string[];
 			create_phonebook?: boolean;
 			update_phonebook?: boolean;
 			delete_phonebook?: boolean;
@@ -547,9 +546,9 @@ export default class UserService {
 			email: user.email ?? '',
 			phone: user.phone ?? '',
 			permissions: {
-				assigned_broadcast_labels: user.permissions.assigned_broadcast_labels ?? [],
+				assigned_labels: user.permissions.assigned_labels ?? [],
 				view_broadcast_reports: user.permissions.view_broadcast_reports ?? false,
-				assigned_phonebook_labels: user.permissions.assigned_phonebook_labels ?? [],
+				create_broadcast: user.permissions.create_broadcast ?? false,
 				create_phonebook: user.permissions.create_phonebook ?? false,
 				update_phonebook: user.permissions.update_phonebook ?? false,
 				delete_phonebook: user.permissions.delete_phonebook ?? false,
@@ -558,6 +557,24 @@ export default class UserService {
 				update_template: user.permissions.update_template ?? false,
 				delete_template: user.permissions.delete_template ?? false,
 			},
+		};
+	}
+
+	async getPermissions() {
+		const permission = await PermissionDB.findOne({
+			linked_to: this._user_id,
+		});
+
+		return {
+			assigned_labels: permission?.assigned_labels ?? [],
+			view_broadcast_reports: permission?.view_broadcast_reports ?? false,
+			create_phonebook: permission?.create_phonebook ?? false,
+			update_phonebook: permission?.update_phonebook ?? false,
+			delete_phonebook: permission?.delete_phonebook ?? false,
+			auto_assign_chats: permission?.auto_assign_chats ?? false,
+			create_template: permission?.create_template ?? false,
+			update_template: permission?.update_template ?? false,
+			delete_template: permission?.delete_template ?? false,
 		};
 	}
 }

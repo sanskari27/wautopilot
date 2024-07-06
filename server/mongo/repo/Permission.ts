@@ -10,17 +10,13 @@ const schema = new mongoose.Schema<IPermission>({
 		ref: AccountDB_name,
 	},
 
-	assigned_broadcast_labels: {
+	assigned_labels: {
 		type: [String],
 		default: [],
 	},
 	view_broadcast_reports: {
 		type: Boolean,
 		default: false,
-	},
-	assigned_phonebook_labels: {
-		type: [String],
-		default: [],
 	},
 	create_phonebook: {
 		type: Boolean,

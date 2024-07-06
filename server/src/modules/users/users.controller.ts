@@ -4,7 +4,11 @@ import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import { UserService } from '../../services';
 import { Respond } from '../../utils/ExpressUtils';
-import { CreateAgentValidationResult, UpgradePlanValidationResult } from './users.validator';
+import {
+	CreateAgentValidationResult,
+	PermissionsValidationResult,
+	UpgradePlanValidationResult,
+} from './users.validator';
 export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
 export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
 
@@ -126,6 +130,24 @@ async function updateAgent(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function assignPermissions(req: Request, res: Response, next: NextFunction) {
+	const data = req.locals.data as PermissionsValidationResult;
+	const { id, user } = req.locals;
+	try {
+		const details = await user.assignPermissions(id, data);
+
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				...details,
+			},
+		});
+	} catch (err) {
+		return next(new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR));
+	}
+}
+
 async function getAgents(req: Request, res: Response, next: NextFunction) {
 	try {
 		return Respond({
@@ -158,6 +180,7 @@ const Controller = {
 	getAgents,
 	createAgent,
 	updateAgent,
+	assignPermissions,
 	removeAgent,
 };
 

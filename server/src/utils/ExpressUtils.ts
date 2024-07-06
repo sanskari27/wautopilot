@@ -130,5 +130,5 @@ export function intersection<T>(arr1: T[], arr2: T[]) {
 
 	// Use the built-in Set method `has` to check for common elements
 	const res = arr1.map((e) => String(e)).filter((item) => set.has(String(item)));
-	return new Set(res);
+	return [...new Set(res)];
 }

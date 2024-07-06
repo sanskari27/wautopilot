@@ -1,11 +1,12 @@
 import csv from 'csvtojson/v2';
 import { NextFunction, Request, Response } from 'express';
 import FileUpload, { ONLY_CSV_ALLOWED, SingleFileUploadOptions } from '../../config/FileUpload';
+import { UserLevel } from '../../config/const';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import PhoneBookService from '../../services/phonebook';
 import CSVHelper from '../../utils/CSVHelper';
-import { Respond, RespondCSV, idValidator } from '../../utils/ExpressUtils';
+import { Respond, RespondCSV, idValidator, intersection } from '../../utils/ExpressUtils';
 import {
 	MultiDeleteValidationResult,
 	RecordsValidationResult,
@@ -14,9 +15,16 @@ import {
 } from './phonebook.validator';
 
 async function getAllLabels(req: Request, res: Response, next: NextFunction) {
+	const { user, serviceAccount } = req.locals;
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
-		const labels = await phoneBookService.getAllLabels();
+		const phoneBookService = new PhoneBookService(serviceAccount);
+		let labels = await phoneBookService.getAllLabels();
+
+		if (user.userLevel === UserLevel.Agent) {
+			const permissions = await user.getPermissions();
+			const allowedLabels = permissions.assigned_labels;
+			labels = intersection(labels, allowedLabels);
+		}
 
 		return Respond({
 			res,
@@ -26,8 +34,6 @@ async function getAllLabels(req: Request, res: Response, next: NextFunction) {
 			},
 		});
 	} catch (err) {
-		console.log(err);
-
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
@@ -52,11 +58,32 @@ async function addRecords(req: Request, res: Response, next: NextFunction) {
 }
 
 async function records(req: Request, res: Response, next: NextFunction) {
+	const { user, serviceAccount } = req.locals;
 	const page = req.query.page ? parseInt(req.query.page as string) || 1 : 1;
 	const limit = req.query.limit ? parseInt(req.query.limit as string) || 20 : 20;
-	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];
+	let labels = req.query.labels ? (req.query.labels as string).split(',') : [];
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
+		const phoneBookService = new PhoneBookService(serviceAccount);
+		if (user.userLevel === UserLevel.Agent) {
+			const permissions = await user.getPermissions();
+			const allowedLabels = permissions.assigned_labels;
+
+			if (allowedLabels.length === 0) {
+				return Respond({
+					res,
+					status: 200,
+					data: {
+						records: [],
+						totalRecords: 0,
+					},
+				});
+			}
+			if (labels.length > 0) {
+				labels = intersection(labels, allowedLabels);
+			} else {
+				labels = allowedLabels;
+			}
+		}
 		const records = await phoneBookService.fetchRecords({
 			page,
 			limit,

@@ -16,9 +16,9 @@ export type CreateAgentValidationResult = {
 };
 
 export type PermissionsValidationResult = {
-	assigned_broadcast_labels?: string[];
+	assigned_labels?: string[];
 	view_broadcast_reports?: boolean;
-	assigned_phonebook_labels?: string[];
+	create_broadcast?: boolean;
 	create_phonebook?: boolean;
 	update_phonebook?: boolean;
 	delete_phonebook?: boolean;
@@ -90,9 +90,9 @@ export async function CreateAgentValidator(req: Request, res: Response, next: Ne
 
 export async function PermissionsValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		assigned_broadcast_labels: z.array(z.string()).optional(),
+		assigned_labels: z.array(z.string()).optional(),
 		view_broadcast_reports: z.boolean().optional(),
-		assigned_phonebook_labels: z.array(z.string()).optional(),
+		create_broadcast: z.boolean().optional(),
 		create_phonebook: z.boolean().optional(),
 		update_phonebook: z.boolean().optional(),
 		delete_phonebook: z.boolean().optional(),

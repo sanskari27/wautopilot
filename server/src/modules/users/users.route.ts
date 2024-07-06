@@ -30,7 +30,7 @@ router.route('/admins').all(VerifyMinLevel(UserLevel.Master)).get(Controller.get
 router
 	.route('/agents/:id/permissions')
 	.all(VerifyMinLevel(UserLevel.Admin), IDValidator)
-	.post(PermissionsValidator, Controller.updateAgent);
+	.post(PermissionsValidator, Controller.assignPermissions);
 
 router
 	.route('/agents/:id')
