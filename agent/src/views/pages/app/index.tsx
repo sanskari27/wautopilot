@@ -88,6 +88,7 @@ const AppPage = () => {
 					DashboardService.getDashboardData(selected_device_id),
 					ChatbotFlowService.listChatBots({ deviceId: selected_device_id }),
 					RecurringService.getRecurringList({ deviceId: selected_device_id }),
+					AgentService.getAgent(),
 				];
 
 				const results = await Promise.all(promises);
@@ -98,6 +99,7 @@ const AppPage = () => {
 				dispatch(setDashboardList(results[4]));
 				dispatch(setChatbotFlow(results[5]));
 				dispatch(setRecurringList(results[6]));
+				dispatch(setAgentList(results[7]));
 			} catch (e) {
 				return;
 			}

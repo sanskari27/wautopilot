@@ -2,7 +2,6 @@ import { Skeleton, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chak
 import { useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
 import Each from '../../../components/utils/Each';
-import AgentContextMenu from './AgentContextMenu';
 
 export default function AllAgents() {
 	const {
@@ -17,9 +16,9 @@ export default function AllAgents() {
 					<Thead>
 						<Tr>
 							<Th width={'5%'}>S.No.</Th>
-							<Th width={'40%'}>Name</Th>
-							<Th width={'40%'}>Phone</Th>
-							<Th>Actions</Th>
+							<Th width={'30%'}>Name</Th>
+							<Th width={'25%'}>Phone</Th>
+							<Th width={'40%'}>Email</Th>
 						</Tr>
 					</Thead>
 					<Tbody>
@@ -36,10 +35,8 @@ export default function AllAgents() {
 									<Tr key={index}>
 										<Td>{index + 1}.</Td>
 										<Td>{agent.name}</Td>
-										<Td>{agent.phone}</Td>
-										<Td>
-											<AgentContextMenu agent={agent} />
-										</Td>
+										<Td>+{agent.phone}</Td>
+										<Td>{agent.email}</Td>
 									</Tr>
 								)}
 							/>

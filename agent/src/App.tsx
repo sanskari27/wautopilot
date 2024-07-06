@@ -32,7 +32,6 @@ const RecurringPage = lazy(() => import('./views/pages/recurring'));
 const CreateRecurring = lazy(() => import('./views/pages/recurring/CreateRecurring'));
 const ButtonResponseReport = lazy(() => import('./views/components/button-report'));
 const AgentPage = lazy(() => import('./views/pages/agent'));
-const AgentDetailsDialog = lazy(() => import('./views/pages/agent/components/AgentDetailsDialog'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -65,10 +64,7 @@ function App() {
 							</Route>
 							<Route path={NAVIGATION.TEMPLATES} element={<Templates />} />
 							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
-							<Route path={NAVIGATION.AGENT} element={<AgentPage />}>
-								<Route path={'new'} element={<AgentDetailsDialog />} />
-								<Route path={':id'} element={<AgentDetailsDialog />} />
-							</Route>
+							<Route path={NAVIGATION.AGENT} element={<AgentPage />} />
 							<Route path={NAVIGATION.RECURRING} element={<RecurringPage />}>
 								<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
 								<Route path={'new'} element={<CreateRecurring />} />
