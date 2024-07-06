@@ -33,6 +33,9 @@ const CreateRecurring = lazy(() => import('./views/pages/recurring/CreateRecurri
 const ButtonResponseReport = lazy(() => import('./views/components/button-report'));
 const AgentPage = lazy(() => import('./views/pages/agent'));
 const AgentDetailsDialog = lazy(() => import('./views/pages/agent/components/AgentDetailsDialog'));
+const AgentPermissionDialog = lazy(
+	() => import('./views/pages/agent/components/AgentPermissionDialog')
+);
 const LinkShortener = lazy(() => import('./views/pages/link-shortener'));
 
 function App() {
@@ -68,6 +71,7 @@ function App() {
 							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
 							<Route path={NAVIGATION.AGENT} element={<AgentPage />}>
 								<Route path={'new'} element={<AgentDetailsDialog />} />
+								<Route path={'permissions/:id'} element={<AgentPermissionDialog />} />
 								<Route path={':id'} element={<AgentDetailsDialog />} />
 							</Route>
 							<Route path={NAVIGATION.RECURRING} element={<RecurringPage />}>

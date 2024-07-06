@@ -18,7 +18,8 @@ export default function AllAgents() {
 						<Tr>
 							<Th width={'5%'}>S.No.</Th>
 							<Th width={'40%'}>Name</Th>
-							<Th width={'40%'}>Phone</Th>
+							<Th width={'30%'}>Email</Th>
+							<Th width={'25%'}>Phone</Th>
 							<Th>Actions</Th>
 						</Tr>
 					</Thead>
@@ -36,6 +37,7 @@ export default function AllAgents() {
 									<Tr key={index}>
 										<Td>{index + 1}.</Td>
 										<Td>{agent.name}</Td>
+										<Td>{agent.email}</Td>
 										<Td>{agent.phone}</Td>
 										<Td>
 											<AgentContextMenu agent={agent} />

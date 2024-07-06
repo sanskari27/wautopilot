@@ -46,6 +46,11 @@ export default function AgentContextMenu({ agent }: { agent: Agent }) {
 			error: { title: 'Failed to delete agent' },
 		});
 	};
+
+	const handleAgentPermissions = () => {
+		navigate(`${NAVIGATION.APP}/${NAVIGATION.AGENT}/permissions/${agent.id}`);
+	};
+
 	return (
 		<>
 			<Menu>
@@ -53,6 +58,7 @@ export default function AgentContextMenu({ agent }: { agent: Agent }) {
 					Actions
 				</MenuButton>
 				<MenuList>
+					<MenuItem onClick={() => handleAgentPermissions()}>Permissions</MenuItem>
 					<MenuItem onClick={() => handleEditAgent()}>Edit</MenuItem>
 					<MenuItem onClick={() => deleteAlertRef.current?.open(agent.id)}>Delete</MenuItem>
 					<MenuItem onClick={() => openServiceAccount(agent.id)}>Service account</MenuItem>
