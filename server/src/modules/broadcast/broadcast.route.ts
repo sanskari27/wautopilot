@@ -32,7 +32,8 @@ router
 
 router
 	.route('/recurring')
-	.get(Controller.listRecurringBroadcasts, recurringPermission)
+	.all(recurringPermission)
+	.get(Controller.listRecurringBroadcasts)
 	.post(CreateRecurringValidator, Controller.scheduleRecurringBroadcast);
 
 // -----------------------------------------------------------------------------------

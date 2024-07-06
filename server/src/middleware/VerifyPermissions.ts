@@ -6,7 +6,7 @@ import COMMON_ERRORS from '../errors/common-errors';
 export default function VerifyPermissions(permission: Permissions) {
 	async function validator(req: Request, res: Response, next: NextFunction) {
 		const { user } = req.locals;
-		if (user.userLevel > -UserLevel.Admin) {
+		if (user.userLevel >= UserLevel.Admin) {
 			return next();
 		}
 		if (user.userLevel === UserLevel.Agent) {
