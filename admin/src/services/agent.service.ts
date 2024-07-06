@@ -97,6 +97,10 @@ export default class AgentService {
 	}: {
 		agentId: string;
 		permission: {
+			manage_media: boolean;
+			manage_contacts: boolean;
+			manage_chatbot: boolean;
+			manage_chatbot_flows: boolean;
 			assigned_labels: string[];
 			view_broadcast_reports: boolean;
 			create_broadcast: boolean;
@@ -118,6 +122,10 @@ export default class AgentService {
 				email: data.email ?? '',
 				phone: data.phone ?? '',
 				permissions: {
+					manage_media: data.permissions?.manage_media ?? false,
+					manage_contacts: data.permissions?.manage_contacts ?? false,
+					manage_chatbot: data.permissions?.manage_chatbot ?? false,
+					manage_chatbot_flows: data.permissions?.manage_chatbot_flows ?? false,
 					assigned_labels: data.permissions?.assigned_labels ?? [],
 					view_broadcast_reports: data.permissions?.view_broadcast_reports ?? false,
 					create_broadcast: data.permissions?.create_broadcast ?? false,
@@ -128,7 +136,7 @@ export default class AgentService {
 					create_template: data.permissions?.create_template ?? false,
 					update_template: data.permissions?.update_template ?? false,
 					delete_template: data.permissions?.delete_template ?? false,
-					create_recurring_broadcast: data.permissions?.create_recurring ?? false,
+					create_recurring_broadcast: data.permissions?.create_recurring_broadcast ?? false,
 				},
 			};
 		} catch (err) {
