@@ -33,6 +33,7 @@ const CreateRecurring = lazy(() => import('./views/pages/recurring/CreateRecurri
 const ButtonResponseReport = lazy(() => import('./views/components/button-report'));
 const AgentPage = lazy(() => import('./views/pages/agent'));
 const AgentDetailsDialog = lazy(() => import('./views/pages/agent/components/AgentDetailsDialog'));
+const LinkShortener = lazy(() => import('./views/pages/link-shortener'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -89,6 +90,7 @@ function App() {
 								<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
 								<Route path={':id'} element={<CreateChatbotFlow />} />
 							</Route>
+							<Route path={NAVIGATION.SHORTEN_LINKS} element={<LinkShortener />} />
 							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
 						</Route>
 						<Route

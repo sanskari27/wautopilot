@@ -13,6 +13,7 @@ import DeviceService from '../../../services/device.service';
 import MediaService from '../../../services/media.service';
 import MessagesService from '../../../services/messages.service';
 import RecurringService from '../../../services/recurring.service';
+import ShortenerService from '../../../services/shortener.service';
 import TemplateService from '../../../services/template.service';
 import { StoreNames, StoreState } from '../../../store';
 import { setAgentList } from '../../../store/reducers/AgentReducer';
@@ -25,6 +26,7 @@ import {
 	startDeviceLoading,
 	stopDeviceLoading,
 } from '../../../store/reducers/DevicesReducers';
+import { setLoadingLinks, setShortenLinksList } from '../../../store/reducers/LinkShortenerReducer';
 import { setMediaFetching, setMediaList } from '../../../store/reducers/MediaReducer';
 import { setRecipientsList, setRecipientsLoading } from '../../../store/reducers/RecipientReducer';
 import { setRecurringList } from '../../../store/reducers/RecurringReducer';
@@ -79,6 +81,7 @@ const AppPage = () => {
 				dispatch(setRecipientsLoading(false));
 				dispatch(setMediaFetching(false));
 				dispatch(setTemplateFetching(false));
+				dispatch(setLoadingLinks(true));
 
 				const promises = [
 					MessagesService.fetchAllConversation(selected_device_id),
@@ -88,6 +91,7 @@ const AppPage = () => {
 					DashboardService.getDashboardData(selected_device_id),
 					ChatbotFlowService.listChatBots({ deviceId: selected_device_id }),
 					RecurringService.getRecurringList({ deviceId: selected_device_id }),
+					ShortenerService.listAll(),
 				];
 
 				const results = await Promise.all(promises);
@@ -98,6 +102,7 @@ const AppPage = () => {
 				dispatch(setDashboardList(results[4]));
 				dispatch(setChatbotFlow(results[5]));
 				dispatch(setRecurringList(results[6]));
+				dispatch(setShortenLinksList(results[7]));
 			} catch (e) {
 				return;
 			}

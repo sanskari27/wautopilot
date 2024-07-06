@@ -9,6 +9,7 @@ import ContactReducer from './reducers/ContactReducer';
 import DashboardReducer from './reducers/DashboardReducer';
 import DevicesReducers from './reducers/DevicesReducers';
 import { default as MediaReducer } from './reducers/MediaReducer';
+import { default as LinkShortenerReducer } from './reducers/LinkShortenerReducer';
 import MessagesReducers from './reducers/MessagesReducers';
 import { default as PhonebookReducer } from './reducers/PhonebookReducer';
 import RecipientReducer from './reducers/RecipientReducer';
@@ -32,6 +33,7 @@ const store = configureStore({
 		[StoreNames.CHATBOT_FLOW]: ChatbotFlowReducer,
 		[StoreNames.RECURRING]: RecurringReducer,
 		[StoreNames.AGENT]: AgentReducer,
+		[StoreNames.LINK]: LinkShortenerReducer,
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({

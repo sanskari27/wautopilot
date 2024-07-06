@@ -10,6 +10,7 @@ import MediaRoute from './media/media.route';
 import OverviewRoute from './overview/overview.route';
 import PaymentRoute from './payment/payment.route';
 import PhonebookRoute from './phonebook/phonebook.route';
+import ShortenerRoute from './shortener/shortener.route';
 import TemplateRoute from './template/template.route';
 import UploadsRoute from './uploads/uploads.route';
 import UsersRoute from './users/users.route';
@@ -32,6 +33,7 @@ router.use('/phonebook', VerifySession, PhonebookRoute);
 router.use('/coupon', VerifySession, CouponRoute);
 router.use('/whatsapp-link', VerifySession, WhatsappLinkRoute);
 router.use('/payment', VerifySession, PaymentRoute);
+router.use('/shortener', VerifySession, ShortenerRoute);
 
 router.use('/:device_id/overview', VerifySession, VerifyDevice, OverviewRoute);
 router.use('/:device_id/template', VerifySession, VerifyDevice, TemplateRoute);

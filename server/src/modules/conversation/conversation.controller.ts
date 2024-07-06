@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import MetaAPI from '../../config/MetaAPI';
 import { UserLevel } from '../../config/const';
-import { CustomError } from '../../errors';
+import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import ConversationService from '../../services/conversation';
 import { Respond } from '../../utils/ExpressUtils';
@@ -197,9 +197,14 @@ async function assignConversationToAgent(req: Request, res: Response, next: Next
 async function removeConversationFromAgent(req: Request, res: Response, next: NextFunction) {
 	const {
 		serviceAccount: account,
+		user,
 		device: { device },
 		id,
 	} = req.locals;
+
+	if (user.userLevel <= UserLevel.Agent) {
+		return next(new CustomError(AUTH_ERRORS.PERMISSION_DENIED));
+	}
 
 	const conversationService = new ConversationService(account, device);
 	await conversationService.removeConversationFromAgent(id);

@@ -19,7 +19,7 @@ function processDocs(docs: IShortenLink[]) {
 			base64: doc.qrString,
 			isWhatsappLink,
 			...(isWhatsappLink && {
-				phoneNumber: doc.link.split('?')[0].split('/').pop(),
+				number: doc.link.split('?')[0].split('/').pop(),
 				message: decodeURIComponent(doc.link.split('?')[1].split('=')[1]),
 			}),
 		};
@@ -80,6 +80,8 @@ export default class LinkShortenerService extends UserService {
 				},
 			}
 		);
+
+		return await this.getShortenLink(id);
 	}
 
 	public async updateShortenLink(id: Types.ObjectId, opts: { title?: string; link?: string }) {

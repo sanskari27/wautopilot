@@ -14,4 +14,5 @@ export enum StoreNames {
 	CHATBOT_FLOW = 'chatbot-flow',
 	RECURRING = 'recurring',
 	AGENT = 'agent',
+	LINK = 'link-shortener',
 }

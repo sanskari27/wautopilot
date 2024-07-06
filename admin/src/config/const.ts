@@ -1,5 +1,6 @@
 import { BiBot, BiCake, BiConversation } from 'react-icons/bi';
 import { MdContacts, MdOutlineDashboard, MdOutlinePermMedia } from 'react-icons/md';
+import { PiLinkSimpleBold } from 'react-icons/pi';
 import { RiContactsBook2Line, RiFlowChart } from 'react-icons/ri';
 import { TbMessage2Plus, TbReportSearch, TbTemplate } from 'react-icons/tb';
 
@@ -25,6 +26,8 @@ export const NAVIGATION = {
 	PHONEBOOK: 'phonebook',
 	CHATBOT: 'chatbot',
 	CHATBOT_FLOW: 'chat-bot-flow',
+
+	SHORTEN_LINKS: 'shorten-links',
 
 	TEMPLATES: 'templates',
 	ADD_TEMPLATE: 'add-template',
@@ -90,6 +93,11 @@ export const MenuItems = [
 		icon: RiFlowChart,
 		route: NAVIGATION.CHATBOT_FLOW,
 		title: 'Chatbot Flow',
+	},
+	{
+		icon: PiLinkSimpleBold,
+		route: NAVIGATION.SHORTEN_LINKS,
+		title: 'Short Links',
 	},
 ];
 
