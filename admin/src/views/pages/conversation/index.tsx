@@ -164,7 +164,7 @@ const Conversation = () => {
 			<Flex width={'full'} height={'calc(100vh - 60px)'}>
 				<Flex
 					direction={'column'}
-					className={`md:border-r-2 overflow-hidden md:!w-[30%] bg-white p-2 ${
+					className={`md:border-r-2 overflow-hidden md:!w-[30%] md:min-w-[350px] bg-white p-2 ${
 						listExpanded ? '!w-full' : '!hidden md:!flex'
 					}`}
 				>
