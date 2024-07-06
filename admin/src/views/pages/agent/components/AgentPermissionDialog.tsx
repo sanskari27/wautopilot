@@ -152,44 +152,42 @@ const AgentPermissionDialog = () => {
 			<ModalContent>
 				<ModalHeader>Assign Permissions</ModalHeader>
 				<ModalBody>
-					{(create_broadcast || can_manipulate_phonebook.access) && (
-						<HStack mb={'0.25rem'}>
-							<LabelFilter
-								labels={all_labels}
-								selectedLabels={assigned_labels}
-								onAddLabel={handleAddLabels}
-								onRemoveLabel={handleRemoveLabels}
-								onClear={handleClearLabels}
-							/>
-							<Wrap
-								width={'full'}
-								borderWidth={'2px'}
-								minH={'38px'}
-								rounded={'lg'}
-								borderStyle={'dashed'}
-								p={'0.5rem'}
-							>
-								{assigned_labels.length === 0 && (
-									<Text width={'full'} textAlign={'center'}>
-										No labels selected
-									</Text>
+					<HStack mb={'0.25rem'}>
+						<LabelFilter
+							labels={all_labels}
+							selectedLabels={assigned_labels}
+							onAddLabel={handleAddLabels}
+							onRemoveLabel={handleRemoveLabels}
+							onClear={handleClearLabels}
+						/>
+						<Wrap
+							width={'full'}
+							borderWidth={'2px'}
+							minH={'38px'}
+							rounded={'lg'}
+							borderStyle={'dashed'}
+							p={'0.5rem'}
+						>
+							{assigned_labels.length === 0 && (
+								<Text width={'full'} textAlign={'center'}>
+									No labels selected
+								</Text>
+							)}
+							<Each
+								items={assigned_labels}
+								render={(label) => (
+									<Tag variant='outline' colorScheme='green' size={'sm'}>
+										<TagLabel>{label}</TagLabel>
+										<TagRightIcon
+											cursor={'pointer'}
+											as={CloseIcon}
+											onClick={() => handleRemoveLabels(label)}
+										/>
+									</Tag>
 								)}
-								<Each
-									items={assigned_labels}
-									render={(label) => (
-										<Tag variant='outline' colorScheme='green' size={'sm'}>
-											<TagLabel>{label}</TagLabel>
-											<TagRightIcon
-												cursor={'pointer'}
-												as={CloseIcon}
-												onClick={() => handleRemoveLabels(label)}
-											/>
-										</Tag>
-									)}
-								/>
-							</Wrap>
-						</HStack>
-					)}
+							/>
+						</Wrap>
+					</HStack>
 					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Broadcast Report access</FormLabel>
