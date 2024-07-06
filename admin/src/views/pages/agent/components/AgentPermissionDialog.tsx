@@ -190,7 +190,7 @@ const AgentPermissionDialog = () => {
 							</Wrap>
 						</HStack>
 					)}
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Broadcast Report access</FormLabel>
 							<Switch
@@ -201,7 +201,7 @@ const AgentPermissionDialog = () => {
 							/>
 						</HStack>
 					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Contacts access</FormLabel>
 							<Switch
@@ -212,7 +212,7 @@ const AgentPermissionDialog = () => {
 							/>
 						</HStack>
 					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Media access</FormLabel>
 							<Switch
@@ -223,7 +223,7 @@ const AgentPermissionDialog = () => {
 							/>
 						</HStack>
 					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Chatbot access</FormLabel>
 							<Switch
@@ -234,7 +234,7 @@ const AgentPermissionDialog = () => {
 							/>
 						</HStack>
 					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Chatbot Flow access</FormLabel>
 							<Switch
@@ -245,7 +245,7 @@ const AgentPermissionDialog = () => {
 							/>
 						</HStack>
 					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Auto Assign Chats</FormLabel>
 							<Switch
@@ -256,7 +256,7 @@ const AgentPermissionDialog = () => {
 							/>
 						</HStack>
 					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Create Recurring Broadcast</FormLabel>
 							<Switch
@@ -267,7 +267,7 @@ const AgentPermissionDialog = () => {
 							/>
 						</HStack>
 					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Broadcast access</FormLabel>
 							<Switch
@@ -279,7 +279,7 @@ const AgentPermissionDialog = () => {
 						</HStack>
 					</FormControl>
 
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Manipulate Phonebook access</FormLabel>
 							<Switch
@@ -321,7 +321,7 @@ const AgentPermissionDialog = () => {
 							</>
 						)}
 					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Manipulate template access</FormLabel>
 							<Switch
