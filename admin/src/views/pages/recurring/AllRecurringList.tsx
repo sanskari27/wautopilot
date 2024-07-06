@@ -104,8 +104,8 @@ export default function AllRecurringList() {
 
 	return (
 		<>
-			<TableContainer>
-				<Table>
+			<TableContainer border={'1px dashed gray'} rounded={'2xl'}>
+				<Table variant='striped' colorScheme='gray'>
 					<Thead>
 						<Tr>
 							<Th width={'35%'}>Name</Th>

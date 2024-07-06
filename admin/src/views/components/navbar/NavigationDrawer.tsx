@@ -1,5 +1,6 @@
 import { Avatar, Box, Flex, Icon, Text, VStack } from '@chakra-ui/react';
 import { useRef } from 'react';
+import { BiSupport } from 'react-icons/bi';
 import { IconType } from 'react-icons/lib';
 import { MdSettings } from 'react-icons/md';
 import { TbLogout2 } from 'react-icons/tb';
@@ -11,7 +12,6 @@ import { StoreNames, StoreState } from '../../../store';
 import DevicesDialog, { DevicesHandle } from '../devices';
 import SettingsDrawer, { SettingsDrawerHandle } from '../settings-dialog';
 import Each from '../utils/Each';
-import { FaUserSecret } from 'react-icons/fa';
 
 function isActiveTab(tab: string, path: string): boolean {
 	if (path.includes(tab)) return true;
@@ -122,7 +122,7 @@ export default function NavigationDrawer({
 							width={'full'}
 							alignItems={'center'}
 						>
-							<Icon as={FaUserSecret} width={5} height={5} />
+							<Icon as={BiSupport} width={5} height={5} />
 							<Text ml={'0.5rem'} fontSize={'sm'} whiteSpace={'nowrap'}>
 								Agents
 							</Text>

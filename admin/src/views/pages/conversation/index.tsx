@@ -17,6 +17,7 @@ import {
 	setSelectedRecipient,
 } from '../../../store/reducers/RecipientReducer';
 import { Recipient } from '../../../store/types/RecipientsState';
+import AgentFilter from '../../components/agentFilter';
 import LabelFilter from '../../components/labelFilter';
 import SearchBar from '../../components/searchBar';
 import Each from '../../components/utils/Each';
@@ -149,6 +150,7 @@ const Conversation = () => {
 							selectedLabels={selectedLabels}
 							onClear={onClear}
 						/>
+						<AgentFilter />
 					</HStack>
 					<Flex direction={'column'} overflowY={'auto'} overflowX={'hidden'}>
 						{loading ? (

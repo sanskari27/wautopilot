@@ -36,6 +36,9 @@ const Slice = createSlice({
 		clearSelectedAgent: (state) => {
 			state.selectedAgent = [];
 		},
+		addSingleSelectedAgent: (state, action: PayloadAction<string>) => {
+			state.selectedAgent = [action.payload];
+		},
 		setAgentLoading: (state, action: PayloadAction<boolean>) => {
 			state.ui.loading = action.payload;
 		},
@@ -87,6 +90,7 @@ export const {
 	addAgent,
 	removeAgent,
 	updateAgent,
+	addSingleSelectedAgent,
 } = Slice.actions;
 
 export default Slice.reducer;
