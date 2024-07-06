@@ -79,8 +79,6 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 		} = useSelector((state: StoreState) => state[StoreNames.USER]);
 		const [isNewContact, setIsNewContact] = useState(false);
 
-		const isUpdating = contact.id !== '';
-
 		useImperativeHandle(ref, () => ({
 			open: ({ contact, editable: newContact }) => {
 				if (contact) {
