@@ -266,8 +266,9 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 							<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
 								<Input
 									type='text'
-									placeholder='Enter tag'
+									placeholder='Select tags'
 									value={label_input}
+									disabled
 									onChange={(e) => dispatch(addLabelInput(e.target.value))}
 								/>
 								<InputRightAddon px={0}>

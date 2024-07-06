@@ -39,10 +39,17 @@ async function getAllLabels(req: Request, res: Response, next: NextFunction) {
 }
 
 async function addRecords(req: Request, res: Response, next: NextFunction) {
+	const { user, serviceAccount } = req.locals;
 	const { records } = req.locals.data as RecordsValidationResult;
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
+		if (user.userLevel === UserLevel.Agent) {
+			const permissions = await user.getPermissions();
+			if (!permissions.create_phonebook) {
+				return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
+			}
+		}
+		const phoneBookService = new PhoneBookService(serviceAccount);
 		const created = await phoneBookService.addRecords(records);
 
 		return Respond({
@@ -62,28 +69,31 @@ async function records(req: Request, res: Response, next: NextFunction) {
 	const page = req.query.page ? parseInt(req.query.page as string) || 1 : 1;
 	const limit = req.query.limit ? parseInt(req.query.limit as string) || 20 : 20;
 	let labels = req.query.labels ? (req.query.labels as string).split(',') : [];
+
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		const allowedLabels = permissions.assigned_labels;
+
+		if (allowedLabels.length === 0) {
+			return Respond({
+				res,
+				status: 200,
+				data: {
+					records: [],
+					totalRecords: 0,
+				},
+			});
+		}
+		if (labels.length > 0) {
+			labels = intersection(labels, allowedLabels);
+		} else {
+			labels = allowedLabels;
+		}
+	}
+
 	try {
 		const phoneBookService = new PhoneBookService(serviceAccount);
-		if (user.userLevel === UserLevel.Agent) {
-			const permissions = await user.getPermissions();
-			const allowedLabels = permissions.assigned_labels;
 
-			if (allowedLabels.length === 0) {
-				return Respond({
-					res,
-					status: 200,
-					data: {
-						records: [],
-						totalRecords: 0,
-					},
-				});
-			}
-			if (labels.length > 0) {
-				labels = intersection(labels, allowedLabels);
-			} else {
-				labels = allowedLabels;
-			}
-		}
 		const records = await phoneBookService.fetchRecords({
 			page,
 			limit,
@@ -108,12 +118,33 @@ async function records(req: Request, res: Response, next: NextFunction) {
 }
 
 async function exportRecords(req: Request, res: Response, next: NextFunction) {
+	const { user, serviceAccount } = req.locals;
+	let labels = req.query.labels ? (req.query.labels as string).split(',') : [];
+
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		const allowedLabels = permissions.assigned_labels;
+
+		if (allowedLabels.length === 0) {
+			return RespondCSV({
+				res,
+				filename: 'phonebook.csv',
+				data: CSVHelper.exportPhonebook([]),
+			});
+		}
+		if (labels.length > 0) {
+			labels = intersection(labels, allowedLabels);
+		} else {
+			labels = allowedLabels;
+		}
+	}
+
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
+		const phoneBookService = new PhoneBookService(serviceAccount);
 		const records = await phoneBookService.fetchRecords({
 			page: 1,
 			limit: 9999999,
-			labels: req.query.labels ? (req.query.labels as string).split(',') : [],
+			labels,
 		});
 
 		const processedRecords = records.map((record) => {
@@ -136,11 +167,19 @@ async function exportRecords(req: Request, res: Response, next: NextFunction) {
 }
 
 async function updateRecords(req: Request, res: Response, next: NextFunction) {
+	const { user, serviceAccount } = req.locals;
 	const data = req.locals.data as SingleRecordValidationResult;
 	const id = req.locals.id;
 
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		if (!permissions.update_phonebook) {
+			return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
+		}
+	}
+
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
+		const phoneBookService = new PhoneBookService(serviceAccount);
 		const created = await phoneBookService.updateRecord(id, data);
 
 		return Respond({
@@ -156,10 +195,16 @@ async function updateRecords(req: Request, res: Response, next: NextFunction) {
 }
 
 async function deleteRecords(req: Request, res: Response, next: NextFunction) {
-	const id = req.locals.id;
+	const { user, serviceAccount, id } = req.locals;
 
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		if (!permissions.delete_phonebook) {
+			return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
+		}
+	}
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
+		const phoneBookService = new PhoneBookService(serviceAccount);
 		await phoneBookService.deleteRecord([id]);
 
 		return Respond({
@@ -177,8 +222,16 @@ async function deleteRecords(req: Request, res: Response, next: NextFunction) {
 async function deleteMultiple(req: Request, res: Response, next: NextFunction) {
 	const { ids } = req.locals.data as MultiDeleteValidationResult;
 
+	const { user, serviceAccount } = req.locals;
+
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		if (!permissions.delete_phonebook) {
+			return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
+		}
+	}
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
+		const phoneBookService = new PhoneBookService(serviceAccount);
 		await phoneBookService.deleteRecord(ids);
 
 		return Respond({
@@ -194,15 +247,23 @@ async function deleteMultiple(req: Request, res: Response, next: NextFunction) {
 }
 
 async function setLabelsByPhone(req: Request, res: Response, next: NextFunction) {
+	const { user, serviceAccount } = req.locals;
+
 	const phone_number = req.params.phone_number;
-	const labels = Array.isArray(req.body.labels) ? [...new Set(req.body.labels as string[])] : [];
+	let labels = Array.isArray(req.body.labels) ? [...new Set(req.body.labels as string[])] : [];
+
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		const allowedLabels = permissions.assigned_labels;
+		labels = intersection(labels, allowedLabels);
+	}
 
 	if (!phone_number) {
 		return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
 	}
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
+		const phoneBookService = new PhoneBookService(serviceAccount);
 		const doc = await phoneBookService.findRecordByPhone(phone_number);
 		if (!doc) {
 			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
@@ -223,10 +284,17 @@ async function setLabelsByPhone(req: Request, res: Response, next: NextFunction)
 }
 
 async function setLabels(req: Request, res: Response, next: NextFunction) {
-	const { labels, ids } = req.locals.data as SetLabelValidationResult;
+	const { user, serviceAccount } = req.locals;
+	const { ids } = req.locals.data as SetLabelValidationResult;
+	let { labels } = req.locals.data as SetLabelValidationResult;
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		const allowedLabels = permissions.assigned_labels;
+		labels = intersection(labels, allowedLabels);
+	}
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
+		const phoneBookService = new PhoneBookService(serviceAccount);
 		await phoneBookService.setLabels(ids, labels);
 
 		return Respond({
@@ -242,10 +310,17 @@ async function setLabels(req: Request, res: Response, next: NextFunction) {
 }
 
 async function addLabels(req: Request, res: Response, next: NextFunction) {
-	const { labels, ids } = req.locals.data as SetLabelValidationResult;
+	const { user, serviceAccount } = req.locals;
+	const { ids } = req.locals.data as SetLabelValidationResult;
+	let { labels } = req.locals.data as SetLabelValidationResult;
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		const allowedLabels = permissions.assigned_labels;
+		labels = intersection(labels, allowedLabels);
+	}
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
+		const phoneBookService = new PhoneBookService(serviceAccount);
 		await phoneBookService.addLabels(ids, labels);
 
 		return Respond({
@@ -261,10 +336,17 @@ async function addLabels(req: Request, res: Response, next: NextFunction) {
 }
 
 async function removeLabels(req: Request, res: Response, next: NextFunction) {
-	const { labels, ids } = req.locals.data as SetLabelValidationResult;
+	const { user, serviceAccount } = req.locals;
+	const { ids } = req.locals.data as SetLabelValidationResult;
+	let { labels } = req.locals.data as SetLabelValidationResult;
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		const allowedLabels = permissions.assigned_labels;
+		labels = intersection(labels, allowedLabels);
+	}
 
 	try {
-		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
+		const phoneBookService = new PhoneBookService(serviceAccount);
 		await phoneBookService.removeLabels(ids, labels);
 
 		return Respond({
@@ -286,10 +368,17 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 			fileFilter: ONLY_CSV_ALLOWED,
 		},
 	};
+	const { serviceAccount, user } = req.locals;
 
 	try {
 		const uploadedFile = await FileUpload.SingleFileUpload(req, res, fileUploadOptions);
-		const labels = req.body.labels ? req.body.labels.split(',') : [];
+		let labels = req.body.labels ? req.body.labels.split(',') : [];
+
+		if (user.userLevel === UserLevel.Agent) {
+			const permissions = await user.getPermissions();
+			const allowedLabels = permissions.assigned_labels;
+			labels = intersection(labels, allowedLabels);
+		}
 
 		const parsed_csv = await csv().fromFile(uploadedFile.path);
 
@@ -297,7 +386,7 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 			return next(new CustomError(COMMON_ERRORS.ERROR_PARSING_CSV));
 		}
 
-		const phoneBookService = new PhoneBookService(req.locals.serviceAccount);
+		const phoneBookService = new PhoneBookService(serviceAccount);
 		const data = parsed_csv.map((record) => {
 			const { prefix, tags, ...rest } = record;
 			return {
