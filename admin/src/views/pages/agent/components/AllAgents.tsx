@@ -38,7 +38,7 @@ export default function AllAgents() {
 										<Td>{index + 1}.</Td>
 										<Td>{agent.name}</Td>
 										<Td>{agent.email}</Td>
-										<Td>{agent.phone}</Td>
+										<Td>{agent.phone && '+' + agent.phone}</Td>
 										<Td>
 											<AgentContextMenu agent={agent} />
 										</Td>
