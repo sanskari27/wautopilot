@@ -20,6 +20,8 @@ const allowlist = [
 	'http://localhost:5276',
 	'http://localhost:5277',
 	'https://wautopilot.com',
+	'https://agent.wautopilot.com',
+	'https://agent.wautopilot.com',
 	'https://admin.wautopilot.com',
 	'https://master.wautopilot.com',
 	'https://auth.wautopilot.com',
