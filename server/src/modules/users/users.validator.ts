@@ -19,6 +19,7 @@ export type PermissionsValidationResult = {
 	assigned_labels?: string[];
 	view_broadcast_reports?: boolean;
 	create_broadcast?: boolean;
+	create_recurring_broadcast?: boolean;
 	create_phonebook?: boolean;
 	update_phonebook?: boolean;
 	delete_phonebook?: boolean;
@@ -26,6 +27,10 @@ export type PermissionsValidationResult = {
 	create_template?: boolean;
 	update_template?: boolean;
 	delete_template?: boolean;
+	manage_media?: boolean;
+	manage_contacts?: boolean;
+	manage_chatbot?: boolean;
+	manage_chatbot_flows?: boolean;
 };
 
 export async function UpgradePlanValidator(req: Request, res: Response, next: NextFunction) {
@@ -93,6 +98,7 @@ export async function PermissionsValidator(req: Request, res: Response, next: Ne
 		assigned_labels: z.array(z.string()).optional(),
 		view_broadcast_reports: z.boolean().optional(),
 		create_broadcast: z.boolean().optional(),
+		create_recurring_broadcast: z.boolean().optional(),
 		create_phonebook: z.boolean().optional(),
 		update_phonebook: z.boolean().optional(),
 		delete_phonebook: z.boolean().optional(),
@@ -100,6 +106,10 @@ export async function PermissionsValidator(req: Request, res: Response, next: Ne
 		create_template: z.boolean().optional(),
 		update_template: z.boolean().optional(),
 		delete_template: z.boolean().optional(),
+		manage_media: z.boolean().optional(),
+		manage_contacts: z.boolean().optional(),
+		manage_chatbot: z.boolean().optional(),
+		manage_chatbot_flows: z.boolean().optional(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

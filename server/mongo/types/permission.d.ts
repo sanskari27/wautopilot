@@ -7,6 +7,7 @@ export default interface IPermission extends Document {
 	assigned_labels: string[];
 	view_broadcast_reports: boolean;
 	create_broadcast: boolean;
+	create_recurring_broadcast: boolean;
 	create_phonebook: boolean;
 	update_phonebook: boolean;
 	delete_phonebook: boolean;
@@ -14,4 +15,8 @@ export default interface IPermission extends Document {
 	create_template: boolean;
 	update_template: boolean;
 	delete_template: boolean;
+	manage_media: boolean;
+	manage_contacts: boolean;
+	manage_chatbot: boolean;
+	manage_chatbot_flows: boolean;
 }

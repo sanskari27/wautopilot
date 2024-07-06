@@ -437,6 +437,7 @@ export default class UserService {
 					assigned_labels: user.permissions.assigned_labels ?? [],
 					view_broadcast_reports: user.permissions.view_broadcast_reports ?? false,
 					create_broadcast: user.permissions.create_broadcast ?? false,
+					create_recurring_broadcast: user.permissions.create_recurring_broadcast ?? false,
 					create_phonebook: user.permissions.create_phonebook ?? false,
 					update_phonebook: user.permissions.update_phonebook ?? false,
 					delete_phonebook: user.permissions.delete_phonebook ?? false,
@@ -444,6 +445,10 @@ export default class UserService {
 					create_template: user.permissions.create_template ?? false,
 					update_template: user.permissions.update_template ?? false,
 					delete_template: user.permissions.delete_template ?? false,
+					manage_media: user.permissions.manage_media ?? false,
+					manage_contacts: user.permissions.manage_contacts ?? false,
+					manage_chatbot: user.permissions.manage_chatbot ?? false,
+					manage_chatbot_flows: user.permissions.manage_chatbot_flows ?? false,
 				},
 			};
 		});
@@ -484,6 +489,9 @@ export default class UserService {
 			_id: id,
 			parent: this._user_id,
 		});
+		await PermissionDB.deleteOne({
+			linked_to: id,
+		});
 	}
 
 	async assignPermissions(
@@ -491,6 +499,8 @@ export default class UserService {
 		opts: {
 			assigned_labels?: string[];
 			view_broadcast_reports?: boolean;
+			create_broadcast?: boolean;
+			create_recurring_broadcast?: boolean;
 			create_phonebook?: boolean;
 			update_phonebook?: boolean;
 			delete_phonebook?: boolean;
@@ -498,6 +508,10 @@ export default class UserService {
 			create_template?: boolean;
 			update_template?: boolean;
 			delete_template?: boolean;
+			manage_media?: boolean;
+			manage_contacts?: boolean;
+			manage_chatbot?: boolean;
+			manage_chatbot_flows?: boolean;
 		}
 	) {
 		await PermissionDB.updateOne(
@@ -549,6 +563,7 @@ export default class UserService {
 				assigned_labels: user.permissions.assigned_labels ?? [],
 				view_broadcast_reports: user.permissions.view_broadcast_reports ?? false,
 				create_broadcast: user.permissions.create_broadcast ?? false,
+				create_recurring_broadcast: user.permissions.create_recurring_broadcast ?? false,
 				create_phonebook: user.permissions.create_phonebook ?? false,
 				update_phonebook: user.permissions.update_phonebook ?? false,
 				delete_phonebook: user.permissions.delete_phonebook ?? false,
@@ -556,6 +571,10 @@ export default class UserService {
 				create_template: user.permissions.create_template ?? false,
 				update_template: user.permissions.update_template ?? false,
 				delete_template: user.permissions.delete_template ?? false,
+				manage_media: user.permissions.manage_media ?? false,
+				manage_contacts: user.permissions.manage_contacts ?? false,
+				manage_chatbot: user.permissions.manage_chatbot ?? false,
+				manage_chatbot_flows: user.permissions.manage_chatbot_flows ?? false,
 			},
 		};
 	}
@@ -568,6 +587,8 @@ export default class UserService {
 		return {
 			assigned_labels: permission?.assigned_labels ?? [],
 			view_broadcast_reports: permission?.view_broadcast_reports ?? false,
+			create_broadcast: permission?.create_broadcast ?? false,
+			create_recurring_broadcast: permission?.create_recurring_broadcast ?? false,
 			create_phonebook: permission?.create_phonebook ?? false,
 			update_phonebook: permission?.update_phonebook ?? false,
 			delete_phonebook: permission?.delete_phonebook ?? false,
@@ -575,6 +596,10 @@ export default class UserService {
 			create_template: permission?.create_template ?? false,
 			update_template: permission?.update_template ?? false,
 			delete_template: permission?.delete_template ?? false,
+			manage_media: permission?.manage_media ?? false,
+			manage_contacts: permission?.manage_contacts ?? false,
+			manage_chatbot: permission?.manage_chatbot ?? false,
+			manage_chatbot_flows: permission?.manage_chatbot_flows ?? false,
 		};
 	}
 }

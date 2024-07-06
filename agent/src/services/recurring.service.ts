@@ -38,7 +38,7 @@ export default class RecurringService {
 			const { data } = await APIInstance.get(`/${deviceId}/broadcast/recurring`);
 			return validateRecurringResult(data.list);
 		} catch (err) {
-			//ignore
+			return [];
 		}
 	}
 

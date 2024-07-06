@@ -14,6 +14,14 @@ const schema = new mongoose.Schema<IPermission>({
 		type: [String],
 		default: [],
 	},
+	create_broadcast: {
+		type: Boolean,
+		default: false,
+	},
+	create_recurring_broadcast: {
+		type: Boolean,
+		default: false,
+	},
 	view_broadcast_reports: {
 		type: Boolean,
 		default: false,
@@ -43,6 +51,22 @@ const schema = new mongoose.Schema<IPermission>({
 		default: false,
 	},
 	delete_template: {
+		type: Boolean,
+		default: false,
+	},
+	manage_media: {
+		type: Boolean,
+		default: false,
+	},
+	manage_contacts: {
+		type: Boolean,
+		default: false,
+	},
+	manage_chatbot: {
+		type: Boolean,
+		default: false,
+	},
+	manage_chatbot_flows: {
 		type: Boolean,
 		default: false,
 	},
