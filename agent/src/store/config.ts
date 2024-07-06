@@ -1,0 +1,17 @@
+export enum StoreNames {
+	MEDIA = 'media',
+	BROADCAST = 'broadcast',
+	TEMPLATES = 'templates',
+	PHONEBOOK = 'phonebook',
+	USER = 'user',
+	DEVICES = 'devices',
+	RECIPIENT = 'recipient',
+	MESSAGES = 'messages',
+	CONTACT = 'contact',
+	FILTER_LABELS = 'filterLabels',
+	CHATBOT = 'chatbot',
+	DASHBOARD = 'dashboard',
+	CHATBOT_FLOW = 'chatbot-flow',
+	RECURRING = 'recurring',
+	AGENT = 'agent',
+}
