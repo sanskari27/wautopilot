@@ -23,10 +23,7 @@ router
 	.all(IDValidator, AgentValidator)
 	.post(Controller.assignConversationToAgent);
 
-router
-	.route('/:id/remove-agent')
-	.all(IDValidator, AgentValidator)
-	.post(Controller.removeConversationFromAgent);
+router.route('/:id/remove-agent').all(IDValidator).post(Controller.removeConversationFromAgent);
 
 router.route('/').get(Controller.fetchConversations);
 
