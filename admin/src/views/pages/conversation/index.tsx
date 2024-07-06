@@ -82,6 +82,7 @@ const Conversation = () => {
 	};
 
 	const handleAssignConversationToAgent = (id: string[]) => {
+		if (selected_recipient_list.length === 0) return;
 		if (id.length === 0) {
 			const promises = selected_recipient_list.map((recipient) => {
 				return AgentService.removeConversationFromAgent({
