@@ -1,21 +1,22 @@
-import { DownloadIcon, EditIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
-	IconButton,
+	Button,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuList,
 	Skeleton,
 	Table,
 	TableContainer,
 	Tbody,
 	Td,
+	Text,
 	Th,
 	Thead,
-	Tooltip,
 	Tr,
 	useToast,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { MdDelete, MdScheduleSend } from 'react-icons/md';
-import { PiPause, PiPlay } from 'react-icons/pi';
-import { TbReportSearch } from 'react-icons/tb';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
@@ -149,99 +150,45 @@ export default function AllRecurringList() {
 										<Td>{recurring.wish_from}</Td>
 										<Td>{recurring.delay} Days</Td>
 										<Td>
-											<Tooltip label='Delete Recurring' aria-label='Delete Responder'>
-												<IconButton
-													aria-label='Delete'
-													icon={<MdDelete />}
-													color={'red.400'}
-													onClick={() => {
-														deleteAlertRef.current?.open(recurring.id);
-													}}
-													bgColor={'transparent'}
-													_hover={{
-														bgColor: 'transparent',
-													}}
-													outline='none'
-													border='none'
-												/>
-											</Tooltip>
-											<Tooltip label='Edit Recurring' aria-label='Edit Responder'>
-												<IconButton
-													aria-label='Edit'
-													icon={<EditIcon />}
-													color={'yellow.400'}
-													onClick={() => handleEditBot(recurring.id)}
-													bgColor={'transparent'}
-													_hover={{
-														bgColor: 'transparent',
-													}}
-													outline='none'
-													border='none'
-												/>
-											</Tooltip>
-											<Tooltip label='Toggle Recurring' aria-label='Toggle Responder'>
-												<IconButton
-													aria-label='toggle'
-													icon={recurring.active === 'ACTIVE' ? <PiPause /> : <PiPlay />}
-													color={recurring.active === 'ACTIVE' ? 'red.400' : 'green.400'}
-													onClick={() => {
-														confirmationAlertRef.current?.open({
-															id: recurring.id,
-															disclaimer: 'Are you sure you want to change running status?',
-															type: 'TOGGLE_BOT',
-														});
-													}}
-													bgColor={'transparent'}
-													_hover={{
-														bgColor: 'transparent',
-													}}
-													outline='none'
-													border='none'
-												/>
-											</Tooltip>
-											<Tooltip label='Reschedule Recurring' aria-label='Toggle Responder'>
-												<IconButton
-													aria-label='toggle'
-													icon={<MdScheduleSend color='gray' />}
-													onClick={() => handleReschedule(recurring.id)}
-													bgColor={'transparent'}
-													_hover={{
-														bgColor: 'transparent',
-													}}
-													outline='none'
-													border='none'
-												/>
-											</Tooltip>
-											<Tooltip label='Download Report' aria-label='Toggle Responder'>
-												<IconButton
-													aria-label='toggle'
-													icon={<DownloadIcon color='blueviolet' />}
-													onClick={() => handleDownload(recurring.id)}
-													bgColor={'transparent'}
-													_hover={{
-														bgColor: 'transparent',
-													}}
-													outline='none'
-													border='none'
-												/>
-											</Tooltip>
-											<Tooltip label='Button Click Report' aria-label='Toggle Responder'>
-												<IconButton
-													aria-label='toggle'
-													icon={<TbReportSearch />}
-													onClick={() => {
-														navigate(
-															`${NAVIGATION.APP}/${NAVIGATION.CHATBOT}/button-report/${recurring.id}`
-														);
-													}}
-													bgColor={'transparent'}
-													_hover={{
-														bgColor: 'transparent',
-													}}
-													outline='none'
-													border='none'
-												/>
-											</Tooltip>
+											<Menu>
+												<MenuButton as={Button} rightIcon={<ChevronDownIcon />} size='sm'>
+													Actions
+												</MenuButton>
+												<MenuList>
+													<MenuItem onClick={() => handleEditBot(recurring.id)}>Edit</MenuItem>
+													<MenuItem
+														onClick={() =>
+															confirmationAlertRef.current?.open({
+																id: recurring.id,
+																disclaimer: 'Are you sure you want to change running status?',
+																type: 'TOGGLE_BOT',
+															})
+														}
+													>
+														<Text color={recurring.active ? 'red' : 'green'}>
+															{recurring.active ? 'Stop' : 'Play'}
+														</Text>
+													</MenuItem>
+													<MenuItem onClick={() => handleDownload(recurring.id)}>
+														Download Report
+													</MenuItem>
+													<MenuItem
+														onClick={() =>
+															navigate(
+																`${NAVIGATION.APP}/${NAVIGATION.CHATBOT}/button-report/${recurring.id}`
+															)
+														}
+													>
+														Button Click Report
+													</MenuItem>
+													<MenuItem onClick={() => handleReschedule(recurring.id)}>
+														Reschedule Today's Messages
+													</MenuItem>
+													<MenuItem onClick={() => deleteAlertRef.current?.open(recurring.id)}>
+														Delete
+													</MenuItem>
+												</MenuList>
+											</Menu>
 										</Td>
 									</Tr>
 								)}

@@ -1,21 +1,22 @@
-import { DownloadIcon, EditIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
 	Box,
-	IconButton,
+	Button,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuList,
 	Skeleton,
 	Table,
 	TableContainer,
 	Tbody,
 	Td,
+	Text,
 	Th,
 	Thead,
-	Tooltip,
 	Tr,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { MdDelete } from 'react-icons/md';
-import { PiPause, PiPlay } from 'react-icons/pi';
-import { TbReportSearch } from 'react-icons/tb';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { NAVIGATION } from '../../../../config/const';
@@ -107,87 +108,42 @@ export default function AllResponders() {
 												: `${Math.floor(bot.trigger_gap_seconds / 86400)} day`}
 										</Td>
 										<Td>
-											<Tooltip label='Delete Responder' aria-label='Delete Responder'>
-												<IconButton
-													aria-label='Delete'
-													icon={<MdDelete />}
-													color={'red.400'}
-													onClick={() => {
-														deleteAlertRef.current?.open(bot.id);
-													}}
-													bgColor={'transparent'}
-													_hover={{
-														bgColor: 'transparent',
-													}}
-													outline='none'
-													border='none'
-												/>
-											</Tooltip>
-											<Tooltip label='Edit Responder' aria-label='Edit Responder'>
-												<IconButton
-													aria-label='Edit'
-													icon={<EditIcon />}
-													color={'yellow.400'}
-													onClick={() => handleEditBot(bot.id)}
-													bgColor={'transparent'}
-													_hover={{
-														bgColor: 'transparent',
-													}}
-													outline='none'
-													border='none'
-												/>
-											</Tooltip>
-											<Tooltip label='Download Responder' aria-label='Edit Responder'>
-												<IconButton
-													aria-label='Edit'
-													icon={<DownloadIcon />}
-													color={'blue.400'}
-													onClick={() => downloadChatBot(bot.id)}
-													bgColor={'transparent'}
-													_hover={{
-														bgColor: 'transparent',
-													}}
-													outline='none'
-													border='none'
-												/>
-											</Tooltip>
-											<Tooltip label='Toggle Responder' aria-label='Toggle Responder'>
-												<IconButton
-													aria-label='toggle'
-													icon={bot.isActive ? <PiPause /> : <PiPlay />}
-													color={bot.isActive ? 'red.400' : 'green.400'}
-													onClick={() => {
-														confirmationAlertRef.current?.open({
-															id: bot.id,
-															disclaimer: 'Are you sure you want to change running status?',
-															type: 'TOGGLE_BOT',
-														});
-													}}
-													bgColor={'transparent'}
-													_hover={{
-														bgColor: 'transparent',
-													}}
-													outline='none'
-													border='none'
-												/>
-											</Tooltip>
-											<Tooltip label='Button Click Report' aria-label='Toggle Responder'>
-												<IconButton
-													aria-label='toggle'
-													icon={<TbReportSearch />}
-													onClick={() => {
-														navigate(
-															`${NAVIGATION.APP}/${NAVIGATION.CHATBOT}/button-report/${bot.id}`
-														);
-													}}
-													bgColor={'transparent'}
-													_hover={{
-														bgColor: 'transparent',
-													}}
-													outline='none'
-													border='none'
-												/>
-											</Tooltip>
+											<Menu>
+												<MenuButton as={Button} rightIcon={<ChevronDownIcon />} size='sm'>
+													Actions
+												</MenuButton>
+												<MenuList>
+													<MenuItem onClick={() => handleEditBot(bot.id)}>Edit</MenuItem>
+													<MenuItem
+														onClick={() =>
+															confirmationAlertRef.current?.open({
+																id: bot.id,
+																disclaimer: 'Are you sure you want to change running status?',
+																type: 'TOGGLE_BOT',
+															})
+														}
+													>
+														<Text color={bot.isActive ? 'red' : 'green'}>
+															{bot.isActive ? 'Stop' : 'Play'}
+														</Text>
+													</MenuItem>
+													<MenuItem onClick={() => downloadChatBot(bot.id)}>
+														Download Report
+													</MenuItem>
+													<MenuItem
+														onClick={() =>
+															navigate(
+																`${NAVIGATION.APP}/${NAVIGATION.CHATBOT}/button-report/${bot.id}`
+															)
+														}
+													>
+														Button Click Report
+													</MenuItem>
+													<MenuItem onClick={() => deleteAlertRef.current?.open(bot.id)}>
+														Delete
+													</MenuItem>
+												</MenuList>
+											</Menu>
 										</Td>
 									</Tr>
 								)}
