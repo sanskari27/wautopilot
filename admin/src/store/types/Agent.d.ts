@@ -3,7 +3,7 @@ export type Agent = {
 	name: string;
 	email: string;
 	phone: string;
-    password?:string
+	password?: string;
 	permissions: {
 		assigned_labels: string[];
 		view_broadcast_reports: boolean;
@@ -16,7 +16,11 @@ export type Agent = {
 		update_template: boolean;
 		delete_template: boolean;
 		create_recurring_broadcast: boolean;
-	}
+		manage_media: boolean;
+		manage_contacts: boolean;
+		manage_chatbot: boolean;
+		manage_chatbot_flows: boolean;
+	};
 };
 
 export type AgentPermission = {
@@ -25,6 +29,10 @@ export type AgentPermission = {
 	view_broadcast_report: boolean;
 	auto_assign_chats: boolean;
 	create_recurring_broadcast: boolean;
+	manage_media: boolean;
+	manage_contacts: boolean;
+	manage_chatbot: boolean;
+	manage_chatbot_flows: boolean;
 	can_manipulate_phonebook: {
 		access: boolean;
 		create_phonebook: boolean;

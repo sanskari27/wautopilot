@@ -22,9 +22,17 @@ const initState: AgentState = {
 			create_template: false,
 			update_template: false,
 			delete_template: false,
+			manage_media: false,
+			manage_contacts: false,
+			manage_chatbot: false,
+			manage_chatbot_flows: false,
 		},
 	},
 	agentPermissions: {
+		manage_media: false,
+		manage_contacts: false,
+		manage_chatbot: false,
+		manage_chatbot_flows: false,
 		create_recurring_broadcast: false,
 		assigned_labels: [],
 		create_broadcast: false,
@@ -94,6 +102,10 @@ const Slice = createSlice({
 			if (agent) {
 				state.details = agent;
 				state.agentPermissions = {
+					manage_media: agent.permissions.manage_media,
+					manage_contacts: agent.permissions.manage_contacts,
+					manage_chatbot: agent.permissions.manage_chatbot,
+					manage_chatbot_flows: agent.permissions.manage_chatbot_flows,
 					create_recurring_broadcast: agent.permissions.create_recurring_broadcast,
 					assigned_labels: agent.permissions.assigned_labels,
 					create_broadcast: agent.permissions.create_broadcast,
@@ -231,6 +243,10 @@ const Slice = createSlice({
 					update_template: boolean;
 					delete_template: boolean;
 					create_recurring_broadcast: boolean;
+					manage_media: boolean;
+					manage_contacts: boolean;
+					manage_chatbot: boolean;
+					manage_chatbot_flows: boolean;
 				};
 			}>
 		) => {
@@ -238,6 +254,18 @@ const Slice = createSlice({
 			if (index !== -1) {
 				state.list[index].permissions = action.payload.permission;
 			}
+		},
+		changeMediaAccess: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.manage_media = action.payload;
+		},
+		changeContactsAccess: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.manage_contacts = action.payload;
+		},
+		changeChatbotAccess: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.manage_chatbot = action.payload;
+		},
+		changeChatbotFlowsAccess: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.manage_chatbot_flows = action.payload;
 		},
 	},
 });
@@ -274,6 +302,10 @@ export const {
 	deleteTemplate,
 	updateAgentPermission,
 	changeRecurringBroadcast,
+	changeMediaAccess,
+	changeContactsAccess,
+	changeChatbotAccess,
+	changeChatbotFlowsAccess
 } = Slice.actions;
 
 export default Slice.reducer;

@@ -31,6 +31,10 @@ import {
 	changeBroadcastAccess,
 	changeCanManipulatePhonebook,
 	changeCanManipulateTemplate,
+	changeChatbotAccess,
+	changeChatbotFlowsAccess,
+	changeContactsAccess,
+	changeMediaAccess,
 	changeRecurringBroadcast,
 	changeViewBroadcastReport,
 	clearLabels,
@@ -66,7 +70,11 @@ const AgentPermissionDialog = () => {
 			can_manipulate_phonebook,
 			can_manipulate_template,
 			view_broadcast_report,
-            create_recurring_broadcast
+			create_recurring_broadcast,
+			manage_chatbot,
+			manage_chatbot_flows,
+			manage_contacts,
+			manage_media,
 		},
 	} = useSelector((state: StoreState) => state[StoreNames.AGENT]);
 
@@ -81,7 +89,11 @@ const AgentPermissionDialog = () => {
 			agentId: id,
 			permission: {
 				assigned_labels,
-                create_recurring_broadcast: create_recurring_broadcast,
+				manage_chatbot: manage_chatbot,
+				manage_chatbot_flows: manage_chatbot_flows,
+				manage_contacts: manage_contacts,
+				manage_media: manage_media,
+				create_recurring_broadcast: create_recurring_broadcast,
 				view_broadcast_reports: view_broadcast_report,
 				create_broadcast: create_broadcast,
 				create_phonebook: can_manipulate_phonebook.create_phonebook,
@@ -135,13 +147,13 @@ const AgentPermissionDialog = () => {
 	}, [dispatch, id]);
 
 	return (
-		<Modal isOpen={true} onClose={handleClose} size={'4xl'}>
+		<Modal isOpen={true} onClose={handleClose} size={'4xl'} scrollBehavior='inside'>
 			<ModalOverlay />
 			<ModalContent>
 				<ModalHeader>Assign Permissions</ModalHeader>
 				<ModalBody>
 					{(create_broadcast || can_manipulate_phonebook.access) && (
-						<HStack mb={'1rem'}>
+						<HStack mb={'0.25rem'}>
 							<LabelFilter
 								labels={all_labels}
 								selectedLabels={assigned_labels}
@@ -178,7 +190,7 @@ const AgentPermissionDialog = () => {
 							</Wrap>
 						</HStack>
 					)}
-					<FormControl mb={'1rem'} borderBottom={'1px solid gray'} pb={'1rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Broadcast Report access</FormLabel>
 							<Switch
@@ -189,7 +201,51 @@ const AgentPermissionDialog = () => {
 							/>
 						</HStack>
 					</FormControl>
-					<FormControl mb={'1rem'} borderBottom={'1px solid gray'} pb={'1rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+						<HStack justifyContent={'space-between'}>
+							<FormLabel m={0}>Contacts access</FormLabel>
+							<Switch
+								onChange={(e) => dispatch(changeContactsAccess(e.target.checked))}
+								colorScheme={'green'}
+								size='sm'
+								isChecked={manage_contacts}
+							/>
+						</HStack>
+					</FormControl>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+						<HStack justifyContent={'space-between'}>
+							<FormLabel m={0}>Media access</FormLabel>
+							<Switch
+								onChange={(e) => dispatch(changeMediaAccess(e.target.checked))}
+								colorScheme={'green'}
+								size='sm'
+								isChecked={manage_media}
+							/>
+						</HStack>
+					</FormControl>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+						<HStack justifyContent={'space-between'}>
+							<FormLabel m={0}>Chatbot access</FormLabel>
+							<Switch
+								onChange={(e) => dispatch(changeChatbotAccess(e.target.checked))}
+								colorScheme={'green'}
+								size='sm'
+								isChecked={manage_chatbot}
+							/>
+						</HStack>
+					</FormControl>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
+						<HStack justifyContent={'space-between'}>
+							<FormLabel m={0}>Chatbot Flow access</FormLabel>
+							<Switch
+								onChange={(e) => dispatch(changeChatbotFlowsAccess(e.target.checked))}
+								colorScheme={'green'}
+								size='sm'
+								isChecked={manage_chatbot_flows}
+							/>
+						</HStack>
+					</FormControl>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Auto Assign Chats</FormLabel>
 							<Switch
@@ -200,7 +256,7 @@ const AgentPermissionDialog = () => {
 							/>
 						</HStack>
 					</FormControl>
-					<FormControl mb={'1rem'} borderBottom={'1px solid gray'} pb={'1rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Create Recurring Broadcast</FormLabel>
 							<Switch
@@ -211,7 +267,7 @@ const AgentPermissionDialog = () => {
 							/>
 						</HStack>
 					</FormControl>
-					<FormControl mb={'1rem'} borderBottom={'1px solid gray'} pb={'1rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Broadcast access</FormLabel>
 							<Switch
@@ -223,7 +279,7 @@ const AgentPermissionDialog = () => {
 						</HStack>
 					</FormControl>
 
-					<FormControl mb={'1rem'} borderBottom={'1px solid gray'} pb={'1rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Manipulate Phonebook access</FormLabel>
 							<Switch
@@ -265,7 +321,7 @@ const AgentPermissionDialog = () => {
 							</>
 						)}
 					</FormControl>
-					<FormControl mb={'1rem'} borderBottom={'1px solid gray'} pb={'1rem'}>
+					<FormControl mb={'0.25rem'} borderBottom={'1px solid gray'} pb={'0.25rem'}>
 						<HStack justifyContent={'space-between'}>
 							<FormLabel m={0}>Manipulate template access</FormLabel>
 							<Switch
