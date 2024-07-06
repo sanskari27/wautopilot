@@ -60,6 +60,7 @@ const LinkShortenerReducer = createSlice({
 		},
 		setShortenLinksList: (state, action: PayloadAction<typeof initialState.list>) => {
 			state.list = action.payload;
+			state.ui.loading_links = false;
 		},
 		addShortenLink: (state, action: PayloadAction<(typeof initialState.list)[number]>) => {
 			state.details = initialState.details;

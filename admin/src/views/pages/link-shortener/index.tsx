@@ -88,8 +88,14 @@ const LinkShortener = () => {
 						</Tr>
 					</Thead>
 					<Tbody>
-						{loading_links && list.length === 0 ? (
+						{loading_links ? (
 							<Each items={[1, 2, 3]} render={() => <ListSkeleton />} />
+						) : filtered.filtered.length === 0 ? (
+							<Tr>
+								<Td colSpan={6} textAlign={'center'} fontWeight={'medium'}>
+									No links found
+								</Td>
+							</Tr>
 						) : (
 							<Each
 								items={filtered.filtered}
