@@ -9,7 +9,7 @@ import {
 	SubscriptionDetailsDB,
 } from '../../mongo';
 import IAccount from '../../mongo/types/account';
-import { UserLevel } from '../config/const';
+import { Permissions, UserLevel } from '../config/const';
 import { AUTH_ERRORS, CustomError, PAYMENT_ERRORS } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
 import { sendLoginCredentialsEmail } from '../provider/email';
@@ -579,7 +579,13 @@ export default class UserService {
 		};
 	}
 
-	async getPermissions() {
+	async getPermissions(): Promise<
+		{
+			assigned_labels: string[];
+		} & {
+			[key in Permissions]: boolean;
+		}
+	> {
 		const permission = await PermissionDB.findOne({
 			linked_to: this._user_id,
 		});

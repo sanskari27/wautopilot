@@ -42,13 +42,20 @@ export enum Path {
 }
 
 export enum Permissions {
-	Dashboard = 'dashboard',
-	Phonebook = 'phonebook',
-	Templates = 'templates',
-	Media = 'media',
-	Broadcast = 'broadcast',
-	Conversations = 'conversations',
-	Devices = 'devices',
+	view_broadcast_reports = 'view_broadcast_reports',
+	create_broadcast = 'create_broadcast',
+	create_recurring_broadcast = 'create_recurring_broadcast',
+	create_phonebook = 'create_phonebook',
+	update_phonebook = 'update_phonebook',
+	delete_phonebook = 'delete_phonebook',
+	auto_assign_chats = 'auto_assign_chats',
+	create_template = 'create_template',
+	update_template = 'update_template',
+	delete_template = 'delete_template',
+	manage_media = 'manage_media',
+	manage_contacts = 'manage_contacts',
+	manage_chatbot = 'manage_chatbot',
+	manage_chatbot_flows = 'manage_chatbot_flows',
 }
 
 export const CACHE_TIMEOUT = 60 * 60; //seconds
