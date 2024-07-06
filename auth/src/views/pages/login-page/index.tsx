@@ -10,14 +10,15 @@ import {
 	Tabs,
 	Text,
 } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { ADMIN_URL, Color, LOGO_PRIMARY, WEBPAGE_URL } from '../../../config/const';
 import { useGeoLocation } from '../../../hooks/useGeolocation';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
 import { setIsAuthenticated, stopUserLoading } from '../../../store/reducers/UserReducers';
+import InvalidPage from '../../components/invalid-page';
 import LoginTab from './login-tab';
 import SignupTab from './signup-tab';
 
@@ -25,6 +26,7 @@ export default function LoginPopup() {
 	useGeoLocation();
 
 	const dispatch = useDispatch();
+	const { login_type } = useParams();
 
 	const [params] = useSearchParams();
 	const callback_url = params.get('callback_url');
@@ -33,12 +35,20 @@ export default function LoginPopup() {
 		uiDetails: { isLoading, isAuthenticated },
 	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 
+	const [invalidLogin, setInvalidLogin] = useState(false);
+
 	useEffect(() => {
-		AuthService.isAuthenticated().then((res) => {
+		if (!login_type || !['admin', 'master', 'agent'].includes(login_type)) {
+			setInvalidLogin(true);
+			dispatch(setIsAuthenticated(false));
+			dispatch(stopUserLoading());
+			return;
+		}
+		AuthService.isAuthenticated(login_type as 'admin' | 'master' | 'agent').then((res) => {
 			dispatch(setIsAuthenticated(res));
 			dispatch(stopUserLoading());
 		});
-	}, [dispatch]);
+	}, [dispatch, login_type]);
 
 	if (isLoading) {
 		return <></>;
@@ -51,6 +61,10 @@ export default function LoginPopup() {
 		}
 		window.location.href = WEBPAGE_URL;
 		return <></>;
+	}
+
+	if (invalidLogin) {
+		return <InvalidPage />;
 	}
 
 	return (

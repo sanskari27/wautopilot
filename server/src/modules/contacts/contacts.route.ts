@@ -15,8 +15,8 @@ router
 
 router
 	.route('/')
-	.all(contactsPermission)
 	.get(Controller.getContacts)
+	.all(contactsPermission)
 	.delete(MultiDeleteValidator, Controller.deleteContact)
 	.post(CreateContactValidator, Controller.createContact);
 

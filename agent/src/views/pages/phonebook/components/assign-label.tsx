@@ -1,7 +1,6 @@
+import { CloseIcon } from '@chakra-ui/icons';
 import {
 	Button,
-	FormControl,
-	FormLabel,
 	HStack,
 	Modal,
 	ModalBody,
@@ -9,15 +8,28 @@ import {
 	ModalFooter,
 	ModalHeader,
 	ModalOverlay,
-	Textarea,
+	Tag,
+	TagLabel,
+	TagRightIcon,
+	Text,
+	Wrap,
 	useBoolean,
 	useToast,
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useFetchLabels } from '../../../../hooks/useFetchLabels';
 import PhoneBookService from '../../../../services/phonebook.service';
 import { StoreNames, StoreState } from '../../../../store';
-import { setCSVLabels, setFile } from '../../../../store/reducers/PhonebookReducer';
+import {
+	addCSVLabel,
+	removeCSVLabels,
+	setCSVLabels,
+	setFile,
+} from '../../../../store/reducers/PhonebookReducer';
+import LabelFilter from '../../../components/labelFilter';
+import Each from '../../../components/utils/Each';
+import Show from '../../../components/utils/Show';
 
 export type AssignLabelDialogHandle = {
 	close: () => void;
@@ -29,6 +41,7 @@ const AssignLabelDialog = forwardRef<AssignLabelDialogHandle>((_, ref) => {
 	const toast = useToast();
 	const [isOpen, setOpen] = useBoolean();
 
+	const { all_labels } = useFetchLabels();
 	const {
 		csv: { labels },
 		selected,
@@ -49,6 +62,18 @@ const AssignLabelDialog = forwardRef<AssignLabelDialogHandle>((_, ref) => {
 			setOpen.on();
 		},
 	}));
+
+	const handleAddLabels = (label: string) => {
+		dispatch(addCSVLabel(label));
+	};
+
+	const handleRemoveLabels = (label: string) => {
+		dispatch(removeCSVLabels(label));
+	};
+
+	const handleClearLabels = () => {
+		dispatch(setCSVLabels([]));
+	};
 
 	const handleSave = async () => {
 		PhoneBookService.assignLabels(selected, labels)
@@ -80,16 +105,50 @@ const AssignLabelDialog = forwardRef<AssignLabelDialogHandle>((_, ref) => {
 			<ModalContent>
 				<ModalHeader>Bulk Assign Tags</ModalHeader>
 				<ModalBody pb={6}>
-					<FormControl pt={'1rem'}>
-						<FormLabel>Tags</FormLabel>
-						<Textarea
-							placeholder={`Enter tags here separated by comma`}
-							value={labels.join(', ') ?? ''}
-							onChange={(e) =>
-								dispatch(setCSVLabels(e.target.value.split(',').map((label) => label.trim())))
-							}
-						/>
-					</FormControl>
+					<Wrap
+						width={'full'}
+						borderWidth={'2px'}
+						minH={'38px'}
+						rounded={'lg'}
+						borderStyle={'dashed'}
+						p={'0.5rem'}
+					>
+						<Show>
+							<Show.When condition={labels.length === 0}>
+								<Text width={'full'} textAlign={'center'}>
+									No labels selected
+								</Text>
+							</Show.When>
+							<Show.Else>
+								<Each
+									items={labels}
+									render={(label) => (
+										<Tag variant='outline' colorScheme='green' size={'sm'}>
+											<TagLabel>{label}</TagLabel>
+											<TagRightIcon
+												cursor={'pointer'}
+												as={CloseIcon}
+												onClick={() => handleRemoveLabels(label)}
+											/>
+										</Tag>
+									)}
+								/>
+							</Show.Else>
+						</Show>
+					</Wrap>
+
+					<LabelFilter
+						labels={all_labels}
+						selectedLabels={labels}
+						onAddLabel={handleAddLabels}
+						onRemoveLabel={handleRemoveLabels}
+						onClear={handleClearLabels}
+						buttonComponent={
+							<Button colorScheme='green' size={'sm'} width={'full'} mt={'1rem'}>
+								Select Labels
+							</Button>
+						}
+					/>
 				</ModalBody>
 
 				<ModalFooter>

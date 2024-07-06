@@ -74,7 +74,7 @@ export default async function VerifySession(req: Request, res: Response, next: N
 
 export function VerifyMinLevel(level: number) {
 	function validator(req: Request, res: Response, next: NextFunction) {
-		if (req.locals.serviceUser && req.locals.serviceUser.userLevel >= level) {
+		if (req.locals.user && req.locals.user.userLevel >= level) {
 			return next();
 		}
 

@@ -55,7 +55,7 @@ export default function AdminPage() {
 	if (!authLoaded) return <></>;
 
 	if (!isAuthenticated) {
-		window.location.href = `${AUTH_URL}auth/login?callback_url=${window.location.href}`;
+		window.location.href = `${AUTH_URL}auth/master/login?callback_url=${window.location.href}`;
 		return <></>;
 	}
 

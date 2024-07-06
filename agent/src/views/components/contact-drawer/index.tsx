@@ -55,6 +55,7 @@ import {
 } from '../../../store/reducers/ContactReducer';
 import { Contact } from '../../../store/types/ContactState';
 import Each from '../utils/Each';
+import Show from '../utils/Show';
 
 export type ContactHandle = {
 	open: ({ contact, editable }: { contact?: Contact; editable: boolean }) => void;
@@ -71,6 +72,11 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 
 		const { isOpen, onOpen, onClose: closeDrawer } = useDisclosure();
 		const { contact } = useSelector((state: StoreState) => state[StoreNames.CONTACT]);
+		const {
+			user_details: {
+				permissions: { manage_contacts },
+			},
+		} = useSelector((state: StoreState) => state[StoreNames.USER]);
 		const [isNewContact, setIsNewContact] = useState(false);
 
 		const isUpdating = contact.id !== '';
@@ -495,11 +501,13 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 							<Button variant='outline' colorScheme='red' mr={3} onClick={handleClose}>
 								Close
 							</Button>
-							{isNewContact && (
-								<Button colorScheme='green' onClick={handleSubmit}>
-									{isUpdating ? 'Update' : 'Create'}
-								</Button>
-							)}
+							<Show>
+								<Show.When condition={manage_contacts && isNewContact}>
+									<Button colorScheme='green' onClick={handleSubmit}>
+										Save
+									</Button>
+								</Show.When>
+							</Show>
 						</HStack>
 					</DrawerFooter>
 				</DrawerContent>

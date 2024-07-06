@@ -38,12 +38,18 @@ import ContactDrawer, { ContactHandle } from '../../components/contact-drawer';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import SearchBar from '../../components/searchBar';
 import Each from '../../components/utils/Each';
+import Show from '../../components/utils/Show';
 
 const ContactPage = () => {
 	const dispatch = useDispatch();
 	const toast = useToast();
 	const deleteDialog = useRef<DeleteAlertHandle>(null);
 	const contactDrawerRef = useRef<ContactHandle>(null);
+	const {
+		user_details: {
+			permissions: { manage_contacts },
+		},
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const {
 		list,
 		uiDetails: { fetchingContact },
@@ -140,28 +146,32 @@ const ContactPage = () => {
 				<Text fontSize={'2xl'} fontWeight={'bold'}>
 					Contacts
 				</Text>
-				<Flex gap={3}>
-					{selected.length > 0 && (
-						<Button
-							colorScheme='red'
-							leftIcon={<DeleteIcon color='white' fontSize={'1rem'} />}
-							onClick={() => {
-								deleteDialog.current?.open();
-							}}
-						>
-							Delete
-						</Button>
-					)}
-					<Button
-						colorScheme='teal'
-						leftIcon={<AddIcon color='white' fontSize={'1rem'} />}
-						onClick={() => {
-							contactDrawerRef.current?.open({ editable: true });
-						}}
-					>
-						Add
-					</Button>
-				</Flex>
+				<Show>
+					<Show.When condition={manage_contacts}>
+						<Flex gap={3}>
+							{selected.length > 0 && (
+								<Button
+									colorScheme='red'
+									leftIcon={<DeleteIcon color='white' fontSize={'1rem'} />}
+									onClick={() => {
+										deleteDialog.current?.open();
+									}}
+								>
+									Delete
+								</Button>
+							)}
+							<Button
+								colorScheme='teal'
+								leftIcon={<AddIcon color='white' fontSize={'1rem'} />}
+								onClick={() => {
+									contactDrawerRef.current?.open({ editable: true });
+								}}
+							>
+								Add
+							</Button>
+						</Flex>
+					</Show.When>
+				</Show>
 			</Flex>
 			<Flex
 				justifyContent={'space-between'}

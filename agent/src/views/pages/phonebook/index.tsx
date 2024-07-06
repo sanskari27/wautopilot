@@ -47,6 +47,7 @@ import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import LabelFilter from '../../components/labelFilter';
 import SearchBar from '../../components/searchBar';
 import Each from '../../components/utils/Each';
+import Show from '../../components/utils/Show';
 import AssignLabelDialog, { AssignLabelDialogHandle } from './components/assign-label';
 import ContactInputDialog, { ContactInputDialogHandle } from './components/contact-input-dialog';
 import UploadPhonebookDialog, { UploadPhonebookDialogHandle } from './components/upload-csv';
@@ -62,6 +63,12 @@ export default function Phonebook() {
 	const { selectedLabels, onAddLabel, onClear, onRemoveLabel } = useFilterLabels();
 
 	const { all_labels } = useFetchLabels();
+
+	const {
+		user_details: {
+			permissions: { create_phonebook, delete_phonebook },
+		},
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const {
 		list,
@@ -213,16 +220,20 @@ export default function Phonebook() {
 				<Flex gap={3}>
 					{selected.length !== 0 ? (
 						<>
-							<Button
-								size={'sm'}
-								colorScheme='red'
-								leftIcon={<DeleteIcon color='white' fontSize={'1rem'} />}
-								onClick={() => {
-									deleteDialog.current?.open();
-								}}
-							>
-								Delete
-							</Button>
+							<Show>
+								<Show.When condition={delete_phonebook}>
+									<Button
+										size={'sm'}
+										colorScheme='red'
+										leftIcon={<DeleteIcon color='white' fontSize={'1rem'} />}
+										onClick={() => {
+											deleteDialog.current?.open();
+										}}
+									>
+										Delete
+									</Button>
+								</Show.When>
+							</Show>
 							<Button
 								size={'sm'}
 								colorScheme='teal'
@@ -244,26 +255,30 @@ export default function Phonebook() {
 							Export
 						</Button>
 					)}
-					<Button
-						size={'sm'}
-						colorScheme='blue'
-						leftIcon={<HiUpload color='white' fontSize={'1.2rem'} />}
-						onClick={() => {
-							uploadCSVDialog.current?.open();
-						}}
-					>
-						Upload CSV
-					</Button>
-					<Button
-						size={'sm'}
-						colorScheme='green'
-						leftIcon={<BiPlus color='white' fontSize={'1.2rem'} />}
-						onClick={() => {
-							drawerRef.current?.open();
-						}}
-					>
-						Add Records
-					</Button>
+					<Show>
+						<Show.When condition={create_phonebook}>
+							<Button
+								size={'sm'}
+								colorScheme='blue'
+								leftIcon={<HiUpload color='white' fontSize={'1.2rem'} />}
+								onClick={() => {
+									uploadCSVDialog.current?.open();
+								}}
+							>
+								Upload CSV
+							</Button>
+							<Button
+								size={'sm'}
+								colorScheme='green'
+								leftIcon={<BiPlus color='white' fontSize={'1.2rem'} />}
+								onClick={() => {
+									drawerRef.current?.open();
+								}}
+							>
+								Add Records
+							</Button>
+						</Show.When>
+					</Show>
 				</Flex>
 			</Flex>
 			<Flex

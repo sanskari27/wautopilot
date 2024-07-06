@@ -164,6 +164,13 @@ const Slice = createSlice({
 		setCSVLabels: (state, action: PayloadAction<string[]>) => {
 			state.csv.labels = action.payload;
 		},
+		addCSVLabel: (state, action: PayloadAction<string>) => {
+			state.csv.labels.push(action.payload);
+		},
+		removeCSVLabels: (state, action: PayloadAction<string>) => {
+			state.csv.labels = state.csv.labels.filter((label) => label !== action.payload);
+		},
+
 		setLabels: (state, action: PayloadAction<string[]>) => {
 			state.labels = action.payload;
 		},
@@ -226,6 +233,8 @@ export const {
 	addSelectedList,
 	removeSelectedList,
 	setSelected,
+	addCSVLabel,
+	removeCSVLabels,
 } = Slice.actions;
 
 export default Slice.reducer;

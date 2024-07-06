@@ -1,17 +1,17 @@
 import { Avatar, Box, Flex, Icon, Text, VStack } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { BiSupport } from 'react-icons/bi';
+import { BiBot, BiCake, BiConversation, BiSupport } from 'react-icons/bi';
 import { IconType } from 'react-icons/lib';
-import { MdSettings } from 'react-icons/md';
-import { TbLogout2 } from 'react-icons/tb';
+import { MdContacts, MdOutlineDashboard, MdOutlinePermMedia, MdSettings } from 'react-icons/md';
+import { RiContactsBook2Line, RiFlowChart } from 'react-icons/ri';
+import { TbLogout2, TbMessage2Plus, TbReportSearch, TbTemplate } from 'react-icons/tb';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { MenuItems, NAVIGATION, WEBPAGE_URL } from '../../../config/const';
+import { NAVIGATION, WEBPAGE_URL } from '../../../config/const';
 import AuthService from '../../../services/auth.service';
 import { StoreNames, StoreState } from '../../../store';
 import DevicesDialog, { DevicesHandle } from '../devices';
 import SettingsDrawer, { SettingsDrawerHandle } from '../settings-dialog';
-import Each from '../utils/Each';
 
 function isActiveTab(tab: string, path: string): boolean {
 	if (path.includes(tab)) return true;
@@ -38,7 +38,10 @@ export default function NavigationDrawer({
 	};
 
 	const { list: deviceList } = useSelector((state: StoreState) => state[StoreNames.DEVICES]);
-	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
+	const {
+		selected_device_id,
+		user_details: { permissions },
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const handleLogout = async () => {
 		await AuthService.logout();
@@ -71,18 +74,82 @@ export default function NavigationDrawer({
 				>
 					<Box flexGrow={'1'}>
 						<Flex flexDirection={'column'} paddingY={'0.5rem'} paddingX={'0.85rem'} gap={'0.25rem'}>
-							<Each
-								items={MenuItems}
-								render={(item, index) => (
-									<MenuButton
-										setDrawerExpanded={setDrawerExpanded}
-										key={index}
-										route={item.route}
-										icon={item.icon}
-										name={item.title}
-									/>
-								)}
+							<MenuButton
+								setDrawerExpanded={setDrawerExpanded}
+								route={NAVIGATION.DASHBOARD}
+								icon={MdOutlineDashboard}
+								name='Dashboard'
 							/>
+							<MenuButton
+								setDrawerExpanded={setDrawerExpanded}
+								route={NAVIGATION.PHONEBOOK}
+								icon={RiContactsBook2Line}
+								name='Phonebook'
+							/>
+							<MenuButton
+								setDrawerExpanded={setDrawerExpanded}
+								route={NAVIGATION.TEMPLATES}
+								icon={TbTemplate}
+								name='Templates'
+							/>
+							{permissions.create_broadcast && (
+								<MenuButton
+									setDrawerExpanded={setDrawerExpanded}
+									route={NAVIGATION.BROADCAST}
+									icon={TbMessage2Plus}
+									name='Broadcast'
+								/>
+							)}
+							{permissions.create_recurring_broadcast && (
+								<MenuButton
+									setDrawerExpanded={setDrawerExpanded}
+									route={NAVIGATION.RECURRING}
+									icon={BiCake}
+									name='Recurring'
+								/>
+							)}
+							{permissions.view_broadcast_reports && (
+								<MenuButton
+									setDrawerExpanded={setDrawerExpanded}
+									route={NAVIGATION.BROADCAST_REPORT}
+									icon={TbReportSearch}
+									name='Report'
+								/>
+							)}
+							<MenuButton
+								setDrawerExpanded={setDrawerExpanded}
+								route={NAVIGATION.INBOX}
+								icon={BiConversation}
+								name='Conversations'
+							/>
+							<MenuButton
+								setDrawerExpanded={setDrawerExpanded}
+								route={NAVIGATION.MEDIA}
+								icon={MdOutlinePermMedia}
+								name='Media'
+							/>
+							<MenuButton
+								setDrawerExpanded={setDrawerExpanded}
+								route={NAVIGATION.CONTACT}
+								icon={MdContacts}
+								name='Contacts'
+							/>
+							{permissions.manage_chatbot && (
+								<MenuButton
+									setDrawerExpanded={setDrawerExpanded}
+									route={NAVIGATION.CHATBOT}
+									icon={BiBot}
+									name='Chat Bot'
+								/>
+							)}
+							{permissions.manage_chatbot_flows && (
+								<MenuButton
+									setDrawerExpanded={setDrawerExpanded}
+									route={NAVIGATION.CHATBOT_FLOW}
+									icon={RiFlowChart}
+									name='Chatbot Flow'
+								/>
+							)}
 						</Flex>
 					</Box>
 					<VStack

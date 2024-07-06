@@ -42,6 +42,7 @@ import { countOccurrences } from '../../../../utils/templateHelper';
 import { RadioBoxGroup } from '../../../components/radioBox';
 import SampleMessage from '../../../components/sampleMessage';
 import Each from '../../../components/utils/Each';
+import Show from '../../../components/utils/Show';
 import AddQuickReply from './AddQuickReply';
 import PhoneNumberButton from './PhoneNumberButton';
 import URLButton from './URLButton';
@@ -52,7 +53,12 @@ export default function EditTemplate() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
+	const {
+		selected_device_id,
+		user_details: {
+			permissions: { update_template, create_template },
+		},
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const {
 		file,
 		details: { category, name, components },
@@ -357,9 +363,18 @@ export default function EditTemplate() {
 						>
 							Cancel
 						</Button>
-						<Button colorScheme='green' onClick={onSave} ml={3}>
-							Save
-						</Button>
+						<Show>
+							<Show.When condition={update_template && id}>
+								<Button colorScheme='green' onClick={onSave} ml={3}>
+									Save
+								</Button>
+							</Show.When>
+							<Show.When condition={create_template && !id}>
+								<Button colorScheme='green' onClick={onSave} ml={3}>
+									Save
+								</Button>
+							</Show.When>
+						</Show>
 					</Flex>
 
 					<SampleMessage components={components} />

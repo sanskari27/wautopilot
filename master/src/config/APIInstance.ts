@@ -28,7 +28,7 @@ APIInstance.interceptors.response.use(
 
 		if (error.response?.data?.title === 'PERMISSION_DENIED') {
 			await AuthService.logout();
-			window.location.replace(`${AUTH_URL}auth/login?callback_url=${window.location.href}`);
+			window.location.replace(`${AUTH_URL}auth/master/login?callback_url=${window.location.href}`);
 		}
 
 		if (error.response?.data?.title === 'SESSION_INVALIDATED' && !originalRequest._retry) {
@@ -37,7 +37,9 @@ APIInstance.interceptors.response.use(
 			if (isAuthenticated) {
 				return APIInstance(originalRequest);
 			} else {
-				window.location.replace(`${AUTH_URL}auth/login?callback_url=${window.location.href}`);
+				window.location.replace(
+					`${AUTH_URL}auth/master/login?callback_url=${window.location.href}`
+				);
 			}
 		}
 

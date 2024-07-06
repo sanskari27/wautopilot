@@ -157,15 +157,36 @@ async function validateAuth(req: Request, res: Response, next: NextFunction) {
 async function details(req: Request, res: Response, next: NextFunction) {
 	const { user } = req.locals;
 	const details = await user.getDetails();
+	const account = {
+		...details,
+		walletBalance: details.walletBalance.toFixed(2),
+		permissions: {
+			view_broadcast_reports: true,
+			create_broadcast: true,
+			create_recurring_broadcast: true,
+			create_phonebook: true,
+			update_phonebook: true,
+			delete_phonebook: true,
+			auto_assign_chats: true,
+			create_template: true,
+			update_template: true,
+			delete_template: true,
+			manage_media: true,
+			manage_contacts: true,
+			manage_chatbot: true,
+			manage_chatbot_flows: true,
+		},
+	};
+
+	if (user.userLevel === UserLevel.Agent) {
+		account.permissions = await user.getPermissions();
+	}
 
 	return Respond({
 		res,
 		status: 200,
 		data: {
-			account: {
-				...details,
-				walletBalance: details.walletBalance.toFixed(2),
-			},
+			account,
 		},
 	});
 }

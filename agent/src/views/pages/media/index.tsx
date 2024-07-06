@@ -40,6 +40,7 @@ import { Media } from '../../../store/types/MediaState';
 import { getFileSize } from '../../../utils/file-utils';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import Each from '../../components/utils/Each';
+import Show from '../../components/utils/Show';
 import Preview from './preview.component';
 
 const MediaPage = () => {
@@ -47,7 +48,12 @@ const MediaPage = () => {
 	const outlet = useOutlet();
 	const toast = useToast();
 	const deleteDialogRef = useRef<DeleteAlertHandle>(null);
-	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
+	const {
+		selected_device_id,
+		user_details: {
+			permissions: { manage_media },
+		},
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const {
 		list,
 		uiDetails: { isFetching },
@@ -73,11 +79,18 @@ const MediaPage = () => {
 				<Text fontSize={'2xl'} fontWeight={'bold'}>
 					Media
 				</Text>
-				<Link to={`${NAVIGATION.APP}/${NAVIGATION.MEDIA}/new`}>
-					<Button variant='outline' size={'sm'} colorScheme='green' leftIcon={<IoMdCloudUpload />}>
-						Upload Media
-					</Button>
-				</Link>
+				{manage_media && (
+					<Link to={`${NAVIGATION.APP}/${NAVIGATION.MEDIA}/new`}>
+						<Button
+							variant='outline'
+							size={'sm'}
+							colorScheme='green'
+							leftIcon={<IoMdCloudUpload />}
+						>
+							Upload Media
+						</Button>
+					</Link>
+				)}
 			</Flex>
 
 			<Box marginTop={'1rem'} width={'98%'} pb={'5rem'}>
@@ -120,7 +133,11 @@ const MediaPage = () => {
 									<Th width={'60%'}>File Name</Th>
 									<Th width={'15%'}>Type</Th>
 									<Th width={'10%'}>Size</Th>
-									<Th width={'10%'}>Action</Th>
+									<Show>
+										<Show.When condition={manage_media}>
+											<Th width={'10%'}>Action</Th>
+										</Show.When>
+									</Show>
 								</Tr>
 							</Thead>
 							<Tbody>
@@ -130,7 +147,7 @@ const MediaPage = () => {
 											items={Array.from({ length: 20 })}
 											render={() => (
 												<Tr>
-													<Td colSpan={7} textAlign={'center'}>
+													<Td colSpan={manage_media ? 5 : 4} textAlign={'center'}>
 														<Skeleton height={'1.2rem'} />
 													</Td>
 												</Tr>
@@ -139,7 +156,7 @@ const MediaPage = () => {
 									</>
 								) : list.length === 0 ? (
 									<Tr>
-										<Td colSpan={5} textAlign={'center'}>
+										<Td colSpan={manage_media ? 5 : 4} textAlign={'center'}>
 											No records found
 										</Td>
 									</Tr>
@@ -152,28 +169,32 @@ const MediaPage = () => {
 												<Td>{record.filename}</Td>
 												<Td>{record.mime_type}</Td>
 												<Td>{getFileSize(record.file_length)}</Td>
-												<Td>
-													<HStack>
-														<a
-															href={`${SERVER_URL}media/${selected_device_id}/${record.id}/download`}
-															target='_blank'
-														>
-															<IconButton
-																aria-label='Preview'
-																icon={<DownloadIcon />}
-																color={'blue'}
-																border={'1px blue solid'}
-															/>
-														</a>
-														<IconButton
-															aria-label='Preview'
-															icon={<DeleteIcon />}
-															border={'1px red solid'}
-															color={'red'}
-															onClick={() => deleteDialogRef.current?.open(record.id)}
-														/>
-													</HStack>
-												</Td>
+												<Show>
+													<Show.When condition={manage_media}>
+														<Td>
+															<HStack>
+																<a
+																	href={`${SERVER_URL}media/${selected_device_id}/${record.id}/download`}
+																	target='_blank'
+																>
+																	<IconButton
+																		aria-label='Preview'
+																		icon={<DownloadIcon />}
+																		color={'blue'}
+																		border={'1px blue solid'}
+																	/>
+																</a>
+																<IconButton
+																	aria-label='Preview'
+																	icon={<DeleteIcon />}
+																	border={'1px red solid'}
+																	color={'red'}
+																	onClick={() => deleteDialogRef.current?.open(record.id)}
+																/>
+															</HStack>
+														</Td>
+													</Show.When>
+												</Show>
 											</Tr>
 										)}
 									/>
@@ -201,7 +222,12 @@ function PreviewElement({ media, onRemove }: { media: Media; onRemove: () => voi
 	} | null>(null);
 
 	const [progress, setProgress] = useState(0);
-	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
+	const {
+		selected_device_id,
+		user_details: {
+			permissions: { manage_media },
+		},
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	useEffect(() => {
 		if (!selected_device_id) return;
@@ -316,28 +342,32 @@ function PreviewElement({ media, onRemove }: { media: Media; onRemove: () => voi
 
 						<Text fontWeight={'medium'}>{data?.size}</Text>
 					</Flex>
-					<Flex gap='2'>
-						<Button
-							leftIcon={<DownloadIcon />}
-							variant='outline'
-							colorScheme='green'
-							onClick={download}
-							flexGrow={1}
-						>
-							Download
-						</Button>
-						<IconButton
-							aria-label='delete'
-							icon={<DeleteIcon color={'red.400'} />}
-							variant='unstyled'
-							colorScheme='red'
-							border={'1px red solid'}
-							_hover={{
-								bgColor: 'red.100',
-							}}
-							onClick={onRemove}
-						/>
-					</Flex>
+					<Show>
+						<Show.When condition={manage_media}>
+							<Flex gap='2'>
+								<Button
+									leftIcon={<DownloadIcon />}
+									variant='outline'
+									colorScheme='green'
+									onClick={download}
+									flexGrow={1}
+								>
+									Download
+								</Button>
+								<IconButton
+									aria-label='delete'
+									icon={<DeleteIcon color={'red.400'} />}
+									variant='unstyled'
+									colorScheme='red'
+									border={'1px red solid'}
+									_hover={{
+										bgColor: 'red.100',
+									}}
+									onClick={onRemove}
+								/>
+							</Flex>
+						</Show.When>
+					</Show>
 				</VStack>
 			</CardFooter>
 		</Card>

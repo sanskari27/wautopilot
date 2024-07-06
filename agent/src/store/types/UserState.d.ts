@@ -37,4 +37,21 @@ export type UserDetails = {
 	subscription_expiry: string;
 	walletBalance: number;
 	no_of_devices: number;
+
+	permissions: {
+		view_broadcast_reports: false;
+		create_broadcast: false;
+		create_recurring_broadcast: false;
+		create_phonebook: false;
+		update_phonebook: false;
+		delete_phonebook: false;
+		auto_assign_chats: false;
+		create_template: false;
+		update_template: false;
+		delete_template: false;
+		manage_media: false;
+		manage_contacts: false;
+		manage_chatbot: false;
+		manage_chatbot_flows: false;
+	};
 };

@@ -26,6 +26,7 @@ import { setTemplatesList } from '../../../store/reducers/TemplateReducer';
 import { Template } from '../../../store/types/TemplateState';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import Each from '../../components/utils/Each';
+import Show from '../../components/utils/Show';
 
 export default function Templates() {
 	const confirmationAlertDialogRef = useRef<DeleteAlertHandle>(null);
@@ -33,7 +34,12 @@ export default function Templates() {
 	const dispatch = useDispatch();
 	const toast = useToast();
 
-	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
+	const {
+		selected_device_id,
+		user_details: {
+			permissions: { create_template, delete_template },
+		},
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const {
 		list,
 		uiDetails: { isFetching },
@@ -66,13 +72,17 @@ export default function Templates() {
 				<Text fontSize={'2xl'} fontWeight={'bold'}>
 					Templates
 				</Text>
-				<Flex gap={3}>
-					<Link to={`${NAVIGATION.APP}/${NAVIGATION.TEMPLATES}/${NAVIGATION.ADD_TEMPLATE}`}>
-						<Button colorScheme='green' leftIcon={<BiPlus color='white' fontSize={'1.2rem'} />}>
-							Add Template
-						</Button>
-					</Link>
-				</Flex>
+				<Show>
+					<Show.When condition={create_template}>
+						<Flex gap={3}>
+							<Link to={`${NAVIGATION.APP}/${NAVIGATION.TEMPLATES}/${NAVIGATION.ADD_TEMPLATE}`}>
+								<Button colorScheme='green' leftIcon={<BiPlus color='white' fontSize={'1.2rem'} />}>
+									Add Template
+								</Button>
+							</Link>
+						</Flex>
+					</Show.When>
+				</Show>
 			</Flex>
 
 			<TableContainer width={'full'} border={'1px dashed gray'} rounded={'2xl'} mt={'1rem'}>
@@ -83,7 +93,11 @@ export default function Templates() {
 							<Th>Name</Th>
 							<Th>Status</Th>
 							<Th>Category</Th>
-							<Th></Th>
+							<Show>
+								<Show.When condition={delete_template}>
+									<Th></Th>
+								</Show.When>
+							</Show>
 						</Tr>
 					</Thead>
 					<Tbody>
@@ -93,7 +107,7 @@ export default function Templates() {
 									items={Array.from({ length: 5 })}
 									render={() => (
 										<Tr>
-											<Td colSpan={5} textAlign={'center'}>
+											<Td colSpan={delete_template ? 5 : 4} textAlign={'center'}>
 												<Skeleton height={'1.2rem'} />
 											</Td>
 										</Tr>
@@ -102,7 +116,7 @@ export default function Templates() {
 							</>
 						) : list.length === 0 ? (
 							<Tr>
-								<Td colSpan={5} textAlign={'center'}>
+								<Td colSpan={delete_template ? 5 : 4} textAlign={'center'}>
 									No records found
 								</Td>
 							</Tr>
@@ -117,15 +131,19 @@ export default function Templates() {
 										<Td onClick={() => editTemplate(record)}>{record.name}</Td>
 										<Td onClick={() => editTemplate(record)}>{record.status}</Td>
 										<Td onClick={() => editTemplate(record)}>{record.category}</Td>
-										<Td width={'5%'}>
-											<IconButton
-												aria-label='Remove Device'
-												colorScheme='red'
-												size={'sm'}
-												icon={<DeleteIcon color='white' fontSize={'0.75rem'} />}
-												onClick={() => confirmationAlertDialogRef.current?.open(record.id)}
-											/>
-										</Td>
+										<Show>
+											<Show.When condition={delete_template}>
+												<Td width={'5%'}>
+													<IconButton
+														aria-label='Remove Device'
+														colorScheme='red'
+														size={'sm'}
+														icon={<DeleteIcon color='white' fontSize={'0.75rem'} />}
+														onClick={() => confirmationAlertDialogRef.current?.open(record.id)}
+													/>
+												</Td>
+											</Show.When>
+										</Show>
 									</Tr>
 								)}
 							/>

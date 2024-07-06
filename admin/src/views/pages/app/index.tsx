@@ -139,7 +139,7 @@ const AppPage = () => {
 	if (!authLoaded) return <></>;
 
 	if (!isAuthenticated) {
-		window.location.replace(`${AUTH_URL}auth/login?callback_url=${window.location.href}`);
+		window.location.replace(`${AUTH_URL}auth/admin/login?callback_url=${window.location.href}`);
 		return <></>;
 	}
 

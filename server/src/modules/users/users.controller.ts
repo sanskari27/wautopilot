@@ -149,12 +149,28 @@ async function assignPermissions(req: Request, res: Response, next: NextFunction
 }
 
 async function getAgents(req: Request, res: Response, next: NextFunction) {
+	const { user, serviceUser } = req.locals;
 	try {
+		let list = await serviceUser.getAgents();
+		if (user.userLevel === UserLevel.Agent) {
+			return Respond({
+				res,
+				status: 200,
+				data: {
+					list: list.map((agent) => ({
+						id: agent.id,
+						email: agent.email,
+						name: agent.name,
+						phone: agent.phone,
+					})),
+				},
+			});
+		}
 		return Respond({
 			res,
 			status: 200,
 			data: {
-				list: await req.locals.serviceUser.getAgents(),
+				list,
 			},
 		});
 	} catch (err) {

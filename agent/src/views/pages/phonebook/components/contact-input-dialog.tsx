@@ -55,6 +55,7 @@ import {
 } from '../../../../store/reducers/PhonebookReducer';
 import LabelFilter from '../../../components/labelFilter';
 import Each from '../../../components/utils/Each';
+import Show from '../../../components/utils/Show';
 
 export type ContactInputDialogHandle = {
 	open: () => void;
@@ -76,6 +77,11 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 		},
 	}));
 
+	const {
+		user_details: {
+			permissions: { update_phonebook },
+		},
+	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const { details, uiDetails, field_name, label_input } = useSelector(
 		(state: StoreState) => state[StoreNames.PHONEBOOK]
 	);
@@ -338,9 +344,18 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 						<Button variant='outline' colorScheme='red' mr={3} onClick={handleClose}>
 							Cancel
 						</Button>
-						<Button isLoading={isSaving} colorScheme='green' onClick={handleSave}>
-							Save
-						</Button>
+						<Show>
+							<Show.When condition={update_phonebook && id}>
+								<Button isLoading={isSaving} colorScheme='green' onClick={handleSave}>
+									Save
+								</Button>
+							</Show.When>
+							<Show.When condition={!id}>
+								<Button isLoading={isSaving} colorScheme='green' onClick={handleSave}>
+									Save
+								</Button>
+							</Show.When>
+						</Show>
 					</HStack>
 				</DrawerFooter>
 			</DrawerContent>
