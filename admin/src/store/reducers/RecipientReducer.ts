@@ -8,7 +8,7 @@ const initialState: RecipientsState = {
 	list: [],
 	pinnedConversations: [],
 	unpinnedConversations: [],
-
+	selected_recipient_list: [],
 	uiDetails: {
 		loading: false,
 	},
@@ -91,6 +91,15 @@ const Slice = createSlice({
 		setExpiry: (state, action: PayloadAction<'EXPIRED' | number>) => {
 			state.selected_recipient.expiry = action.payload;
 		},
+		addRemoveRecipientList: (state, action: PayloadAction<string>) => {
+			if (state.selected_recipient_list.includes(action.payload)) {
+				state.selected_recipient_list = state.selected_recipient_list.filter(
+					(item) => item !== action.payload
+				);
+			} else {
+				state.selected_recipient_list.push(action.payload);
+			}
+		},
 	},
 });
 
@@ -105,6 +114,7 @@ export const {
 	removeUnreadConversation,
 	setLabelFilter,
 	setExpiry,
+	addRemoveRecipientList,
 } = Slice.actions;
 
 export default Slice.reducer;

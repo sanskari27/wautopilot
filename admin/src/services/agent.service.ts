@@ -24,13 +24,17 @@ export default class AgentService {
 		phone: string;
 		password: string;
 	}) {
-		const { data } = await APIInstance.post('/users/agents', agent);
-		return {
-			id: data.id ?? '',
-			name: data.name ?? '',
-			email: data.email ?? '',
-			phone: data.phone ?? '',
-		};
+		try {
+			const { data } = await APIInstance.post('/users/agents', agent);
+			return {
+				id: data.id ?? '',
+				name: data.name ?? '',
+				email: data.email ?? '',
+				phone: data.phone ?? '',
+			};
+		} catch (err) {
+			throw new Error('Email already exists');
+		}
 	}
 
 	static async updateAgent(agent: {
@@ -44,7 +48,7 @@ export default class AgentService {
 			const { data } = await APIInstance.post(`/users/agents/${agent.id}`, agent);
 			return data;
 		} catch (err) {
-			//ignore
+			throw new Error('Agent not found');
 		}
 	}
 

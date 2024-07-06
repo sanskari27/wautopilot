@@ -7,6 +7,7 @@ export type RecipientsState = {
 		loading: boolean;
 	};
 	selected_recipient: Recipient;
+	selected_recipient_list: string[];
 	label_filter: string[];
 	unReadConversations: string[];
 };

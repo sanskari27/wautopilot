@@ -78,7 +78,11 @@ const AgentDetailsDialog = () => {
 					title: 'Agent saved successfully',
 				};
 			},
-			error: { title: 'Email already exist' },
+			error: (err) => {
+				return {
+					title: err.message,
+				};
+			},
 		});
 	};
 

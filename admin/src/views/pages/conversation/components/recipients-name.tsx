@@ -1,7 +1,9 @@
 import { Avatar, Box, Flex, HStack, Icon, Tag, Text } from '@chakra-ui/react';
+import { GiCheckMark } from 'react-icons/gi';
 import { TiPinOutline } from 'react-icons/ti';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { StoreNames, StoreState } from '../../../../store';
+import { addRemoveRecipientList } from '../../../../store/reducers/RecipientReducer';
 import Each from '../../../components/utils/Each';
 import ContextMenu from './recipient-context-menu';
 
@@ -19,16 +21,22 @@ type RecipientsNameProps = {
 };
 
 const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
+	const dispatch = useDispatch();
 	const handleRecipientClick = () => {
 		// setListExpanded.off();
 		onClick?.(item);
 	};
 
-	const { selected_recipient, unReadConversations } = useSelector(
+	const { selected_recipient, unReadConversations, selected_recipient_list } = useSelector(
 		(state: StoreState) => state[StoreNames.RECIPIENT]
 	);
 
 	const hasUnreadConversation = unReadConversations.includes(item._id);
+
+	const handleClick = (e: React.MouseEvent, id: string) => {
+		e.stopPropagation();
+		dispatch(addRemoveRecipientList(id));
+	};
 
 	return (
 		<Box
@@ -45,13 +53,27 @@ const RecipientsName = ({ item, onClick }: RecipientsNameProps) => {
 			<Flex alignItems={'center'} key={item._id} className='group' direction={'column'}>
 				<Flex width={'full'} gap={'0.5rem'} position={'relative'}>
 					<Box position={'relative'}>
-						<Avatar name={item.profile_name} />
+						{selected_recipient_list.includes(item._id) ? (
+							<Flex
+								height={'3rem'}
+								width={'3rem'}
+								bgColor={'blue.500'}
+								rounded={'full'}
+								onClick={(e) => handleClick(e, item._id)}
+								justifyContent={'center'}
+								alignItems={'center'}
+							>
+								<Icon as={GiCheckMark} color={'white'} mx={'auto'} />
+							</Flex>
+						) : (
+							<Avatar name={item.profile_name} onClick={(e) => handleClick(e, item._id)}></Avatar>
+						)}
 						{localStorage.getItem('pinned')?.includes(item._id) && (
 							<Icon as={TiPinOutline} mr={2} position={'absolute'} right={'-15px'} />
 						)}
 					</Box>
 					<Box>
-						<Text fontWeight={'medium'} className='line-clamp-1 w-[250px] md:w-[150px]'>
+						<Text fontWeight={'medium'} className='line-clamp-1'>
 							{item.profile_name}
 						</Text>
 						<Text fontSize={'sm'}>{item.recipient}</Text>
