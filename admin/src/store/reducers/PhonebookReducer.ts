@@ -144,7 +144,10 @@ const Slice = createSlice({
 		},
 		setMaxPage: (state, action: PayloadAction<number>) => {
 			state.pagination.maxPage = action.payload;
-			state.pagination.page = Math.min(state.pagination.page, state.pagination.maxPage);
+			state.pagination.page = Math.min(
+				Math.max(1, state.pagination.page),
+				state.pagination.maxPage
+			);
 		},
 		nextPage: (state) => {
 			state.pagination.page = Math.min(state.pagination.page + 1, state.pagination.maxPage);
