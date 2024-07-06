@@ -21,7 +21,9 @@ export const RAZORPAY_API_KEY = process.env.RAZORPAY_API_KEY ?? '';
 export const RAZORPAY_API_SECRET = process.env.RAZORPAY_API_SECRET ?? '';
 export const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET ?? '';
 
-export const LOGO_PATH = '/static/assets/logo.png';
+export const LOGO_PATH = '/static/assets/logo-primary.svg';
+
+export const SHORT_LINK_REDIRECT = 'https://open.wautopilot.com/';
 
 export enum Cookie {
 	Auth = 'auth-cookie',

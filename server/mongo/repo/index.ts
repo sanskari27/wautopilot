@@ -14,6 +14,7 @@ export { default as PlanDB } from './Plan';
 export { default as RecurringBroadcastDB } from './RecurringBroadcast';
 export { default as ScheduledMessageDB } from './ScheduledMessage';
 export { default as SessionDB } from './Session';
+export { default as ShortenLinkDB } from './ShortenLink';
 export { default as StorageDB } from './Storage';
 export { default as SubscriptionDetailsDB } from './SubscriptionDetails';
 export { default as WalletTransactionDB } from './WalletTransaction';

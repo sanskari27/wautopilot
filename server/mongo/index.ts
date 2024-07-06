@@ -16,6 +16,7 @@ export {
 	RecurringBroadcastDB,
 	ScheduledMessageDB,
 	SessionDB,
+	ShortenLinkDB,
 	StorageDB,
 	SubscriptionDetailsDB,
 	WalletTransactionDB,
