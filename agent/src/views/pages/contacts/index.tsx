@@ -1,4 +1,4 @@
-import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
+import { AddIcon } from '@chakra-ui/icons';
 import {
 	Box,
 	Button,
@@ -28,14 +28,12 @@ import {
 	nextPage,
 	prevPage,
 	removeSelectedContact,
-	resetSelectedContacts,
 	setContactList,
 	setFetchingContact,
 	setMaxPage,
 } from '../../../store/reducers/ContactReducer';
 import { Contact } from '../../../store/types/ContactState';
 import ContactDrawer, { ContactHandle } from '../../components/contact-drawer';
-import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import SearchBar from '../../components/searchBar';
 import Each from '../../components/utils/Each';
 import Show from '../../components/utils/Show';
@@ -43,7 +41,6 @@ import Show from '../../components/utils/Show';
 const ContactPage = () => {
 	const dispatch = useDispatch();
 	const toast = useToast();
-	const deleteDialog = useRef<DeleteAlertHandle>(null);
 	const contactDrawerRef = useRef<ContactHandle>(null);
 	const {
 		user_details: {
@@ -122,24 +119,6 @@ const ContactPage = () => {
 		}
 	};
 
-	const handleDeleteContact = () => {
-		ContactService.deleteContact(selected).then((res) => {
-			if (res) {
-				dispatch(setContactList(list.filter((c) => !selected.includes(c.id))));
-				dispatch(resetSelectedContacts());
-				toast({
-					title: 'Contact deleted successfully',
-					status: 'success',
-				});
-				return;
-			}
-			toast({
-				title: 'Failed to delete contact',
-				status: 'error',
-			});
-		});
-	};
-
 	return (
 		<Box padding={'1rem'}>
 			<Flex justifyContent={'space-between'}>
@@ -149,17 +128,6 @@ const ContactPage = () => {
 				<Show>
 					<Show.When condition={manage_contacts}>
 						<Flex gap={3}>
-							{selected.length > 0 && (
-								<Button
-									colorScheme='red'
-									leftIcon={<DeleteIcon color='white' fontSize={'1rem'} />}
-									onClick={() => {
-										deleteDialog.current?.open();
-									}}
-								>
-									Delete
-								</Button>
-							)}
 							<Button
 								colorScheme='teal'
 								leftIcon={<AddIcon color='white' fontSize={'1rem'} />}
@@ -261,7 +229,6 @@ const ContactPage = () => {
 				</Table>
 			</TableContainer>
 			{/* <AssignLabelDialog ref={assignLabelDialog} /> */}
-			<DeleteAlert ref={deleteDialog} onConfirm={handleDeleteContact} type='Records' />
 			<ContactDrawer onConfirm={handleContactInput} ref={contactDrawerRef} />
 			{/* <ContactInputDialog ref={drawerRef} /> */}
 		</Box>

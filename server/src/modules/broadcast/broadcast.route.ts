@@ -44,23 +44,23 @@ router
 	.post(Controller.sendTemplateMessage);
 router
 	.route('/:id/pause')
-	.all(viewBroadcastPermission, IDValidator)
+	.all(createBroadcastPermission, IDValidator)
 	.post(Controller.pauseBroadcast);
 router
 	.route('/:id/resume')
-	.all(viewBroadcastPermission, IDValidator)
+	.all(createBroadcastPermission, IDValidator)
 	.post(Controller.resumeBroadcast);
 router
 	.route('/:id/delete')
-	.all(viewBroadcastPermission, IDValidator)
+	.all(createBroadcastPermission, IDValidator)
 	.post(Controller.deleteBroadcast);
 router
 	.route('/:id/resend')
-	.all(viewBroadcastPermission, IDValidator)
+	.all(createBroadcastPermission, IDValidator)
 	.post(Controller.resendBroadcast);
 router
 	.route('/:id/download')
-	.all(viewBroadcastPermission, IDValidator)
+	.all(createBroadcastPermission, IDValidator)
 	.get(Controller.downloadBroadcast);
 
 router

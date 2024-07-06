@@ -43,6 +43,7 @@ import {
 	setSelected,
 } from '../../../store/reducers/PhonebookReducer';
 import { PhonebookRecord } from '../../../store/types/PhonebookState';
+import { formatPhoneNumber } from '../../../utils/date-utils';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import LabelFilter from '../../components/labelFilter';
 import SearchBar from '../../components/searchBar';
@@ -372,7 +373,7 @@ export default function Phonebook() {
 							<Each
 								items={filtered}
 								render={(record, index) => (
-									<Tr cursor={'pointer'}>
+									<Tr cursor={'pointer'} userSelect={'none'}>
 										<Td width={'5%'}>
 											<Checkbox
 												colorScheme='green'
@@ -393,7 +394,9 @@ export default function Phonebook() {
 											{record.first_name} {record.middle_name} {record.last_name}
 										</Td>
 										<Td onClick={() => openRecord(record)}>
-											{record.phone_number.length > 0 ? `+${record.phone_number}` : ''}
+											{record.phone_number.length > 0
+												? `+${formatPhoneNumber(record.phone_number)}`
+												: ''}
 										</Td>
 										<Td onClick={() => openRecord(record)}>{record.email}</Td>
 										<Td onClick={() => openRecord(record)}>{record.birthday}</Td>

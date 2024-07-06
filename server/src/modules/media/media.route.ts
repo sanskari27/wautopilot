@@ -8,7 +8,7 @@ const router = express.Router();
 
 const mediaPermission = VerifyPermissions(Permissions.manage_media);
 
-router.route('/:id/download').all(mediaPermission, IDValidator).get(Controller.downloadMedia);
+router.route('/:id/download').all(IDValidator).get(Controller.downloadMedia);
 
 router
 	.route('/:id')

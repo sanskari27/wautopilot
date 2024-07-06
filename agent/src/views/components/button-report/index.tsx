@@ -18,6 +18,7 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import BroadcastService from '../../../services/broadcast.service';
 import { StoreNames, StoreState } from '../../../store';
+import { formatPhoneNumber } from '../../../utils/date-utils';
 import Each from '../utils/Each';
 
 const COLORS = [
@@ -167,11 +168,11 @@ export default function ButtonResponse() {
 						<Each
 							items={buttonResponse}
 							render={(broadcast, index) => (
-								<Tr key={index} color={'black'}>
+								<Tr key={index} color={'black'} userSelect={'none'}>
 									<Td>{index + 1}.</Td>
 									<Td className='whitespace-break-spaces'>{broadcast.name}</Td>
 									<Td className='whitespace-break-spaces'>{broadcast.email}</Td>
-									<Td>{broadcast.recipient}</Td>
+									<Td>+{formatPhoneNumber(broadcast.recipient)}</Td>
 									<Td className='whitespace-break-spaces'>{broadcast.button_text}</Td>
 									<Td>{broadcast.responseAt}</Td>
 								</Tr>
