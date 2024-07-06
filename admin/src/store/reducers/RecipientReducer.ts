@@ -100,6 +100,9 @@ const Slice = createSlice({
 				state.selected_recipient_list.push(action.payload);
 			}
 		},
+		clearSelectedRecipientList: (state) => {
+			state.selected_recipient_list = [];
+		},
 	},
 });
 
@@ -115,6 +118,7 @@ export const {
 	setLabelFilter,
 	setExpiry,
 	addRemoveRecipientList,
+	clearSelectedRecipientList,
 } = Slice.actions;
 
 export default Slice.reducer;

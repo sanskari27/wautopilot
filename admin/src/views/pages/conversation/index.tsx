@@ -13,6 +13,7 @@ import { StoreNames, StoreState } from '../../../store';
 import { addMessage, reset, updateMessage } from '../../../store/reducers/MessagesReducers';
 import {
 	addUnreadConversation,
+	clearSelectedRecipientList,
 	setLabelFilter,
 	setRecipientsList,
 	setSelectedRecipient,
@@ -93,7 +94,10 @@ const Conversation = () => {
 
 			toast.promise(Promise.all(promises), {
 				loading: { title: 'Assigning conversation to agent' },
-				success: { title: 'Conversation assigned to agent' },
+				success: () => {
+					dispatch(clearSelectedRecipientList());
+					return { title: 'Conversation assigned to agent' };
+				},
 				error: { title: 'Failed to assign conversation to agent' },
 			});
 			return;
@@ -108,7 +112,10 @@ const Conversation = () => {
 
 		toast.promise(Promise.all(promises), {
 			loading: { title: 'Assigning conversation to agent' },
-			success: { title: 'Conversation assigned to agent' },
+			success: () => {
+				dispatch(clearSelectedRecipientList());
+				return { title: 'Conversation assigned to agent' };
+			},
 			error: { title: 'Failed to assign conversation to agent' },
 		});
 	};
