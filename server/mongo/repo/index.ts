@@ -9,6 +9,7 @@ export { default as ConversationMessageDB } from './ConversationMessage';
 export { default as CouponDB } from './Coupon';
 export { default as FlowMessagesDB } from './FlowMessages';
 export { default as MediaDB } from './Media';
+export { default as PermissionDB } from './Permission';
 export { default as PhoneBookDB } from './PhoneBook';
 export { default as PlanDB } from './Plan';
 export { default as RecurringBroadcastDB } from './RecurringBroadcast';

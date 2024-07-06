@@ -1,6 +1,13 @@
 import { randomBytes } from 'crypto';
 import { Types } from 'mongoose';
-import { AccountDB, PlanDB, SessionDB, StorageDB, SubscriptionDetailsDB } from '../../mongo';
+import {
+	AccountDB,
+	PermissionDB,
+	PlanDB,
+	SessionDB,
+	StorageDB,
+	SubscriptionDetailsDB,
+} from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import { UserLevel } from '../config/const';
 import { AUTH_ERRORS, CustomError, PAYMENT_ERRORS } from '../errors';
@@ -169,6 +176,10 @@ export default class UserService {
 					plan_id: idValidator('6671deb40994d39d3f22a34e')[1],
 					start_date: DateUtils.toDate(),
 					end_date: DateUtils.getMomentNow().add(7, 'days').toDate(),
+				}).catch(() => {});
+			} else {
+				PermissionDB.create({
+					linked_to: user._id,
 				}).catch(() => {});
 			}
 
@@ -384,11 +395,37 @@ export default class UserService {
 			};
 		});
 	}
+
 	public async getAgents() {
-		const users = await AccountDB.find({
-			userLevel: UserLevel.Agent,
-			parent: this._user_id,
-		});
+		const users = await AccountDB.aggregate([
+			{
+				$match: {
+					userLevel: UserLevel.Agent,
+					parent: this._user_id,
+				},
+			},
+			{
+				$lookup: {
+					from: PermissionDB.collection.name, // The name of the collection to join
+					localField: '_id', // Field from the input documents
+					foreignField: 'linked_to', // Field from the documents of the "from" collection
+					as: 'permissions', // The name of the new array field to add to the input documents
+				},
+			},
+			{
+				$unwind: {
+					path: '$permissions',
+					preserveNullAndEmptyArrays: true,
+				},
+			},
+			{
+				$addFields: {
+					permissions: {
+						$ifNull: ['$permissions', {}],
+					},
+				},
+			},
+		]);
 
 		return users.map((user) => {
 			return {
@@ -396,6 +433,18 @@ export default class UserService {
 				name: user.name ?? '',
 				email: user.email ?? '',
 				phone: user.phone ?? '',
+				permissions: {
+					assigned_broadcast_labels: user.permissions.assigned_broadcast_labels ?? [],
+					view_broadcast_reports: user.permissions.view_broadcast_reports ?? false,
+					assigned_phonebook_labels: user.permissions.assigned_phonebook_labels ?? [],
+					create_phonebook: user.permissions.create_phonebook ?? false,
+					update_phonebook: user.permissions.update_phonebook ?? false,
+					delete_phonebook: user.permissions.delete_phonebook ?? false,
+					auto_assign_chats: user.permissions.auto_assign_chats ?? false,
+					create_template: user.permissions.create_template ?? false,
+					update_template: user.permissions.update_template ?? false,
+					delete_template: user.permissions.delete_template ?? false,
+				},
 			};
 		});
 	}
@@ -435,5 +484,80 @@ export default class UserService {
 			_id: id,
 			parent: this._user_id,
 		});
+	}
+
+	async assignPermissions(
+		id: Types.ObjectId,
+		opts: {
+			assigned_broadcast_labels?: string[];
+			view_broadcast_reports?: boolean;
+			assigned_phonebook_labels?: string[];
+			create_phonebook?: boolean;
+			update_phonebook?: boolean;
+			delete_phonebook?: boolean;
+			auto_assign_chats?: boolean;
+			create_template?: boolean;
+			update_template?: boolean;
+			delete_template?: boolean;
+		}
+	) {
+		await PermissionDB.updateOne(
+			{
+				linked_to: id,
+			},
+			{ $set: filterUndefinedKeys(opts) }
+		);
+
+		const users = await AccountDB.aggregate([
+			{
+				$match: {
+					userLevel: UserLevel.Agent,
+					parent: this._user_id,
+					_id: id,
+				},
+			},
+			{
+				$lookup: {
+					from: PermissionDB.collection.name, // The name of the collection to join
+					localField: '_id', // Field from the input documents
+					foreignField: 'linked_to', // Field from the documents of the "from" collection
+					as: 'permissions', // The name of the new array field to add to the input documents
+				},
+			},
+			{
+				$unwind: {
+					path: '$permissions',
+					preserveNullAndEmptyArrays: true,
+				},
+			},
+			{
+				$addFields: {
+					permissions: {
+						$ifNull: ['$permissions', {}],
+					},
+				},
+			},
+		]);
+
+		const user = users[0];
+
+		return {
+			id: user._id,
+			name: user.name ?? '',
+			email: user.email ?? '',
+			phone: user.phone ?? '',
+			permissions: {
+				assigned_broadcast_labels: user.permissions.assigned_broadcast_labels ?? [],
+				view_broadcast_reports: user.permissions.view_broadcast_reports ?? false,
+				assigned_phonebook_labels: user.permissions.assigned_phonebook_labels ?? [],
+				create_phonebook: user.permissions.create_phonebook ?? false,
+				update_phonebook: user.permissions.update_phonebook ?? false,
+				delete_phonebook: user.permissions.delete_phonebook ?? false,
+				auto_assign_chats: user.permissions.auto_assign_chats ?? false,
+				create_template: user.permissions.create_template ?? false,
+				update_template: user.permissions.update_template ?? false,
+				delete_template: user.permissions.delete_template ?? false,
+			},
+		};
 	}
 }

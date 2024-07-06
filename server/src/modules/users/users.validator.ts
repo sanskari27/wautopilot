@@ -15,6 +15,19 @@ export type CreateAgentValidationResult = {
 	phone: string;
 };
 
+export type PermissionsValidationResult = {
+	assigned_broadcast_labels?: string[];
+	view_broadcast_reports?: boolean;
+	assigned_phonebook_labels?: string[];
+	create_phonebook?: boolean;
+	update_phonebook?: boolean;
+	delete_phonebook?: boolean;
+	auto_assign_chats?: boolean;
+	create_template?: boolean;
+	update_template?: boolean;
+	delete_template?: boolean;
+};
+
 export async function UpgradePlanValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
 		date: z.string(),
@@ -52,6 +65,41 @@ export async function CreateAgentValidator(req: Request, res: Response, next: Ne
 		phone: z.string(),
 		email: z.string().email(),
 		password: z.string().min(6),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function PermissionsValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z.object({
+		assigned_broadcast_labels: z.array(z.string()).optional(),
+		view_broadcast_reports: z.boolean().optional(),
+		assigned_phonebook_labels: z.array(z.string()).optional(),
+		create_phonebook: z.boolean().optional(),
+		update_phonebook: z.boolean().optional(),
+		delete_phonebook: z.boolean().optional(),
+		auto_assign_chats: z.boolean().optional(),
+		create_template: z.boolean().optional(),
+		update_template: z.boolean().optional(),
+		delete_template: z.boolean().optional(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

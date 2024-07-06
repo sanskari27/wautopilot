@@ -2,7 +2,11 @@ import express from 'express';
 import { UserLevel } from '../../config/const';
 import { IDValidator, VerifyMinLevel } from '../../middleware';
 import Controller from './users.controller';
-import { CreateAgentValidator, UpgradePlanValidator } from './users.validator';
+import {
+	CreateAgentValidator,
+	PermissionsValidator,
+	UpgradePlanValidator,
+} from './users.validator';
 
 const router = express.Router();
 
@@ -22,6 +26,11 @@ router
 	.post(Controller.extendSubscription);
 
 router.route('/admins').all(VerifyMinLevel(UserLevel.Master)).get(Controller.getAdmins);
+
+router
+	.route('/agents/:id/permissions')
+	.all(VerifyMinLevel(UserLevel.Admin), IDValidator)
+	.post(PermissionsValidator, Controller.updateAgent);
 
 router
 	.route('/agents/:id')

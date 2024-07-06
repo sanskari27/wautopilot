@@ -11,6 +11,7 @@ export {
 	CouponDB,
 	FlowMessagesDB,
 	MediaDB,
+	PermissionDB,
 	PhoneBookDB,
 	PlanDB,
 	RecurringBroadcastDB,
