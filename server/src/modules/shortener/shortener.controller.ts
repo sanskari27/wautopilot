@@ -1,6 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { UserLevel } from '../../config/const';
-import { AUTH_ERRORS, CustomError } from '../../errors';
 import LinkShortenerService from '../../services/linkShortener';
 import { Respond } from '../../utils/ExpressUtils';
 import { CreateLinkValidationResult } from './shortener.validator';
@@ -28,6 +26,7 @@ async function createLink(req: Request, res: Response, next: NextFunction) {
 
 async function updateLink(req: Request, res: Response, next: NextFunction) {
 	const { link, title, type, message, number } = req.locals.data as CreateLinkValidationResult;
+
 	const id = req.locals.id;
 
 	const service = new LinkShortenerService(req.locals.serviceAccount);
@@ -71,10 +70,6 @@ async function open(req: Request, res: Response, next: NextFunction) {
 }
 
 async function listAll(req: Request, res: Response, next: NextFunction) {
-	if (req.locals.user.userLevel <= UserLevel.Agent) {
-		return next(new CustomError(AUTH_ERRORS.PERMISSION_DENIED));
-	}
-
 	const service = new LinkShortenerService(req.locals.serviceAccount);
 
 	return Respond({
@@ -86,7 +81,7 @@ async function listAll(req: Request, res: Response, next: NextFunction) {
 	});
 }
 
-const WhatsappShortner = {
+const WhatsappShortener = {
 	createLink,
 	open,
 	deleteLink,
@@ -94,4 +89,4 @@ const WhatsappShortner = {
 	listAll,
 };
 
-export default WhatsappShortner;
+export default WhatsappShortener;

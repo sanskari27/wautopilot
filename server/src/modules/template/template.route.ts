@@ -20,7 +20,10 @@ router
 	.all(VerifyPermissions(Permissions.Templates), TemplateEditValidator)
 	.post(Controller.editTemplate);
 
-router.route('/delete-template').all(TemplateRemoveValidator).post(Controller.deleteTemplate);
+router
+	.route('/delete-template')
+	.all(VerifyPermissions(Permissions.Templates), TemplateRemoveValidator)
+	.post(Controller.deleteTemplate);
 
 router.route('/:id').get(Controller.fetchTemplate);
 router.route('/').get(Controller.fetchTemplates);
