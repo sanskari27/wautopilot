@@ -194,10 +194,27 @@ async function assignConversationToAgent(req: Request, res: Response, next: Next
 	});
 }
 
+async function removeConversationFromAgent(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount: account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	const conversationService = new ConversationService(account, device);
+	await conversationService.removeConversationFromAgent(id);
+
+	return Respond({
+		res,
+		status: 200,
+	});
+}
+
 const Controller = {
 	fetchConversations,
 	fetchConversationMessages,
 	assignConversationToAgent,
+	removeConversationFromAgent,
 	markRead,
 	assignLabelToMessage,
 	sendMessageToConversation,

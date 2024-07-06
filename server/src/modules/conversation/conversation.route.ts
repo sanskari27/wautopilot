@@ -23,6 +23,11 @@ router
 	.all(IDValidator, AgentValidator)
 	.post(Controller.assignConversationToAgent);
 
+router
+	.route('/:id/remove-agent')
+	.all(IDValidator, AgentValidator)
+	.post(Controller.removeConversationFromAgent);
+
 router.route('/').get(Controller.fetchConversations);
 
 export default router;

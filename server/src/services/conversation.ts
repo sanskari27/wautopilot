@@ -579,4 +579,19 @@ export default class ConversationService extends WhatsappLinkService {
 			}
 		);
 	}
+
+	public async removeConversationFromAgent(c_id: Types.ObjectId) {
+		await ConversationDB.updateOne(
+			{
+				linked_to: this.userId,
+				device_id: this.deviceId,
+				_id: c_id,
+			},
+			{
+				$set: {
+					assigned_to: null,
+				},
+			}
+		);
+	}
 }
