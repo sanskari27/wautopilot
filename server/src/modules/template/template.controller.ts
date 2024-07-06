@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { UserLevel } from '../../config/const';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import TemplateService from '../../services/templates';
@@ -8,9 +9,18 @@ import { TemplateRemoveValidationResult } from './template.validator';
 
 async function addTemplate(req: Request, res: Response, next: NextFunction) {
 	const {
+		user,
 		serviceAccount: account,
 		device: { device },
 	} = req.locals;
+
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		if (!permissions.create_template) {
+			return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
+		}
+	}
+
 	try {
 		const templateService = new TemplateService(account, device);
 		const success = await templateService.addTemplate(req.locals.data as Template);
@@ -30,9 +40,18 @@ async function addTemplate(req: Request, res: Response, next: NextFunction) {
 
 async function editTemplate(req: Request, res: Response, next: NextFunction) {
 	const {
+		user,
 		serviceAccount: account,
 		device: { device },
 	} = req.locals;
+
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		if (!permissions.create_template) {
+			return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
+		}
+	}
+
 	try {
 		const { id, ...data } = req.locals.data as Template & { id: string };
 
@@ -55,9 +74,18 @@ async function editTemplate(req: Request, res: Response, next: NextFunction) {
 async function deleteTemplate(req: Request, res: Response, next: NextFunction) {
 	const { id, name } = req.locals.data as TemplateRemoveValidationResult;
 	const {
+		user,
 		serviceAccount: account,
 		device: { device },
 	} = req.locals;
+
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		if (!permissions.create_template) {
+			return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
+		}
+	}
+
 	try {
 		const templateService = new TemplateService(account, device);
 		const success = await templateService.deleteTemplate(id, name);
