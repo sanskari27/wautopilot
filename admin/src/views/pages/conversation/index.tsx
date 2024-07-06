@@ -1,4 +1,4 @@
-import { Box, Flex, HStack, Skeleton, Stack, Text, useBoolean } from '@chakra-ui/react';
+import { Box, Flex, HStack, Skeleton, Stack, Text, useBoolean, useToast } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
@@ -6,6 +6,7 @@ import { SERVER_URL } from '../../../config/const';
 import { useFetchLabels } from '../../../hooks/useFetchLabels';
 import useFilterLabels from '../../../hooks/useFilterLabels';
 import useFilteredList from '../../../hooks/useFilteredList';
+import AgentService from '../../../services/agent.service';
 import AuthService from '../../../services/auth.service';
 import MessagesService from '../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../store';
@@ -26,6 +27,7 @@ import RecipientsName from './components/recipients-name';
 
 const Conversation = () => {
 	const dispatch = useDispatch();
+	const toast = useToast();
 	const [listExpanded, setListExpanded] = useBoolean(true);
 
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
@@ -34,6 +36,7 @@ const Conversation = () => {
 		unpinnedConversations,
 		uiDetails: { loading },
 		selected_recipient,
+		selected_recipient_list,
 	} = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 
 	const { all_labels } = useFetchLabels();
@@ -76,6 +79,37 @@ const Conversation = () => {
 	const handleRemoveRecipientLabel = (label: string) => {
 		onRemoveLabel(label);
 		dispatch(setLabelFilter(selectedLabels));
+	};
+
+	const handleAssignConversationToAgent = (id: string[]) => {
+		if (id.length === 0) {
+			const promises = selected_recipient_list.map((recipient) => {
+				return AgentService.removeConversationFromAgent({
+					conversationId: recipient,
+					device_id: selected_device_id,
+				});
+			});
+
+			toast.promise(Promise.all(promises), {
+				loading: { title: 'Assigning conversation to agent' },
+				success: { title: 'Conversation assigned to agent' },
+				error: { title: 'Failed to assign conversation to agent' },
+			});
+			return;
+		}
+		const promises = selected_recipient_list.map((recipient) => {
+			return AgentService.assignConversationToAgent({
+				agentId: id[0],
+				conversationId: recipient,
+				device_id: selected_device_id,
+			});
+		});
+
+		toast.promise(Promise.all(promises), {
+			loading: { title: 'Assigning conversation to agent' },
+			success: { title: 'Conversation assigned to agent' },
+			error: { title: 'Failed to assign conversation to agent' },
+		});
 	};
 
 	useEffect(() => {
@@ -150,7 +184,9 @@ const Conversation = () => {
 							selectedLabels={selectedLabels}
 							onClear={onClear}
 						/>
-						<AgentFilter />
+						{selected_recipient_list.length > 0 && (
+							<AgentFilter onConfirm={handleAssignConversationToAgent} />
+						)}
 					</HStack>
 					<Flex direction={'column'} overflowY={'auto'} overflowX={'hidden'}>
 						{loading ? (

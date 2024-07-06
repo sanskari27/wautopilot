@@ -55,4 +55,26 @@ export default class AgentService {
 	static async deleteAgent(agentId: string) {
 		APIInstance.delete(`/users/agents/${agentId}`);
 	}
+
+	static async assignConversationToAgent({
+		device_id,
+		agentId,
+		conversationId,
+	}: {
+		device_id: string;
+		agentId: string;
+		conversationId: string;
+	}) {
+		APIInstance.post(`/${device_id}/conversation/${conversationId}/assign-agent/${agentId}`);
+	}
+
+	static async removeConversationFromAgent({
+		device_id,
+		conversationId,
+	}: {
+		device_id: string;
+		conversationId: string;
+	}) {
+		APIInstance.post(`/${device_id}/conversation/${conversationId}/remove-agent`);
+	}
 }

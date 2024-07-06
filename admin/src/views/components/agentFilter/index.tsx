@@ -15,6 +15,7 @@ import {
 	PopoverTrigger,
 	Text,
 } from '@chakra-ui/react';
+import { useRef } from 'react';
 import { BiSupport } from 'react-icons/bi';
 import { GiCheckMark } from 'react-icons/gi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,6 +24,7 @@ import { StoreNames, StoreState } from '../../../store';
 import {
 	addSelectedAgent,
 	addSingleSelectedAgent,
+	clearSelectedAgent,
 	removeSelectedAgent,
 } from '../../../store/reducers/AgentReducer';
 import SearchBar from '../searchBar';
@@ -31,14 +33,13 @@ import Each from '../utils/Each';
 export default function AgentFilter({
 	buttonComponent,
 	multiSelect = false,
-}: // onAddLabel,
-// onRemoveLabel,
-// onClear,
-// selectedLabels,
-{
+	onConfirm,
+}: {
 	buttonComponent?: React.ReactNode;
 	multiSelect?: boolean;
+	onConfirm: (id: string[]) => void;
 }) {
+	const buttonRef = useRef<HTMLButtonElement>(null);
 	const dispatch = useDispatch();
 	const { list, selectedAgent } = useSelector((state: StoreState) => state[StoreNames.AGENT]);
 
@@ -63,10 +64,23 @@ export default function AgentFilter({
 		}
 	}
 
+	const handleConfirm = () => {
+		onConfirm(selectedAgent);
+		dispatch(clearSelectedAgent());
+		handleClose();
+	};
+
+	const handleClose = () => {
+		buttonRef.current?.click();
+		dispatch(clearSelectedAgent());
+	};
+
 	return (
-		<Popover>
+		<Popover onClose={handleClose}>
 			<PopoverTrigger>
-				{buttonComponent || <IconButton aria-label='filter-button' icon={<BiSupport />} />}
+				{buttonComponent || (
+					<IconButton ref={buttonRef} aria-label='filter-button' icon={<BiSupport />} />
+				)}
 			</PopoverTrigger>
 			<PopoverContent>
 				<PopoverArrow />
@@ -114,7 +128,7 @@ export default function AgentFilter({
 							)}
 						/>
 						<Divider my={'0.5rem'} />
-						<Button width={'full'} colorScheme='green' size={'sm'}>
+						<Button width={'full'} colorScheme='green' size={'sm'} onClick={handleConfirm}>
 							Confirm
 						</Button>
 					</Flex>
