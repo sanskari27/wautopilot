@@ -28,10 +28,10 @@ function processPhonebookDocs(
 		_id: Types.ObjectId;
 	})[]
 ): (Record & {
-	id: string;
+	id: Types.ObjectId;
 })[] {
 	return docs.map((doc) => ({
-		id: doc._id.toString(),
+		id: doc._id,
 		salutation: doc.salutation ?? '',
 		first_name: doc.first_name ?? '',
 		last_name: doc.last_name ?? '',
@@ -115,11 +115,7 @@ export default class PhoneBookService extends UserService {
 			limit: 2000000,
 			labels: [],
 		}
-	): Promise<
-		(Record & {
-			id: string;
-		})[]
-	> {
+	) {
 		const records = await PhoneBookDB.find({
 			linked_to: this.userId,
 			...(labels.length > 0 ? { labels: { $in: labels } } : {}),
@@ -191,5 +187,14 @@ export default class PhoneBookService extends UserService {
 		}
 
 		return processPhonebookDocs([record])[0];
+	}
+
+	public async findRecordsByPhone(phones: string[]) {
+		const records = await PhoneBookDB.find({
+			phone_number: { $in: phones },
+			linked_to: this.userId,
+		});
+
+		return processPhonebookDocs(records);
 	}
 }

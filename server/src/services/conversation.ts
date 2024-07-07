@@ -565,12 +565,15 @@ export default class ConversationService extends WhatsappLinkService {
 		return result;
 	}
 
-	public async assignConversationToAgent(c_id: Types.ObjectId, agent_id: Types.ObjectId) {
+	public async assignConversationToAgent(
+		agent_id: Types.ObjectId,
+		c_id: Types.ObjectId | Types.ObjectId[]
+	) {
 		await ConversationDB.updateOne(
 			{
 				linked_to: this.userId,
 				device_id: this.deviceId,
-				_id: c_id,
+				_id: Array.isArray(c_id) ? { $in: c_id } : c_id,
 			},
 			{
 				$set: {

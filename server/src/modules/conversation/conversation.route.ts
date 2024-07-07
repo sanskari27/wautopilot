@@ -1,9 +1,20 @@
 import express from 'express';
 import { AgentValidator, IDValidator } from '../../middleware';
 import Controller from './conversation.controller';
-import { LabelValidator, SendMessageValidator } from './conversation.validator';
+import { LabelValidator, NumbersValidator, SendMessageValidator } from './conversation.validator';
 
 const router = express.Router();
+
+router
+	.route('/message/:id/assign-labels')
+	.all(IDValidator, LabelValidator)
+	.post(Controller.assignLabelToMessage);
+router.route('/mark-read/:message_id').post(Controller.markRead);
+
+router
+	.route('/assign-agent/:agent_id')
+	.all(IDValidator, AgentValidator, NumbersValidator)
+	.post(Controller.bulkAssignConversationToAgent);
 
 router.route('/:id/messages').all(IDValidator).get(Controller.fetchConversationMessages);
 
@@ -11,12 +22,6 @@ router
 	.route('/:id/send-message')
 	.all(IDValidator, SendMessageValidator)
 	.post(Controller.sendMessageToConversation);
-
-router
-	.route('/message/:id/assign-labels')
-	.all(IDValidator, LabelValidator)
-	.post(Controller.assignLabelToMessage);
-router.route('/mark-read/:message_id').post(Controller.markRead);
 
 router
 	.route('/:id/assign-agent/:agent_id')

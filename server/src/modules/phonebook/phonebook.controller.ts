@@ -6,7 +6,7 @@ import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import PhoneBookService from '../../services/phonebook';
 import CSVHelper from '../../utils/CSVHelper';
-import { Respond, RespondCSV, idValidator, intersection } from '../../utils/ExpressUtils';
+import { Respond, RespondCSV, intersection } from '../../utils/ExpressUtils';
 import {
 	MultiDeleteValidationResult,
 	RecordsValidationResult,
@@ -244,7 +244,7 @@ async function setLabelsByPhone(req: Request, res: Response, next: NextFunction)
 			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 		}
 
-		await phoneBookService.setLabels([idValidator(doc.id)[1]!], labels);
+		await phoneBookService.setLabels([doc.id], labels);
 
 		return Respond({
 			res,

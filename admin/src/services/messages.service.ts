@@ -215,6 +215,7 @@ export default class MessagesService {
 			return false;
 		}
 	}
+	
 	static async markRead(deviceId: string, message_id: string) {
 		try {
 			await APIInstance.post(`/${deviceId}/mark-read/${message_id}`);

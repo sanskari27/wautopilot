@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { Types } from 'mongoose';
 import { z } from 'zod';
 import { CustomError } from '../../errors';
 
@@ -55,6 +56,11 @@ export type SendMessageValidationResult = {
 	context: {
 		message_id: string;
 	};
+};
+
+export type NumbersValidationResult = {
+	numbers: string[];
+	ids: Types.ObjectId[];
 };
 
 export async function SendMessageValidator(req: Request, res: Response, next: NextFunction) {
@@ -152,6 +158,47 @@ export async function LabelValidator(req: Request, res: Response, next: NextFunc
 	const reqValidator = z.object({
 		labels: z.string().array().default([]),
 	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function NumbersValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z
+		.object({
+			numbers: z.string().array().default([]),
+			ids: z
+				.string()
+				.array()
+				.default([])
+				.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
+				.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
+		})
+		.refine((data) => {
+			if (data.numbers.length === 0 && data.ids.length === 0) {
+				return false;
+			} else if (data.numbers.length > 0 && data.ids.length > 0) {
+				return false;
+			}
+			return true;
+		});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
 

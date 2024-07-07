@@ -4,8 +4,9 @@ import { UserLevel } from '../../config/const';
 import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import ConversationService from '../../services/conversation';
+import PhoneBookService from '../../services/phonebook';
 import { Respond } from '../../utils/ExpressUtils';
-import { SendMessageValidationResult } from './conversation.validator';
+import { NumbersValidationResult, SendMessageValidationResult } from './conversation.validator';
 
 async function fetchConversations(req: Request, res: Response, next: NextFunction) {
 	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];
@@ -186,7 +187,32 @@ async function assignConversationToAgent(req: Request, res: Response, next: Next
 	} = req.locals;
 
 	const conversationService = new ConversationService(account, device);
-	await conversationService.assignConversationToAgent(id, agent_id);
+	await conversationService.assignConversationToAgent(agent_id, id);
+
+	return Respond({
+		res,
+		status: 200,
+	});
+}
+
+async function bulkAssignConversationToAgent(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount: account,
+		device: { device },
+		agent_id,
+	} = req.locals;
+
+	const { ids, numbers } = req.locals.data as NumbersValidationResult;
+
+	const conversationService = new ConversationService(account, device);
+	const phoneBookService = new PhoneBookService(account);
+	if (ids.length > 0) {
+		await conversationService.assignConversationToAgent(agent_id, ids);
+	} else if (numbers.length > 0) {
+		const records = await phoneBookService.findRecordsByPhone(numbers);
+		const ids = records.map((record) => record.id);
+		await conversationService.assignConversationToAgent(agent_id, ids);
+	}
 
 	return Respond({
 		res,
@@ -219,6 +245,7 @@ const Controller = {
 	fetchConversations,
 	fetchConversationMessages,
 	assignConversationToAgent,
+	bulkAssignConversationToAgent,
 	removeConversationFromAgent,
 	markRead,
 	assignLabelToMessage,

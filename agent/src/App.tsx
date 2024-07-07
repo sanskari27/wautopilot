@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import { NAVIGATION } from './config/const';
 
@@ -110,6 +110,7 @@ function App() {
 							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
 							<Route path='*' element={<InvalidPage />} />
 						</Route>
+						<Route path='/' element={<Navigate to={NAVIGATION.APP} />} />
 						<Route path='*' element={<InvalidPage />} />
 					</Routes>
 				</Suspense>
