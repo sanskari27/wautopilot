@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 export {
 	AccountDB,
+	AgentLogDB,
 	BroadcastDB,
 	ButtonResponseDB,
 	ChatbotDB,

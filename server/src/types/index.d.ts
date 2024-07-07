@@ -2,8 +2,8 @@
 
 import { Types } from 'mongoose';
 import IAccount from '../../mongo/types/account';
-import IPlan from '../../mongo/types/plan';
 import { UserService } from '../services';
+import AgentLogService from '../services/agentLogs';
 import WhatsappLinkService from '../services/whatsappLink';
 
 declare global {
@@ -31,7 +31,7 @@ export interface LocalVariables {
 	serviceUser: UserService;
 	user: UserService;
 	device: WhatsappLinkService;
-	plan: IPlan;
+	agentLogService?: AgentLogService;
 }
 
 export { default as ServerError } from './serverError';

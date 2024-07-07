@@ -14,6 +14,7 @@ async function addMedia(req: Request, res: Response, next: NextFunction) {
 	const {
 		serviceAccount: account,
 		device: { device },
+		agentLogService,
 	} = req.locals;
 	const fileUploadOptions: SingleFileUploadOptions = {
 		field_name: 'file',
@@ -52,6 +53,13 @@ async function addMedia(req: Request, res: Response, next: NextFunction) {
 			file_length: Number(data.file_size),
 			mime_type: data.mime_type,
 			local_path: Path.Media + uploadedFile.filename,
+		});
+
+		agentLogService?.addLog({
+			text: `Create media with name ${media.filename}`,
+			data: {
+				id: media.id,
+			},
 		});
 
 		return Respond({
@@ -94,10 +102,12 @@ async function deleteMedia(req: Request, res: Response, next: NextFunction) {
 		serviceAccount: account,
 		device: { device },
 		id,
+		agentLogService,
 	} = req.locals;
 
+	let media;
 	try {
-		const media = await new MediaService(account, device).getMedia(id);
+		media = await new MediaService(account, device).getMedia(id);
 		await MetaAPI(device.accessToken).delete(
 			`/${media.media_id}/?phone_number_id=${device.phoneNumberId}`
 		);
@@ -109,13 +119,21 @@ async function deleteMedia(req: Request, res: Response, next: NextFunction) {
 		let path = await new MediaService(account, device).delete(id);
 		path = __basedir + path;
 		FileUtils.deleteFile(path);
+
+		agentLogService?.addLog({
+			text: `Delete media with name ${media.filename}`,
+			data: {
+				id: media.id,
+			},
+		});
+
 		return Respond({
 			res,
 			status: 200,
 			data: {},
 		});
 	} catch (err: unknown) {
-		return next(new CustomError(COMMON_ERRORS.FILE_UPLOAD_ERROR));
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
 

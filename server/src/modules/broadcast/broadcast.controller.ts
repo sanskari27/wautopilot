@@ -49,11 +49,18 @@ async function pauseBroadcast(req: Request, res: Response, next: NextFunction) {
 		id,
 		serviceAccount: account,
 		device: { device },
+		agentLogService,
 	} = req.locals;
 
 	try {
 		const broadcastService = new BroadcastService(account, device);
-		await broadcastService.pauseBroadcast(id);
+		const campaign = await broadcastService.pauseBroadcast(id);
+		agentLogService?.addLog({
+			text: `Paused broadcast ${campaign.name}`,
+			data: {
+				broadcast_id: id,
+			},
+		});
 
 		return Respond({
 			res,
@@ -69,11 +76,18 @@ async function resumeBroadcast(req: Request, res: Response, next: NextFunction) 
 		id,
 		serviceAccount: account,
 		device: { device },
+		agentLogService,
 	} = req.locals;
 
 	try {
 		const broadcastService = new BroadcastService(account, device);
-		await broadcastService.resumeBroadcast(id);
+		const campaign = await broadcastService.resumeBroadcast(id);
+		agentLogService?.addLog({
+			text: `Resume broadcast ${campaign.name}`,
+			data: {
+				broadcast_id: id,
+			},
+		});
 
 		return Respond({
 			res,
@@ -89,12 +103,18 @@ async function resendBroadcast(req: Request, res: Response, next: NextFunction) 
 		id,
 		serviceAccount: account,
 		device: { device },
+		agentLogService,
 	} = req.locals;
 
 	try {
 		const broadcastService = new BroadcastService(account, device);
-		await broadcastService.resendBroadcast(id);
-
+		const campaign = await broadcastService.resendBroadcast(id);
+		agentLogService?.addLog({
+			text: `Resend broadcast ${campaign.name}`,
+			data: {
+				broadcast_id: id,
+			},
+		});
 		return Respond({
 			res,
 			status: 200,
@@ -109,11 +129,18 @@ async function downloadBroadcast(req: Request, res: Response, next: NextFunction
 		id,
 		serviceAccount: account,
 		device: { device },
+		agentLogService,
 	} = req.locals;
 
 	try {
 		const broadcastService = new BroadcastService(account, device);
 		const records = await broadcastService.generateBroadcastReport(id);
+		agentLogService?.addLog({
+			text: `Download broadcast ${await broadcastService.getBroadcastName(id)}`,
+			data: {
+				broadcast_id: id,
+			},
+		});
 
 		return RespondCSV({
 			res,
@@ -130,12 +157,18 @@ async function deleteBroadcast(req: Request, res: Response, next: NextFunction) 
 		id,
 		serviceAccount: account,
 		device: { device },
+		agentLogService,
 	} = req.locals;
 
 	try {
 		const broadcastService = new BroadcastService(account, device);
-		await broadcastService.deleteBroadcast(id);
-
+		const campaign = await broadcastService.deleteBroadcast(id);
+		agentLogService?.addLog({
+			text: `Delete broadcast ${campaign.name}`,
+			data: {
+				broadcast_id: id,
+			},
+		});
 		return Respond({
 			res,
 			status: 200,
@@ -160,6 +193,7 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 
 	const {
 		serviceAccount: account,
+		agentLogService,
 		device: { device },
 	} = req.locals;
 
@@ -269,6 +303,10 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 			broadcast_options
 		);
 
+		agentLogService?.addLog({
+			text: `Create broadcast ${name}`,
+		});
+
 		return Respond({
 			res,
 			status: 200,
@@ -305,12 +343,16 @@ async function scheduleRecurringBroadcast(req: Request, res: Response, next: Nex
 	const {
 		serviceAccount: account,
 		device: { device },
+		agentLogService,
 	} = req.locals;
 
 	try {
 		const broadcastService = new BroadcastService(account, device);
 
 		const details = await broadcastService.scheduleRecurring(data);
+		agentLogService?.addLog({
+			text: `Create recurring broadcast ${data.name}`,
+		});
 
 		return Respond({
 			res,
@@ -331,16 +373,27 @@ async function updateRecurringBroadcast(req: Request, res: Response, next: NextF
 		serviceAccount: account,
 		device: { device },
 		id,
+		agentLogService,
 	} = req.locals;
 
 	try {
 		const broadcastService = new BroadcastService(account, device);
 
-		await broadcastService.updateRecurringBroadcast(id, data);
+		const doc = await broadcastService.updateRecurringBroadcast(id, data);
+
+		agentLogService?.addLog({
+			text: `Update recurring broadcast ${doc.name}`,
+			data: {
+				recurring_broadcast_id: id,
+			},
+		});
 
 		return Respond({
 			res,
 			status: 200,
+			data: {
+				details: doc,
+			},
 		});
 	} catch (err) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
@@ -350,6 +403,7 @@ async function updateRecurringBroadcast(req: Request, res: Response, next: NextF
 async function toggleRecurringBroadcast(req: Request, res: Response, next: NextFunction) {
 	const {
 		serviceAccount: account,
+		agentLogService,
 		device: { device },
 		id,
 	} = req.locals;
@@ -357,7 +411,14 @@ async function toggleRecurringBroadcast(req: Request, res: Response, next: NextF
 	try {
 		const broadcastService = new BroadcastService(account, device);
 
-		const status = await broadcastService.toggleRecurringBroadcast(id);
+		const { status, name } = await broadcastService.toggleRecurringBroadcast(id);
+
+		agentLogService?.addLog({
+			text: `Update recurring broadcast status ${name}`,
+			data: {
+				recurring_broadcast_id: id,
+			},
+		});
 
 		return Respond({
 			res,
@@ -398,12 +459,17 @@ async function deleteRecurringBroadcast(req: Request, res: Response, next: NextF
 		serviceAccount: account,
 		device: { device },
 		id,
+		agentLogService,
 	} = req.locals;
 
 	try {
 		const broadcastService = new BroadcastService(account, device);
 
-		await broadcastService.deleteRecurringBroadcast(id);
+		const doc = await broadcastService.deleteRecurringBroadcast(id);
+
+		agentLogService?.addLog({
+			text: `Delete recurring broadcast ${doc.name}`,
+		});
 
 		return Respond({
 			res,
@@ -419,12 +485,20 @@ async function rescheduleRecurringBroadcast(req: Request, res: Response, next: N
 		serviceAccount: account,
 		device: { device },
 		id,
+		agentLogService,
 	} = req.locals;
 
 	try {
 		const broadcastService = new BroadcastService(account, device);
 
-		await broadcastService.rescheduleRecurringBroadcast(id);
+		const doc = await broadcastService.rescheduleRecurringBroadcast(id);
+
+		agentLogService?.addLog({
+			text: `Reschedule recurring broadcast ${doc.name}`,
+			data: {
+				recurring_broadcast_id: id,
+			},
+		});
 
 		return Respond({
 			res,
@@ -437,6 +511,7 @@ async function rescheduleRecurringBroadcast(req: Request, res: Response, next: N
 
 async function buttonResponses(req: Request, res: Response, next: NextFunction) {
 	const {
+		agentLogService,
 		serviceAccount: account,
 		device: { device },
 		id,
@@ -454,6 +529,14 @@ async function buttonResponses(req: Request, res: Response, next: NextFunction) 
 				return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
 			}
 		}
+
+		agentLogService?.addLog({
+			text: `Download button responses for broadcast ${id}`,
+			data: {
+				id,
+			},
+		});
+
 		return RespondCSV({
 			res,
 			filename: `responses-${id}.csv`,

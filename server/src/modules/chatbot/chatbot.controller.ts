@@ -14,11 +14,20 @@ async function createBot(req: Request, res: Response, next: NextFunction) {
 	const {
 		serviceAccount: account,
 		device: { device },
+		agentLogService,
 	} = req.locals;
 
 	const data = req.locals.data as CreateBotValidationResult;
 
 	const bot = await new ChatBotService(account, device).createBot(data);
+
+	agentLogService?.addLog({
+		text: `Create bot with trigger ${bot.trigger}`,
+		data: {
+			id: bot.bot_id,
+		},
+	});
+
 	return Respond({
 		res,
 		status: 200,
@@ -33,11 +42,19 @@ async function updateBot(req: Request, res: Response, next: NextFunction) {
 		serviceAccount: account,
 		device: { device },
 		id,
+		agentLogService,
 	} = req.locals;
 
 	const data = req.locals.data as CreateBotValidationResult;
 
 	const bot = await new ChatBotService(account, device).modifyBot(id, data);
+
+	agentLogService?.addLog({
+		text: `Create bot with trigger ${bot.trigger}`,
+		data: {
+			id: bot.bot_id,
+		},
+	});
 	return Respond({
 		res,
 		status: 200,
@@ -69,14 +86,22 @@ async function toggleActive(req: Request, res: Response, next: NextFunction) {
 		serviceAccount: account,
 		device: { device },
 		id,
+		agentLogService,
 	} = req.locals;
 
-	const list = await new ChatBotService(account, device).toggleActive(id);
+	const bot = await new ChatBotService(account, device).toggleActive(id);
+	agentLogService?.addLog({
+		text: `Create bot with trigger ${bot.trigger}`,
+		data: {
+			id: bot.bot_id,
+		},
+	});
+
 	return Respond({
 		res,
 		status: 200,
 		data: {
-			bot: list,
+			bot: bot,
 		},
 	});
 }
@@ -86,9 +111,18 @@ async function deleteBot(req: Request, res: Response, next: NextFunction) {
 		serviceAccount: account,
 		device: { device },
 		id,
+		agentLogService,
 	} = req.locals;
 
 	await new ChatBotService(account, device).deleteBot(id);
+
+	agentLogService?.addLog({
+		text: `Delete bot with id ${id}`,
+		data: {
+			id,
+		},
+	});
+
 	return Respond({
 		res,
 		status: 200,
@@ -100,9 +134,18 @@ async function downloadResponses(req: Request, res: Response, next: NextFunction
 		serviceAccount: account,
 		device: { device },
 		id,
+		agentLogService,
 	} = req.locals;
 
 	const responses = await new ChatBotService(account, device).botResponses(id);
+
+	agentLogService?.addLog({
+		text: `Download bot responses with id ${id}`,
+		data: {
+			id,
+		},
+	});
+
 	return RespondCSV({
 		res,
 		filename: `responses-${id}.csv`,
@@ -114,11 +157,20 @@ async function createFlow(req: Request, res: Response, next: NextFunction) {
 	const {
 		serviceAccount: account,
 		device: { device },
+		agentLogService,
 	} = req.locals;
 
 	const data = req.locals.data as CreateFlowValidationResult;
 
 	const flow = await new ChatBotService(account, device).createFlow(data);
+
+	agentLogService?.addLog({
+		text: `Create flow with id ${flow.bot_id}`,
+		data: {
+			id: flow.bot_id,
+		},
+	});
+
 	return Respond({
 		res,
 		status: 200,
@@ -133,11 +185,20 @@ async function updateFlow(req: Request, res: Response, next: NextFunction) {
 		serviceAccount: account,
 		device: { device },
 		id,
+		agentLogService,
 	} = req.locals;
 
 	const data = req.locals.data as UpdateFlowValidationResult;
 
 	const flow = await new ChatBotService(account, device).modifyFlow(id, data);
+
+	agentLogService?.addLog({
+		text: `Create flow with id ${flow.bot_id}`,
+		data: {
+			id: flow.bot_id,
+		},
+	});
+
 	return Respond({
 		res,
 		status: 200,
@@ -189,14 +250,23 @@ async function toggleActiveFlow(req: Request, res: Response, next: NextFunction)
 		serviceAccount: account,
 		device: { device },
 		id,
+		agentLogService,
 	} = req.locals;
 
-	const list = await new ChatBotService(account, device).toggleActiveFlow(id);
+	const flow = await new ChatBotService(account, device).toggleActiveFlow(id);
+
+	agentLogService?.addLog({
+		text: `Create flow with id ${flow.bot_id}`,
+		data: {
+			id: flow.bot_id,
+		},
+	});
+
 	return Respond({
 		res,
 		status: 200,
 		data: {
-			flow: list,
+			flow: flow,
 		},
 	});
 }
@@ -206,9 +276,18 @@ async function deleteFlow(req: Request, res: Response, next: NextFunction) {
 		serviceAccount: account,
 		device: { device },
 		id,
+		agentLogService,
 	} = req.locals;
 
 	await new ChatBotService(account, device).deleteFlow(id);
+
+	agentLogService?.addLog({
+		text: `Delete flow with id ${id}`,
+		data: {
+			id,
+		},
+	});
+
 	return Respond({
 		res,
 		status: 200,

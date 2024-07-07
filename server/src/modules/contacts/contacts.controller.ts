@@ -31,11 +31,17 @@ async function getContacts(req: Request, res: Response, next: NextFunction) {
 }
 
 async function createContact(req: Request, res: Response, next: NextFunction) {
+	const { serviceAccount, data, agentLogService } = req.locals;
 	try {
-		const contactService = new ContactService(req.locals.serviceAccount);
-		const contact = await contactService.addContact(
-			req.locals.data as CreateContactValidationResult
-		);
+		const contactService = new ContactService(serviceAccount);
+		const contact = await contactService.addContact(data as CreateContactValidationResult);
+
+		agentLogService?.addLog({
+			text: `Create contact with name ${contact.formatted_name}`,
+			data: {
+				id: contact.id,
+			},
+		});
 
 		return Respond({
 			res,
@@ -50,12 +56,18 @@ async function createContact(req: Request, res: Response, next: NextFunction) {
 }
 
 async function updateContact(req: Request, res: Response, next: NextFunction) {
+	const { serviceAccount, data, id, agentLogService } = req.locals;
+
 	try {
-		const contactService = new ContactService(req.locals.serviceAccount);
-		const contact = await contactService.updateContact(
-			req.locals.id,
-			req.locals.data as CreateContactValidationResult
-		);
+		const contactService = new ContactService(serviceAccount);
+		const contact = await contactService.updateContact(id, data as CreateContactValidationResult);
+
+		agentLogService?.addLog({
+			text: `Update contact with name ${contact.formatted_name}`,
+			data: {
+				id: contact.id,
+			},
+		});
 
 		return Respond({
 			res,
@@ -70,10 +82,19 @@ async function updateContact(req: Request, res: Response, next: NextFunction) {
 }
 
 async function deleteContact(req: Request, res: Response, next: NextFunction) {
+	const { serviceAccount, data, agentLogService } = req.locals;
+
 	try {
-		const { ids } = req.locals.data as MultiDeleteValidationResult;
-		const contactService = new ContactService(req.locals.serviceAccount);
+		const { ids } = data as MultiDeleteValidationResult;
+		const contactService = new ContactService(serviceAccount);
 		await contactService.deleteContacts(ids);
+
+		agentLogService?.addLog({
+			text: `Delete contacts with ids ${ids.join(', ')}`,
+			data: {
+				ids,
+			},
+		});
 
 		return Respond({
 			res,

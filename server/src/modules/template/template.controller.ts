@@ -10,15 +10,21 @@ async function addTemplate(req: Request, res: Response, next: NextFunction) {
 	const {
 		serviceAccount: account,
 		device: { device },
+		agentLogService,
+		data,
 	} = req.locals;
 
 	try {
 		const templateService = new TemplateService(account, device);
-		const success = await templateService.addTemplate(req.locals.data as Template);
+		const success = await templateService.addTemplate(data as Template);
 
 		if (!success) {
 			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 		}
+
+		agentLogService?.addLog({
+			text: `Create template with name ${data.name}`,
+		});
 
 		return Respond({
 			res,
@@ -33,6 +39,7 @@ async function editTemplate(req: Request, res: Response, next: NextFunction) {
 	const {
 		serviceAccount: account,
 		device: { device },
+		agentLogService,
 	} = req.locals;
 
 	try {
@@ -44,6 +51,13 @@ async function editTemplate(req: Request, res: Response, next: NextFunction) {
 		if (!success) {
 			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 		}
+
+		agentLogService?.addLog({
+			text: `Update template with name ${data.name}`,
+			data: {
+				id,
+			},
+		});
 
 		return Respond({
 			res,
@@ -59,6 +73,7 @@ async function deleteTemplate(req: Request, res: Response, next: NextFunction) {
 	const {
 		serviceAccount: account,
 		device: { device },
+		agentLogService,
 	} = req.locals;
 
 	try {
@@ -68,6 +83,13 @@ async function deleteTemplate(req: Request, res: Response, next: NextFunction) {
 		if (!success) {
 			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 		}
+
+		agentLogService?.addLog({
+			text: `Delete template with name ${name}`,
+			data: {
+				id,
+			},
+		});
 
 		return Respond({
 			res,

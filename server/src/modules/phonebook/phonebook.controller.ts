@@ -39,12 +39,16 @@ async function getAllLabels(req: Request, res: Response, next: NextFunction) {
 }
 
 async function addRecords(req: Request, res: Response, next: NextFunction) {
-	const { serviceAccount } = req.locals;
+	const { serviceAccount, agentLogService } = req.locals;
 	const { records } = req.locals.data as RecordsValidationResult;
 
 	try {
 		const phoneBookService = new PhoneBookService(serviceAccount);
 		const created = await phoneBookService.addRecords(records);
+
+		agentLogService?.addLog({
+			text: `Create phonebook records`,
+		});
 
 		return Respond({
 			res,
@@ -112,7 +116,7 @@ async function records(req: Request, res: Response, next: NextFunction) {
 }
 
 async function exportRecords(req: Request, res: Response, next: NextFunction) {
-	const { user, serviceAccount } = req.locals;
+	const { user, serviceAccount, agentLogService } = req.locals;
 	let labels = req.query.labels ? (req.query.labels as string).split(',') : [];
 
 	if (user.userLevel === UserLevel.Agent) {
@@ -150,6 +154,10 @@ async function exportRecords(req: Request, res: Response, next: NextFunction) {
 			};
 		});
 
+		agentLogService?.addLog({
+			text: `Export phonebook records to CSV ${labels.join(',')}`,
+		});
+
 		return RespondCSV({
 			res,
 			filename: 'phonebook.csv',
@@ -161,13 +169,17 @@ async function exportRecords(req: Request, res: Response, next: NextFunction) {
 }
 
 async function updateRecords(req: Request, res: Response, next: NextFunction) {
-	const { serviceAccount } = req.locals;
+	const { serviceAccount, agentLogService } = req.locals;
 	const data = req.locals.data as SingleRecordValidationResult;
 	const id = req.locals.id;
 
 	try {
 		const phoneBookService = new PhoneBookService(serviceAccount);
 		const created = await phoneBookService.updateRecord(id, data);
+
+		agentLogService?.addLog({
+			text: `Update phonebook records`,
+		});
 
 		return Respond({
 			res,
@@ -182,11 +194,15 @@ async function updateRecords(req: Request, res: Response, next: NextFunction) {
 }
 
 async function deleteRecords(req: Request, res: Response, next: NextFunction) {
-	const { serviceAccount, id } = req.locals;
+	const { serviceAccount, id, agentLogService } = req.locals;
 
 	try {
 		const phoneBookService = new PhoneBookService(serviceAccount);
 		await phoneBookService.deleteRecord([id]);
+
+		agentLogService?.addLog({
+			text: `Delete phonebook records`,
+		});
 
 		return Respond({
 			res,
@@ -203,11 +219,15 @@ async function deleteRecords(req: Request, res: Response, next: NextFunction) {
 async function deleteMultiple(req: Request, res: Response, next: NextFunction) {
 	const { ids } = req.locals.data as MultiDeleteValidationResult;
 
-	const { serviceAccount } = req.locals;
+	const { serviceAccount, agentLogService } = req.locals;
 
 	try {
 		const phoneBookService = new PhoneBookService(serviceAccount);
 		await phoneBookService.deleteRecord(ids);
+
+		agentLogService?.addLog({
+			text: `Delete phonebook records`,
+		});
 
 		return Respond({
 			res,
@@ -343,7 +363,7 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 			fileFilter: ONLY_CSV_ALLOWED,
 		},
 	};
-	const { serviceAccount, user } = req.locals;
+	const { serviceAccount, user, agentLogService } = req.locals;
 
 	try {
 		const uploadedFile = await FileUpload.SingleFileUpload(req, res, fileUploadOptions);
@@ -389,6 +409,10 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 		const uniqueData = Array.from(uniqueDataMap.values());
 
 		phoneBookService.addRecords(uniqueData);
+
+		agentLogService?.addLog({
+			text: `Bulk upload phonebook records`,
+		});
 
 		return Respond({
 			res,

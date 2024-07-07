@@ -1,4 +1,5 @@
 export { default as AccountDB } from './Account';
+export { default as AgentLogDB } from './AgentLog';
 export { default as BroadcastDB } from './Broadcast';
 export { default as ButtonResponseDB } from './ButtonResponse';
 export { default as ChatbotDB } from './Chatbot';
