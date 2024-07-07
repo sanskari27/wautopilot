@@ -16,6 +16,7 @@ const schema = new mongoose.Schema<IAgentLog>(
 			ref: AccountDB_name,
 			required: true,
 		},
+		agent_name: String,
 		text: String,
 		data: { type: mongoose.Schema.Types.Mixed, default: {} },
 	},

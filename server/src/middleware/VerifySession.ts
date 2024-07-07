@@ -29,7 +29,7 @@ export default async function VerifySession(req: Request, res: Response, next: N
 				const parent = req.locals.user.account.parent;
 				req.locals.serviceUser = await UserService.findById(parent!);
 				const serviceAccount = (req.locals.serviceAccount = req.locals.serviceUser.account);
-				req.locals.agentLogService = new AgentLogService(serviceAccount, req.locals.user.userId);
+				req.locals.agentLogService = new AgentLogService(serviceAccount, req.locals.user.account);
 			}
 
 			setCookie(res, {
@@ -57,7 +57,8 @@ export default async function VerifySession(req: Request, res: Response, next: N
 			} else if (req.locals.user.userLevel === UserLevel.Agent) {
 				const parent = req.locals.user.account.parent;
 				req.locals.serviceUser = await UserService.findById(parent!);
-				req.locals.serviceAccount = req.locals.serviceUser.account;
+				const serviceAccount = req.locals.serviceAccount = req.locals.serviceUser.account;
+				req.locals.agentLogService = new AgentLogService(serviceAccount, req.locals.user.account);
 			}
 
 			setCookie(res, {
