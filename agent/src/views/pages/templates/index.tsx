@@ -20,6 +20,7 @@ import { BiPlus } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
+import usePermissions from '../../../hooks/usePermissions';
 import TemplateService from '../../../services/template.service';
 import { StoreNames, StoreState } from '../../../store';
 import { setTemplatesList } from '../../../store/reducers/TemplateReducer';
@@ -34,12 +35,10 @@ export default function Templates() {
 	const dispatch = useDispatch();
 	const toast = useToast();
 
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const {
-		selected_device_id,
-		user_details: {
-			permissions: { create_template, delete_template },
-		},
-	} = useSelector((state: StoreState) => state[StoreNames.USER]);
+		template: { create: create_template, delete: delete_template },
+	} = usePermissions();
 	const {
 		list,
 		uiDetails: { isFetching },
