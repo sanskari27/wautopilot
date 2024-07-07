@@ -5,6 +5,7 @@ export default interface IPermission extends Document {
 	linked_to: Types.ObjectId;
 
 	assigned_labels: string[];
+	auto_assign_chats: boolean;
 	phonebook: {
 		create: boolean;
 		update: boolean;

@@ -9,7 +9,10 @@ const schema = new mongoose.Schema<IPermission>({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: AccountDB_name,
 	},
-
+	auto_assign_chats: {
+		type: Boolean,
+		default: false,
+	},
 	assigned_labels: {
 		type: [String],
 		default: [],

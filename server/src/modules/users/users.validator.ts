@@ -17,6 +17,7 @@ export type CreateAgentValidationResult = {
 
 export type PermissionsValidationResult = {
 	assigned_labels?: string[];
+	auto_assign_chats?: boolean;
 	phonebook?: {
 		create: boolean;
 		update: boolean;
@@ -131,6 +132,7 @@ export async function CreateAgentValidator(req: Request, res: Response, next: Ne
 export async function PermissionsValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
 		assigned_labels: z.array(z.string()).optional(),
+		auto_assign_chats: z.boolean().optional(),
 		phonebook: z
 			.object({
 				create: z.boolean(),

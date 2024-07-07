@@ -482,6 +482,7 @@ export default class UserService {
 		id: Types.ObjectId,
 		opts: {
 			assigned_labels?: string[];
+			auto_assign_chats?: boolean;
 			phonebook?: {
 				create: boolean;
 				update: boolean;
@@ -594,6 +595,7 @@ export default class UserService {
 function processPermissions(permissions: any) {
 	return {
 		assigned_labels: (permissions?.assigned_labels as string[]) ?? [],
+		auto_assign_chats: (permissions?.auto_assign_chats as boolean) ?? false,
 		phonebook: {
 			create: (permissions?.phonebook?.create as boolean) ?? false,
 			update: (permissions?.phonebook?.update as boolean) ?? false,
