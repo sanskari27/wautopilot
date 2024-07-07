@@ -42,6 +42,8 @@ import {
 	toggleBroadcastExport,
 	toggleBroadcastReport,
 	toggleBroadcastUpdate,
+	toggleButtonExport,
+	toggleButtonRead,
 	toggleChatbotCreate,
 	toggleChatbotDelete,
 	toggleChatbotExport,
@@ -442,6 +444,28 @@ const AgentPermissionDialog = () => {
 									onChange={(value) => dispatch(toggleChatbotFlowDelete(value))}
 									label={'Delete'}
 									isChecked={chatbot_flow.delete}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Button Analysis
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleButtonRead(value))}
+									label={'Report'}
+									isChecked={buttons.read}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleButtonExport(value))}
+									label={'Export'}
+									isChecked={buttons.export}
 								/>
 							</AccordionPanel>
 						</AccordionItem>

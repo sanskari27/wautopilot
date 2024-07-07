@@ -284,6 +284,12 @@ const Slice = createSlice({
 		clearLabels: (state) => {
 			state.agentPermissions.assigned_labels = [];
 		},
+		toggleButtonRead: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.buttons.read = action.payload;
+		},
+		toggleButtonExport: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.buttons.export = action.payload;
+		},
 	},
 });
 
@@ -333,6 +339,8 @@ export const {
 	toggleTemplateUpdate,
 	toggleTemplateDelete,
 	toggleAutoAssignChats,
+	toggleButtonRead,
+	toggleButtonExport,
 	addLabels,
 	clearLabels,
 	removeLabels,
