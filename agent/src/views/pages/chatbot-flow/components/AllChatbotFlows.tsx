@@ -157,7 +157,7 @@ export default function AllChatbotFlows() {
 																<MenuItem
 																	onClick={() =>
 																		navigate(
-																			`${NAVIGATION.APP}/${NAVIGATION.CHATBOT}/button-report/${bot.id}`
+																			`${NAVIGATION.APP}/${NAVIGATION.CHATBOT_FLOW}/button-report/${bot.id}`
 																		)
 																	}
 																>

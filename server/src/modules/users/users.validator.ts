@@ -62,6 +62,10 @@ export type PermissionsValidationResult = {
 		update: boolean;
 		delete: boolean;
 	};
+	buttons?: {
+		read: boolean;
+		export: boolean;
+	};
 };
 
 export async function UpgradePlanValidator(req: Request, res: Response, next: NextFunction) {
@@ -186,6 +190,12 @@ export async function PermissionsValidator(req: Request, res: Response, next: Ne
 				create: z.boolean(),
 				update: z.boolean(),
 				delete: z.boolean(),
+			})
+			.optional(),
+		buttons: z
+			.object({
+				read: z.boolean(),
+				export: z.boolean(),
 			})
 			.optional(),
 	});

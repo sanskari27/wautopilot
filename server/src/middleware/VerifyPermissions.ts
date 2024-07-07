@@ -10,8 +10,9 @@ export default function VerifyPermissions(permission: string) {
 			return next();
 		}
 		if (user.userLevel === UserLevel.Agent) {
-			const permissions = await user.getPermissions();
-			if (!permissions[permission as keyof typeof permissions]) {
+			const permissions = (await user.getPermissions()) as any;
+			const [module, action] = permission.split('.');
+			if (!permissions[module] || !permissions[module][action]) {
 				return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
 			}
 		}
