@@ -220,6 +220,24 @@ async function bulkAssignConversationToAgent(req: Request, res: Response, next: 
 	});
 }
 
+async function transferAgentConversation(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount: account,
+		device: { device },
+		agent_id,
+	} = req.locals;
+
+	const id = req.params.id;
+
+	const conversationService = new ConversationService(account, device);
+	await conversationService.transferConversations(agent_id, id ? String(id) : undefined);
+
+	return Respond({
+		res,
+		status: 200,
+	});
+}
+
 async function removeConversationFromAgent(req: Request, res: Response, next: NextFunction) {
 	const {
 		serviceAccount: account,
@@ -246,6 +264,7 @@ const Controller = {
 	fetchConversationMessages,
 	assignConversationToAgent,
 	bulkAssignConversationToAgent,
+	transferAgentConversation,
 	removeConversationFromAgent,
 	markRead,
 	assignLabelToMessage,

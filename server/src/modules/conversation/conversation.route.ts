@@ -16,6 +16,11 @@ router
 	.all(AgentValidator, NumbersValidator)
 	.post(Controller.bulkAssignConversationToAgent);
 
+router
+	.route('/transfer-agent/:agent_id/:id')
+	.all(AgentValidator)
+	.post(Controller.transferAgentConversation);
+
 router.route('/:id/messages').all(IDValidator).get(Controller.fetchConversationMessages);
 
 router
