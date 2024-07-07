@@ -21,6 +21,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { NAVIGATION } from '../../../../config/const';
+import usePermissions from '../../../../hooks/usePermissions';
 import TemplateService from '../../../../services/template.service';
 import UploadService from '../../../../services/upload.service';
 import { StoreNames, StoreState } from '../../../../store';
@@ -54,11 +55,9 @@ export default function EditTemplate() {
 	const navigate = useNavigate();
 
 	const {
-		selected_device_id,
-		user_details: {
-			permissions: { update_template, create_template },
-		},
-	} = useSelector((state: StoreState) => state[StoreNames.USER]);
+		template: { create: create_template, update: update_template },
+	} = usePermissions();
+
 	const {
 		file,
 		details: { category, name, components },
