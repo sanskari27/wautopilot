@@ -50,7 +50,6 @@ export default function Broadcast() {
 	const toast = useToast();
 
 	const { selectedLabels, onAddLabel, onClear, onRemoveLabel } = useFilterLabels();
-
 	const { all_labels } = useFetchLabels();
 
 	const {
@@ -109,28 +108,25 @@ export default function Broadcast() {
 	function sendBroadcast(header_media: { link?: string; media_id?: string } = {}) {
 		const template = templateListFiltered.find((t) => t.id === template_id)!;
 		const header = template.components.find((c) => c.type === 'HEADER');
-		const promise = APIInstance.post(
-			`${selected_device_id}/message/broadcast/send-broadcast`,
-			{
-				name: name,
-				description: description,
-				template_id: template_id,
-				template_name: template.name,
-				to: recipients_from === 'numbers' ? to : [],
-				labels: recipients_from === 'phonebook' ? selectedLabels : [],
-				broadcast_options,
-				body,
-				...(header
-					? {
-							header: {
-								media_id: header_media.media_id,
-								link: header_media.link,
-								type: header.format,
-							},
-					  }
-					: {}),
-			}
-		);
+		const promise = APIInstance.post(`${selected_device_id}/message/broadcast/send-broadcast`, {
+			name: name,
+			description: description,
+			template_id: template_id,
+			template_name: template.name,
+			to: recipients_from === 'numbers' ? to : [],
+			labels: recipients_from === 'phonebook' ? selectedLabels : [],
+			broadcast_options,
+			body,
+			...(header
+				? {
+						header: {
+							media_id: header_media.media_id,
+							link: header_media.link,
+							type: header.format,
+						},
+				  }
+				: {}),
+		});
 
 		toast.promise(promise, {
 			success: () => {

@@ -53,15 +53,23 @@ const AppPage = () => {
 
 	useEffect(() => {
 		AuthService.isAuthenticated().then((res) => {
-			dispatch(setIsAuthenticated(res));
-			setAuthLoaded.on();
+			if (res) {
+				AuthService.userDetails().then((user) => {
+					if (user) {
+						dispatch(setUserDetails(user));
+					}
+					dispatch(setIsAuthenticated(res));
+					setAuthLoaded.on();
+				});
+			} else {
+				dispatch(setIsAuthenticated(res));
+				setAuthLoaded.on();
+			}
 		});
 	}, [dispatch, setAuthLoaded]);
 
 	const fetchUserDetails = useCallback(async () => {
 		try {
-			AuthService.userDetails().then((user) => user && dispatch(setUserDetails(user)));
-
 			const promises = [APIInstance.get(`/contacts`), AgentService.getAgent()];
 
 			const results = await Promise.all(promises);

@@ -98,22 +98,7 @@ export default class AuthService {
 				subscription_expiry: data.account.subscription_expiry ?? '',
 				walletBalance: data.account.walletBalance ?? 0,
 				no_of_devices: data.account.no_of_devices ?? 0,
-				permissions: {
-					view_broadcast_reports: data.account.permissions.view_broadcast_reports ?? false,
-					create_broadcast: data.account.permissions.create_broadcast ?? false,
-					create_recurring_broadcast: data.account.permissions.create_recurring_broadcast ?? false,
-					create_phonebook: data.account.permissions.create_phonebook ?? false,
-					update_phonebook: data.account.permissions.update_phonebook ?? false,
-					delete_phonebook: data.account.permissions.delete_phonebook ?? false,
-					auto_assign_chats: data.account.permissions.auto_assign_chats ?? false,
-					create_template: data.account.permissions.create_template ?? false,
-					update_template: data.account.permissions.update_template ?? false,
-					delete_template: data.account.permissions.delete_template ?? false,
-					manage_media: data.account.permissions.manage_media ?? false,
-					manage_contacts: data.account.permissions.manage_contacts ?? false,
-					manage_chatbot: data.account.permissions.manage_chatbot ?? false,
-					manage_chatbot_flows: data.account.permissions.manage_chatbot_flows ?? false,
-				},
+				permissions: data.account.permissions ?? {},
 			} as UserDetails;
 		} catch (err) {
 			return null;

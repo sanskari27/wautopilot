@@ -9,7 +9,7 @@ import {
 	SubscriptionDetailsDB,
 } from '../../mongo';
 import IAccount from '../../mongo/types/account';
-import { Permissions, UserLevel } from '../config/const';
+import { UserLevel } from '../config/const';
 import { AUTH_ERRORS, CustomError, PAYMENT_ERRORS } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
 import { sendLoginCredentialsEmail } from '../provider/email';
@@ -433,23 +433,7 @@ export default class UserService {
 				name: user.name ?? '',
 				email: user.email ?? '',
 				phone: user.phone ?? '',
-				permissions: {
-					assigned_labels: user.permissions.assigned_labels ?? [],
-					view_broadcast_reports: user.permissions.view_broadcast_reports ?? false,
-					create_broadcast: user.permissions.create_broadcast ?? false,
-					create_recurring_broadcast: user.permissions.create_recurring_broadcast ?? false,
-					create_phonebook: user.permissions.create_phonebook ?? false,
-					update_phonebook: user.permissions.update_phonebook ?? false,
-					delete_phonebook: user.permissions.delete_phonebook ?? false,
-					auto_assign_chats: user.permissions.auto_assign_chats ?? false,
-					create_template: user.permissions.create_template ?? false,
-					update_template: user.permissions.update_template ?? false,
-					delete_template: user.permissions.delete_template ?? false,
-					manage_media: user.permissions.manage_media ?? false,
-					manage_contacts: user.permissions.manage_contacts ?? false,
-					manage_chatbot: user.permissions.manage_chatbot ?? false,
-					manage_chatbot_flows: user.permissions.manage_chatbot_flows ?? false,
-				},
+				permissions: processPermissions(user.permissions),
 			};
 		});
 	}
@@ -498,20 +482,55 @@ export default class UserService {
 		id: Types.ObjectId,
 		opts: {
 			assigned_labels?: string[];
-			view_broadcast_reports?: boolean;
-			create_broadcast?: boolean;
-			create_recurring_broadcast?: boolean;
-			create_phonebook?: boolean;
-			update_phonebook?: boolean;
-			delete_phonebook?: boolean;
-			auto_assign_chats?: boolean;
-			create_template?: boolean;
-			update_template?: boolean;
-			delete_template?: boolean;
-			manage_media?: boolean;
-			manage_contacts?: boolean;
-			manage_chatbot?: boolean;
-			manage_chatbot_flows?: boolean;
+			phonebook?: {
+				create: boolean;
+				update: boolean;
+				delete: boolean;
+				export: boolean;
+			};
+			chatbot?: {
+				create: boolean;
+				update: boolean;
+				delete: boolean;
+				export: boolean;
+			};
+			chatbot_flow?: {
+				create: boolean;
+				update: boolean;
+				delete: boolean;
+				export: boolean;
+			};
+			broadcast?: {
+				create: boolean;
+				update: boolean;
+				report: boolean;
+				export: boolean;
+			};
+			recurring?: {
+				create: boolean;
+				update: boolean;
+				delete: boolean;
+				export: boolean;
+			};
+			media?: {
+				create: boolean;
+				update: boolean;
+				delete: boolean;
+			};
+			contacts?: {
+				create: boolean;
+				update: boolean;
+				delete: boolean;
+			};
+			template?: {
+				create: boolean;
+				update: boolean;
+				delete: boolean;
+			};
+			buttons?: {
+				read: boolean;
+				export: boolean;
+			};
 		}
 	) {
 		await PermissionDB.updateOne(
@@ -559,53 +578,70 @@ export default class UserService {
 			name: user.name ?? '',
 			email: user.email ?? '',
 			phone: user.phone ?? '',
-			permissions: {
-				assigned_labels: user.permissions.assigned_labels ?? [],
-				view_broadcast_reports: user.permissions.view_broadcast_reports ?? false,
-				create_broadcast: user.permissions.create_broadcast ?? false,
-				create_recurring_broadcast: user.permissions.create_recurring_broadcast ?? false,
-				create_phonebook: user.permissions.create_phonebook ?? false,
-				update_phonebook: user.permissions.update_phonebook ?? false,
-				delete_phonebook: user.permissions.delete_phonebook ?? false,
-				auto_assign_chats: user.permissions.auto_assign_chats ?? false,
-				create_template: user.permissions.create_template ?? false,
-				update_template: user.permissions.update_template ?? false,
-				delete_template: user.permissions.delete_template ?? false,
-				manage_media: user.permissions.manage_media ?? false,
-				manage_contacts: user.permissions.manage_contacts ?? false,
-				manage_chatbot: user.permissions.manage_chatbot ?? false,
-				manage_chatbot_flows: user.permissions.manage_chatbot_flows ?? false,
-			},
+			permissions: processPermissions(user.permissions),
 		};
 	}
 
-	async getPermissions(): Promise<
-		{
-			assigned_labels: string[];
-		} & {
-			[key in Permissions]: boolean;
-		}
-	> {
+	async getPermissions() {
 		const permission = await PermissionDB.findOne({
 			linked_to: this._user_id,
 		});
 
-		return {
-			assigned_labels: permission?.assigned_labels ?? [],
-			view_broadcast_reports: permission?.view_broadcast_reports ?? false,
-			create_broadcast: permission?.create_broadcast ?? false,
-			create_recurring_broadcast: permission?.create_recurring_broadcast ?? false,
-			create_phonebook: permission?.create_phonebook ?? false,
-			update_phonebook: permission?.update_phonebook ?? false,
-			delete_phonebook: permission?.delete_phonebook ?? false,
-			auto_assign_chats: permission?.auto_assign_chats ?? false,
-			create_template: permission?.create_template ?? false,
-			update_template: permission?.update_template ?? false,
-			delete_template: permission?.delete_template ?? false,
-			manage_media: permission?.manage_media ?? false,
-			manage_contacts: permission?.manage_contacts ?? false,
-			manage_chatbot: permission?.manage_chatbot ?? false,
-			manage_chatbot_flows: permission?.manage_chatbot_flows ?? false,
-		};
+		return processPermissions(permission);
 	}
+}
+
+function processPermissions(permissions: any) {
+	return {
+		assigned_labels: (permissions?.assigned_labels as string[]) ?? [],
+		phonebook: {
+			create: (permissions?.phonebook?.create as boolean) ?? false,
+			update: (permissions?.phonebook?.update as boolean) ?? false,
+			delete: (permissions?.phonebook?.delete as boolean) ?? false,
+			export: (permissions?.phonebook?.export as boolean) ?? false,
+		},
+		chatbot: {
+			create: (permissions?.chatbot?.create as boolean) ?? false,
+			update: (permissions?.chatbot?.update as boolean) ?? false,
+			delete: (permissions?.chatbot?.delete as boolean) ?? false,
+			export: (permissions?.chatbot?.export as boolean) ?? false,
+		},
+		chatbot_flow: {
+			create: (permissions?.chatbot_flow?.create as boolean) ?? false,
+			update: (permissions?.chatbot_flow?.update as boolean) ?? false,
+			delete: (permissions?.chatbot_flow?.delete as boolean) ?? false,
+			export: (permissions?.chatbot_flow?.export as boolean) ?? false,
+		},
+		broadcast: {
+			create: (permissions?.broadcast?.create as boolean) ?? false,
+			update: (permissions?.broadcast?.update as boolean) ?? false,
+			report: (permissions?.broadcast?.report as boolean) ?? false,
+			export: (permissions?.broadcast?.export as boolean) ?? false,
+		},
+		recurring: {
+			create: (permissions?.recurring?.create as boolean) ?? false,
+			update: (permissions?.recurring?.update as boolean) ?? false,
+			delete: (permissions?.recurring?.delete as boolean) ?? false,
+			export: (permissions?.recurring?.export as boolean) ?? false,
+		},
+		media: {
+			create: (permissions?.media?.create as boolean) ?? false,
+			update: (permissions?.media?.update as boolean) ?? false,
+			delete: (permissions?.media?.delete as boolean) ?? false,
+		},
+		contacts: {
+			create: (permissions?.contacts?.create as boolean) ?? false,
+			update: (permissions?.contacts?.update as boolean) ?? false,
+			delete: (permissions?.contacts?.delete as boolean) ?? false,
+		},
+		template: {
+			create: (permissions?.template?.create as boolean) ?? false,
+			update: (permissions?.template?.update as boolean) ?? false,
+			delete: (permissions?.template?.delete as boolean) ?? false,
+		},
+		buttons: {
+			read: (permissions?.buttons?.read as boolean) ?? false,
+			export: (permissions?.buttons?.export as boolean) ?? false,
+		},
+	};
 }

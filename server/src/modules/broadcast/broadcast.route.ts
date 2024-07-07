@@ -9,63 +9,70 @@ const router = express.Router();
 
 // ------------------------------------------Recurring------------------------------------------
 
-const recurringPermission = VerifyPermissions(Permissions.create_recurring_broadcast);
-const createBroadcastPermission = VerifyPermissions(Permissions.create_broadcast);
-const viewBroadcastPermission = VerifyPermissions(Permissions.view_broadcast_reports);
-
 router
 	.route('/recurring/:id/reschedule')
-	.all(IDValidator, recurringPermission)
+	.all(IDValidator, VerifyPermissions(Permissions.recurring.update))
 	.post(Controller.rescheduleRecurringBroadcast);
 
 router
 	.route('/recurring/:id/toggle')
-	.all(IDValidator, recurringPermission)
+	.all(IDValidator, VerifyPermissions(Permissions.recurring.update))
 	.post(Controller.toggleRecurringBroadcast);
 
 router
 	.route('/recurring/:id')
-	.all(IDValidator, recurringPermission)
-	.get(Controller.fetchRecurringBroadcast)
-	.delete(Controller.deleteRecurringBroadcast)
-	.put(CreateRecurringValidator, Controller.updateRecurringBroadcast);
+	.all(IDValidator)
+	.get(VerifyPermissions(Permissions.recurring.export), Controller.fetchRecurringBroadcast)
+	.delete(VerifyPermissions(Permissions.recurring.delete), Controller.deleteRecurringBroadcast)
+	.put(
+		VerifyPermissions(Permissions.recurring.update),
+		CreateRecurringValidator,
+		Controller.updateRecurringBroadcast
+	);
 
 router
 	.route('/recurring')
-	.all(recurringPermission)
 	.get(Controller.listRecurringBroadcasts)
-	.post(CreateRecurringValidator, Controller.scheduleRecurringBroadcast);
+	.post(
+		VerifyPermissions(Permissions.recurring.create),
+		CreateRecurringValidator,
+		Controller.scheduleRecurringBroadcast
+	);
 
 // -----------------------------------------------------------------------------------
-router.route('/reports').all(viewBroadcastPermission).get(Controller.broadcastReport);
+router
+	.route('/reports')
+	.all(VerifyPermissions(Permissions.broadcast.report))
+	.get(Controller.broadcastReport);
+
 router
 	.route('/send')
-	.all(createBroadcastPermission, CreateBroadcastValidator)
+	.all(VerifyPermissions(Permissions.broadcast.create), CreateBroadcastValidator)
 	.post(Controller.sendTemplateMessage);
 router
 	.route('/:id/pause')
-	.all(createBroadcastPermission, IDValidator)
+	.all(VerifyPermissions(Permissions.broadcast.update), IDValidator)
 	.post(Controller.pauseBroadcast);
 router
 	.route('/:id/resume')
-	.all(createBroadcastPermission, IDValidator)
+	.all(VerifyPermissions(Permissions.broadcast.update), IDValidator)
 	.post(Controller.resumeBroadcast);
 router
 	.route('/:id/delete')
-	.all(createBroadcastPermission, IDValidator)
+	.all(VerifyPermissions(Permissions.broadcast.update), IDValidator)
 	.post(Controller.deleteBroadcast);
 router
 	.route('/:id/resend')
-	.all(createBroadcastPermission, IDValidator)
+	.all(VerifyPermissions(Permissions.broadcast.update), IDValidator)
 	.post(Controller.resendBroadcast);
 router
 	.route('/:id/download')
-	.all(createBroadcastPermission, IDValidator)
+	.all(VerifyPermissions(Permissions.broadcast.export), IDValidator)
 	.get(Controller.downloadBroadcast);
 
 router
 	.route('/:id/button-responses')
-	.all(viewBroadcastPermission, IDValidator)
+	.all(VerifyPermissions(Permissions.buttons.read), IDValidator)
 	.get(Controller.buttonResponses);
 
 export default router;

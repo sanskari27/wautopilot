@@ -26,6 +26,7 @@ import { DeleteIcon } from '@chakra-ui/icons';
 import { HiUpload } from 'react-icons/hi';
 import { useFetchLabels } from '../../../hooks/useFetchLabels';
 import useFilterLabels from '../../../hooks/useFilterLabels';
+import usePermissions from '../../../hooks/usePermissions';
 import PhoneBookService from '../../../services/phonebook.service';
 import {
 	addSelected,
@@ -66,10 +67,8 @@ export default function Phonebook() {
 	const { all_labels } = useFetchLabels();
 
 	const {
-		user_details: {
-			permissions: { create_phonebook, delete_phonebook },
-		},
-	} = useSelector((state: StoreState) => state[StoreNames.USER]);
+		phonebook: { create: create_phonebook, delete: delete_phonebook, export: export_phonebook },
+	} = usePermissions();
 
 	const {
 		list,
@@ -247,14 +246,18 @@ export default function Phonebook() {
 							</Button>
 						</>
 					) : (
-						<Button
-							size={'sm'}
-							colorScheme='teal'
-							leftIcon={<BiExport color='white' fontSize={'1.2rem'} />}
-							onClick={handleExport}
-						>
-							Export
-						</Button>
+						<Show>
+							<Show.When condition={export_phonebook}>
+								<Button
+									size={'sm'}
+									colorScheme='teal'
+									leftIcon={<BiExport color='white' fontSize={'1.2rem'} />}
+									onClick={handleExport}
+								>
+									Export
+								</Button>
+							</Show.When>
+						</Show>
 					)}
 					<Show>
 						<Show.When condition={create_phonebook}>

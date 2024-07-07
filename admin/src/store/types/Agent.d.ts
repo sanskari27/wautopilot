@@ -53,6 +53,10 @@ export type AgentPermission = {
 		update: boolean;
 		delete: boolean;
 	};
+	buttons: {
+		read: boolean;
+		export: boolean;
+	};
 	auto_assign_chats: boolean;
 	assigned_labels: string[];
 };

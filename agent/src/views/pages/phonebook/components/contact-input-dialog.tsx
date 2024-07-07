@@ -30,6 +30,7 @@ import { MdAdd, MdRemove } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFetchLabels } from '../../../../hooks/useFetchLabels';
 import useFilterLabels from '../../../../hooks/useFilterLabels';
+import usePermissions from '../../../../hooks/usePermissions';
 import PhoneBookService from '../../../../services/phonebook.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
@@ -78,10 +79,9 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 	}));
 
 	const {
-		user_details: {
-			permissions: { update_phonebook },
-		},
-	} = useSelector((state: StoreState) => state[StoreNames.USER]);
+		phonebook: { update: update_phonebook },
+	} = usePermissions();
+
 	const { details, uiDetails, field_name, label_input } = useSelector(
 		(state: StoreState) => state[StoreNames.PHONEBOOK]
 	);
@@ -345,7 +345,7 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 							Cancel
 						</Button>
 						<Show>
-							<Show.When condition={update_phonebook && id}>
+							<Show.When condition={update_phonebook && !!id}>
 								<Button isLoading={isSaving} colorScheme='green' onClick={handleSave}>
 									Save
 								</Button>

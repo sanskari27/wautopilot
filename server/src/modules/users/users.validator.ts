@@ -17,20 +17,51 @@ export type CreateAgentValidationResult = {
 
 export type PermissionsValidationResult = {
 	assigned_labels?: string[];
-	view_broadcast_reports?: boolean;
-	create_broadcast?: boolean;
-	create_recurring_broadcast?: boolean;
-	create_phonebook?: boolean;
-	update_phonebook?: boolean;
-	delete_phonebook?: boolean;
-	auto_assign_chats?: boolean;
-	create_template?: boolean;
-	update_template?: boolean;
-	delete_template?: boolean;
-	manage_media?: boolean;
-	manage_contacts?: boolean;
-	manage_chatbot?: boolean;
-	manage_chatbot_flows?: boolean;
+	phonebook?: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		export: boolean;
+	};
+	chatbot?: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		export: boolean;
+	};
+	chatbot_flow?: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		export: boolean;
+	};
+	broadcast?: {
+		create: boolean;
+		update: boolean;
+		report: boolean;
+		export: boolean;
+	};
+	recurring?: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		export: boolean;
+	};
+	media?: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	contacts?: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	template?: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
 };
 
 export async function UpgradePlanValidator(req: Request, res: Response, next: NextFunction) {
@@ -96,20 +127,67 @@ export async function CreateAgentValidator(req: Request, res: Response, next: Ne
 export async function PermissionsValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
 		assigned_labels: z.array(z.string()).optional(),
-		view_broadcast_reports: z.boolean().optional(),
-		create_broadcast: z.boolean().optional(),
-		create_recurring_broadcast: z.boolean().optional(),
-		create_phonebook: z.boolean().optional(),
-		update_phonebook: z.boolean().optional(),
-		delete_phonebook: z.boolean().optional(),
-		auto_assign_chats: z.boolean().optional(),
-		create_template: z.boolean().optional(),
-		update_template: z.boolean().optional(),
-		delete_template: z.boolean().optional(),
-		manage_media: z.boolean().optional(),
-		manage_contacts: z.boolean().optional(),
-		manage_chatbot: z.boolean().optional(),
-		manage_chatbot_flows: z.boolean().optional(),
+		phonebook: z
+			.object({
+				create: z.boolean(),
+				update: z.boolean(),
+				delete: z.boolean(),
+				export: z.boolean(),
+			})
+			.optional(),
+		chatbot: z
+			.object({
+				create: z.boolean(),
+				update: z.boolean(),
+				delete: z.boolean(),
+				export: z.boolean(),
+			})
+			.optional(),
+		chatbot_flow: z
+			.object({
+				create: z.boolean(),
+				update: z.boolean(),
+				delete: z.boolean(),
+				export: z.boolean(),
+			})
+			.optional(),
+		broadcast: z
+			.object({
+				create: z.boolean(),
+				update: z.boolean(),
+				report: z.boolean(),
+				export: z.boolean(),
+			})
+			.optional(),
+		recurring: z
+			.object({
+				create: z.boolean(),
+				update: z.boolean(),
+				delete: z.boolean(),
+				export: z.boolean(),
+			})
+			.optional(),
+		media: z
+			.object({
+				create: z.boolean(),
+				update: z.boolean(),
+				delete: z.boolean(),
+			})
+			.optional(),
+		contacts: z
+			.object({
+				create: z.boolean(),
+				update: z.boolean(),
+				delete: z.boolean(),
+			})
+			.optional(),
+		template: z
+			.object({
+				create: z.boolean(),
+				update: z.boolean(),
+				delete: z.boolean(),
+			})
+			.optional(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

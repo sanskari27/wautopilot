@@ -6,18 +6,24 @@ import Controller from './contacts.controller';
 import { CreateContactValidator, MultiDeleteValidator } from './contacts.validator';
 
 const router = express.Router();
-const contactsPermission = VerifyPermissions(Permissions.manage_contacts);
 
 router
 	.route('/:id')
-	.all(contactsPermission, IDValidator)
+	.all(VerifyPermissions(Permissions.contacts.update), IDValidator)
 	.put(CreateContactValidator, Controller.updateContact);
 
 router
 	.route('/')
 	.get(Controller.getContacts)
-	.all(contactsPermission)
-	.delete(MultiDeleteValidator, Controller.deleteContact)
-	.post(CreateContactValidator, Controller.createContact);
+	.delete(
+		VerifyPermissions(Permissions.contacts.delete),
+		MultiDeleteValidator,
+		Controller.deleteContact
+	)
+	.post(
+		VerifyPermissions(Permissions.contacts.create),
+		CreateContactValidator,
+		Controller.createContact
+	);
 
 export default router;

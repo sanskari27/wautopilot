@@ -33,6 +33,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useOutlet } from 'react-router-dom';
 import APIInstance from '../../../config/APIInstance';
 import { NAVIGATION, SERVER_URL } from '../../../config/const';
+import usePermissions from '../../../hooks/usePermissions';
 import MediaService from '../../../services/media.service';
 import { StoreNames, StoreState } from '../../../store';
 import { deleteMedia } from '../../../store/reducers/MediaReducer';
@@ -49,11 +50,10 @@ const MediaPage = () => {
 	const toast = useToast();
 	const deleteDialogRef = useRef<DeleteAlertHandle>(null);
 	const {
-		selected_device_id,
-		user_details: {
-			permissions: { manage_media },
-		},
-	} = useSelector((state: StoreState) => state[StoreNames.USER]);
+		media: { create: create_media, delete: delete_media, update: update_media },
+	} = usePermissions();
+
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const {
 		list,
 		uiDetails: { isFetching },
@@ -79,18 +79,20 @@ const MediaPage = () => {
 				<Text fontSize={'2xl'} fontWeight={'bold'}>
 					Media
 				</Text>
-				{manage_media && (
-					<Link to={`${NAVIGATION.APP}/${NAVIGATION.MEDIA}/new`}>
-						<Button
-							variant='outline'
-							size={'sm'}
-							colorScheme='green'
-							leftIcon={<IoMdCloudUpload />}
-						>
-							Upload Media
-						</Button>
-					</Link>
-				)}
+				<Show>
+					<Show.When condition={create_media}>
+						<Link to={`${NAVIGATION.APP}/${NAVIGATION.MEDIA}/new`}>
+							<Button
+								variant='outline'
+								size={'sm'}
+								colorScheme='green'
+								leftIcon={<IoMdCloudUpload />}
+							>
+								Upload Media
+							</Button>
+						</Link>
+					</Show.When>
+				</Show>
 			</Flex>
 
 			<Box marginTop={'1rem'} width={'98%'} pb={'5rem'}>
@@ -134,71 +136,77 @@ const MediaPage = () => {
 									<Th width={'15%'}>Type</Th>
 									<Th width={'10%'}>Size</Th>
 									<Show>
-										<Show.When condition={manage_media}>
+										<Show.When condition={update_media || delete_media}>
 											<Th width={'10%'}>Action</Th>
 										</Show.When>
 									</Show>
 								</Tr>
 							</Thead>
 							<Tbody>
-								{isFetching ? (
-									<>
+								<Show>
+									<Show.When condition={isFetching}>
 										<Each
 											items={Array.from({ length: 20 })}
 											render={() => (
 												<Tr>
-													<Td colSpan={manage_media ? 5 : 4} textAlign={'center'}>
+													<Td colSpan={update_media || delete_media ? 5 : 4} textAlign={'center'}>
 														<Skeleton height={'1.2rem'} />
 													</Td>
 												</Tr>
 											)}
 										/>
-									</>
-								) : list.length === 0 ? (
-									<Tr>
-										<Td colSpan={manage_media ? 5 : 4} textAlign={'center'}>
-											No records found
-										</Td>
-									</Tr>
-								) : (
-									<Each
-										items={list}
-										render={(record, index) => (
-											<Tr cursor={'pointer'}>
-												<Td isNumeric>{index + 1}.</Td>
-												<Td>{record.filename}</Td>
-												<Td>{record.mime_type}</Td>
-												<Td>{getFileSize(record.file_length)}</Td>
-												<Show>
-													<Show.When condition={manage_media}>
-														<Td>
-															<HStack>
-																<a
-																	href={`${SERVER_URL}media/${selected_device_id}/${record.id}/download`}
-																	target='_blank'
-																>
+									</Show.When>
+									<Show.When condition={list.length === 0}>
+										<Tr>
+											<Td colSpan={update_media || delete_media ? 5 : 4} textAlign={'center'}>
+												No records found
+											</Td>
+										</Tr>
+									</Show.When>
+									<Show.Else>
+										<Each
+											items={list}
+											render={(record, index) => (
+												<Tr cursor={'pointer'}>
+													<Td isNumeric>{index + 1}.</Td>
+													<Td>{record.filename}</Td>
+													<Td>{record.mime_type}</Td>
+													<Td>{getFileSize(record.file_length)}</Td>
+													<Td>
+														<HStack>
+															<Show>
+																<Show.When condition={update_media}>
+																	<a
+																		href={`${SERVER_URL}media/${selected_device_id}/${record.id}/download`}
+																		target='_blank'
+																	>
+																		<IconButton
+																			aria-label='Preview'
+																			icon={<DownloadIcon />}
+																			color={'blue'}
+																			border={'1px blue solid'}
+																		/>
+																	</a>
+																</Show.When>
+															</Show>
+															<Show>
+																<Show.When condition={delete_media}>
 																	<IconButton
 																		aria-label='Preview'
-																		icon={<DownloadIcon />}
-																		color={'blue'}
-																		border={'1px blue solid'}
+																		icon={<DeleteIcon />}
+																		border={'1px red solid'}
+																		color={'red'}
+																		onClick={() => deleteDialogRef.current?.open(record.id)}
 																	/>
-																</a>
-																<IconButton
-																	aria-label='Preview'
-																	icon={<DeleteIcon />}
-																	border={'1px red solid'}
-																	color={'red'}
-																	onClick={() => deleteDialogRef.current?.open(record.id)}
-																/>
-															</HStack>
-														</Td>
-													</Show.When>
-												</Show>
-											</Tr>
-										)}
-									/>
-								)}
+																</Show.When>
+															</Show>
+														</HStack>
+													</Td>
+												</Tr>
+											)}
+										/>
+									</Show.Else>
+								</Show>
 							</Tbody>
 						</Table>
 					</TableContainer>
@@ -223,11 +231,9 @@ function PreviewElement({ media, onRemove }: { media: Media; onRemove: () => voi
 
 	const [progress, setProgress] = useState(0);
 	const {
-		selected_device_id,
-		user_details: {
-			permissions: { manage_media },
-		},
-	} = useSelector((state: StoreState) => state[StoreNames.USER]);
+		media: { delete: delete_media },
+	} = usePermissions();
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	useEffect(() => {
 		if (!selected_device_id) return;
@@ -342,18 +348,19 @@ function PreviewElement({ media, onRemove }: { media: Media; onRemove: () => voi
 
 						<Text fontWeight={'medium'}>{data?.size}</Text>
 					</Flex>
-					<Show>
-						<Show.When condition={manage_media}>
-							<Flex gap='2'>
-								<Button
-									leftIcon={<DownloadIcon />}
-									variant='outline'
-									colorScheme='green'
-									onClick={download}
-									flexGrow={1}
-								>
-									Download
-								</Button>
+
+					<Flex gap='2'>
+						<Button
+							leftIcon={<DownloadIcon />}
+							variant='outline'
+							colorScheme='green'
+							onClick={download}
+							flexGrow={1}
+						>
+							Download
+						</Button>
+						<Show>
+							<Show.When condition={delete_media}>
 								<IconButton
 									aria-label='delete'
 									icon={<DeleteIcon color={'red.400'} />}
@@ -365,9 +372,9 @@ function PreviewElement({ media, onRemove }: { media: Media; onRemove: () => voi
 									}}
 									onClick={onRemove}
 								/>
-							</Flex>
-						</Show.When>
-					</Show>
+							</Show.When>
+						</Show>
+					</Flex>
 				</VStack>
 			</CardFooter>
 		</Card>

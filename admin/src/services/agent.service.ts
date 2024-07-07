@@ -12,23 +12,12 @@ export default class AgentService {
 					name: agent.name ?? '',
 					email: agent.email ?? '',
 					phone: agent.phone ?? '',
-					permissions: {
-						assigned_labels: agent.permissions?.assigned_labels ?? [],
-						view_broadcast_reports: agent.permissions?.view_broadcast_reports ?? false,
-						create_broadcast: agent.permissions?.create_broadcast ?? false,
-						create_phonebook: agent.permissions?.create_phonebook ?? false,
-						update_phonebook: agent.permissions?.update_phonebook ?? false,
-						delete_phonebook: agent.permissions?.delete_phonebook ?? false,
-						auto_assign_chats: agent.permissions?.auto_assign_chats ?? false,
-						create_template: agent.permissions?.create_template ?? false,
-						update_template: agent.permissions?.update_template ?? false,
-						delete_template: agent.permissions?.delete_template ?? false,
-						create_recurring: agent.permissions?.create_recurring ?? false,
-					},
+					permissions: agent.permissions ?? {},
 				};
 			});
 		} catch (err) {
 			//ignore
+			return [];
 		}
 	}
 
@@ -151,6 +140,10 @@ export default class AgentService {
 						create: data.permissions?.template?.create ?? false,
 						update: data.permissions?.template?.update ?? false,
 						delete: data.permissions?.template?.delete ?? false,
+					},
+					buttons: {
+						read: data.permissions?.buttons?.read ?? false,
+						export: data.permissions?.buttons?.export ?? false,
 					},
 					auto_assign_chats: data.permissions?.auto_assign_chats ?? false,
 					assigned_labels: data.permissions?.assigned_labels ?? [],

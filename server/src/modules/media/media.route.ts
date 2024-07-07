@@ -6,16 +6,17 @@ import Controller from './media.controller';
 
 const router = express.Router();
 
-const mediaPermission = VerifyPermissions(Permissions.manage_media);
-
 router.route('/:id/download').all(IDValidator).get(Controller.downloadMedia);
 
 router
 	.route('/:id')
-	.all(mediaPermission, IDValidator)
+	.all(IDValidator)
 	.get(Controller.mediaById)
-	.delete(Controller.deleteMedia);
+	.delete(VerifyPermissions(Permissions.media.delete), Controller.deleteMedia);
 
-router.route('/').get(Controller.listMedia).all(mediaPermission).post(Controller.addMedia);
+router
+	.route('/')
+	.get(Controller.listMedia)
+	.post(VerifyPermissions(Permissions.media.create), Controller.addMedia);
 
 export default router;

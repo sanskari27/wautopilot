@@ -1,5 +1,7 @@
 import express from 'express';
+import { Permissions } from '../../config/const';
 import { IDValidator } from '../../middleware';
+import VerifyPermissions from '../../middleware/VerifyPermissions';
 import Controller from './phonebook.controller';
 import {
 	LabelValidator,
@@ -14,23 +16,48 @@ router.route('/all-labels').get(Controller.getAllLabels);
 
 router
 	.route('/set-labels/phone/:phone_number')
-	.all(LabelValidator)
+	.all(VerifyPermissions(Permissions.phonebook.update), LabelValidator)
 	.post(Controller.setLabelsByPhone);
-router.route('/set-labels').all(LabelValidator).post(Controller.setLabels);
-router.route('/add-labels').all(LabelValidator).post(Controller.addLabels);
-router.route('/remove-labels').all(LabelValidator).post(Controller.removeLabels);
+router
+	.route('/set-labels')
+	.all(VerifyPermissions(Permissions.phonebook.update), LabelValidator)
+	.post(Controller.setLabels);
+router
+	.route('/add-labels')
+	.all(VerifyPermissions(Permissions.phonebook.update), LabelValidator)
+	.post(Controller.addLabels);
+router
+	.route('/remove-labels')
+	.all(VerifyPermissions(Permissions.phonebook.update), LabelValidator)
+	.post(Controller.removeLabels);
 
-router.route('/bulk-upload').post(Controller.bulkUpload);
+router
+	.route('/bulk-upload')
+	.post(VerifyPermissions(Permissions.phonebook.create), Controller.bulkUpload);
 
-router.route('/delete-multiple').all(MultiDeleteValidator).post(Controller.deleteMultiple);
-router.route('/export').get(Controller.exportRecords);
-router.route('/').get(Controller.records).all(RecordsValidator).post(Controller.addRecords);
+router
+	.route('/delete-multiple')
+	.all(VerifyPermissions(Permissions.phonebook.delete), MultiDeleteValidator)
+	.post(Controller.deleteMultiple);
+
+router
+	.route('/export')
+	.get(VerifyPermissions(Permissions.phonebook.export), Controller.exportRecords);
 
 router
 	.route('/:id')
 	.all(IDValidator)
-	.delete(Controller.deleteRecords)
-	.all(RecordUpdateValidator)
-	.put(Controller.updateRecords);
+	.delete(VerifyPermissions(Permissions.phonebook.delete), Controller.deleteRecords)
+	.put(
+		VerifyPermissions(Permissions.phonebook.update),
+		RecordUpdateValidator,
+		Controller.updateRecords
+	);
+
+router
+	.route('/')
+	.get(Controller.records)
+	.all(RecordsValidator)
+	.post(VerifyPermissions(Permissions.phonebook.create), Controller.addRecords);
 
 export default router;

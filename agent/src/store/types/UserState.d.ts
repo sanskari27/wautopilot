@@ -39,19 +39,56 @@ export type UserDetails = {
 	no_of_devices: number;
 
 	permissions: {
-		view_broadcast_reports: false;
-		create_broadcast: false;
-		create_recurring_broadcast: false;
-		create_phonebook: false;
-		update_phonebook: false;
-		delete_phonebook: false;
-		auto_assign_chats: false;
-		create_template: false;
-		update_template: false;
-		delete_template: false;
-		manage_media: false;
-		manage_contacts: false;
-		manage_chatbot: false;
-		manage_chatbot_flows: false;
+		phonebook: {
+			create: boolean;
+			update: boolean;
+			delete: boolean;
+			export: boolean;
+		};
+		chatbot: {
+			create: boolean;
+			update: boolean;
+			delete: boolean;
+			export: boolean;
+		};
+		chatbot_flow: {
+			create: boolean;
+			update: boolean;
+			delete: boolean;
+			export: boolean;
+		};
+		broadcast: {
+			create: boolean;
+			update: boolean;
+			report: boolean;
+			export: boolean;
+		};
+		recurring: {
+			create: boolean;
+			update: boolean;
+			delete: boolean;
+			export: boolean;
+		};
+		media: {
+			create: boolean;
+			update: boolean;
+			delete: boolean;
+		};
+		contacts: {
+			create: boolean;
+			update: boolean;
+			delete: boolean;
+		};
+		template: {
+			create: boolean;
+			update: boolean;
+			delete: boolean;
+		};
+		buttons: {
+			read: boolean;
+			export: boolean;
+		};
+		auto_assign_chats: boolean;
+		assigned_labels: string[];
 	};
 };

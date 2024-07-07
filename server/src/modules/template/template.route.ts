@@ -12,17 +12,17 @@ const router = express.Router();
 
 router
 	.route('/add-template')
-	.all(VerifyPermissions(Permissions.create_template), TemplateCreateValidator)
+	.all(VerifyPermissions(Permissions.template.create), TemplateCreateValidator)
 	.post(Controller.addTemplate);
 
 router
 	.route('/edit-template')
-	.all(VerifyPermissions(Permissions.update_template), TemplateEditValidator)
+	.all(VerifyPermissions(Permissions.template.update), TemplateEditValidator)
 	.post(Controller.editTemplate);
 
 router
 	.route('/delete-template')
-	.all(VerifyPermissions(Permissions.delete_template), TemplateRemoveValidator)
+	.all(VerifyPermissions(Permissions.template.delete), TemplateRemoveValidator)
 	.post(Controller.deleteTemplate);
 
 router.route('/:id').get(Controller.fetchTemplate);

@@ -39,16 +39,10 @@ async function getAllLabels(req: Request, res: Response, next: NextFunction) {
 }
 
 async function addRecords(req: Request, res: Response, next: NextFunction) {
-	const { user, serviceAccount } = req.locals;
+	const { serviceAccount } = req.locals;
 	const { records } = req.locals.data as RecordsValidationResult;
 
 	try {
-		if (user.userLevel === UserLevel.Agent) {
-			const permissions = await user.getPermissions();
-			if (!permissions.create_phonebook) {
-				return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
-			}
-		}
 		const phoneBookService = new PhoneBookService(serviceAccount);
 		const created = await phoneBookService.addRecords(records);
 
@@ -167,16 +161,9 @@ async function exportRecords(req: Request, res: Response, next: NextFunction) {
 }
 
 async function updateRecords(req: Request, res: Response, next: NextFunction) {
-	const { user, serviceAccount } = req.locals;
+	const { serviceAccount } = req.locals;
 	const data = req.locals.data as SingleRecordValidationResult;
 	const id = req.locals.id;
-
-	if (user.userLevel === UserLevel.Agent) {
-		const permissions = await user.getPermissions();
-		if (!permissions.update_phonebook) {
-			return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
-		}
-	}
 
 	try {
 		const phoneBookService = new PhoneBookService(serviceAccount);
@@ -195,14 +182,8 @@ async function updateRecords(req: Request, res: Response, next: NextFunction) {
 }
 
 async function deleteRecords(req: Request, res: Response, next: NextFunction) {
-	const { user, serviceAccount, id } = req.locals;
+	const { serviceAccount, id } = req.locals;
 
-	if (user.userLevel === UserLevel.Agent) {
-		const permissions = await user.getPermissions();
-		if (!permissions.delete_phonebook) {
-			return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
-		}
-	}
 	try {
 		const phoneBookService = new PhoneBookService(serviceAccount);
 		await phoneBookService.deleteRecord([id]);
@@ -222,14 +203,8 @@ async function deleteRecords(req: Request, res: Response, next: NextFunction) {
 async function deleteMultiple(req: Request, res: Response, next: NextFunction) {
 	const { ids } = req.locals.data as MultiDeleteValidationResult;
 
-	const { user, serviceAccount } = req.locals;
+	const { serviceAccount } = req.locals;
 
-	if (user.userLevel === UserLevel.Agent) {
-		const permissions = await user.getPermissions();
-		if (!permissions.delete_phonebook) {
-			return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
-		}
-	}
 	try {
 		const phoneBookService = new PhoneBookService(serviceAccount);
 		await phoneBookService.deleteRecord(ids);

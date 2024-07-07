@@ -20,12 +20,14 @@ import { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
+import usePermissions from '../../../hooks/usePermissions';
 import RecurringService from '../../../services/recurring.service';
 import { StoreNames, StoreState } from '../../../store';
 import { removeRecurring, toggleRecurring } from '../../../store/reducers/RecurringReducer';
 import ConfirmationAlert, { ConfirmationAlertHandle } from '../../components/confirmation-alert';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import Each from '../../components/utils/Each';
+import Show from '../../components/utils/Show';
 
 export default function AllRecurringList() {
 	const dispatch = useDispatch();
@@ -38,6 +40,7 @@ export default function AllRecurringList() {
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const deleteAlertRef = useRef<DeleteAlertHandle>(null);
 	const confirmationAlertRef = useRef<ConfirmationAlertHandle>(null);
+	const { recurring: permission, buttons: buttonPermission } = usePermissions();
 
 	const deleteBot = (id: string) => {
 		const promise = RecurringService.deleteRecurring({
@@ -103,6 +106,8 @@ export default function AllRecurringList() {
 		navigate(`${NAVIGATION.APP}/${NAVIGATION.RECURRING}/${id}`);
 	};
 
+	const canManipulate = permission.update || permission.delete || permission.export;
+
 	return (
 		<>
 			<TableContainer border={'1px dashed gray'} rounded={'2xl'}>
@@ -113,29 +118,33 @@ export default function AllRecurringList() {
 							<Th width={'35%'}>Description</Th>
 							<Th width={'5%'}>Wish type</Th>
 							<Th width={'5%'}>Delay</Th>
-							<Th width={'10%'}>Actions</Th>
+							<Show>
+								<Show.When condition={canManipulate}>
+									<Th width={'10%'}>Actions</Th>
+								</Show.When>
+							</Show>
 						</Tr>
 					</Thead>
 					<Tbody>
 						{isLoading ? (
 							<>
 								<Tr>
-									<Td colSpan={6}>
+									<Td colSpan={canManipulate ? 6 : 5}>
 										<Skeleton height={'2rem'} width={'100%'} />
 									</Td>
 								</Tr>
 								<Tr>
-									<Td colSpan={6}>
+									<Td colSpan={canManipulate ? 6 : 5}>
 										<Skeleton height={'2rem'} width={'100%'} />
 									</Td>
 								</Tr>
 								<Tr>
-									<Td colSpan={6}>
+									<Td colSpan={canManipulate ? 6 : 5}>
 										<Skeleton height={'2rem'} width={'100%'} />
 									</Td>
 								</Tr>
 								<Tr>
-									<Td colSpan={6}>
+									<Td colSpan={canManipulate ? 6 : 5}>
 										<Skeleton height={'2rem'} width={'100%'} />
 									</Td>
 								</Tr>
@@ -149,47 +158,73 @@ export default function AllRecurringList() {
 										<Td className='whitespace-break-spaces'>{recurring.description}</Td>
 										<Td>{recurring.wish_from}</Td>
 										<Td>{recurring.delay} Days</Td>
-										<Td>
-											<Menu>
-												<MenuButton as={Button} rightIcon={<ChevronDownIcon />} size='sm'>
-													Actions
-												</MenuButton>
-												<MenuList>
-													<MenuItem onClick={() => handleEditBot(recurring.id)}>Edit</MenuItem>
-													<MenuItem
-														onClick={() =>
-															confirmationAlertRef.current?.open({
-																id: recurring.id,
-																disclaimer: 'Are you sure you want to change running status?',
-																type: 'TOGGLE_BOT',
-															})
-														}
-													>
-														<Text color={recurring.active ? 'red' : 'green'}>
-															{recurring.active ? 'Stop' : 'Play'}
-														</Text>
-													</MenuItem>
-													<MenuItem onClick={() => handleDownload(recurring.id)}>
-														Download Report
-													</MenuItem>
-													<MenuItem
-														onClick={() =>
-															navigate(
-																`${NAVIGATION.APP}/${NAVIGATION.CHATBOT}/button-report/${recurring.id}`
-															)
-														}
-													>
-														Button Click Report
-													</MenuItem>
-													<MenuItem onClick={() => handleReschedule(recurring.id)}>
-														Reschedule Today's Messages
-													</MenuItem>
-													<MenuItem onClick={() => deleteAlertRef.current?.open(recurring.id)}>
-														Delete
-													</MenuItem>
-												</MenuList>
-											</Menu>
-										</Td>
+										<Show>
+											<Show.When condition={canManipulate}>
+												<Td>
+													<Menu>
+														<MenuButton as={Button} rightIcon={<ChevronDownIcon />} size='sm'>
+															Actions
+														</MenuButton>
+														<MenuList>
+															<Show>
+																<Show.When condition={permission.update}>
+																	<MenuItem onClick={() => handleEditBot(recurring.id)}>
+																		Edit
+																	</MenuItem>
+																	<MenuItem
+																		onClick={() =>
+																			confirmationAlertRef.current?.open({
+																				id: recurring.id,
+																				disclaimer:
+																					'Are you sure you want to change running status?',
+																				type: 'TOGGLE_BOT',
+																			})
+																		}
+																	>
+																		<Text color={recurring.active ? 'red' : 'green'}>
+																			{recurring.active ? 'Stop' : 'Play'}
+																		</Text>
+																	</MenuItem>
+																	<MenuItem onClick={() => handleReschedule(recurring.id)}>
+																		Reschedule Today's Messages
+																	</MenuItem>
+																</Show.When>
+															</Show>
+
+															<Show>
+																<Show.When condition={permission.export}>
+																	<MenuItem onClick={() => handleDownload(recurring.id)}>
+																		Download Report
+																	</MenuItem>
+																</Show.When>
+															</Show>
+															<Show>
+																<Show.When condition={buttonPermission.read}>
+																	<MenuItem
+																		onClick={() =>
+																			navigate(
+																				`${NAVIGATION.APP}/${NAVIGATION.CHATBOT}/button-report/${recurring.id}`
+																			)
+																		}
+																	>
+																		Button Click Report
+																	</MenuItem>
+																</Show.When>
+															</Show>
+															<Show>
+																<Show.When condition={permission.delete}>
+																	<MenuItem
+																		onClick={() => deleteAlertRef.current?.open(recurring.id)}
+																	>
+																		Delete
+																	</MenuItem>
+																</Show.When>
+															</Show>
+														</MenuList>
+													</Menu>
+												</Td>
+											</Show.When>
+										</Show>
 									</Tr>
 								)}
 							/>

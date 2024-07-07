@@ -5,18 +5,53 @@ export default interface IPermission extends Document {
 	linked_to: Types.ObjectId;
 
 	assigned_labels: string[];
-	view_broadcast_reports: boolean;
-	create_broadcast: boolean;
-	create_recurring_broadcast: boolean;
-	create_phonebook: boolean;
-	update_phonebook: boolean;
-	delete_phonebook: boolean;
-	auto_assign_chats: boolean;
-	create_template: boolean;
-	update_template: boolean;
-	delete_template: boolean;
-	manage_media: boolean;
-	manage_contacts: boolean;
-	manage_chatbot: boolean;
-	manage_chatbot_flows: boolean;
+	phonebook: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		export: boolean;
+	};
+	chatbot: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		export: boolean;
+	};
+	chatbot_flow: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		export: boolean;
+	};
+	broadcast: {
+		create: boolean;
+		update: boolean;
+		report: boolean;
+		export: boolean;
+	};
+	recurring: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		export: boolean;
+	};
+	media: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	contacts: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	template: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	buttons: {
+		read: boolean;
+		export: boolean;
+	};
 }

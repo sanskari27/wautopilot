@@ -1,14 +1,13 @@
-import { Suspense, lazy, useEffect } from 'react';
-import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Suspense, lazy } from 'react';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import { NAVIGATION } from './config/const';
 
 import { Flex, Progress } from '@chakra-ui/react';
-import { useDispatch } from 'react-redux';
 import { useFetchLabels } from './hooks/useFetchLabels';
 import useFilterLabels from './hooks/useFilterLabels';
-import AuthService from './services/auth.service';
-import { setIsAuthenticated } from './store/reducers/UserReducers';
+import usePermissions from './hooks/usePermissions';
+import InvalidPage from './views/components/invalid-page';
 
 const BroadcastReport = lazy(() => import('./views/pages/broadcast-report'));
 const AppPage = lazy(() => import('./views/pages/app'));
@@ -34,15 +33,11 @@ const ButtonResponseReport = lazy(() => import('./views/components/button-report
 const AgentPage = lazy(() => import('./views/pages/agent'));
 
 function App() {
-	const dispatch = useDispatch();
 	useFilterLabels();
 	useFetchLabels();
 
-	useEffect(() => {
-		AuthService.isAuthenticated().then((res) => {
-			dispatch(setIsAuthenticated(res));
-		});
-	}, [dispatch]);
+	const { broadcast, buttons, chatbot, chatbot_flow, template, media, recurring } =
+		usePermissions();
 
 	return (
 		<Flex minHeight={'100vh'} width={'100vw'} className='bg-background '>
@@ -51,46 +46,71 @@ function App() {
 					<Routes>
 						<Route path={NAVIGATION.APP} element={<AppPage />}>
 							<Route path={NAVIGATION.PHONEBOOK} element={<Phonebook />} />
-							<Route
-								path={NAVIGATION.TEMPLATES + '/' + NAVIGATION.ADD_TEMPLATE}
-								element={<EditTemplate />}
-							/>
-							<Route
-								path={NAVIGATION.TEMPLATES + '/' + NAVIGATION.EDIT_TEMPLATE + '/:id'}
-								element={<EditTemplate />}
-							/>
+							{template.create && (
+								<Route
+									path={NAVIGATION.TEMPLATES + '/' + NAVIGATION.ADD_TEMPLATE}
+									element={<EditTemplate />}
+								/>
+							)}
+							{template.update && (
+								<Route
+									path={NAVIGATION.TEMPLATES + '/' + NAVIGATION.EDIT_TEMPLATE + '/:id'}
+									element={<EditTemplate />}
+								/>
+							)}
 							<Route path={NAVIGATION.MEDIA} element={<MediaPage />}>
-								<Route path={'new'} element={<AddMedia />} />
+								{media.create && <Route path={'new'} element={<AddMedia />} />}
 							</Route>
 							<Route path={NAVIGATION.TEMPLATES} element={<Templates />} />
-							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
+							{broadcast.create && <Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />}
 							<Route path={NAVIGATION.AGENT} element={<AgentPage />} />
 							<Route path={NAVIGATION.RECURRING} element={<RecurringPage />}>
-								<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
-								<Route path={'new'} element={<CreateRecurring />} />
-								<Route path={':id'} element={<CreateRecurring />} />
+								{buttons.read && (
+									<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
+								)}
+								{recurring.create ? (
+									<Route path={'new'} element={<CreateRecurring />} />
+								) : (
+									<Route path={'new'} element={<InvalidPage />} />
+								)}
+								{recurring.update && <Route path={':id'} element={<CreateRecurring />} />}
 							</Route>
-							<Route path={NAVIGATION.BROADCAST_REPORT} element={<BroadcastReport />}>
-								<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
-							</Route>
+							{broadcast.report && (
+								<Route path={NAVIGATION.BROADCAST_REPORT} element={<BroadcastReport />}>
+									{buttons.read && (
+										<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
+									)}
+								</Route>
+							)}
 							<Route path={NAVIGATION.CONTACT} element={<ContactPage />} />
 							<Route path={NAVIGATION.INBOX} element={<Conversation />} />
 							<Route path={NAVIGATION.CHATBOT} element={<ChatBot />}>
-								<Route path={'new'} element={<CreateChatBot />} />
-								<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
-								<Route path={':id'} element={<CreateChatBot />} />
+								{chatbot.create ? (
+									<Route path={'new'} element={<CreateChatBot />} />
+								) : (
+									<Route path={'new'} element={<InvalidPage />} />
+								)}
+								{buttons.read && (
+									<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
+								)}
+								{chatbot.update && <Route path={':id'} element={<CreateChatBot />} />}
 							</Route>
 							<Route path={NAVIGATION.CHATBOT_FLOW} element={<ChatbotFlow />}>
-								<Route path={'update-flow/:id'} element={<RenderFlow />} />
-								<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
-								<Route path={':id'} element={<CreateChatbotFlow />} />
+								{chatbot_flow.update && <Route path={'update-flow/:id'} element={<RenderFlow />} />}
+								{buttons.read && (
+									<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
+								)}
+								{chatbot_flow.create ? (
+									<Route path={'new'} element={<CreateChatbotFlow />} />
+								) : (
+									<Route path={'new'} element={<InvalidPage />} />
+								)}
+								{chatbot_flow.update && <Route path={':id'} element={<CreateChatbotFlow />} />}
 							</Route>
 							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
+							<Route path='*' element={<InvalidPage />} />
 						</Route>
-						<Route
-							path='*'
-							element={<Navigate to={NAVIGATION.APP + '/' + NAVIGATION.DASHBOARD} />}
-						/>
+						<Route path='*' element={<InvalidPage />} />
 					</Routes>
 				</Suspense>
 			</Router>

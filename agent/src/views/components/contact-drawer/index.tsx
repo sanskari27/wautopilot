@@ -72,11 +72,6 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 
 		const { isOpen, onOpen, onClose: closeDrawer } = useDisclosure();
 		const { contact } = useSelector((state: StoreState) => state[StoreNames.CONTACT]);
-		const {
-			user_details: {
-				permissions: { manage_contacts },
-			},
-		} = useSelector((state: StoreState) => state[StoreNames.USER]);
 		const [isNewContact, setIsNewContact] = useState(false);
 
 		useImperativeHandle(ref, () => ({
@@ -500,7 +495,7 @@ const ContactDrawer = forwardRef<ContactHandle, ContactProps>(
 								Close
 							</Button>
 							<Show>
-								<Show.When condition={manage_contacts && isNewContact}>
+								<Show.When condition={isNewContact}>
 									<Button colorScheme='green' onClick={handleSubmit}>
 										Save
 									</Button>

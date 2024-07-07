@@ -15,14 +15,16 @@ import {
 	useBoolean,
 	useToast,
 } from '@chakra-ui/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useOutlet } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
 import useFilteredList from '../../../hooks/useFilteredList';
+import usePermissions from '../../../hooks/usePermissions';
 import BroadcastService from '../../../services/broadcast.service';
 import { StoreNames, StoreState } from '../../../store';
-import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
+import Each from '../../components/utils/Each';
+import Show from '../../components/utils/Show';
 
 export type ScheduledBroadcast = {
 	broadcast_id: string;
@@ -39,12 +41,12 @@ export default function BroadcastReport() {
 	const navigate = useNavigate();
 	const [list, setList] = useState<ScheduledBroadcast[]>([]);
 	const [campaignLoading, setCampaignLoading] = useBoolean(true);
-	const deleteAlertRef = useRef<DeleteAlertHandle>(null);
 	const toast = useToast();
 	const outlet = useOutlet();
 
 	const [selectedBroadcast, setSelectedBroadcast] = useState<string[]>([]);
 
+	const { broadcast: permission } = usePermissions();
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	// const exportCampaign = useCallback(async (selectedCampaigns: string[]) => {
@@ -67,27 +69,6 @@ export default function BroadcastReport() {
 	useEffect(() => {
 		fetchBroadcast();
 	}, [fetchBroadcast]);
-
-	const deleteCampaign = async () => {
-		const promises = selectedBroadcast.map(async (campaign) => {
-			await BroadcastService.deleteBroadcast(selected_device_id, campaign);
-		});
-		toast.promise(Promise.all(promises), {
-			success: () => {
-				toast({
-					title: 'Campaign deleted successfully',
-					status: 'success',
-					duration: 3000,
-					isClosable: true,
-				});
-				setSelectedBroadcast([]);
-				fetchBroadcast();
-				return { title: 'Campaign deleted successfully' };
-			},
-			error: { title: 'Failed to delete campaign' },
-			loading: { title: 'Deleting campaign...' },
-		});
-	};
 
 	const removeCampaignList = (campaign_id: string) => {
 		setSelectedBroadcast((prev) => prev.filter((campaign) => campaign !== campaign_id));
@@ -129,27 +110,13 @@ export default function BroadcastReport() {
 					Broadcast Report
 				</Text>
 				<Flex ml={'auto'}>
-					<Button
-						colorScheme='red'
-						mr={2}
-						onClick={() => {
-							if (selectedBroadcast.length === 0) {
-								toast({
-									title: 'No campaign selected',
-									status: 'error',
-									duration: 3000,
-									isClosable: true,
-								});
-								return;
-							}
-							deleteAlertRef.current?.open();
-						}}
-					>
-						Delete
-					</Button>
-					<Button colorScheme='green' mr={2} onClick={handleExport}>
-						Export
-					</Button>
+					<Show>
+						<Show.When condition={permission.export}>
+							<Button colorScheme='green' mr={2} onClick={handleExport}>
+								Export
+							</Button>
+						</Show.When>
+					</Show>
 				</Flex>
 			</Flex>
 			<TableContainer border={'1px dashed gray'} rounded={'2xl'} mt={'1rem'}>
@@ -175,179 +142,181 @@ export default function BroadcastReport() {
 						</Tr>
 					</Thead>
 					<Tbody>
-						{campaignLoading && list.length === 0 ? (
-							<Tr bg={'gray.50'} color={'black'}>
-								<Td>
-									<SkeletonCircle size='10' />
-								</Td>
-								<Td>
-									<LineSkeleton />
-								</Td>
-								<Td>
-									<LineSkeleton />
-								</Td>
-								<Td>
-									<LineSkeleton />
-								</Td>
-								<Td>
-									<LineSkeleton />
-								</Td>
-								<Td>
-									<LineSkeleton />
-								</Td>
-								<Td>
-									<LineSkeleton />
-								</Td>
-								<Td>
-									<LineSkeleton />
-								</Td>
-							</Tr>
-						) : (
-							filtered.map((broadcast, index) => (
-								<Tr key={index} color={'black'}>
+						<Show>
+							<Show.When condition={campaignLoading && list.length === 0}>
+								<Tr bg={'gray.50'} color={'black'}>
 									<Td>
-										<Checkbox
-											colorScheme='green'
-											mr={4}
-											isChecked={selectedBroadcast.includes(broadcast.broadcast_id)}
-											onChange={(e) => {
-												if (e.target.checked) {
-													addCampaignList(broadcast.broadcast_id);
-												} else {
-													removeCampaignList(broadcast.broadcast_id);
-												}
-											}}
-										/>
-										{index + 1}.
-									</Td>
-									<Td
-										onClick={() =>
-											navigate(
-												`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
-											)
-										}
-										cursor={'pointer'}
-										className='whitespace-break-spaces'
-									>
-										{broadcast.name}
-									</Td>
-									<Td
-										onClick={() =>
-											navigate(
-												`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
-											)
-										}
-										cursor={'pointer'}
-										className='whitespace-break-spaces'
-									>
-										{broadcast.description}
-									</Td>
-									<Td
-										onClick={() =>
-											navigate(
-												`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
-											)
-										}
-										cursor={'pointer'}
-										textAlign={'center'}
-									>
-										{broadcast.createdAt}
-									</Td>
-									<Td
-										onClick={() =>
-											navigate(
-												`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
-											)
-										}
-										cursor={'pointer'}
-										textColor={'green'}
-									>
-										{broadcast.sent}
-									</Td>
-									<Td
-										onClick={() =>
-											navigate(
-												`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
-											)
-										}
-										cursor={'pointer'}
-										textColor={'yellow.500'}
-									>
-										{broadcast.pending}
-									</Td>
-									<Td
-										onClick={() =>
-											navigate(
-												`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
-											)
-										}
-										cursor={'pointer'}
-										textColor={'red.400'}
-									>
-										{broadcast.failed}
+										<SkeletonCircle size='10' />
 									</Td>
 									<Td>
-										{broadcast.isPaused ? (
-											<Button
-												size={'sm'}
-												colorScheme='green'
-												onClick={() => {
-													BroadcastService.resumeBroadcast(
-														selected_device_id,
-														broadcast.broadcast_id
-													).then(() => {
-														fetchBroadcast();
-													});
-												}}
-											>
-												Resume
-											</Button>
-										) : broadcast.pending !== 0 ? (
-											<Button
-												size={'sm'}
-												colorScheme='red'
-												onClick={() => {
-													BroadcastService.pauseBroadcast(
-														selected_device_id,
-														broadcast.broadcast_id
-													).then(() => {
-														fetchBroadcast();
-													});
-												}}
-											>
-												Pause
-											</Button>
-										) : broadcast.failed > 0 ? (
-											<Button
-												size={'sm'}
-												colorScheme='orange'
-												onClick={() => {
-													BroadcastService.resendFailedBroadcast(
-														selected_device_id,
-														broadcast.broadcast_id
-													).then(() => {
-														fetchBroadcast();
-													});
-												}}
-											>
-												Resend Failed
-											</Button>
-										) : (
-											'Completed'
-										)}
+										<LineSkeleton />
+									</Td>
+									<Td>
+										<LineSkeleton />
+									</Td>
+									<Td>
+										<LineSkeleton />
+									</Td>
+									<Td>
+										<LineSkeleton />
+									</Td>
+									<Td>
+										<LineSkeleton />
+									</Td>
+									<Td>
+										<LineSkeleton />
+									</Td>
+									<Td>
+										<LineSkeleton />
 									</Td>
 								</Tr>
-							))
-						)}
+							</Show.When>
+							<Show.Else>
+								<Each
+									items={filtered}
+									render={(broadcast, index) => (
+										<Tr key={index} color={'black'}>
+											<Td>
+												<Checkbox
+													colorScheme='green'
+													mr={4}
+													isChecked={selectedBroadcast.includes(broadcast.broadcast_id)}
+													onChange={(e) => {
+														if (e.target.checked) {
+															addCampaignList(broadcast.broadcast_id);
+														} else {
+															removeCampaignList(broadcast.broadcast_id);
+														}
+													}}
+												/>
+												{index + 1}.
+											</Td>
+											<Td
+												onClick={() =>
+													navigate(
+														`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
+													)
+												}
+												cursor={'pointer'}
+												className='whitespace-break-spaces'
+											>
+												{broadcast.name}
+											</Td>
+											<Td
+												onClick={() =>
+													navigate(
+														`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
+													)
+												}
+												cursor={'pointer'}
+												className='whitespace-break-spaces'
+											>
+												{broadcast.description}
+											</Td>
+											<Td
+												onClick={() =>
+													navigate(
+														`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
+													)
+												}
+												cursor={'pointer'}
+												textAlign={'center'}
+											>
+												{broadcast.createdAt}
+											</Td>
+											<Td
+												onClick={() =>
+													navigate(
+														`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
+													)
+												}
+												cursor={'pointer'}
+												textColor={'green'}
+											>
+												{broadcast.sent}
+											</Td>
+											<Td
+												onClick={() =>
+													navigate(
+														`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
+													)
+												}
+												cursor={'pointer'}
+												textColor={'yellow.500'}
+											>
+												{broadcast.pending}
+											</Td>
+											<Td
+												onClick={() =>
+													navigate(
+														`${NAVIGATION.APP}/${NAVIGATION.BROADCAST_REPORT}/button-report/${broadcast.broadcast_id}`
+													)
+												}
+												cursor={'pointer'}
+												textColor={'red.400'}
+											>
+												{broadcast.failed}
+											</Td>
+											<Td>
+												<Show>
+													<Show.When condition={broadcast.isPaused && permission.update}>
+														<Button
+															size={'sm'}
+															colorScheme='green'
+															onClick={() => {
+																BroadcastService.resumeBroadcast(
+																	selected_device_id,
+																	broadcast.broadcast_id
+																).then(() => {
+																	fetchBroadcast();
+																});
+															}}
+														>
+															Resume
+														</Button>
+													</Show.When>
+													<Show.When condition={broadcast.pending > 0 && permission.update}>
+														<Button
+															size={'sm'}
+															colorScheme='red'
+															onClick={() => {
+																BroadcastService.pauseBroadcast(
+																	selected_device_id,
+																	broadcast.broadcast_id
+																).then(() => {
+																	fetchBroadcast();
+																});
+															}}
+														>
+															Pause
+														</Button>
+													</Show.When>
+													<Show.When condition={broadcast.failed > 0 && permission.update}>
+														<Button
+															size={'sm'}
+															colorScheme='orange'
+															onClick={() => {
+																BroadcastService.resendFailedBroadcast(
+																	selected_device_id,
+																	broadcast.broadcast_id
+																).then(() => {
+																	fetchBroadcast();
+																});
+															}}
+														>
+															Resend Failed
+														</Button>
+													</Show.When>
+												</Show>
+											</Td>
+										</Tr>
+									)}
+								/>
+							</Show.Else>
+						</Show>
 					</Tbody>
 				</Table>
 			</TableContainer>
-			<DeleteAlert
-				type={'Campaign'}
-				ref={deleteAlertRef}
-				disclaimer={'This will pause the campaign.'}
-				onConfirm={deleteCampaign}
-			/>
 		</Flex>
 	);
 }

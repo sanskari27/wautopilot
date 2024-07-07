@@ -41,22 +41,57 @@ export enum Path {
 	Media = '/static/media/',
 }
 
-export enum Permissions {
-	view_broadcast_reports = 'view_broadcast_reports',
-	create_broadcast = 'create_broadcast',
-	create_recurring_broadcast = 'create_recurring_broadcast',
-	create_phonebook = 'create_phonebook',
-	update_phonebook = 'update_phonebook',
-	delete_phonebook = 'delete_phonebook',
-	auto_assign_chats = 'auto_assign_chats',
-	create_template = 'create_template',
-	update_template = 'update_template',
-	delete_template = 'delete_template',
-	manage_media = 'manage_media',
-	manage_contacts = 'manage_contacts',
-	manage_chatbot = 'manage_chatbot',
-	manage_chatbot_flows = 'manage_chatbot_flows',
-}
+export const Permissions = {
+	phonebook: {
+		create: 'phonebook.create',
+		update: 'phonebook.update',
+		delete: 'phonebook.delete',
+		export: 'phonebook.export',
+	},
+	chatbot: {
+		create: 'chatbot.create',
+		update: 'chatbot.update',
+		delete: 'chatbot.delete',
+		export: 'chatbot.export',
+	},
+	chatbot_flow: {
+		create: 'chatbot_flow.create',
+		update: 'chatbot_flow.update',
+		delete: 'chatbot_flow.delete',
+		export: 'chatbot_flow.export',
+	},
+	broadcast: {
+		create: 'broadcast.create',
+		update: 'broadcast.update',
+		report: 'broadcast.report',
+		export: 'broadcast.export',
+	},
+	recurring: {
+		create: 'recurring.create',
+		update: 'recurring.update',
+		delete: 'recurring.delete',
+		export: 'recurring.export',
+	},
+	media: {
+		create: 'media.create',
+		update: 'media.update',
+		delete: 'media.delete',
+	},
+	contacts: {
+		create: 'contacts.create',
+		update: 'contacts.update',
+		delete: 'contacts.delete',
+	},
+	template: {
+		create: 'template.create',
+		update: 'template.update',
+		delete: 'template.delete',
+	},
+	buttons: {
+		read: 'buttons.read',
+		export: 'buttons.export',
+	},
+};
 
 export const CACHE_TIMEOUT = 60 * 60; //seconds
 export const REFRESH_CACHE_TIMEOUT = 30 * 24 * 60 * 60; //seconds

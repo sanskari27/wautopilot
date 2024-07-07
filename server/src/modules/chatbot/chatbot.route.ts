@@ -7,39 +7,42 @@ import { CreateBotValidator, CreateFlowValidator, UpdateFlowValidator } from './
 
 const router = express.Router();
 
-const chatbotPermission = VerifyPermissions(Permissions.manage_chatbot);
-const chatbotFlowPermission = VerifyPermissions(Permissions.manage_chatbot_flows);
-
 router
 	.route('/flows/:id')
-	.all(IDValidator, chatbotFlowPermission)
+	.all(IDValidator)
 	.get(Controller.chatBotFlowDetails)
-	.delete(Controller.deleteFlow)
-	.put(Controller.toggleActiveFlow)
-	.patch(UpdateFlowValidator, Controller.updateFlow);
+	.delete(VerifyPermissions(Permissions.chatbot_flow.delete), Controller.deleteFlow)
+	.put(VerifyPermissions(Permissions.chatbot_flow.update), Controller.toggleActiveFlow)
+	.patch(
+		VerifyPermissions(Permissions.chatbot_flow.update),
+		UpdateFlowValidator,
+		Controller.updateFlow
+	);
 
 router
 	.route('/flows')
-	.all(chatbotFlowPermission)
 	.get(Controller.listFlows)
-	.post(CreateFlowValidator, Controller.createFlow);
+	.post(
+		VerifyPermissions(Permissions.chatbot_flow.create),
+		CreateFlowValidator,
+		Controller.createFlow
+	);
 
 router
 	.route('/:id/download-response')
-	.all(chatbotPermission, IDValidator)
+	.all(VerifyPermissions(Permissions.chatbot.export), IDValidator)
 	.get(Controller.downloadResponses);
 
 router
 	.route('/:id')
-	.all(chatbotPermission, IDValidator)
-	.delete(Controller.deleteBot)
-	.put(Controller.toggleActive)
-	.patch(CreateBotValidator, Controller.updateBot);
+	.all(IDValidator)
+	.delete(VerifyPermissions(Permissions.chatbot.delete), Controller.deleteBot)
+	.put(VerifyPermissions(Permissions.chatbot.update), Controller.toggleActive)
+	.patch(VerifyPermissions(Permissions.chatbot.update), CreateBotValidator, Controller.updateBot);
 
 router
 	.route('/')
-	.all(chatbotPermission)
 	.get(Controller.listBots)
-	.post(CreateBotValidator, Controller.createBot);
+	.post(VerifyPermissions(Permissions.chatbot.create), CreateBotValidator, Controller.createBot);
 
 export default router;

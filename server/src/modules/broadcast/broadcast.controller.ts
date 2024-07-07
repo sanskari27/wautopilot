@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { UserLevel } from '../../config/const';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import BroadcastService from '../../services/broadcast';
@@ -446,6 +447,13 @@ async function buttonResponses(req: Request, res: Response, next: NextFunction) 
 	const responses = await new ButtonResponseService(account, device).getResponses(id);
 
 	if (export_csv) {
+		const { user } = req.locals;
+		if (user.userLevel === UserLevel.Agent) {
+			const permissions = await user.getPermissions();
+			if (!permissions.buttons.export) {
+				return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
+			}
+		}
 		return RespondCSV({
 			res,
 			filename: `responses-${id}.csv`,

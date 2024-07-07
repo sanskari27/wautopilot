@@ -58,6 +58,10 @@ const initState: AgentState = {
 				update: false,
 				delete: false,
 			},
+			buttons: {
+				read: false,
+				export: false,
+			},
 		},
 	},
 	agentPermissions: {
@@ -105,6 +109,10 @@ const initState: AgentState = {
 			create: false,
 			update: false,
 			delete: false,
+		},
+		buttons: {
+			read: false,
+			export: false,
 		},
 		assigned_labels: [],
 		auto_assign_chats: false,
@@ -158,7 +166,12 @@ const Slice = createSlice({
 		setAgentDetails: (state, action: PayloadAction<string>) => {
 			const agent = state.list.find((record) => record.id === action.payload);
 			if (agent) {
-				state.details = agent;
+				state.details.id = agent.id;
+				state.details.name = agent.name;
+				state.details.email = agent.email;
+				state.details.phone = agent.phone;
+				state.details.permissions = agent.permissions;
+				state.agentPermissions = agent.permissions;
 			}
 		},
 		removeAgent: (state, action: PayloadAction<string>) => {

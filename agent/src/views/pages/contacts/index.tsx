@@ -21,6 +21,7 @@ import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import APIInstance from '../../../config/APIInstance';
 import useFilteredList from '../../../hooks/useFilteredList';
+import usePermissions from '../../../hooks/usePermissions';
 import ContactService from '../../../services/contact.service';
 import { StoreNames, StoreState } from '../../../store';
 import {
@@ -42,11 +43,10 @@ const ContactPage = () => {
 	const dispatch = useDispatch();
 	const toast = useToast();
 	const contactDrawerRef = useRef<ContactHandle>(null);
+
 	const {
-		user_details: {
-			permissions: { manage_contacts },
-		},
-	} = useSelector((state: StoreState) => state[StoreNames.USER]);
+		contacts: { create: create_permission, update: update_permission },
+	} = usePermissions();
 	const {
 		list,
 		uiDetails: { fetchingContact },
@@ -126,7 +126,7 @@ const ContactPage = () => {
 					Contacts
 				</Text>
 				<Show>
-					<Show.When condition={manage_contacts}>
+					<Show.When condition={create_permission}>
 						<Flex gap={3}>
 							<Button
 								colorScheme='teal'
@@ -175,62 +175,65 @@ const ContactPage = () => {
 						</Tr>
 					</Thead>
 					<Tbody>
-						{fetchingContact ? (
-							<>
+						<Show>
+							<Show.When condition={fetchingContact}>
 								<Each
 									items={Array.from({ length: 20 })}
 									render={() => (
 										<Tr>
-											<Td colSpan={7} textAlign={'center'}>
+											<Td colSpan={2} textAlign={'center'}>
 												<Skeleton height={'1.2rem'} />
 											</Td>
 										</Tr>
 									)}
 								/>
-							</>
-						) : filtered.length === 0 ? (
-							<Tr>
-								<Td colSpan={2} textAlign={'center'}>
-									No records found
-								</Td>
-							</Tr>
-						) : (
-							<Each
-								items={filtered}
-								render={(record, index) => (
-									<Tr cursor={'pointer'}>
-										<Td width={'5%'}>
-											<Checkbox
-												colorScheme='green'
-												mr={2}
-												isChecked={selected.includes(record.id)}
-												onChange={(e) => {
-													if (e.target.checked) {
-														dispatch(addSelectedContact(record.id));
-													} else {
-														dispatch(removeSelectedContact(record.id));
-													}
-												}}
-											/>
-											{pagination.page === 1 ? index + 1 : (pagination.page - 1) * 20 + index + 1}
-										</Td>
-										<Td
-											onClick={() =>
-												contactDrawerRef.current?.open({ contact: record, editable: true })
-											}
-										>
-											{record.name.formatted_name}
-										</Td>
-									</Tr>
-								)}
-							/>
-						)}
+							</Show.When>
+							<Show.When condition={filtered.length === 0}>
+								<Tr>
+									<Td colSpan={2} textAlign={'center'}>
+										No records found
+									</Td>
+								</Tr>
+							</Show.When>
+							<Show.Else>
+								<Each
+									items={filtered}
+									render={(record, index) => (
+										<Tr cursor={'pointer'}>
+											<Td width={'5%'}>
+												<Checkbox
+													colorScheme='green'
+													mr={2}
+													isChecked={selected.includes(record.id)}
+													onChange={(e) => {
+														if (e.target.checked) {
+															dispatch(addSelectedContact(record.id));
+														} else {
+															dispatch(removeSelectedContact(record.id));
+														}
+													}}
+												/>
+												{pagination.page === 1 ? index + 1 : (pagination.page - 1) * 20 + index + 1}
+											</Td>
+											<Td
+												onClick={() =>
+													contactDrawerRef.current?.open({
+														contact: record,
+														editable: update_permission,
+													})
+												}
+											>
+												{record.name.formatted_name}
+											</Td>
+										</Tr>
+									)}
+								/>
+							</Show.Else>
+						</Show>
 					</Tbody>
 				</Table>
 			</TableContainer>
-			{/* <AssignLabelDialog ref={assignLabelDialog} /> */}
 			<ContactDrawer onConfirm={handleContactInput} ref={contactDrawerRef} />
-			{/* <ContactInputDialog ref={drawerRef} /> */}
 		</Box>
 	);
 };

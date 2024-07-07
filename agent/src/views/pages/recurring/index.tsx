@@ -2,11 +2,14 @@ import { AddIcon } from '@chakra-ui/icons';
 import { Button, Flex, HStack, Text } from '@chakra-ui/react';
 import { useNavigate, useOutlet } from 'react-router-dom';
 import { NAVIGATION } from '../../../config/const';
+import usePermissions from '../../../hooks/usePermissions';
+import Show from '../../components/utils/Show';
 import AllRecurringList from './AllRecurringList';
 
 export default function Recurring() {
 	const navigate = useNavigate();
 	const outlet = useOutlet();
+	const { recurring: permission } = usePermissions();
 
 	if (outlet) {
 		return outlet;
@@ -23,15 +26,19 @@ export default function Recurring() {
 				<Text fontSize={'2xl'} fontWeight={'bold'}>
 					Recurring
 				</Text>
-				<Button
-					size={'sm'}
-					leftIcon={<AddIcon />}
-					variant={'outline'}
-					colorScheme={'green'}
-					onClick={() => navigate(`${NAVIGATION.APP}/${NAVIGATION.RECURRING}/new`)}
-				>
-					Create
-				</Button>
+				<Show>
+					<Show.When condition={permission.create}>
+						<Button
+							size={'sm'}
+							leftIcon={<AddIcon />}
+							variant={'outline'}
+							colorScheme={'green'}
+							onClick={() => navigate(`${NAVIGATION.APP}/${NAVIGATION.RECURRING}/new`)}
+						>
+							Create
+						</Button>
+					</Show.When>
+				</Show>
 			</HStack>
 			<AllRecurringList />
 		</Flex>

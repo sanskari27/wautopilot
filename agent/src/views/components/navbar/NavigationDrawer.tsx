@@ -40,7 +40,9 @@ export default function NavigationDrawer({
 	const { list: deviceList } = useSelector((state: StoreState) => state[StoreNames.DEVICES]);
 	const {
 		selected_device_id,
-		user_details: { permissions },
+		user_details: {
+			permissions: { broadcast },
+		},
 	} = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	const handleLogout = async () => {
@@ -92,7 +94,7 @@ export default function NavigationDrawer({
 								icon={TbTemplate}
 								name='Templates'
 							/>
-							{permissions.create_broadcast && (
+							{broadcast.create && (
 								<MenuButton
 									setDrawerExpanded={setDrawerExpanded}
 									route={NAVIGATION.BROADCAST}
@@ -100,15 +102,13 @@ export default function NavigationDrawer({
 									name='Broadcast'
 								/>
 							)}
-							{permissions.create_recurring_broadcast && (
-								<MenuButton
-									setDrawerExpanded={setDrawerExpanded}
-									route={NAVIGATION.RECURRING}
-									icon={BiCake}
-									name='Recurring'
-								/>
-							)}
-							{permissions.view_broadcast_reports && (
+							<MenuButton
+								setDrawerExpanded={setDrawerExpanded}
+								route={NAVIGATION.RECURRING}
+								icon={BiCake}
+								name='Recurring'
+							/>
+							{broadcast.report && (
 								<MenuButton
 									setDrawerExpanded={setDrawerExpanded}
 									route={NAVIGATION.BROADCAST_REPORT}
@@ -134,22 +134,18 @@ export default function NavigationDrawer({
 								icon={MdContacts}
 								name='Contacts'
 							/>
-							{permissions.manage_chatbot && (
-								<MenuButton
-									setDrawerExpanded={setDrawerExpanded}
-									route={NAVIGATION.CHATBOT}
-									icon={BiBot}
-									name='Chat Bot'
-								/>
-							)}
-							{permissions.manage_chatbot_flows && (
-								<MenuButton
-									setDrawerExpanded={setDrawerExpanded}
-									route={NAVIGATION.CHATBOT_FLOW}
-									icon={RiFlowChart}
-									name='Chatbot Flow'
-								/>
-							)}
+							<MenuButton
+								setDrawerExpanded={setDrawerExpanded}
+								route={NAVIGATION.CHATBOT}
+								icon={BiBot}
+								name='Chat Bot'
+							/>
+							<MenuButton
+								setDrawerExpanded={setDrawerExpanded}
+								route={NAVIGATION.CHATBOT_FLOW}
+								icon={RiFlowChart}
+								name='Chatbot Flow'
+							/>
 						</Flex>
 					</Box>
 					<VStack

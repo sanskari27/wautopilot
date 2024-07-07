@@ -47,7 +47,6 @@ import {
 	toggleChatbotExport,
 	toggleChatbotFlowCreate,
 	toggleChatbotFlowDelete,
-	toggleChatbotFlowExport,
 	toggleChatbotFlowUpdate,
 	toggleChatbotUpdate,
 	toggleContactsCreate,
@@ -92,6 +91,7 @@ const AgentPermissionDialog = () => {
 			phonebook,
 			recurring,
 			template,
+			buttons,
 		},
 	} = useSelector((state: StoreState) => state[StoreNames.AGENT]);
 
@@ -115,6 +115,7 @@ const AgentPermissionDialog = () => {
 				phonebook,
 				recurring,
 				template,
+				buttons,
 			},
 		});
 
@@ -212,99 +213,7 @@ const AgentPermissionDialog = () => {
 							<h2>
 								<AccordionButton>
 									<Box as='span' flex='1' textAlign='left'>
-										Broadcast Permission
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleBroadcastCreate(value))}
-									label={'Create'}
-									isChecked={broadcast.create}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleBroadcastUpdate(value))}
-									label={'Update'}
-									isChecked={broadcast.update}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleBroadcastExport(value))}
-									label={'Export'}
-									isChecked={broadcast.export}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleBroadcastReport(value))}
-									label={'Report'}
-									isChecked={broadcast.report}
-								/>
-							</AccordionPanel>
-						</AccordionItem>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Recurring Broadcast Permission
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleRecurringCreate(value))}
-									label={'Create'}
-									isChecked={recurring.create}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleRecurringUpdate(value))}
-									label={'Update'}
-									isChecked={recurring.update}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleRecurringDelete(value))}
-									label={'Delete'}
-									isChecked={recurring.delete}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleRecurringExport(value))}
-									label={'Export'}
-									isChecked={recurring.export}
-								/>
-							</AccordionPanel>
-						</AccordionItem>
-
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Media Permission
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleMediaCreate(value))}
-									label={'Create'}
-									isChecked={media.create}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleMediaUpdate(value))}
-									label={'Update'}
-									isChecked={media.update}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleMediaDelete(value))}
-									label={'Delete'}
-									isChecked={media.delete}
-								/>
-							</AccordionPanel>
-						</AccordionItem>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Phonebook Permission
+										Phonebook
 									</Box>
 									<AccordionIcon />
 								</AccordionButton>
@@ -336,7 +245,152 @@ const AgentPermissionDialog = () => {
 							<h2>
 								<AccordionButton>
 									<Box as='span' flex='1' textAlign='left'>
-										Chatbot Permission
+										Templates
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleTemplateCreate(value))}
+									label={'Create'}
+									isChecked={template.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleTemplateUpdate(value))}
+									label={'Update'}
+									isChecked={template.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleTemplateDelete(value))}
+									label={'Delete'}
+									isChecked={template.delete}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Broadcast
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleBroadcastCreate(value))}
+									label={'Create'}
+									isChecked={broadcast.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleBroadcastUpdate(value))}
+									label={'Update'}
+									isChecked={broadcast.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleBroadcastExport(value))}
+									label={'Export'}
+									isChecked={broadcast.export}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleBroadcastReport(value))}
+									label={'Report'}
+									isChecked={broadcast.report}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Recurring Broadcast
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleRecurringCreate(value))}
+									label={'Create'}
+									isChecked={recurring.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleRecurringUpdate(value))}
+									label={'Update'}
+									isChecked={recurring.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleRecurringDelete(value))}
+									label={'Delete'}
+									isChecked={recurring.delete}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleRecurringExport(value))}
+									label={'Export'}
+									isChecked={recurring.export}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Media
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleMediaCreate(value))}
+									label={'Create'}
+									isChecked={media.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleMediaUpdate(value))}
+									label={'Update'}
+									isChecked={media.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleMediaDelete(value))}
+									label={'Delete'}
+									isChecked={media.delete}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Contacts
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleContactsCreate(value))}
+									label={'Create'}
+									isChecked={contacts.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleContactsUpdate(value))}
+									label={'Update'}
+									isChecked={contacts.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleContactsDelete(value))}
+									label={'Delete'}
+									isChecked={contacts.delete}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Chatbot
 									</Box>
 									<AccordionIcon />
 								</AccordionButton>
@@ -368,7 +422,7 @@ const AgentPermissionDialog = () => {
 							<h2>
 								<AccordionButton>
 									<Box as='span' flex='1' textAlign='left'>
-										Chatbot Flow Permission
+										Chatbot Flow
 									</Box>
 									<AccordionIcon />
 								</AccordionButton>
@@ -388,65 +442,6 @@ const AgentPermissionDialog = () => {
 									onChange={(value) => dispatch(toggleChatbotFlowDelete(value))}
 									label={'Delete'}
 									isChecked={chatbot_flow.delete}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleChatbotFlowExport(value))}
-									label={'Export'}
-									isChecked={chatbot_flow.export}
-								/>
-							</AccordionPanel>
-						</AccordionItem>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Contacts Permission
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleContactsCreate(value))}
-									label={'Create'}
-									isChecked={contacts.create}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleContactsUpdate(value))}
-									label={'Update'}
-									isChecked={contacts.update}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleContactsDelete(value))}
-									label={'Delete'}
-									isChecked={contacts.delete}
-								/>
-							</AccordionPanel>
-						</AccordionItem>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Templates Permission
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleTemplateCreate(value))}
-									label={'Create'}
-									isChecked={template.create}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleTemplateUpdate(value))}
-									label={'Update'}
-									isChecked={template.update}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleTemplateDelete(value))}
-									label={'Delete'}
-									isChecked={template.delete}
 								/>
 							</AccordionPanel>
 						</AccordionItem>

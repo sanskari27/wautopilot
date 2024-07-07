@@ -14,61 +14,148 @@ const schema = new mongoose.Schema<IPermission>({
 		type: [String],
 		default: [],
 	},
-	create_broadcast: {
-		type: Boolean,
-		default: false,
+
+	phonebook: {
+		create: {
+			type: Boolean,
+			default: false,
+		},
+		update: {
+			type: Boolean,
+			default: false,
+		},
+		delete: {
+			type: Boolean,
+			default: false,
+		},
+		export: {
+			type: Boolean,
+			default: false,
+		},
 	},
-	create_recurring_broadcast: {
-		type: Boolean,
-		default: false,
+	chatbot: {
+		create: {
+			type: Boolean,
+			default: false,
+		},
+		update: {
+			type: Boolean,
+			default: false,
+		},
+		delete: {
+			type: Boolean,
+			default: false,
+		},
+		export: {
+			type: Boolean,
+			default: false,
+		},
 	},
-	view_broadcast_reports: {
-		type: Boolean,
-		default: false,
+	chatbot_flow: {
+		create: {
+			type: Boolean,
+			default: false,
+		},
+		update: {
+			type: Boolean,
+			default: false,
+		},
+		delete: {
+			type: Boolean,
+			default: false,
+		},
+		export: {
+			type: Boolean,
+			default: false,
+		},
 	},
-	create_phonebook: {
-		type: Boolean,
-		default: false,
+	broadcast: {
+		create: {
+			type: Boolean,
+			default: false,
+		},
+		update: {
+			type: Boolean,
+			default: false,
+		},
+		report: {
+			type: Boolean,
+			default: false,
+		},
+		export: {
+			type: Boolean,
+			default: false,
+		},
 	},
-	update_phonebook: {
-		type: Boolean,
-		default: false,
+	recurring: {
+		create: {
+			type: Boolean,
+			default: false,
+		},
+		update: {
+			type: Boolean,
+			default: false,
+		},
+		delete: {
+			type: Boolean,
+			default: false,
+		},
+		export: {
+			type: Boolean,
+			default: false,
+		},
 	},
-	delete_phonebook: {
-		type: Boolean,
-		default: false,
+	media: {
+		create: {
+			type: Boolean,
+			default: false,
+		},
+		update: {
+			type: Boolean,
+			default: false,
+		},
+		delete: {
+			type: Boolean,
+			default: false,
+		},
 	},
-	auto_assign_chats: {
-		type: Boolean,
-		default: false,
+	contacts: {
+		create: {
+			type: Boolean,
+			default: false,
+		},
+		update: {
+			type: Boolean,
+			default: false,
+		},
+		delete: {
+			type: Boolean,
+			default: false,
+		},
 	},
-	create_template: {
-		type: Boolean,
-		default: false,
+	template: {
+		create: {
+			type: Boolean,
+			default: false,
+		},
+		update: {
+			type: Boolean,
+			default: false,
+		},
+		delete: {
+			type: Boolean,
+			default: false,
+		},
 	},
-	update_template: {
-		type: Boolean,
-		default: false,
-	},
-	delete_template: {
-		type: Boolean,
-		default: false,
-	},
-	manage_media: {
-		type: Boolean,
-		default: false,
-	},
-	manage_contacts: {
-		type: Boolean,
-		default: false,
-	},
-	manage_chatbot: {
-		type: Boolean,
-		default: false,
-	},
-	manage_chatbot_flows: {
-		type: Boolean,
-		default: false,
+	buttons: {
+		read: {
+			type: Boolean,
+			default: false,
+		},
+		export: {
+			type: Boolean,
+			default: false,
+		},
 	},
 });
 
