@@ -7,4 +7,5 @@ export default interface IAgentLog extends Document {
 	agent_name: string;
 	text: string;
 	data: Schema.Types.Mixed;
+	createdAt: Date;
 }

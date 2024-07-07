@@ -21,7 +21,7 @@ const schema = new mongoose.Schema<IAgentLog>(
 		data: { type: mongoose.Schema.Types.Mixed, default: {} },
 	},
 	{
-		timestamps: { createdAt: true },
+		timestamps: { createdAt: true, updatedAt: false },
 	}
 );
 

@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { AgentLogDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
+import DateUtils from '../utils/DateUtils';
 import UserService from './user';
 
 export default class AgentLogService extends UserService {
@@ -24,5 +25,17 @@ export default class AgentLogService extends UserService {
 		});
 		await log.save();
 		return log;
+	}
+
+	async getLogs() {
+		const logs = await AgentLogDB.find({ linked_to: this.userId });
+		return logs.map((log) => ({
+			_id: log._id,
+			agent_id: log.agent_id,
+			agent_name: log.agent_name,
+			text: log.text,
+			data: log.data,
+			createdAt: DateUtils.getMoment(log.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+		}));
 	}
 }
