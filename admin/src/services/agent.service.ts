@@ -164,4 +164,18 @@ export default class AgentService {
 			throw new Error('You are not authorized to update permissions');
 		}
 	}
+
+	static async getAgentLogs(agentId: string) {
+		try {
+			const { data } = await APIInstance.get(`/users/agents/${agentId}/logs`);
+			return data.logs as {
+				agent_name: string;
+				text: string;
+				data: object;
+				createdAt: string;
+			}[];
+		} catch (err) {
+			return [];
+		}
+	}
 }

@@ -33,6 +33,11 @@ router
 	.post(PermissionsValidator, Controller.assignPermissions);
 
 router
+	.route('/agents/:id/logs')
+	.all(VerifyMinLevel(UserLevel.Admin), IDValidator)
+	.get(Controller.agentLogs);
+
+router
 	.route('/agents/:id')
 	.all(VerifyMinLevel(UserLevel.Admin), IDValidator)
 	.post(CreateAgentValidator, Controller.updateAgent)

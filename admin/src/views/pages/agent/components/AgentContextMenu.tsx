@@ -60,6 +60,11 @@ export default function AgentContextMenu({ agent }: { agent: Agent }) {
 					Actions
 				</MenuButton>
 				<MenuList>
+					<MenuItem
+						onClick={() => navigate(`${NAVIGATION.APP}/${NAVIGATION.AGENT}/logs/${agent.id}`)}
+					>
+						View Logs
+					</MenuItem>
 					<MenuItem onClick={() => assignAgentRef.current?.open()}>Assign Chats</MenuItem>
 					<MenuItem onClick={() => handleAgentPermissions()}>Permissions</MenuItem>
 					<MenuItem onClick={() => handleEditAgent()}>Edit</MenuItem>

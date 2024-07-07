@@ -3,6 +3,7 @@ import { UserLevel } from '../../config/const';
 import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import { UserService } from '../../services';
+import AgentLogService from '../../services/agentLogs';
 import { Respond } from '../../utils/ExpressUtils';
 import {
 	CreateAgentValidationResult,
@@ -188,6 +189,26 @@ async function removeAgent(req: Request, res: Response, next: NextFunction) {
 	});
 }
 
+async function agentLogs(req: Request, res: Response, next: NextFunction) {
+	try {
+		const { id, user } = req.locals;
+		const agent = await user.getAgent(id);
+		const agentLogService = new AgentLogService(user.account, agent);
+
+		const logs = await agentLogService.getLogs();
+
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				logs,
+			},
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 const Controller = {
 	getAdmins,
 	extendSubscription,
@@ -198,6 +219,7 @@ const Controller = {
 	updateAgent,
 	assignPermissions,
 	removeAgent,
+	agentLogs,
 };
 
 export default Controller;

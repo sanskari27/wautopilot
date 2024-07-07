@@ -37,6 +37,7 @@ const AgentPermissionDialog = lazy(
 	() => import('./views/pages/agent/components/AgentPermissionDialog')
 );
 const LinkShortener = lazy(() => import('./views/pages/link-shortener'));
+const AgentLogs = lazy(() => import('./views/pages/agent/components/AgentLogs'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -71,6 +72,7 @@ function App() {
 							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
 							<Route path={NAVIGATION.AGENT} element={<AgentPage />}>
 								<Route path={'new'} element={<AgentDetailsDialog />} />
+								<Route path={'logs/:id'} element={<AgentLogs />} />
 								<Route path={'permissions/:id'} element={<AgentPermissionDialog />} />
 								<Route path={':id'} element={<AgentDetailsDialog />} />
 							</Route>

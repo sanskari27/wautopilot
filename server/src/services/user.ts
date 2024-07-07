@@ -438,6 +438,19 @@ export default class UserService {
 		});
 	}
 
+	public async getAgent(id: Types.ObjectId) {
+		const agent = await AccountDB.findOne({
+			_id: id,
+			parent: this._user_id,
+		});
+
+		if (!agent) {
+			throw new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR);
+		}
+
+		return agent;
+	}
+
 	async updateAgentDetails(
 		id: Types.ObjectId,
 		opts: { name?: string; email?: string; phone?: string }
