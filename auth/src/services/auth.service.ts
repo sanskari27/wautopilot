@@ -6,7 +6,7 @@ import { UserLevel } from '../store/types/UserState';
 export default class AuthService {
 	static async isAuthenticated(login_type: 'admin' | 'master' | 'agent' = 'admin') {
 		try {
-			await axios.get(SERVER_URL + 'sessions/validate-auth' + login_type, {
+			await axios.get(SERVER_URL + 'sessions/validate-auth/' + login_type, {
 				headers: {
 					'Cache-Control': 'no-cache',
 					Pragma: 'no-cache',
