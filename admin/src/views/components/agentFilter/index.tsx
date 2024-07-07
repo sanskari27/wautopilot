@@ -65,9 +65,9 @@ export default function AgentFilter({
 	}
 
 	const handleConfirm = () => {
+		handleClose();
 		onConfirm(selectedAgent);
 		dispatch(clearSelectedAgent());
-		handleClose();
 	};
 
 	const handleClose = () => {

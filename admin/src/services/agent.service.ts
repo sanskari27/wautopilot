@@ -68,22 +68,18 @@ export default class AgentService {
 		agentId: string;
 		conversationId: string;
 	}) {
-		APIInstance.post(`/${device_id}/conversation/${conversationId}/assign-agent/${agentId}`);
+		await APIInstance.post(`/${device_id}/conversation/${conversationId}/assign-agent/${agentId}`);
 	}
 
-	static async assignConversationsToAgent({
-		device_id,
-		agentId,
-		details,
-	}: {
-		device_id: string;
-		agentId: string;
+	static async assignConversationsToAgent(
+		device_id: string,
+		agentId: string,
 		details: {
-			ids?: string[];
+			phonebook_ids?: string[];
 			numbers?: string[];
-		};
-	}) {
-		APIInstance.post(`/${device_id}/conversation/assign-agent/${agentId}`, details);
+		}
+	) {
+		await APIInstance.post(`/${device_id}/conversation/assign-agent/${agentId}`, details);
 	}
 
 	static async removeConversationFromAgent({

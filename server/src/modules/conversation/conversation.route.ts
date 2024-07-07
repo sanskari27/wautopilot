@@ -13,7 +13,7 @@ router.route('/mark-read/:message_id').post(Controller.markRead);
 
 router
 	.route('/assign-agent/:agent_id')
-	.all(IDValidator, AgentValidator, NumbersValidator)
+	.all(AgentValidator, NumbersValidator)
 	.post(Controller.bulkAssignConversationToAgent);
 
 router.route('/:id/messages').all(IDValidator).get(Controller.fetchConversationMessages);

@@ -583,6 +583,21 @@ export default class ConversationService extends WhatsappLinkService {
 		);
 	}
 
+	public async assignNumbersToAgent(agent_id: Types.ObjectId, numbers: string[]) {
+		await ConversationDB.updateOne(
+			{
+				linked_to: this.userId,
+				device_id: this.deviceId,
+				recipient: { $in: numbers },
+			},
+			{
+				$set: {
+					assigned_to: agent_id,
+				},
+			}
+		);
+	}
+
 	public async removeConversationFromAgent(c_id: Types.ObjectId) {
 		await ConversationDB.updateOne(
 			{

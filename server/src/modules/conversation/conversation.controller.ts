@@ -202,16 +202,16 @@ async function bulkAssignConversationToAgent(req: Request, res: Response, next: 
 		agent_id,
 	} = req.locals;
 
-	const { ids, numbers } = req.locals.data as NumbersValidationResult;
+	const { phonebook_ids, numbers } = req.locals.data as NumbersValidationResult;
 
 	const conversationService = new ConversationService(account, device);
 	const phoneBookService = new PhoneBookService(account);
-	if (ids.length > 0) {
-		await conversationService.assignConversationToAgent(agent_id, ids);
+	if (phonebook_ids.length > 0) {
+		const records = await phoneBookService.findRecordsByIds(phonebook_ids);
+		const numbers = records.map((record) => record.phone_number);
+		await conversationService.assignNumbersToAgent(agent_id, numbers);
 	} else if (numbers.length > 0) {
-		const records = await phoneBookService.findRecordsByPhone(numbers);
-		const ids = records.map((record) => record.id);
-		await conversationService.assignConversationToAgent(agent_id, ids);
+		await conversationService.assignNumbersToAgent(agent_id, numbers);
 	}
 
 	return Respond({

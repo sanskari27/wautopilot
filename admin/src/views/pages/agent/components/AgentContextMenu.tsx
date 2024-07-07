@@ -9,6 +9,7 @@ import AuthService from '../../../../services/auth.service';
 import { removeAgent } from '../../../../store/reducers/AgentReducer';
 import { Agent } from '../../../../store/types/Agent';
 import DeleteAlert, { DeleteAlertHandle } from '../../../components/delete-alert';
+import AssignAgent, { AssignAgentHandle } from './AssignAgent';
 
 export default function AgentContextMenu({ agent }: { agent: Agent }) {
 	const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function AgentContextMenu({ agent }: { agent: Agent }) {
 	const dispatch = useDispatch();
 
 	const deleteAlertRef = useRef<DeleteAlertHandle>(null);
+	const assignAgentRef = useRef<AssignAgentHandle>(null);
 
 	const handleEditAgent = () => {
 		navigate(`${NAVIGATION.APP}/${NAVIGATION.AGENT}/${agent.id}`);
@@ -58,12 +60,14 @@ export default function AgentContextMenu({ agent }: { agent: Agent }) {
 					Actions
 				</MenuButton>
 				<MenuList>
+					<MenuItem onClick={() => assignAgentRef.current?.open()}>Assign Chats</MenuItem>
 					<MenuItem onClick={() => handleAgentPermissions()}>Permissions</MenuItem>
 					<MenuItem onClick={() => handleEditAgent()}>Edit</MenuItem>
 					<MenuItem onClick={() => deleteAlertRef.current?.open(agent.id)}>Delete</MenuItem>
 					<MenuItem onClick={() => openServiceAccount(agent.id)}>Service account</MenuItem>
 				</MenuList>
 			</Menu>
+			<AssignAgent agent_id={agent.id} ref={assignAgentRef} />
 			<DeleteAlert type={'Agent'} ref={deleteAlertRef} onConfirm={handleDeleteAgent} />
 		</>
 	);

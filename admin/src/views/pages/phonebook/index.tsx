@@ -16,7 +16,7 @@ import {
 	useToast,
 } from '@chakra-ui/react';
 import { useEffect, useRef } from 'react';
-import { BiExport, BiLabel, BiLeftArrow, BiPlus, BiRightArrow } from 'react-icons/bi';
+import { BiExport, BiLabel, BiLeftArrow, BiPlus, BiRightArrow, BiSupport } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import APIInstance from '../../../config/APIInstance';
 import useFilteredList from '../../../hooks/useFilteredList';
@@ -26,6 +26,7 @@ import { DeleteIcon } from '@chakra-ui/icons';
 import { HiUpload } from 'react-icons/hi';
 import { useFetchLabels } from '../../../hooks/useFetchLabels';
 import useFilterLabels from '../../../hooks/useFilterLabels';
+import AgentService from '../../../services/agent.service';
 import PhoneBookService from '../../../services/phonebook.service';
 import {
 	addSelected,
@@ -43,6 +44,7 @@ import {
 	setSelected,
 } from '../../../store/reducers/PhonebookReducer';
 import { PhonebookRecord } from '../../../store/types/PhonebookState';
+import AgentFilter from '../../components/agentFilter';
 import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import LabelFilter from '../../components/labelFilter';
 import SearchBar from '../../components/searchBar';
@@ -70,6 +72,7 @@ export default function Phonebook() {
 		selected,
 		uiDetails: { isFetching },
 	} = useSelector((state: StoreState) => state[StoreNames.PHONEBOOK]);
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
 	useEffect(() => {
 		const cancelToken = new AbortController();
@@ -174,6 +177,7 @@ export default function Phonebook() {
 			dispatch(removeSelectedList(filtered.map((el) => el.id)));
 		}
 	};
+
 	const handleAllSelected = () => {
 		toast.promise(
 			APIInstance.get(`/phonebook`, {
@@ -196,6 +200,27 @@ export default function Phonebook() {
 				},
 				loading: {
 					title: 'loading...',
+				},
+			}
+		);
+	};
+
+	const assignAgent = (agent_id: string) => {
+		toast.promise(
+			AgentService.assignConversationsToAgent(selected_device_id, agent_id, {
+				phonebook_ids: selected,
+			}),
+			{
+				success: () => {
+					return {
+						title: 'Assigned successfully',
+					};
+				},
+				error: {
+					title: 'Failed to assign',
+				},
+				loading: {
+					title: 'Assigning...',
 				},
 			}
 		);
@@ -233,6 +258,14 @@ export default function Phonebook() {
 							>
 								Assign Tags
 							</Button>
+							<AgentFilter
+								onConfirm={(ids) => assignAgent(ids[0])}
+								buttonComponent={
+									<Button size='sm' colorScheme='purple' leftIcon={<BiSupport />}>
+										Assign Agent
+									</Button>
+								}
+							/>
 						</>
 					) : (
 						<Button

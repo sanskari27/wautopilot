@@ -60,7 +60,7 @@ export type SendMessageValidationResult = {
 
 export type NumbersValidationResult = {
 	numbers: string[];
-	ids: Types.ObjectId[];
+	phonebook_ids: Types.ObjectId[];
 };
 
 export async function SendMessageValidator(req: Request, res: Response, next: NextFunction) {
@@ -184,7 +184,7 @@ export async function NumbersValidator(req: Request, res: Response, next: NextFu
 	const reqValidator = z
 		.object({
 			numbers: z.string().array().default([]),
-			ids: z
+			phonebook_ids: z
 				.string()
 				.array()
 				.default([])
@@ -192,9 +192,9 @@ export async function NumbersValidator(req: Request, res: Response, next: NextFu
 				.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
 		})
 		.refine((data) => {
-			if (data.numbers.length === 0 && data.ids.length === 0) {
+			if (data.numbers.length === 0 && data.phonebook_ids.length === 0) {
 				return false;
-			} else if (data.numbers.length > 0 && data.ids.length > 0) {
+			} else if (data.numbers.length > 0 && data.phonebook_ids.length > 0) {
 				return false;
 			}
 			return true;

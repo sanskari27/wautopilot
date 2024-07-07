@@ -197,4 +197,13 @@ export default class PhoneBookService extends UserService {
 
 		return processPhonebookDocs(records);
 	}
+
+	public async findRecordsByIds(ids: Types.ObjectId[]) {
+		const records = await PhoneBookDB.find({
+			_id: { $in: ids },
+			linked_to: this.userId,
+		});
+
+		return processPhonebookDocs(records);
+	}
 }
