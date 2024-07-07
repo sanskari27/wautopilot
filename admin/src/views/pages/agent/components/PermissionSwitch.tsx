@@ -10,7 +10,7 @@ export default function PermissionSwitch({
 	label: string;
 }) {
 	return (
-		<FormControl mb={'0.25rem'}>
+		<FormControl>
 			<HStack justifyContent={'space-between'}>
 				<FormLabel m={0}>{label}</FormLabel>
 				<Switch

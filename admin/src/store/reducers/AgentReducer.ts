@@ -290,6 +290,55 @@ const Slice = createSlice({
 		toggleButtonExport: (state, action: PayloadAction<boolean>) => {
 			state.agentPermissions.buttons.export = action.payload;
 		},
+		toggleAllPhonebookPermissions: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.phonebook.create = action.payload;
+			state.agentPermissions.phonebook.update = action.payload;
+			state.agentPermissions.phonebook.delete = action.payload;
+			state.agentPermissions.phonebook.export = action.payload;
+		},
+		toggleAllBroadcastPermissions: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.broadcast.create = action.payload;
+			state.agentPermissions.broadcast.update = action.payload;
+			state.agentPermissions.broadcast.report = action.payload;
+			state.agentPermissions.broadcast.export = action.payload;
+		},
+		toggleAllRecurringPermissions: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.recurring.create = action.payload;
+			state.agentPermissions.recurring.update = action.payload;
+			state.agentPermissions.recurring.delete = action.payload;
+			state.agentPermissions.recurring.export = action.payload;
+		},
+		toggleAllMediaPermissions: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.media.create = action.payload;
+			state.agentPermissions.media.update = action.payload;
+			state.agentPermissions.media.delete = action.payload;
+		},
+		toggleAllChatbotPermissions: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.chatbot.create = action.payload;
+			state.agentPermissions.chatbot.update = action.payload;
+			state.agentPermissions.chatbot.delete = action.payload;
+			state.agentPermissions.chatbot.export = action.payload;
+		},
+		toggleAllChatbotFlowPermissions: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.chatbot_flow.create = action.payload;
+			state.agentPermissions.chatbot_flow.update = action.payload;
+			state.agentPermissions.chatbot_flow.delete = action.payload;
+			state.agentPermissions.chatbot_flow.export = action.payload;
+		},
+		toggleAllContactsPermissions: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.contacts.create = action.payload;
+			state.agentPermissions.contacts.update = action.payload;
+			state.agentPermissions.contacts.delete = action.payload;
+		},
+		toggleAllTemplatePermissions: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.template.create = action.payload;
+			state.agentPermissions.template.update = action.payload;
+			state.agentPermissions.template.delete = action.payload;
+		},
+		toggleAllButtonsPermissions: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.buttons.read = action.payload;
+			state.agentPermissions.buttons.export = action.payload;
+		}
 	},
 });
 
@@ -341,6 +390,15 @@ export const {
 	toggleAutoAssignChats,
 	toggleButtonRead,
 	toggleButtonExport,
+	toggleAllPhonebookPermissions,
+	toggleAllBroadcastPermissions,
+	toggleAllChatbotFlowPermissions,
+	toggleAllChatbotPermissions,
+	toggleAllContactsPermissions,
+	toggleAllMediaPermissions,
+	toggleAllRecurringPermissions,
+	toggleAllTemplatePermissions,
+	toggleAllButtonsPermissions,
 	addLabels,
 	clearLabels,
 	removeLabels,

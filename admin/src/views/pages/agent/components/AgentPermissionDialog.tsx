@@ -1,10 +1,5 @@
 import { CloseIcon } from '@chakra-ui/icons';
 import {
-	Accordion,
-	AccordionButton,
-	AccordionIcon,
-	AccordionItem,
-	AccordionPanel,
 	Box,
 	Button,
 	HStack,
@@ -37,6 +32,15 @@ import {
 	setAgentName,
 	setAgentPassword,
 	setAgentPhone,
+	toggleAllBroadcastPermissions,
+	toggleAllButtonsPermissions,
+	toggleAllChatbotFlowPermissions,
+	toggleAllChatbotPermissions,
+	toggleAllContactsPermissions,
+	toggleAllMediaPermissions,
+	toggleAllPhonebookPermissions,
+	toggleAllRecurringPermissions,
+	toggleAllTemplatePermissions,
 	toggleAutoAssignChats,
 	toggleBroadcastCreate,
 	toggleBroadcastExport,
@@ -49,6 +53,7 @@ import {
 	toggleChatbotExport,
 	toggleChatbotFlowCreate,
 	toggleChatbotFlowDelete,
+	toggleChatbotFlowExport,
 	toggleChatbotFlowUpdate,
 	toggleChatbotUpdate,
 	toggleContactsCreate,
@@ -161,6 +166,19 @@ const AgentPermissionDialog = () => {
 		}
 	}, [dispatch, id]);
 
+	const manipulatePhonebook =
+		phonebook.create || phonebook.update || phonebook.delete || phonebook.export;
+	const manipulateBroadcast =
+		broadcast.create || broadcast.update || broadcast.export || broadcast.report;
+	const manipulateRecurring =
+		recurring.create || recurring.update || recurring.delete || recurring.export;
+	const manipulateMedia = media.create || media.update || media.delete;
+	const manipulateContacts = contacts.create || contacts.update || contacts.delete;
+	const manipulateTemplate = template.create || template.update || template.delete;
+	const manipulateChatbot = chatbot.create || chatbot.update || chatbot.delete || chatbot.export;
+	const manipulateChatbotFlow = chatbot_flow.create || chatbot_flow.update || chatbot_flow.delete;
+	const manipulateButtons = buttons.read || buttons.export;
+
 	return (
 		<Modal isOpen={true} onClose={handleClose} size={'4xl'} scrollBehavior='inside'>
 			<ModalOverlay />
@@ -203,24 +221,23 @@ const AgentPermissionDialog = () => {
 							/>
 						</Wrap>
 					</HStack>
-					<Box px={'1rem'}>
+					<Box p={'0.75rem'} border={'1px dashed gray'} rounded={'lg'} mt={'0.75rem'}>
 						<PermissionSwitch
 							onChange={(value) => dispatch(toggleAutoAssignChats(value))}
 							label={'Auto Assign Chats'}
 							isChecked={auto_assign_chats}
 						/>
 					</Box>
-					<Accordion allowMultiple>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Phonebook
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
+					<Box p={'0.75rem'} border={'1px dashed gray'} rounded={'lg'} mt={'0.75rem'}>
+						<PermissionSwitch
+							onChange={(value) => {
+								dispatch(toggleAllPhonebookPermissions(value));
+							}}
+							label={'Phonebook'}
+							isChecked={manipulatePhonebook}
+						/>
+						{manipulatePhonebook ? (
+							<Box borderTop={'1px dashed gray'} pt={'0.25rem'} mt={'0.5rem'}>
 								<PermissionSwitch
 									onChange={(value) => dispatch(togglePhonebookCreate(value))}
 									label={'Create'}
@@ -241,45 +258,17 @@ const AgentPermissionDialog = () => {
 									label={'Export'}
 									isChecked={phonebook.export}
 								/>
-							</AccordionPanel>
-						</AccordionItem>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Templates
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleTemplateCreate(value))}
-									label={'Create'}
-									isChecked={template.create}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleTemplateUpdate(value))}
-									label={'Update'}
-									isChecked={template.update}
-								/>
-								<PermissionSwitch
-									onChange={(value) => dispatch(toggleTemplateDelete(value))}
-									label={'Delete'}
-									isChecked={template.delete}
-								/>
-							</AccordionPanel>
-						</AccordionItem>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Broadcast
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
+							</Box>
+						) : null}
+					</Box>
+					<Box p={'0.75rem'} border={'1px dashed gray'} rounded={'lg'} mt={'0.75rem'}>
+						<PermissionSwitch
+							onChange={(value) => dispatch(toggleAllBroadcastPermissions(value))}
+							label={'Broadcast'}
+							isChecked={manipulateBroadcast}
+						/>
+						{manipulateBroadcast ? (
+							<Box borderTop={'1px dashed gray'} pt={'0.25rem'} mt={'0.5rem'}>
 								<PermissionSwitch
 									onChange={(value) => dispatch(toggleBroadcastCreate(value))}
 									label={'Create'}
@@ -300,18 +289,17 @@ const AgentPermissionDialog = () => {
 									label={'Report'}
 									isChecked={broadcast.report}
 								/>
-							</AccordionPanel>
-						</AccordionItem>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Recurring Broadcast
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
+							</Box>
+						) : null}
+					</Box>
+					<Box p={'0.75rem'} border={'1px dashed gray'} rounded={'lg'} mt={'0.75rem'}>
+						<PermissionSwitch
+							onChange={(value) => dispatch(toggleAllRecurringPermissions(value))}
+							label={'Recurring'}
+							isChecked={manipulateRecurring}
+						/>
+						{manipulateRecurring ? (
+							<Box borderTop={'1px dashed gray'} pt={'0.25rem'} mt={'0.5rem'}>
 								<PermissionSwitch
 									onChange={(value) => dispatch(toggleRecurringCreate(value))}
 									label={'Create'}
@@ -332,18 +320,17 @@ const AgentPermissionDialog = () => {
 									label={'Export'}
 									isChecked={recurring.export}
 								/>
-							</AccordionPanel>
-						</AccordionItem>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Media
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
+							</Box>
+						) : null}
+					</Box>
+					<Box p={'0.75rem'} border={'1px dashed gray'} rounded={'lg'} mt={'0.75rem'}>
+						<PermissionSwitch
+							onChange={(value) => dispatch(toggleAllMediaPermissions(value))}
+							label={'Media'}
+							isChecked={manipulateMedia}
+						/>
+						{manipulateMedia ? (
+							<Box borderTop={'1px dashed gray'} pt={'0.25rem'} mt={'0.5rem'}>
 								<PermissionSwitch
 									onChange={(value) => dispatch(toggleMediaCreate(value))}
 									label={'Create'}
@@ -359,18 +346,17 @@ const AgentPermissionDialog = () => {
 									label={'Delete'}
 									isChecked={media.delete}
 								/>
-							</AccordionPanel>
-						</AccordionItem>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Contacts
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
+							</Box>
+						) : null}
+					</Box>
+					<Box p={'0.75rem'} border={'1px dashed gray'} rounded={'lg'} mt={'0.75rem'}>
+						<PermissionSwitch
+							onChange={(value) => dispatch(toggleAllContactsPermissions(value))}
+							label={'Contacts'}
+							isChecked={manipulateContacts}
+						/>
+						{manipulateContacts ? (
+							<Box borderTop={'1px dashed gray'} pt={'0.25rem'} mt={'0.5rem'}>
 								<PermissionSwitch
 									onChange={(value) => dispatch(toggleContactsCreate(value))}
 									label={'Create'}
@@ -386,18 +372,43 @@ const AgentPermissionDialog = () => {
 									label={'Delete'}
 									isChecked={contacts.delete}
 								/>
-							</AccordionPanel>
-						</AccordionItem>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Chatbot
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
+							</Box>
+						) : null}
+					</Box>
+					<Box p={'0.75rem'} border={'1px dashed gray'} rounded={'lg'} mt={'0.75rem'}>
+						<PermissionSwitch
+							onChange={(value) => dispatch(toggleAllTemplatePermissions(value))}
+							label={'Template'}
+							isChecked={manipulateTemplate}
+						/>
+						{manipulateTemplate ? (
+							<Box borderTop={'1px dashed gray'} pt={'0.25rem'} mt={'0.5rem'}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleTemplateCreate(value))}
+									label={'Create'}
+									isChecked={template.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleTemplateUpdate(value))}
+									label={'Update'}
+									isChecked={template.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleTemplateDelete(value))}
+									label={'Delete'}
+									isChecked={template.delete}
+								/>
+							</Box>
+						) : null}
+					</Box>
+					<Box p={'0.75rem'} border={'1px dashed gray'} rounded={'lg'} mt={'0.75rem'}>
+						<PermissionSwitch
+							onChange={(value) => dispatch(toggleAllChatbotPermissions(value))}
+							label={'Chatbot'}
+							isChecked={manipulateChatbot}
+						/>
+						{manipulateChatbot ? (
+							<Box borderTop={'1px dashed gray'} pt={'0.25rem'} mt={'0.5rem'}>
 								<PermissionSwitch
 									onChange={(value) => dispatch(toggleChatbotCreate(value))}
 									label={'Create'}
@@ -418,18 +429,17 @@ const AgentPermissionDialog = () => {
 									label={'Export'}
 									isChecked={chatbot.export}
 								/>
-							</AccordionPanel>
-						</AccordionItem>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Chatbot Flow
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
+							</Box>
+						) : null}
+					</Box>
+					<Box p={'0.75rem'} border={'1px dashed gray'} rounded={'lg'} mt={'0.75rem'}>
+						<PermissionSwitch
+							onChange={(value) => dispatch(toggleAllChatbotFlowPermissions(value))}
+							label={'Chatbot Flow'}
+							isChecked={manipulateChatbotFlow}
+						/>
+						{manipulateChatbotFlow ? (
+							<Box borderTop={'1px dashed gray'} pt={'0.25rem'} mt={'0.5rem'}>
 								<PermissionSwitch
 									onChange={(value) => dispatch(toggleChatbotFlowCreate(value))}
 									label={'Create'}
@@ -445,21 +455,25 @@ const AgentPermissionDialog = () => {
 									label={'Delete'}
 									isChecked={chatbot_flow.delete}
 								/>
-							</AccordionPanel>
-						</AccordionItem>
-						<AccordionItem>
-							<h2>
-								<AccordionButton>
-									<Box as='span' flex='1' textAlign='left'>
-										Button Analysis
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-							</h2>
-							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleChatbotFlowExport(value))}
+									label={'Export'}
+									isChecked={chatbot_flow.export}
+								/>
+							</Box>
+						) : null}
+					</Box>
+					<Box p={'0.75rem'} border={'1px dashed gray'} rounded={'lg'} mt={'0.75rem'}>
+						<PermissionSwitch
+							onChange={(value) => dispatch(toggleAllButtonsPermissions(value))}
+							label={'Buttons'}
+							isChecked={manipulateButtons}
+						/>
+						{manipulateButtons ? (
+							<Box borderTop={'1px dashed gray'} pt={'0.25rem'} mt={'0.5rem'}>
 								<PermissionSwitch
 									onChange={(value) => dispatch(toggleButtonRead(value))}
-									label={'Report'}
+									label={'Read'}
 									isChecked={buttons.read}
 								/>
 								<PermissionSwitch
@@ -467,9 +481,9 @@ const AgentPermissionDialog = () => {
 									label={'Export'}
 									isChecked={buttons.export}
 								/>
-							</AccordionPanel>
-						</AccordionItem>
-					</Accordion>
+							</Box>
+						) : null}
+					</Box>
 				</ModalBody>
 				<ModalFooter>
 					<Button colorScheme='red' variant={'outline'} mr={3} onClick={handleClose}>
