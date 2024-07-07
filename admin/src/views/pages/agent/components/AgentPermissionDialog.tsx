@@ -1,8 +1,12 @@
 import { CloseIcon } from '@chakra-ui/icons';
 import {
+	Accordion,
+	AccordionButton,
+	AccordionIcon,
+	AccordionItem,
+	AccordionPanel,
+	Box,
 	Button,
-	FormControl,
-	FormLabel,
 	HStack,
 	Modal,
 	ModalBody,
@@ -10,7 +14,6 @@ import {
 	ModalFooter,
 	ModalHeader,
 	ModalOverlay,
-	Switch,
 	Tag,
 	TagLabel,
 	TagRightIcon,
@@ -27,33 +30,48 @@ import AgentService from '../../../../services/agent.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
 	addLabels,
-	changeAutoAssignChats,
-	changeBroadcastAccess,
-	changeCanManipulatePhonebook,
-	changeCanManipulateTemplate,
-	changeChatbotAccess,
-	changeChatbotFlowsAccess,
-	changeContactsAccess,
-	changeMediaAccess,
-	changeRecurringBroadcast,
-	changeViewBroadcastReport,
 	clearLabels,
-	createPhonebook,
-	createTemplate,
-	deletePhonebook,
-	deleteTemplate,
 	removeLabels,
 	setAgentDetails,
 	setAgentEmail,
 	setAgentName,
 	setAgentPassword,
 	setAgentPhone,
+	toggleAutoAssignChats,
+	toggleBroadcastCreate,
+	toggleBroadcastExport,
+	toggleBroadcastReport,
+	toggleBroadcastUpdate,
+	toggleChatbotCreate,
+	toggleChatbotDelete,
+	toggleChatbotExport,
+	toggleChatbotFlowCreate,
+	toggleChatbotFlowDelete,
+	toggleChatbotFlowExport,
+	toggleChatbotFlowUpdate,
+	toggleChatbotUpdate,
+	toggleContactsCreate,
+	toggleContactsDelete,
+	toggleContactsUpdate,
+	toggleMediaCreate,
+	toggleMediaDelete,
+	toggleMediaUpdate,
+	togglePhonebookCreate,
+	togglePhonebookDelete,
+	togglePhonebookExport,
+	togglePhonebookUpdate,
+	toggleRecurringCreate,
+	toggleRecurringDelete,
+	toggleRecurringExport,
+	toggleRecurringUpdate,
+	toggleTemplateCreate,
+	toggleTemplateDelete,
+	toggleTemplateUpdate,
 	updateAgent,
-	updatePhonebook,
-	updateTemplate,
 } from '../../../../store/reducers/AgentReducer';
 import LabelFilter from '../../../components/labelFilter';
 import Each from '../../../components/utils/Each';
+import PermissionSwitch from './PermissionSwitch';
 
 const AgentPermissionDialog = () => {
 	const dispatch = useDispatch();
@@ -65,16 +83,15 @@ const AgentPermissionDialog = () => {
 	const {
 		agentPermissions: {
 			assigned_labels,
-			create_broadcast,
 			auto_assign_chats,
-			can_manipulate_phonebook,
-			can_manipulate_template,
-			view_broadcast_report,
-			create_recurring_broadcast,
-			manage_chatbot,
-			manage_chatbot_flows,
-			manage_contacts,
-			manage_media,
+			broadcast,
+			chatbot,
+			chatbot_flow,
+			contacts,
+			media,
+			phonebook,
+			recurring,
+			template,
 		},
 	} = useSelector((state: StoreState) => state[StoreNames.AGENT]);
 
@@ -89,20 +106,15 @@ const AgentPermissionDialog = () => {
 			agentId: id,
 			permission: {
 				assigned_labels,
-				manage_chatbot: manage_chatbot,
-				manage_chatbot_flows: manage_chatbot_flows,
-				manage_contacts: manage_contacts,
-				manage_media: manage_media,
-				create_recurring_broadcast: create_recurring_broadcast,
-				view_broadcast_reports: view_broadcast_report,
-				create_broadcast: create_broadcast,
-				create_phonebook: can_manipulate_phonebook.create_phonebook,
-				update_phonebook: can_manipulate_phonebook.update_phonebook,
-				delete_phonebook: can_manipulate_phonebook.delete_phonebook,
-				auto_assign_chats: auto_assign_chats,
-				create_template: can_manipulate_template.create_template,
-				update_template: can_manipulate_template.update_template,
-				delete_template: can_manipulate_template.delete_template,
+				auto_assign_chats,
+				broadcast,
+				chatbot,
+				chatbot_flow,
+				contacts,
+				media,
+				phonebook,
+				recurring,
+				template,
 			},
 		});
 
@@ -188,178 +200,257 @@ const AgentPermissionDialog = () => {
 							/>
 						</Wrap>
 					</HStack>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
-						<HStack justifyContent={'space-between'}>
-							<FormLabel m={0}>Phonebook (as per assigned tags)</FormLabel>
-							<Switch
-								onChange={(e) => dispatch(changeCanManipulatePhonebook(e.target.checked))}
-								colorScheme={'green'}
-								size='sm'
-								isChecked={can_manipulate_phonebook.access}
-							/>
-						</HStack>
-						{can_manipulate_phonebook.access && (
-							<>
-								<HStack mt={'1rem'} justifyContent={'space-between'}>
-									<FormLabel m={0}>Create phonebook</FormLabel>
-									<Switch
-										onChange={(e) => dispatch(createPhonebook(e.target.checked))}
-										colorScheme={'green'}
-										size='sm'
-										isChecked={can_manipulate_phonebook.create_phonebook}
-									/>
-								</HStack>
-								<HStack justifyContent={'space-between'}>
-									<FormLabel m={0}>Update Phonebook</FormLabel>
-									<Switch
-										onChange={(e) => dispatch(updatePhonebook(e.target.checked))}
-										colorScheme={'green'}
-										size='sm'
-										isChecked={can_manipulate_phonebook.update_phonebook}
-									/>
-								</HStack>
-								<HStack justifyContent={'space-between'}>
-									<FormLabel m={0}>Delete Phonebook</FormLabel>
-									<Switch
-										onChange={(e) => dispatch(deletePhonebook(e.target.checked))}
-										colorScheme={'green'}
-										size='sm'
-										isChecked={can_manipulate_phonebook.delete_phonebook}
-									/>
-								</HStack>
-							</>
-						)}
-					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
-						<HStack justifyContent={'space-between'}>
-							<FormLabel m={0}>Template</FormLabel>
-							<Switch
-								onChange={(e) => dispatch(changeCanManipulateTemplate(e.target.checked))}
-								colorScheme={'green'}
-								size='sm'
-								isChecked={can_manipulate_template.access}
-							/>
-						</HStack>
-						{can_manipulate_template.access && (
-							<>
-								<HStack mt={'1rem'} justifyContent={'space-between'}>
-									<FormLabel m={0}>Create template</FormLabel>
-									<Switch
-										onChange={(e) => dispatch(createTemplate(e.target.checked))}
-										colorScheme={'green'}
-										size='sm'
-										isChecked={can_manipulate_template.create_template}
-									/>
-								</HStack>
-								<HStack justifyContent={'space-between'}>
-									<FormLabel m={0}>Update template</FormLabel>
-									<Switch
-										onChange={(e) => dispatch(updateTemplate(e.target.checked))}
-										colorScheme={'green'}
-										size='sm'
-										isChecked={can_manipulate_template.update_template}
-									/>
-								</HStack>
-								<HStack justifyContent={'space-between'}>
-									<FormLabel m={0}>Delete template</FormLabel>
-									<Switch
-										onChange={(e) => dispatch(deleteTemplate(e.target.checked))}
-										colorScheme={'green'}
-										size='sm'
-										isChecked={can_manipulate_template.delete_template}
-									/>
-								</HStack>
-							</>
-						)}
-					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
-						<HStack justifyContent={'space-between'}>
-							<FormLabel m={0}>Broadcast (as per assigned tags)</FormLabel>
-							<Switch
-								onChange={(e) => dispatch(changeBroadcastAccess(e.target.checked))}
-								colorScheme={'green'}
-								size='sm'
-								isChecked={create_broadcast}
-							/>
-						</HStack>
-					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
-						<HStack justifyContent={'space-between'}>
-							<FormLabel m={0}>Recurring Broadcast (as per assigned tags)</FormLabel>
-							<Switch
-								onChange={(e) => dispatch(changeRecurringBroadcast(e.target.checked))}
-								colorScheme={'green'}
-								size='sm'
-								isChecked={create_recurring_broadcast}
-							/>
-						</HStack>
-					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
-						<HStack justifyContent={'space-between'}>
-							<FormLabel m={0}>Broadcast Report</FormLabel>
-							<Switch
-								onChange={(e) => dispatch(changeViewBroadcastReport(e.target.checked))}
-								colorScheme={'green'}
-								size='sm'
-								isChecked={view_broadcast_report}
-							/>
-						</HStack>
-					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
-						<HStack justifyContent={'space-between'}>
-							<FormLabel m={0}>Media</FormLabel>
-							<Switch
-								onChange={(e) => dispatch(changeMediaAccess(e.target.checked))}
-								colorScheme={'green'}
-								size='sm'
-								isChecked={manage_media}
-							/>
-						</HStack>
-					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
-						<HStack justifyContent={'space-between'}>
-							<FormLabel m={0}>Contact as Attachment access</FormLabel>
-							<Switch
-								onChange={(e) => dispatch(changeContactsAccess(e.target.checked))}
-								colorScheme={'green'}
-								size='sm'
-								isChecked={manage_contacts}
-							/>
-						</HStack>
-					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
-						<HStack justifyContent={'space-between'}>
-							<FormLabel m={0}>Chatbot</FormLabel>
-							<Switch
-								onChange={(e) => dispatch(changeChatbotAccess(e.target.checked))}
-								colorScheme={'green'}
-								size='sm'
-								isChecked={manage_chatbot}
-							/>
-						</HStack>
-					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
-						<HStack justifyContent={'space-between'}>
-							<FormLabel m={0}>Chatbot flow</FormLabel>
-							<Switch
-								onChange={(e) => dispatch(changeChatbotFlowsAccess(e.target.checked))}
-								colorScheme={'green'}
-								size='sm'
-								isChecked={manage_chatbot_flows}
-							/>
-						</HStack>
-					</FormControl>
-					<FormControl mb={'0.25rem'} borderBottom={'1px solid lightgray'} pb={'0.25rem'}>
-						<HStack justifyContent={'space-between'}>
-							<FormLabel m={0}>Auto Assign Chats</FormLabel>
-							<Switch
-								onChange={(e) => dispatch(changeAutoAssignChats(e.target.checked))}
-								colorScheme={'green'}
-								size='sm'
-								isChecked={auto_assign_chats}
-							/>
-						</HStack>
-					</FormControl>
+					<Box px={'1rem'}>
+						<PermissionSwitch
+							onChange={(value) => dispatch(toggleAutoAssignChats(value))}
+							label={'Auto Assign Chats'}
+							isChecked={auto_assign_chats}
+						/>
+					</Box>
+					<Accordion allowMultiple>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Broadcast Permission
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleBroadcastCreate(value))}
+									label={'Create'}
+									isChecked={broadcast.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleBroadcastUpdate(value))}
+									label={'Update'}
+									isChecked={broadcast.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleBroadcastExport(value))}
+									label={'Export'}
+									isChecked={broadcast.export}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleBroadcastReport(value))}
+									label={'Report'}
+									isChecked={broadcast.report}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Recurring Broadcast Permission
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleRecurringCreate(value))}
+									label={'Create'}
+									isChecked={recurring.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleRecurringUpdate(value))}
+									label={'Update'}
+									isChecked={recurring.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleRecurringDelete(value))}
+									label={'Delete'}
+									isChecked={recurring.delete}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleRecurringExport(value))}
+									label={'Export'}
+									isChecked={recurring.export}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Media Permission
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleMediaCreate(value))}
+									label={'Create'}
+									isChecked={media.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleMediaUpdate(value))}
+									label={'Update'}
+									isChecked={media.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleMediaDelete(value))}
+									label={'Delete'}
+									isChecked={media.delete}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Phonebook Permission
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(togglePhonebookCreate(value))}
+									label={'Create'}
+									isChecked={phonebook.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(togglePhonebookUpdate(value))}
+									label={'Update'}
+									isChecked={phonebook.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(togglePhonebookDelete(value))}
+									label={'Delete'}
+									isChecked={phonebook.delete}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(togglePhonebookExport(value))}
+									label={'Export'}
+									isChecked={phonebook.export}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Chatbot Permission
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleChatbotCreate(value))}
+									label={'Create'}
+									isChecked={chatbot.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleChatbotUpdate(value))}
+									label={'Update'}
+									isChecked={chatbot.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleChatbotDelete(value))}
+									label={'Delete'}
+									isChecked={chatbot.delete}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleChatbotExport(value))}
+									label={'Export'}
+									isChecked={chatbot.export}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Chatbot Flow Permission
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleChatbotFlowCreate(value))}
+									label={'Create'}
+									isChecked={chatbot_flow.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleChatbotFlowUpdate(value))}
+									label={'Update'}
+									isChecked={chatbot_flow.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleChatbotFlowDelete(value))}
+									label={'Delete'}
+									isChecked={chatbot_flow.delete}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleChatbotFlowExport(value))}
+									label={'Export'}
+									isChecked={chatbot_flow.export}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Contacts Permission
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleContactsCreate(value))}
+									label={'Create'}
+									isChecked={contacts.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleContactsUpdate(value))}
+									label={'Update'}
+									isChecked={contacts.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleContactsDelete(value))}
+									label={'Delete'}
+									isChecked={contacts.delete}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+						<AccordionItem>
+							<h2>
+								<AccordionButton>
+									<Box as='span' flex='1' textAlign='left'>
+										Templates Permission
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+							</h2>
+							<AccordionPanel pb={4}>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleTemplateCreate(value))}
+									label={'Create'}
+									isChecked={template.create}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleTemplateUpdate(value))}
+									label={'Update'}
+									isChecked={template.update}
+								/>
+								<PermissionSwitch
+									onChange={(value) => dispatch(toggleTemplateDelete(value))}
+									label={'Delete'}
+									isChecked={template.delete}
+								/>
+							</AccordionPanel>
+						</AccordionItem>
+					</Accordion>
 				</ModalBody>
 				<ModalFooter>
 					<Button colorScheme='red' variant={'outline'} mr={3} onClick={handleClose}>

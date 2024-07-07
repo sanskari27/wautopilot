@@ -12,44 +12,102 @@ const initState: AgentState = {
 		password: '',
 		permissions: {
 			assigned_labels: [],
-			create_recurring_broadcast: false,
-			view_broadcast_reports: false,
-			create_broadcast: false,
-			create_phonebook: false,
-			update_phonebook: false,
-			delete_phonebook: false,
 			auto_assign_chats: false,
-			create_template: false,
-			update_template: false,
-			delete_template: false,
-			manage_media: false,
-			manage_contacts: false,
-			manage_chatbot: false,
-			manage_chatbot_flows: false,
+			broadcast: {
+				create: false,
+				update: false,
+				report: false,
+				export: false,
+			},
+			recurring: {
+				create: false,
+				update: false,
+				delete: false,
+				export: false,
+			},
+			media: {
+				create: false,
+				update: false,
+				delete: false,
+			},
+			phonebook: {
+				create: false,
+				update: false,
+				delete: false,
+				export: false,
+			},
+			chatbot: {
+				create: false,
+				update: false,
+				delete: false,
+				export: false,
+			},
+			chatbot_flow: {
+				create: false,
+				update: false,
+				delete: false,
+				export: false,
+			},
+			contacts: {
+				create: false,
+				update: false,
+				delete: false,
+			},
+			template: {
+				create: false,
+				update: false,
+				delete: false,
+			},
 		},
 	},
 	agentPermissions: {
-		manage_media: false,
-		manage_contacts: false,
-		manage_chatbot: false,
-		manage_chatbot_flows: false,
-		create_recurring_broadcast: false,
+		broadcast: {
+			create: false,
+			update: false,
+			report: false,
+			export: false,
+		},
+		recurring: {
+			create: false,
+			update: false,
+			delete: false,
+			export: false,
+		},
+		media: {
+			create: false,
+			update: false,
+			delete: false,
+		},
+		phonebook: {
+			create: false,
+			update: false,
+			delete: false,
+			export: false,
+		},
+		chatbot: {
+			create: false,
+			update: false,
+			delete: false,
+			export: false,
+		},
+		chatbot_flow: {
+			create: false,
+			update: false,
+			delete: false,
+			export: false,
+		},
+		contacts: {
+			create: false,
+			update: false,
+			delete: false,
+		},
+		template: {
+			create: false,
+			update: false,
+			delete: false,
+		},
 		assigned_labels: [],
-		create_broadcast: false,
-		view_broadcast_report: false,
-		can_manipulate_phonebook: {
-			access: false,
-			create_phonebook: false,
-			update_phonebook: false,
-			delete_phonebook: false,
-		},
 		auto_assign_chats: false,
-		can_manipulate_template: {
-			access: false,
-			create_template: false,
-			update_template: false,
-			delete_template: false,
-		},
 	},
 	selectedAgent: [],
 	ui: {
@@ -101,35 +159,6 @@ const Slice = createSlice({
 			const agent = state.list.find((record) => record.id === action.payload);
 			if (agent) {
 				state.details = agent;
-				state.agentPermissions = {
-					manage_media: agent.permissions.manage_media,
-					manage_contacts: agent.permissions.manage_contacts,
-					manage_chatbot: agent.permissions.manage_chatbot,
-					manage_chatbot_flows: agent.permissions.manage_chatbot_flows,
-					create_recurring_broadcast: agent.permissions.create_recurring_broadcast,
-					assigned_labels: agent.permissions.assigned_labels,
-					create_broadcast: agent.permissions.create_broadcast,
-					view_broadcast_report: agent.permissions.view_broadcast_reports,
-					auto_assign_chats: agent.permissions.auto_assign_chats,
-					can_manipulate_phonebook: {
-						access:
-							agent.permissions.create_phonebook ||
-							agent.permissions.update_phonebook ||
-							agent.permissions.delete_phonebook,
-						create_phonebook: agent.permissions.create_phonebook,
-						update_phonebook: agent.permissions.update_phonebook,
-						delete_phonebook: agent.permissions.delete_phonebook,
-					},
-					can_manipulate_template: {
-						access:
-							agent.permissions.create_template ||
-							agent.permissions.update_template ||
-							agent.permissions.delete_template,
-						create_template: agent.permissions.create_template,
-						update_template: agent.permissions.update_template,
-						delete_template: agent.permissions.delete_template,
-					},
-				};
 			}
 		},
 		removeAgent: (state, action: PayloadAction<string>) => {
@@ -141,38 +170,95 @@ const Slice = createSlice({
 				state.list[index] = action.payload;
 			}
 		},
-		changeBroadcastAccess: (state, action: PayloadAction<boolean>) => {
-			state.agentPermissions.create_broadcast = action.payload;
+		toggleBroadcastCreate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.broadcast.create = action.payload;
 		},
-		changeViewBroadcastReport: (state, action: PayloadAction<boolean>) => {
-			state.agentPermissions.view_broadcast_report = action.payload;
+		toggleBroadcastUpdate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.broadcast.update = action.payload;
 		},
-		changeAutoAssignChats: (state, action: PayloadAction<boolean>) => {
+		toggleBroadcastReport: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.broadcast.report = action.payload;
+		},
+		toggleBroadcastExport: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.broadcast.export = action.payload;
+		},
+		toggleRecurringCreate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.recurring.create = action.payload;
+		},
+		toggleRecurringUpdate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.recurring.update = action.payload;
+		},
+		toggleRecurringDelete: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.recurring.delete = action.payload;
+		},
+		toggleRecurringExport: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.recurring.export = action.payload;
+		},
+		toggleMediaCreate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.media.create = action.payload;
+		},
+		toggleMediaUpdate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.media.update = action.payload;
+		},
+		toggleMediaDelete: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.media.delete = action.payload;
+		},
+		togglePhonebookCreate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.phonebook.create = action.payload;
+		},
+		togglePhonebookUpdate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.phonebook.update = action.payload;
+		},
+		togglePhonebookDelete: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.phonebook.delete = action.payload;
+		},
+		togglePhonebookExport: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.phonebook.export = action.payload;
+		},
+		toggleChatbotCreate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.chatbot.create = action.payload;
+		},
+		toggleChatbotUpdate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.chatbot.update = action.payload;
+		},
+		toggleChatbotDelete: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.chatbot.delete = action.payload;
+		},
+		toggleChatbotExport: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.chatbot.export = action.payload;
+		},
+		toggleChatbotFlowCreate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.chatbot_flow.create = action.payload;
+		},
+		toggleChatbotFlowUpdate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.chatbot_flow.update = action.payload;
+		},
+		toggleChatbotFlowDelete: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.chatbot_flow.delete = action.payload;
+		},
+		toggleChatbotFlowExport: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.chatbot_flow.export = action.payload;
+		},
+		toggleContactsCreate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.contacts.create = action.payload;
+		},
+		toggleContactsUpdate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.contacts.update = action.payload;
+		},
+		toggleContactsDelete: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.contacts.delete = action.payload;
+		},
+		toggleTemplateCreate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.template.create = action.payload;
+		},
+		toggleTemplateUpdate: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.template.update = action.payload;
+		},
+		toggleTemplateDelete: (state, action: PayloadAction<boolean>) => {
+			state.agentPermissions.template.delete = action.payload;
+		},
+		toggleAutoAssignChats: (state, action: PayloadAction<boolean>) => {
 			state.agentPermissions.auto_assign_chats = action.payload;
-		},
-		changeCanManipulateTemplate: (state, action: PayloadAction<boolean>) => {
-			if (action.payload) {
-				state.agentPermissions.can_manipulate_template.create_template = true;
-				state.agentPermissions.can_manipulate_template.update_template = true;
-				state.agentPermissions.can_manipulate_template.delete_template = true;
-			} else {
-				state.agentPermissions.can_manipulate_template.create_template = false;
-				state.agentPermissions.can_manipulate_template.update_template = false;
-				state.agentPermissions.can_manipulate_template.delete_template = false;
-			}
-			state.agentPermissions.can_manipulate_template.access = action.payload;
-		},
-		changeCanManipulatePhonebook: (state, action: PayloadAction<boolean>) => {
-			if (action.payload) {
-				state.agentPermissions.can_manipulate_phonebook.create_phonebook = true;
-				state.agentPermissions.can_manipulate_phonebook.update_phonebook = true;
-				state.agentPermissions.can_manipulate_phonebook.delete_phonebook = true;
-			} else {
-				state.agentPermissions.can_manipulate_phonebook.create_phonebook = false;
-				state.agentPermissions.can_manipulate_phonebook.update_phonebook = false;
-				state.agentPermissions.can_manipulate_phonebook.delete_phonebook = false;
-			}
-			state.agentPermissions.can_manipulate_phonebook.access = action.payload;
 		},
 		addLabels: (state, action: PayloadAction<string>) => {
 			state.agentPermissions.assigned_labels.push(action.payload);
@@ -184,88 +270,6 @@ const Slice = createSlice({
 		},
 		clearLabels: (state) => {
 			state.agentPermissions.assigned_labels = [];
-		},
-		createPhonebook: (state, action: PayloadAction<boolean>) => {
-			state.agentPermissions.can_manipulate_phonebook.create_phonebook = action.payload;
-		},
-		updatePhonebook: (state, action: PayloadAction<boolean>) => {
-			state.agentPermissions.can_manipulate_phonebook.update_phonebook = action.payload;
-		},
-		deletePhonebook: (state, action: PayloadAction<boolean>) => {
-			state.agentPermissions.can_manipulate_phonebook.delete_phonebook = action.payload;
-		},
-		createTemplate: (state, action: PayloadAction<boolean>) => {
-			if (
-				!action.payload &&
-				!state.agentPermissions.can_manipulate_template.update_template &&
-				!state.agentPermissions.can_manipulate_template.delete_template
-			) {
-				state.agentPermissions.can_manipulate_template.access = false;
-			}
-			state.agentPermissions.can_manipulate_template.create_template = action.payload;
-		},
-		updateTemplate: (state, action: PayloadAction<boolean>) => {
-			if (
-				!state.agentPermissions.can_manipulate_template.create_template &&
-				!action.payload &&
-				!state.agentPermissions.can_manipulate_template.delete_template
-			) {
-				state.agentPermissions.can_manipulate_template.access = false;
-			}
-			state.agentPermissions.can_manipulate_template.update_template = action.payload;
-		},
-		deleteTemplate: (state, action: PayloadAction<boolean>) => {
-			if (
-				!state.agentPermissions.can_manipulate_template.create_template &&
-				!state.agentPermissions.can_manipulate_template.update_template &&
-				!action.payload
-			) {
-				state.agentPermissions.can_manipulate_template.access = false;
-			}
-			state.agentPermissions.can_manipulate_template.delete_template = action.payload;
-		},
-		changeRecurringBroadcast: (state, action: PayloadAction<boolean>) => {
-			state.agentPermissions.create_recurring_broadcast = action.payload;
-		},
-		updateAgentPermission: (
-			state,
-			action: PayloadAction<{
-				id: string;
-				permission: {
-					assigned_labels: string[];
-					view_broadcast_reports: boolean;
-					create_broadcast: boolean;
-					create_phonebook: boolean;
-					update_phonebook: boolean;
-					delete_phonebook: boolean;
-					auto_assign_chats: boolean;
-					create_template: boolean;
-					update_template: boolean;
-					delete_template: boolean;
-					create_recurring_broadcast: boolean;
-					manage_media: boolean;
-					manage_contacts: boolean;
-					manage_chatbot: boolean;
-					manage_chatbot_flows: boolean;
-				};
-			}>
-		) => {
-			const index = state.list.findIndex((record) => record.id === action.payload.id);
-			if (index !== -1) {
-				state.list[index].permissions = action.payload.permission;
-			}
-		},
-		changeMediaAccess: (state, action: PayloadAction<boolean>) => {
-			state.agentPermissions.manage_media = action.payload;
-		},
-		changeContactsAccess: (state, action: PayloadAction<boolean>) => {
-			state.agentPermissions.manage_contacts = action.payload;
-		},
-		changeChatbotAccess: (state, action: PayloadAction<boolean>) => {
-			state.agentPermissions.manage_chatbot = action.payload;
-		},
-		changeChatbotFlowsAccess: (state, action: PayloadAction<boolean>) => {
-			state.agentPermissions.manage_chatbot_flows = action.payload;
 		},
 	},
 });
@@ -286,26 +290,39 @@ export const {
 	removeAgent,
 	updateAgent,
 	addSingleSelectedAgent,
-	changeBroadcastAccess,
-	changeViewBroadcastReport,
-	changeAutoAssignChats,
-	changeCanManipulateTemplate,
-	changeCanManipulatePhonebook,
+	toggleBroadcastCreate,
+	toggleBroadcastUpdate,
+	toggleBroadcastReport,
+	toggleBroadcastExport,
+	toggleRecurringCreate,
+	toggleRecurringUpdate,
+	toggleRecurringDelete,
+	toggleRecurringExport,
+	toggleMediaCreate,
+	toggleMediaUpdate,
+	toggleMediaDelete,
+	togglePhonebookCreate,
+	togglePhonebookUpdate,
+	togglePhonebookDelete,
+	togglePhonebookExport,
+	toggleChatbotCreate,
+	toggleChatbotUpdate,
+	toggleChatbotDelete,
+	toggleChatbotExport,
+	toggleChatbotFlowCreate,
+	toggleChatbotFlowUpdate,
+	toggleChatbotFlowDelete,
+	toggleChatbotFlowExport,
+	toggleContactsCreate,
+	toggleContactsUpdate,
+	toggleContactsDelete,
+	toggleTemplateCreate,
+	toggleTemplateUpdate,
+	toggleTemplateDelete,
+	toggleAutoAssignChats,
 	addLabels,
-	removeLabels,
 	clearLabels,
-	createPhonebook,
-	updatePhonebook,
-	deletePhonebook,
-	createTemplate,
-	updateTemplate,
-	deleteTemplate,
-	updateAgentPermission,
-	changeRecurringBroadcast,
-	changeMediaAccess,
-	changeContactsAccess,
-	changeChatbotAccess,
-	changeChatbotFlowsAccess
+	removeLabels,
 } = Slice.actions;
 
 export default Slice.reducer;

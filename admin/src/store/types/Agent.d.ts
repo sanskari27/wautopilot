@@ -4,47 +4,57 @@ export type Agent = {
 	email: string;
 	phone: string;
 	password?: string;
-	permissions: {
-		assigned_labels: string[];
-		view_broadcast_reports: boolean;
-		create_broadcast: boolean;
-		create_phonebook: boolean;
-		update_phonebook: boolean;
-		delete_phonebook: boolean;
-		auto_assign_chats: boolean;
-		create_template: boolean;
-		update_template: boolean;
-		delete_template: boolean;
-		create_recurring_broadcast: boolean;
-		manage_media: boolean;
-		manage_contacts: boolean;
-		manage_chatbot: boolean;
-		manage_chatbot_flows: boolean;
-	};
+	permissions: AgentPermission;
 };
 
 export type AgentPermission = {
-	create_broadcast: boolean;
-	assigned_labels: string[];
-	view_broadcast_report: boolean;
+	phonebook: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		export: boolean;
+	};
+	chatbot: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		export: boolean;
+	};
+	chatbot_flow: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		export: boolean;
+	};
+	broadcast: {
+		create: boolean;
+		update: boolean;
+		report: boolean;
+		export: boolean;
+	};
+	recurring: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+		export: boolean;
+	};
+	media: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	contacts: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
+	template: {
+		create: boolean;
+		update: boolean;
+		delete: boolean;
+	};
 	auto_assign_chats: boolean;
-	create_recurring_broadcast: boolean;
-	manage_media: boolean;
-	manage_contacts: boolean;
-	manage_chatbot: boolean;
-	manage_chatbot_flows: boolean;
-	can_manipulate_phonebook: {
-		access: boolean;
-		create_phonebook: boolean;
-		update_phonebook: boolean;
-		delete_phonebook: boolean;
-	};
-	can_manipulate_template: {
-		access: boolean;
-		create_template: boolean;
-		update_template: boolean;
-		delete_template: boolean;
-	};
+	assigned_labels: string[];
 };
 
 export type AgentState = {

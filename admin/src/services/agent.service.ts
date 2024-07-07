@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import APIInstance from '../config/APIInstance';
+import { AgentPermission } from '../store/types/Agent';
 
 export default class AgentService {
 	static async getAgent() {
@@ -96,23 +97,7 @@ export default class AgentService {
 		permission,
 	}: {
 		agentId: string;
-		permission: {
-			manage_media: boolean;
-			manage_contacts: boolean;
-			manage_chatbot: boolean;
-			manage_chatbot_flows: boolean;
-			assigned_labels: string[];
-			view_broadcast_reports: boolean;
-			create_broadcast: boolean;
-			create_phonebook: boolean;
-			update_phonebook: boolean;
-			delete_phonebook: boolean;
-			auto_assign_chats: boolean;
-			create_template: boolean;
-			update_template: boolean;
-			delete_template: boolean;
-			create_recurring_broadcast: boolean;
-		};
+		permission: AgentPermission;
 	}) {
 		try {
 			const { data } = await APIInstance.post(`/users/agents/${agentId}/permissions`, permission);
@@ -122,21 +107,53 @@ export default class AgentService {
 				email: data.email ?? '',
 				phone: data.phone ?? '',
 				permissions: {
-					manage_media: data.permissions?.manage_media ?? false,
-					manage_contacts: data.permissions?.manage_contacts ?? false,
-					manage_chatbot: data.permissions?.manage_chatbot ?? false,
-					manage_chatbot_flows: data.permissions?.manage_chatbot_flows ?? false,
-					assigned_labels: data.permissions?.assigned_labels ?? [],
-					view_broadcast_reports: data.permissions?.view_broadcast_reports ?? false,
-					create_broadcast: data.permissions?.create_broadcast ?? false,
-					create_phonebook: data.permissions?.create_phonebook ?? false,
-					update_phonebook: data.permissions?.update_phonebook ?? false,
-					delete_phonebook: data.permissions?.delete_phonebook ?? false,
+					broadcast: {
+						create: data.permissions?.broadcast?.create ?? false,
+						update: data.permissions?.broadcast?.update ?? false,
+						report: data.permissions?.broadcast?.report ?? false,
+						export: data.permissions?.broadcast?.export ?? false,
+					},
+					recurring: {
+						create: data.permissions?.recurring?.create ?? false,
+						update: data.permissions?.recurring?.update ?? false,
+						delete: data.permissions?.recurring?.delete ?? false,
+						export: data.permissions?.recurring?.export ?? false,
+					},
+					media: {
+						create: data.permissions?.media?.create ?? false,
+						update: data.permissions?.media?.update ?? false,
+						delete: data.permissions?.media?.delete ?? false,
+					},
+					phonebook: {
+						create: data.permissions?.phonebook?.create ?? false,
+						update: data.permissions?.phonebook?.update ?? false,
+						delete: data.permissions?.phonebook?.delete ?? false,
+						export: data.permissions?.phonebook?.export ?? false,
+					},
+					chatbot: {
+						create: data.permissions?.chatbot?.create ?? false,
+						update: data.permissions?.chatbot?.update ?? false,
+						delete: data.permissions?.chatbot?.delete ?? false,
+						export: data.permissions?.chatbot?.export ?? false,
+					},
+					chatbot_flow: {
+						create: data.permissions?.chatbot_flow?.create ?? false,
+						update: data.permissions?.chatbot_flow?.update ?? false,
+						delete: data.permissions?.chatbot_flow?.delete ?? false,
+						export: data.permissions?.chatbot_flow?.export ?? false,
+					},
+					contacts: {
+						create: data.permissions?.contacts?.create ?? false,
+						update: data.permissions?.contacts?.update ?? false,
+						delete: data.permissions?.contacts?.delete ?? false,
+					},
+					template: {
+						create: data.permissions?.template?.create ?? false,
+						update: data.permissions?.template?.update ?? false,
+						delete: data.permissions?.template?.delete ?? false,
+					},
 					auto_assign_chats: data.permissions?.auto_assign_chats ?? false,
-					create_template: data.permissions?.create_template ?? false,
-					update_template: data.permissions?.update_template ?? false,
-					delete_template: data.permissions?.delete_template ?? false,
-					create_recurring_broadcast: data.permissions?.create_recurring_broadcast ?? false,
+					assigned_labels: data.permissions?.assigned_labels ?? [],
 				},
 			};
 		} catch (err) {
