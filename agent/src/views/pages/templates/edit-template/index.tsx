@@ -54,6 +54,7 @@ export default function EditTemplate() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
+	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 	const {
 		template: { create: create_template, update: update_template },
 	} = usePermissions();
@@ -363,7 +364,7 @@ export default function EditTemplate() {
 							Cancel
 						</Button>
 						<Show>
-							<Show.When condition={update_template && id}>
+							<Show.When condition={update_template && !!id}>
 								<Button colorScheme='green' onClick={onSave} ml={3}>
 									Save
 								</Button>
