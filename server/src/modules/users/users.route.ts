@@ -4,6 +4,7 @@ import { IDValidator, VerifyMinLevel } from '../../middleware';
 import Controller from './users.controller';
 import {
 	CreateAgentValidator,
+	CreateQuickReplyValidator,
 	PermissionsValidator,
 	UpgradePlanValidator,
 } from './users.validator';
@@ -49,5 +50,16 @@ router
 	.get(Controller.getAgents)
 	.all(VerifyMinLevel(UserLevel.Admin))
 	.post(CreateAgentValidator, Controller.createAgent);
+
+router
+	.route('/quick-replies/:id')
+	.all(IDValidator)
+	.delete(Controller.deleteQuickReply)
+	.put(CreateQuickReplyValidator, Controller.editQuickReply);
+
+router
+	.route('/quick-replies')
+	.get(Controller.quickReplies)
+	.post(CreateQuickReplyValidator, Controller.saveQuickReply);
 
 export default router;

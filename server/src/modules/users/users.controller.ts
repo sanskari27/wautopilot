@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { QuickReplyDB } from '../../../mongo';
 import { UserLevel } from '../../config/const';
 import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
@@ -209,6 +210,76 @@ async function agentLogs(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function quickReplies(req: Request, res: Response, next: NextFunction) {
+	const { user } = req.locals;
+
+	const quickRepliesDocs = await QuickReplyDB.find({ linked_to: user.userId });
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			quickReplies: quickRepliesDocs.map((doc) => ({
+				id: doc._id,
+				message: doc.message,
+			})),
+		},
+	});
+}
+
+async function saveQuickReply(req: Request, res: Response, next: NextFunction) {
+	const { user, data } = req.locals;
+
+	const quickReply = new QuickReplyDB({
+		linked_to: user.userId,
+		message: data,
+	});
+
+	await quickReply.save();
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			id: quickReply._id,
+			message: quickReply.message,
+		},
+	});
+}
+
+async function deleteQuickReply(req: Request, res: Response, next: NextFunction) {
+	const { user, id } = req.locals;
+
+	await QuickReplyDB.deleteOne({ _id: id, linked_to: user.userId });
+
+	return Respond({
+		res,
+		status: 200,
+	});
+}
+
+async function editQuickReply(req: Request, res: Response, next: NextFunction) {
+	const { user, id, data } = req.locals;
+
+	const quickReply = await QuickReplyDB.findOne({ _id: id, linked_to: user.userId });
+
+	if (!quickReply) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	quickReply.message = data;
+	await quickReply.save();
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			id: quickReply._id,
+			message: quickReply.message,
+		},
+	});
+}
+
 const Controller = {
 	getAdmins,
 	extendSubscription,
@@ -220,6 +291,10 @@ const Controller = {
 	assignPermissions,
 	removeAgent,
 	agentLogs,
+	quickReplies,
+	saveQuickReply,
+	deleteQuickReply,
+	editQuickReply,
 };
 
 export default Controller;

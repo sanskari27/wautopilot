@@ -15,6 +15,7 @@ export {
 	PermissionDB,
 	PhoneBookDB,
 	PlanDB,
+	QuickReplyDB,
 	RecurringBroadcastDB,
 	ScheduledMessageDB,
 	SessionDB,

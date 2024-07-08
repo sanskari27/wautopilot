@@ -13,6 +13,7 @@ export { default as MediaDB } from './Media';
 export { default as PermissionDB } from './Permission';
 export { default as PhoneBookDB } from './PhoneBook';
 export { default as PlanDB } from './Plan';
+export { default as QuickReplyDB } from './QuickReply';
 export { default as RecurringBroadcastDB } from './RecurringBroadcast';
 export { default as ScheduledMessageDB } from './ScheduledMessage';
 export { default as SessionDB } from './Session';
