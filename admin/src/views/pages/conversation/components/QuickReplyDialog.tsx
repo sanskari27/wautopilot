@@ -6,7 +6,7 @@ export type QuickReplyHandle = {
 	close: () => void;
 };
 
-const QuickReplyDialog = forwardRef<QuickReplyHandle>((props, ref) => {
+const QuickReplyDialog = forwardRef<QuickReplyHandle>((_, ref) => {
 	const [isOpen, setIsOpen] = useState(false);
 
 	useImperativeHandle(ref, () => ({
