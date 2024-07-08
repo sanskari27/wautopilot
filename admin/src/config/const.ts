@@ -1,4 +1,6 @@
 import { BiBot, BiCake, BiConversation } from 'react-icons/bi';
+import { FaTasks } from 'react-icons/fa';
+import { GoTasklist } from 'react-icons/go';
 import { MdContacts, MdOutlineDashboard, MdOutlinePermMedia } from 'react-icons/md';
 import { RiContactsBook2Line, RiFlowChart } from 'react-icons/ri';
 import { TbMessage2Plus, TbReportSearch, TbTemplate } from 'react-icons/tb';
@@ -26,6 +28,7 @@ export const NAVIGATION = {
 	CHATBOT: 'chatbot',
 	CHATBOT_FLOW: 'chat-bot-flow',
 
+	TASKS: 'tasks',
 	SHORTEN_LINKS: 'shorten-links',
 
 	TEMPLATES: 'templates',
@@ -98,6 +101,11 @@ export const MenuItems = [
 	// 	route: NAVIGATION.SHORTEN_LINKS,
 	// 	title: 'Short Links',
 	// },
+	{
+		icon: FaTasks,
+		route: NAVIGATION.TASKS,
+		title: 'Tasks',
+	},
 ];
 
 export enum Color {

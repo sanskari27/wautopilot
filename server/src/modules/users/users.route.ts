@@ -3,6 +3,7 @@ import { UserLevel } from '../../config/const';
 import { IDValidator, VerifyMinLevel } from '../../middleware';
 import Controller from './users.controller';
 import {
+	AssignTaskValidator,
 	CreateAgentValidator,
 	CreateQuickReplyValidator,
 	PermissionsValidator,
@@ -38,6 +39,8 @@ router
 	.all(VerifyMinLevel(UserLevel.Admin), IDValidator)
 	.get(Controller.agentLogs);
 
+router.route('/agents/:id/tasks').all(IDValidator).get(Controller.getAssignedTask);
+
 router
 	.route('/agents/:id')
 	.all(VerifyMinLevel(UserLevel.Admin), IDValidator)
@@ -61,5 +64,12 @@ router
 	.route('/quick-replies')
 	.get(Controller.quickReplies)
 	.post(CreateQuickReplyValidator, Controller.saveQuickReply);
+
+router.route('/tasks/:id').all(IDValidator).patch(Controller.hideAssignedTask);
+
+router
+	.route('/tasks')
+	.get(Controller.getAssignedTask)
+	.post(AssignTaskValidator, Controller.assignTask);
 
 export default router;

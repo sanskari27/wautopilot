@@ -77,4 +77,58 @@ export default class AgentService {
 	}) {
 		APIInstance.post(`/${device_id}/conversation/${conversationId}/remove-agent`);
 	}
+
+	static async hideAssignedTask(id: string) {
+		try {
+			const { data } = await APIInstance.patch(`/users/tasks/${id}`);
+			return data.tasks as {
+				id: string;
+				hidden: boolean;
+				message: string;
+				due_date: string;
+			}[];
+		} catch (err) {
+			return [];
+		}
+	}
+
+	static async getAssignedTasks(
+		id: string,
+		params: {
+			date_from?: string;
+			date_to?: string;
+		}
+	) {
+		try {
+			const path = id !== 'me' ? `/users/agents/${id}/tasks` : `/users/tasks`;
+			const { data } = await APIInstance.get(path, {
+				params: {
+					...(params.date_from && { date_from: params.date_from }),
+					...(params.date_to && { date_to: params.date_to }),
+				},
+			});
+			return data.tasks as {
+				id: string;
+				hidden: boolean;
+				message: string;
+				due_date: string;
+			}[];
+		} catch (err) {
+			return [];
+		}
+	}
+
+	static async assignTask(message: string, due_date: string, assign_to?: string) {
+		try {
+			const { data } = await APIInstance.post('/users/tasks', { message, assign_to, due_date });
+			return data.task as {
+				id: string;
+				hidden: boolean;
+				due_date: string;
+				message: string;
+			}[];
+		} catch (err) {
+			return [];
+		}
+	}
 }

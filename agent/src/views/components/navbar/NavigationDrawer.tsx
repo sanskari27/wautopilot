@@ -1,6 +1,7 @@
 import { Avatar, Box, Flex, Icon, Text, VStack } from '@chakra-ui/react';
 import { useRef } from 'react';
 import { BiBot, BiCake, BiConversation, BiSupport } from 'react-icons/bi';
+import { FaTasks } from 'react-icons/fa';
 import { IconType } from 'react-icons/lib';
 import { MdContacts, MdOutlineDashboard, MdOutlinePermMedia, MdSettings } from 'react-icons/md';
 import { RiContactsBook2Line, RiFlowChart } from 'react-icons/ri';
@@ -145,6 +146,12 @@ export default function NavigationDrawer({
 								route={NAVIGATION.CHATBOT_FLOW}
 								icon={RiFlowChart}
 								name='Chatbot Flow'
+							/>
+							<MenuButton
+								setDrawerExpanded={setDrawerExpanded}
+								route={NAVIGATION.TASKS}
+								icon={FaTasks}
+								name='Tasks'
 							/>
 						</Flex>
 					</Box>

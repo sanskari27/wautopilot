@@ -1,9 +1,9 @@
 import { Suspense, lazy, useEffect } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
-import { NAVIGATION } from './config/const';
+import { LOGO_PRIMARY, NAVIGATION } from './config/const';
 
-import { Flex, Progress } from '@chakra-ui/react';
+import { Flex, Image, Progress } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
 import { useFetchLabels } from './hooks/useFetchLabels';
 import useFilterLabels from './hooks/useFilterLabels';
@@ -38,6 +38,7 @@ const AgentPermissionDialog = lazy(
 );
 const LinkShortener = lazy(() => import('./views/pages/link-shortener'));
 const AgentLogs = lazy(() => import('./views/pages/agent/components/AgentLogs'));
+const Tasks = lazy(() => import('./views/pages/tasks'));
 
 function App() {
 	const dispatch = useDispatch();
@@ -96,6 +97,7 @@ function App() {
 								<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
 								<Route path={':id'} element={<CreateChatbotFlow />} />
 							</Route>
+							<Route path={NAVIGATION.TASKS} element={<Tasks />} />
 							<Route path={NAVIGATION.SHORTEN_LINKS} element={<LinkShortener />} />
 							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
 						</Route>
@@ -131,8 +133,8 @@ const Loading = () => {
 				height={'550px'}
 			>
 				<Flex justifyContent={'center'} alignItems={'center'} direction={'column'}>
-					<Flex justifyContent={'center'} alignItems={'center'} width={'full'}>
-						{/* <Image src={LOGO_PRIMARY} aspectRatio={1 / 1} className='' /> */}
+					<Flex justifyContent={'center'} alignItems={'center'} width={'full'} mb={'2rem'}>
+						<Image src={LOGO_PRIMARY} className='animate-pulse opacity-90 ' width={'5rem'} />
 					</Flex>
 					<Progress size='xs' isIndeterminate width={'350px'} rounded={'lg'} />
 				</Flex>

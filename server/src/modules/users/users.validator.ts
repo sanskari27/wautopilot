@@ -8,6 +8,12 @@ export type UpgradePlanValidationResult = {
 	plan_id?: Types.ObjectId;
 };
 
+export type AssignTaskValidationResult = {
+	message: string;
+	assign_to?: Types.ObjectId | undefined;
+	due_date?: string | undefined;
+};
+
 export type CreateAgentValidationResult = {
 	email: string;
 	password: string;
@@ -232,6 +238,38 @@ export async function CreateQuickReplyValidator(req: Request, res: Response, nex
 
 	if (reqValidatorResult.success) {
 		req.locals.data = reqValidatorResult.data.message;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function AssignTaskValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z.object({
+		message: z.string(),
+		assign_to: z
+			.string()
+			.refine((value) => Types.ObjectId.isValid(value))
+			.transform((value) => new Types.ObjectId(value))
+			.optional(),
+		due_date: z.string().optional(),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
 		return next();
 	}
 	const message = reqValidatorResult.error.issues

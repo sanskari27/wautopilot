@@ -5,8 +5,10 @@ import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import { UserService } from '../../services';
 import AgentLogService from '../../services/agentLogs';
+import TaskService from '../../services/task';
 import { Respond } from '../../utils/ExpressUtils';
 import {
+	AssignTaskValidationResult,
 	CreateAgentValidationResult,
 	PermissionsValidationResult,
 	UpgradePlanValidationResult,
@@ -280,6 +282,86 @@ async function editQuickReply(req: Request, res: Response, next: NextFunction) {
 	});
 }
 
+async function assignTask(req: Request, res: Response, next: NextFunction) {
+	const { user } = req.locals;
+
+	const data = req.locals.data as AssignTaskValidationResult;
+	try {
+		if (!data.assign_to) {
+			const taskService = new TaskService(user.account);
+			const task = await taskService.addTask({ message: data.message, due_date: data.due_date });
+			return Respond({
+				res,
+				status: 200,
+				data: {
+					task,
+				},
+			});
+		} else {
+			const userService = await UserService.findById(data.assign_to);
+			const taskService = new TaskService(userService.account);
+			const task = await taskService.addTask({ message: data.message, due_date: data.due_date });
+
+			return Respond({
+				res,
+				status: 200,
+				data: {
+					task,
+				},
+			});
+		}
+	} catch (err) {
+		next(new CustomError(AUTH_ERRORS.PERMISSION_DENIED));
+	}
+}
+
+async function getAssignedTask(req: Request, res: Response, next: NextFunction) {
+	const { user, id } = req.locals;
+
+	const date_from = req.query.date_from as string;
+	const date_to = req.query.date_to as string;
+
+	try {
+		let tasks;
+
+		if (id) {
+			const userService = await UserService.findById(id);
+			const taskService = new TaskService(userService.account);
+			tasks = await taskService.listTasks({
+				date_from,
+				date_to,
+			});
+		} else {
+			const taskService = new TaskService(user.account);
+			tasks = await taskService.listTasks({
+				date_from,
+				date_to,
+			});
+		}
+
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				tasks,
+			},
+		});
+	} catch (err) {
+		next(new CustomError(AUTH_ERRORS.PERMISSION_DENIED));
+	}
+}
+
+async function hideAssignedTask(req: Request, res: Response, next: NextFunction) {
+	const { user, id } = req.locals;
+	const taskService = new TaskService(user.account);
+	await taskService.hideTask(id);
+
+	return Respond({
+		res,
+		status: 200,
+	});
+}
+
 const Controller = {
 	getAdmins,
 	extendSubscription,
@@ -295,6 +377,9 @@ const Controller = {
 	saveQuickReply,
 	deleteQuickReply,
 	editQuickReply,
+	assignTask,
+	hideAssignedTask,
+	getAssignedTask,
 };
 
 export default Controller;

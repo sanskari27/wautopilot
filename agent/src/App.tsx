@@ -31,6 +31,7 @@ const RecurringPage = lazy(() => import('./views/pages/recurring'));
 const CreateRecurring = lazy(() => import('./views/pages/recurring/CreateRecurring'));
 const ButtonResponseReport = lazy(() => import('./views/components/button-report'));
 const AgentPage = lazy(() => import('./views/pages/agent'));
+const TasksPage = lazy(() => import('./views/pages/tasks'));
 
 function App() {
 	useFilterLabels();
@@ -107,6 +108,7 @@ function App() {
 								)}
 								{chatbot_flow.update && <Route path={':id'} element={<CreateChatbotFlow />} />}
 							</Route>
+							<Route path={NAVIGATION.TASKS} element={<TasksPage />} />
 							<Route path={NAVIGATION.DASHBOARD} element={<Dashboard />} />
 							<Route path='*' element={<InvalidPage />} />
 						</Route>
