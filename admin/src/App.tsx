@@ -33,6 +33,9 @@ const CreateRecurring = lazy(() => import('./views/pages/recurring/CreateRecurri
 const ButtonResponseReport = lazy(() => import('./views/components/button-report'));
 const AgentPage = lazy(() => import('./views/pages/agent'));
 const AgentDetailsDialog = lazy(() => import('./views/pages/agent/components/AgentDetailsDialog'));
+const AgentPasswordDialog = lazy(
+	() => import('./views/pages/agent/components/AgentPasswordDialog')
+);
 const AgentPermissionDialog = lazy(
 	() => import('./views/pages/agent/components/AgentPermissionDialog')
 );
@@ -73,6 +76,7 @@ function App() {
 							<Route path={NAVIGATION.BROADCAST} element={<Broadcast />} />
 							<Route path={NAVIGATION.AGENT} element={<AgentPage />}>
 								<Route path={'new'} element={<AgentDetailsDialog />} />
+								<Route path={'update-password/:id'} element={<AgentPasswordDialog />} />
 								<Route path={'logs/:id'} element={<AgentLogs />} />
 								<Route path={'permissions/:id'} element={<AgentPermissionDialog />} />
 								<Route path={':id'} element={<AgentDetailsDialog />} />

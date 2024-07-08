@@ -6,6 +6,7 @@ import {
 	AssignTaskValidator,
 	CreateAgentValidator,
 	CreateQuickReplyValidator,
+	PasswordValidator,
 	PermissionsValidator,
 	UpgradePlanValidator,
 } from './users.validator';
@@ -45,6 +46,7 @@ router
 	.route('/agents/:id')
 	.all(VerifyMinLevel(UserLevel.Admin), IDValidator)
 	.post(CreateAgentValidator, Controller.updateAgent)
+	.patch(PasswordValidator, Controller.updateAgentPassword)
 	.delete(Controller.removeAgent);
 
 router

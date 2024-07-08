@@ -21,6 +21,10 @@ export type CreateAgentValidationResult = {
 	phone: string;
 };
 
+export type PasswordValidationResult = {
+	password: string;
+};
+
 export type PermissionsValidationResult = {
 	assigned_labels?: string[];
 	auto_assign_chats?: boolean;
@@ -111,6 +115,32 @@ export async function CreateAgentValidator(req: Request, res: Response, next: Ne
 		name: z.string(),
 		phone: z.string(),
 		email: z.string().email(),
+		password: z.string().min(6),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function PasswordValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z.object({
 		password: z.string().min(6),
 	});
 

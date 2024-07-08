@@ -26,6 +26,9 @@ export default function AgentContextMenu({ agent }: { agent: Agent }) {
 	const handleEditAgent = () => {
 		navigate(`${NAVIGATION.APP}/${NAVIGATION.AGENT}/${agent.id}`);
 	};
+	const handleAgentPasswordChange = () => {
+		navigate(`${NAVIGATION.APP}/${NAVIGATION.AGENT}/update-password/${agent.id}`);
+	};
 
 	const openServiceAccount = async (id: string) => {
 		const status = await AuthService.serviceAccount(id);
@@ -105,6 +108,7 @@ export default function AgentContextMenu({ agent }: { agent: Agent }) {
 					<MenuItem onClick={() => assignAgentRef.current?.open()}>Assign Chats</MenuItem>
 					<MenuItem onClick={() => handleAgentPermissions()}>Permissions</MenuItem>
 					<MenuItem onClick={() => handleEditAgent()}>Edit</MenuItem>
+					<MenuItem onClick={() => handleAgentPasswordChange()}>Change Password</MenuItem>
 					<MenuItem onClick={() => transferChatRef.current?.open(agent.id)}>Delete</MenuItem>
 					<MenuItem onClick={() => openServiceAccount(agent.id)}>Service account</MenuItem>
 				</MenuList>

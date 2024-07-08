@@ -10,6 +10,7 @@ import { Respond } from '../../utils/ExpressUtils';
 import {
 	AssignTaskValidationResult,
 	CreateAgentValidationResult,
+	PasswordValidationResult,
 	PermissionsValidationResult,
 	UpgradePlanValidationResult,
 } from './users.validator';
@@ -128,6 +129,21 @@ async function updateAgent(req: Request, res: Response, next: NextFunction) {
 			data: {
 				...details,
 			},
+		});
+	} catch (err) {
+		return next(new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR));
+	}
+}
+
+async function updateAgentPassword(req: Request, res: Response, next: NextFunction) {
+	const { password } = req.locals.data as PasswordValidationResult;
+	const { id, user } = req.locals;
+	try {
+		await user.updateAgentPassword(id, password);
+
+		return Respond({
+			res,
+			status: 200,
 		});
 	} catch (err) {
 		return next(new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR));
@@ -370,6 +386,7 @@ const Controller = {
 	getAgents,
 	createAgent,
 	updateAgent,
+	updateAgentPassword,
 	assignPermissions,
 	removeAgent,
 	agentLogs,

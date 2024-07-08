@@ -481,6 +481,16 @@ export default class UserService {
 		};
 	}
 
+	async updateAgentPassword(id: Types.ObjectId, password: string) {
+		const user = await AccountDB.findOne({ _id: id }).select('+password');
+		if (user === null) {
+			throw new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR);
+		}
+
+		user.password = password;
+		await user.save();
+	}
+
 	async removeAgent(id: Types.ObjectId) {
 		await AccountDB.deleteOne({
 			_id: id,

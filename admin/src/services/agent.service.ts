@@ -55,6 +55,16 @@ export default class AgentService {
 		}
 	}
 
+	static async updateAgentPassword(id: string, password: string) {
+		try {
+			await APIInstance.patch(`/users/agents/${id}`, {
+				password: password,
+			});
+		} catch (err) {
+			throw new Error('Agent not found');
+		}
+	}
+
 	static async deleteAgent(agentId: string) {
 		APIInstance.delete(`/users/agents/${agentId}`);
 	}
