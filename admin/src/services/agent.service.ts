@@ -178,4 +178,16 @@ export default class AgentService {
 			return [];
 		}
 	}
+
+	static async transferConversationsToAgent({
+		deviceId,
+		agentId,
+		agentTo,
+	}: {
+		deviceId: string;
+		agentId: string;
+		agentTo: string;
+	}) {
+		await APIInstance.post(`/${deviceId}/conversation/transfer-agent/${agentId}/${agentTo}`);
+	}
 }

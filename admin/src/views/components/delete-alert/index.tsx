@@ -15,11 +15,11 @@ import { PiWarningCircle } from 'react-icons/pi';
 
 export type DeleteAlertHandle = {
 	close: () => void;
-	open: (id?: string) => void;
+	open: (id?: string, agentTo?: string) => void;
 };
 
 type Props = {
-	onConfirm: (id: string) => void;
+	onConfirm: (id: string, agentTo?: string) => void;
 	type: string;
 	disclaimer?: string;
 };
@@ -28,14 +28,16 @@ const DeleteAlert = forwardRef<DeleteAlertHandle, Props>(
 	({ onConfirm, type, disclaimer = '' }: Props, ref) => {
 		const [isOpen, setOpen] = useState(false);
 		const [id, setId] = useState('' as string);
+		const [agentTo, setAgentTo] = useState('' as string);
 		const [confirm, setConfirm] = useState('' as string);
 		const onClose = () => {
 			setOpen(false);
 			setId('');
+			setAgentTo('');
 			setConfirm('');
 		};
 		const handleDelete = () => {
-			onConfirm(id);
+			onConfirm(id, agentTo);
 			onClose();
 		};
 
@@ -43,7 +45,8 @@ const DeleteAlert = forwardRef<DeleteAlertHandle, Props>(
 			close: () => {
 				setOpen(false);
 			},
-			open: (id: string = '') => {
+			open: (id: string = '', agentTo?: string) => {
+				if (agentTo) setAgentTo(agentTo);
 				setId(id);
 				setOpen(true);
 			},

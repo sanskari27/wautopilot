@@ -65,9 +65,8 @@ export default function AgentFilter({
 	}
 
 	const handleConfirm = () => {
-		handleClose();
 		onConfirm(selectedAgent);
-		dispatch(clearSelectedAgent());
+		handleClose();
 	};
 
 	const handleClose = () => {
@@ -84,7 +83,7 @@ export default function AgentFilter({
 			</PopoverTrigger>
 			<PopoverContent>
 				<PopoverArrow />
-				<PopoverCloseButton />
+				<PopoverCloseButton ref={buttonRef} />
 				<PopoverHeader>
 					<Flex justifyContent={'space-between'}>
 						<Text fontWeight={'medium'} fontSize={'lg'} textAlign={'center'} mb={'0.25rem'}>
@@ -97,7 +96,13 @@ export default function AgentFilter({
 					</Flex>
 				</PopoverHeader>
 				<PopoverBody>
-					<Flex direction={'column'} maxHeight={'300px'} overflowY={'scroll'} overflowX={'hidden'}>
+					<Flex
+						direction={'column'}
+						maxHeight={'300px'}
+						overflowY={'scroll'}
+						overflowX={'hidden'}
+						gap={'0.5rem'}
+					>
 						<Each
 							items={filtered}
 							render={(agent) => (

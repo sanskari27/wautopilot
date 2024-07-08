@@ -20,7 +20,7 @@ import { BiArrowBack, BiSend } from 'react-icons/bi';
 import { CiMenuKebab } from 'react-icons/ci';
 import { FaFile, FaHeadphones, FaUpload, FaVideo } from 'react-icons/fa';
 import { FaPhotoFilm } from 'react-icons/fa6';
-import { MdContacts } from 'react-icons/md';
+import { MdContacts, MdQuickreply } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
@@ -40,9 +40,10 @@ import AttachmentSelectorDialog, {
 import ContactSelectorDialog, {
 	ContactSelectorHandle,
 } from '../../../components/selector-dialog/ContactSelectorDialog';
-import { default as MessagesList } from './MessagesList';
 import AddMedia, { AddMediaHandle } from './add-media';
 import MessageTagsView, { MessageTagsViewHandle } from './message-tag-view';
+import { default as MessagesList } from './MessagesList';
+import QuickReplyDialog, { QuickReplyHandle } from './QuickReplyDialog';
 
 type ChatScreenProps = {
 	closeChat: () => void;
@@ -254,6 +255,7 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 	const toast = useToast();
 	const attachmentSelectorHandle = useRef<AttachmentDialogHandle>(null);
 	const addMediaHandle = useRef<AddMediaHandle>(null);
+	const quickReplyRef = useRef<QuickReplyHandle>(null);
 
 	const contactDialogHandle = useRef<ContactSelectorHandle>(null);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
@@ -372,6 +374,17 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 							<Text>Upload File</Text>
 						</Flex>
 					</MenuItem>
+					<MenuItem
+						rounded={'none'}
+						width={'full'}
+						justifyContent={'flex-start'}
+						onClick={() => quickReplyRef.current?.open()}
+					>
+						<Flex gap={2} alignItems={'center'}>
+							<Icon as={MdQuickreply} />
+							<Text>Quick Reply</Text>
+						</Flex>
+					</MenuItem>
 				</MenuList>
 			</Menu>
 
@@ -389,6 +402,7 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 				}}
 			/>
 			<ContactSelectorDialog ref={contactDialogHandle} onConfirm={sendContactMessage} />
+			<QuickReplyDialog ref={quickReplyRef} />
 		</>
 	);
 };
