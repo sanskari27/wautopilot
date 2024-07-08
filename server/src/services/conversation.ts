@@ -569,7 +569,7 @@ export default class ConversationService extends WhatsappLinkService {
 		agent_id: Types.ObjectId,
 		c_id: Types.ObjectId | Types.ObjectId[]
 	) {
-		await ConversationDB.updateOne(
+		await ConversationDB.updateMany(
 			{
 				linked_to: this.userId,
 				device_id: this.deviceId,
@@ -584,7 +584,7 @@ export default class ConversationService extends WhatsappLinkService {
 	}
 
 	public async assignNumbersToAgent(agent_id: Types.ObjectId, numbers: string[]) {
-		await ConversationDB.updateOne(
+		await ConversationDB.updateMany(
 			{
 				linked_to: this.userId,
 				device_id: this.deviceId,
@@ -598,7 +598,10 @@ export default class ConversationService extends WhatsappLinkService {
 		);
 	}
 
-	public async transferConversations(agent_id: Types.ObjectId, assigned_to: Types.ObjectId | string | undefined) {
+	public async transferConversations(
+		agent_id: Types.ObjectId,
+		assigned_to: Types.ObjectId | string | undefined
+	) {
 		await ConversationDB.updateMany(
 			{
 				linked_to: this.userId,
