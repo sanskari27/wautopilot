@@ -1,6 +1,5 @@
 import { BiBot, BiCake, BiConversation } from 'react-icons/bi';
 import { FaTasks } from 'react-icons/fa';
-import { GoTasklist } from 'react-icons/go';
 import { MdContacts, MdOutlineDashboard, MdOutlinePermMedia } from 'react-icons/md';
 import { RiContactsBook2Line, RiFlowChart } from 'react-icons/ri';
 import { TbMessage2Plus, TbReportSearch, TbTemplate } from 'react-icons/tb';
