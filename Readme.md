@@ -1,4 +1,4 @@
-# Wautopilot
+# [<img src="https://wautopilot.com/images/logo-primary.png" style="width:30px;"/> Wautopilot](https://wautopilot.com/)
 
 ### Transform Your Business with **Wautopilot's** Official **WhatsApp API**
 
