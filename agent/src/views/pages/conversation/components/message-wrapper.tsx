@@ -62,142 +62,138 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 	};
 
 	return (
-		<>
+		<Flex
+			direction={'column'}
+			className='max-w-[80%] md:max-w-[45%]'
+			marginBottom={'1rem'}
+			alignSelf={isMe ? 'flex-start' : 'flex-end'}
+			id={message.message_id}
+		>
 			<Flex
-				direction={'column'}
-				className='max-w-[80%] md:max-w-[45%]'
-				marginBottom={'1rem'}
-				alignSelf={isMe ? 'flex-start' : 'flex-end'}
-				id={message.message_id}
+				direction={'row-reverse'}
+				alignItems={'flex-end'}
+				marginBottom={'0.25rem'}
+				gap={'0.25rem'}
 			>
 				<Flex
-					direction={'row-reverse'}
-					alignItems={'flex-end'}
-					marginBottom={'0.25rem'}
-					gap={'0.25rem'}
-				>
-					<Flex
-						direction={'column'}
-						bgColor={isMe ? 'white' : '#dcf8c6'}
-						paddingLeft={'1rem'}
-						paddingRight={'1.6rem'}
-						paddingY={'0.5rem'}
-						borderTopRadius={'2xl'}
-						borderBottomStartRadius={isMe ? 'none' : '2xl'}
-						borderBottomEndRadius={isMe ? '2xl' : 'none'}
-						position={'relative'}
-						className='group'
-					>
-						<Menu>
-							<MenuButton
-								m={0}
-								p={0}
-								as={Button}
-								variant={'unstyled'}
-								height={'15px'}
-								leftIcon={
-									<ChevronDownIcon
-										className={`${
-											isMe ? '!text-white' : '!text-[#dcf8c6]'
-										} group-hover:!text-black transition-none`}
-									/>
-								}
-								textAlign={'right'}
-								position={'absolute'}
-								right={'0'}
-							/>
-							<MenuList>
-								<MenuItem
-									onClick={() =>
-										assignMessageLabelsRef.current?.onOpen(message._id, message.labels)
-									}
-								>
-									Assign Labels
-								</MenuItem>
-							</MenuList>
-							<AssignMessageLabelsDialog ref={assignMessageLabelsRef} />
-						</Menu>
-						{message.context.id ? (
-							<Flex
-								borderLeft={isMe ? '2px solid green' : '2px solid white'}
-								paddingLeft={'0.5rem'}
-								paddingY={'0.25rem'}
-								cursor={'pointer'}
-								onClick={scrollToContext}
-							>
-								<Text fontSize={'sm'} color={'gray.500'}>
-									Show context
-								</Text>
-							</Flex>
-						) : null}
-						{children}
-						{message.buttons.length > 0 && (
-							<>
-								<Divider orientation='horizontal' my={'1rem'} />
-								<VStack width={'full'}>
-									<Each
-										items={message.buttons}
-										render={(button, index) => (
-											<Button
-												width={'full'}
-												key={index}
-												variant={'outline'}
-												colorScheme='green'
-												cursor={'pointer'}
-												textAlign={'center'}
-												py={'0.5rem'}
-												leftIcon={
-													<Icon
-														as={
-															button.button_type === 'URL'
-																? BiLink
-																: button.button_type === 'QUICK_REPLY'
-																? FaReply
-																: button.button_type === 'PHONE_NUMBER'
-																? PhoneIcon
-																: IoCall
-														}
-													/>
-												}
-												whiteSpace={'pre-wrap'}
-												height={'max-content'}
-											>
-												{button.button_content}
-											</Button>
-										)}
-									/>
-								</VStack>
-							</>
-						)}
-					</Flex>
-					{sender.id && <Avatar size={'xs'} name={sender.name} cursor={'pointer'} />}
-				</Flex>
-				<Flex
-					gap={1}
-					alignItems={'center'}
-					justifyContent={isMe ? 'flex-start' : 'flex-end'}
+					direction={'column'}
+					bgColor={isMe ? 'white' : '#dcf8c6'}
+					paddingLeft={'1rem'}
+					paddingRight={'1.6rem'}
+					paddingY={'0.5rem'}
+					borderTopRadius={'2xl'}
+					borderBottomStartRadius={isMe ? 'none' : '2xl'}
+					borderBottomEndRadius={isMe ? '2xl' : 'none'}
 					position={'relative'}
+					className='group'
 				>
-					{sender.name && <Text fontSize={'xs'}>Sent by {sender.name} @</Text>}
-					{message.delivered_at && <FormatTime time={message.read_at || message.delivered_at} />}
-					{message.received_at && <FormatTime time={message.received_at} />}
-					{message.read_at ? (
-						<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={BiCheckDouble} color='blue.500' />
-					) : message.delivered_at ? (
-						<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={BiCheckDouble} color='gray.500' />
-					) : message.failed_at ? (
-						<Tooltip label={message.failed_reason}>
-							<span>
-								<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={CgTimer} color='red.500' />
-							</span>
-						</Tooltip>
-					) : // <Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={CgTimer} color='red.500' />
-					!isMe ? (
-						<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={CgTimer} color='gray.500' />
+					<Menu>
+						<MenuButton
+							m={0}
+							p={0}
+							as={Button}
+							variant={'unstyled'}
+							height={'15px'}
+							leftIcon={
+								<ChevronDownIcon
+									className={`${
+										isMe ? '!text-white' : '!text-[#dcf8c6]'
+									} group-hover:!text-black transition-none`}
+								/>
+							}
+							textAlign={'right'}
+							position={'absolute'}
+							right={'0'}
+						/>
+						<MenuList>
+							<MenuItem
+								onClick={() => assignMessageLabelsRef.current?.onOpen(message._id, message.labels)}
+							>
+								Assign Labels
+							</MenuItem>
+						</MenuList>
+						<AssignMessageLabelsDialog ref={assignMessageLabelsRef} />
+					</Menu>
+					{message.context.id ? (
+						<Flex
+							borderLeft={isMe ? '2px solid green' : '2px solid white'}
+							paddingLeft={'0.5rem'}
+							paddingY={'0.25rem'}
+							cursor={'pointer'}
+							onClick={scrollToContext}
+						>
+							<Text fontSize={'sm'} color={'gray.500'}>
+								Show context
+							</Text>
+						</Flex>
 					) : null}
+					{children}
+					{message.buttons.length > 0 && (
+						<>
+							<Divider orientation='horizontal' my={'1rem'} />
+							<VStack width={'full'}>
+								<Each
+									items={message.buttons}
+									render={(button, index) => (
+										<Button
+											width={'full'}
+											key={index}
+											variant={'outline'}
+											colorScheme='green'
+											cursor={'pointer'}
+											textAlign={'center'}
+											py={'0.5rem'}
+											leftIcon={
+												<Icon
+													as={
+														button.button_type === 'URL'
+															? BiLink
+															: button.button_type === 'QUICK_REPLY'
+															? FaReply
+															: button.button_type === 'PHONE_NUMBER'
+															? PhoneIcon
+															: IoCall
+													}
+												/>
+											}
+											whiteSpace={'pre-wrap'}
+											height={'max-content'}
+										>
+											{button.button_content}
+										</Button>
+									)}
+								/>
+							</VStack>
+						</>
+					)}
 				</Flex>
+				{sender.id && <Avatar size={'xs'} name={sender.name} cursor={'pointer'} />}
 			</Flex>
-		</>
+			<Flex
+				gap={1}
+				alignItems={'center'}
+				justifyContent={isMe ? 'flex-start' : 'flex-end'}
+				position={'relative'}
+			>
+				{sender.name && <Text fontSize={'xs'}>Sent by {sender.name} @</Text>}
+				{message.delivered_at && <FormatTime time={message.read_at || message.delivered_at} />}
+				{message.received_at && <FormatTime time={message.received_at} />}
+				{message.read_at ? (
+					<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={BiCheckDouble} color='blue.500' />
+				) : message.delivered_at ? (
+					<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={BiCheckDouble} color='gray.500' />
+				) : message.failed_at ? (
+					<Tooltip label={message.failed_reason}>
+						<span>
+							<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={CgTimer} color='red.500' />
+						</span>
+					</Tooltip>
+				) : // <Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={CgTimer} color='red.500' />
+				!isMe ? (
+					<Icon fontSize={'1.25rem'} alignSelf={'flex-end'} as={CgTimer} color='gray.500' />
+				) : null}
+			</Flex>
+		</Flex>
 	);
 };
 

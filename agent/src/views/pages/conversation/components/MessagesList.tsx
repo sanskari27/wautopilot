@@ -19,7 +19,13 @@ const MessagesList = memo(
 				items={list}
 				render={(item, index) =>
 					index === list.length - 1 ? (
-						<div ref={inViewRef}>
+						<div
+							ref={inViewRef}
+							style={{
+								display: 'flex',
+								justifyContent: item.received_at ? 'flex-start' : 'flex-end',
+							}}
+						>
 							<Message message={item} />
 						</div>
 					) : (
