@@ -47,6 +47,7 @@ function processConversationMessages(docs: Partial<IConversationMessage>[]) {
 		status: doc.status,
 		context: doc.context,
 		labels: doc.labels,
+		sender: doc.sender,
 	}));
 }
 
@@ -138,6 +139,10 @@ export default class ConversationService extends WhatsappLinkService {
 			};
 			failed_at?: Date;
 			failed_reason?: string;
+			sender?: {
+				id: Types.ObjectId;
+				name: string;
+			};
 		}
 	) {
 		try {

@@ -35,16 +35,13 @@ export default class MessagesService {
 		}
 	) {
 		try {
-			const { data } = await APIInstance.get(
-				`/${deviceId}/conversation/${recipientId}/messages`,
-				{
-					params: {
-						page: pagination.page,
-						limit: pagination.limit || 50,
-					},
-					signal: pagination.signal,
-				}
-			);
+			const { data } = await APIInstance.get(`/${deviceId}/conversation/${recipientId}/messages`, {
+				params: {
+					page: pagination.page,
+					limit: pagination.limit || 50,
+				},
+				signal: pagination.signal,
+			});
 			return {
 				messageLabels: data.labels ?? [],
 				messages: data.messages.map((message: any) => {
@@ -136,6 +133,10 @@ export default class MessagesService {
 							from: message.context?.from ?? '',
 							id: message.context?.id ?? '',
 						},
+						sender: {
+							id: message.sender?.id ?? '',
+							name: message.sender?.name ?? '',
+						},
 					};
 				}),
 				expiry: data.expiry as number | 'EXPIRED',
@@ -184,10 +185,7 @@ export default class MessagesService {
 		}
 	) {
 		try {
-			await APIInstance.post(
-				`/${deviceId}/conversation/${recipientId}/send-message`,
-				message
-			);
+			await APIInstance.post(`/${deviceId}/conversation/${recipientId}/send-message`, message);
 			return true;
 		} catch (err) {
 			return false;

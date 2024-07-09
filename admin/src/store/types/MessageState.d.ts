@@ -140,4 +140,8 @@ export type Message = {
 		from: string;
 		id: string;
 	};
+	sender: {
+		id: string;
+		name: string;
+	};
 };

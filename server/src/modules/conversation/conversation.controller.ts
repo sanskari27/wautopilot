@@ -106,6 +106,7 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 		serviceAccount,
 		serviceUser,
 		id,
+		user,
 		device: { device },
 	} = req.locals;
 	const data = req.locals.data as SendMessageValidationResult;
@@ -166,6 +167,10 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 						},
 				  }
 				: {}),
+			sender: {
+				id: user.userId,
+				name: user.account.name,
+			},
 		});
 		serviceUser.deductCredit(1);
 	} catch (err) {

@@ -56,6 +56,10 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 	const pagination = useRef({
 		page: 1,
 		loadMore: true,
+		lastFetched: {
+			page: 1,
+			recipient_id: '',
+		},
 	});
 	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
@@ -72,11 +76,18 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 
 	useEffect(() => {
 		if (!selected_device_id || !selected_recipient) return;
+		if (
+			pagination.current.lastFetched.recipient_id === selected_recipient._id &&
+			pagination.current.lastFetched.page === 1
+		) {
+			return;
+		}
 		const abortController = new AbortController();
 		pagination.current.loadMore = true;
 		pagination.current.page = 1;
 		dispatch(setMessagesLoading(true));
 		dispatch(setMessageList([]));
+
 		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id, {
 			page: 1,
 			signal: abortController.signal,
@@ -89,6 +100,8 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 			if (data.messages.length < 50) {
 				pagination.current.loadMore = false;
 			}
+			pagination.current.lastFetched.page = 1;
+			pagination.current.lastFetched.recipient_id = selected_recipient._id;
 		});
 
 		return () => {
@@ -99,7 +112,13 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 	const loadMore = () => {
 		if (!pagination.current.loadMore) {
 			return;
+		} else if (
+			pagination.current.lastFetched.recipient_id === selected_recipient._id &&
+			pagination.current.lastFetched.page === pagination.current.page
+		) {
+			return;
 		}
+
 		pagination.current.page++;
 		dispatch(setMessagesLoading(true));
 		MessagesService.fetchConversationMessages(selected_device_id, selected_recipient._id, {
@@ -110,6 +129,8 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 			if (data.messages.length < 50) {
 				pagination.current.loadMore = false;
 			}
+			pagination.current.lastFetched.page = 1;
+			pagination.current.lastFetched.recipient_id = selected_recipient._id;
 		});
 	};
 
@@ -266,9 +287,12 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 
 	const sendAttachmentMessage = (type: string, attachments: string[]) => {
 		if (attachments.length === 0) return;
+		
+		const _type = type === 'PHOTOS' ? 'image' : type.toLowerCase();
+
 		for (let i = 0; i < attachments.length; i++) {
 			MessagesService.sendConversationMessage(selected_device_id, selected_recipient._id, {
-				type: type.toLowerCase() as 'image' | 'video' | 'document' | 'audio',
+				type: _type as 'image' | 'video' | 'document' | 'audio',
 				media_id: attachments[i],
 			});
 		}

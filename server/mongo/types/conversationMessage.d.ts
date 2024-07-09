@@ -88,6 +88,10 @@ export default interface IConversationMessage extends Document {
 		id: Types.ObjectId;
 		name: string;
 	};
+	sender:{
+		id: Types.ObjectId;
+		name: string;
+	}
 
 	createdAt: Date;
 	sendAt: Date;

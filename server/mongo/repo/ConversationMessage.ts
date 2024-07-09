@@ -121,6 +121,10 @@ const schema = new mongoose.Schema<IConversationMessage>(
 			id: mongoose.Schema.Types.ObjectId,
 			name: String,
 		},
+		sender: {
+			id: mongoose.Schema.Types.ObjectId,
+			name: String,
+		},
 	},
 	{
 		timestamps: { createdAt: true },

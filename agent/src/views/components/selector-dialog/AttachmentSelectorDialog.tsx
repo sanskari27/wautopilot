@@ -197,7 +197,7 @@ const AttachmentSelectorDialog = forwardRef<AttachmentDialogHandle, Props>(
 								Cancel
 							</Button>
 							<Button
-								isDisabled={selected.length === 0 || (isMultiSelect && selected.length <= 1)}
+								isDisabled={selected.length === 0 || (!isMultiSelect && selected.length > 1)}
 								colorScheme='green'
 								onClick={handleAdd}
 							>
