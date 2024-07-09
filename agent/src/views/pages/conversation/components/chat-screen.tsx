@@ -6,6 +6,7 @@ import {
 	Flex,
 	HStack,
 	Icon,
+	IconButton,
 	Menu,
 	MenuButton,
 	MenuItem,
@@ -13,6 +14,7 @@ import {
 	Tag,
 	Text,
 	Textarea,
+	useBoolean,
 	useToast,
 } from '@chakra-ui/react';
 import { ReactNode, useEffect, useRef, useState } from 'react';
@@ -20,7 +22,7 @@ import { BiArrowBack, BiSend } from 'react-icons/bi';
 import { CiMenuKebab } from 'react-icons/ci';
 import { FaFile, FaHeadphones, FaUpload, FaVideo } from 'react-icons/fa';
 import { FaPhotoFilm } from 'react-icons/fa6';
-import { MdContacts } from 'react-icons/md';
+import { MdContacts, MdQuickreply } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
@@ -43,6 +45,7 @@ import ContactSelectorDialog, {
 import AddMedia, { AddMediaHandle } from './add-media';
 import MessageTagsView, { MessageTagsViewHandle } from './message-tag-view';
 import { default as MessagesList } from './MessagesList';
+import QuickReply from './QuickReply';
 
 type ChatScreenProps = {
 	closeChat: () => void;
@@ -209,6 +212,7 @@ function MessageBox() {
 	const toast = useToast();
 	const dispatch = useDispatch();
 
+	const [quickReply, setQuickReply] = useBoolean(false);
 	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
@@ -243,30 +247,41 @@ function MessageBox() {
 		e.target.style.height = e.target.scrollHeight + 'px';
 	};
 	return (
-		<HStack bg={'white'} width={'full'} p={'0.5rem'} alignItems={'flex-end'}>
-			<AttachmentSelectorPopover>
-				<Icon as={AttachmentIcon} bgColor={'transparent'} />
-			</AttachmentSelectorPopover>
-
-			<Textarea
-				onInput={handleMessageInput}
-				maxHeight={'150px'}
-				minHeight={'40px'}
-				height={'40px'}
-				resize={'none'}
-				value={textMessage}
-				onChange={(e) => dispatch(setTextMessage(e.target.value))}
-				placeholder='Type a message'
+		<>
+			<QuickReply
+				hidden={quickReply}
+				handleChangeMessage={(message) => dispatch(setTextMessage(message))}
 			/>
-			<Button
-				colorScheme='green'
-				px={'1rem'}
-				onClick={sendTextMessage}
-				isLoading={isMessageSending}
-			>
-				<Icon as={BiSend} />
-			</Button>
-		</HStack>
+			<HStack bg={'white'} width={'full'} p={'0.5rem'} alignItems={'flex-end'}>
+				<AttachmentSelectorPopover>
+					<Icon as={AttachmentIcon} bgColor={'transparent'} />
+				</AttachmentSelectorPopover>
+				<IconButton
+					aria-label='toggle quick reply'
+					icon={<MdQuickreply />}
+					onClick={setQuickReply.toggle}
+					bg={'transparent'}
+				/>
+				<Textarea
+					onInput={handleMessageInput}
+					maxHeight={'150px'}
+					minHeight={'40px'}
+					height={'40px'}
+					resize={'none'}
+					value={textMessage}
+					onChange={(e) => dispatch(setTextMessage(e.target.value))}
+					placeholder='Type a message'
+				/>
+				<Button
+					colorScheme='green'
+					px={'1rem'}
+					onClick={sendTextMessage}
+					isLoading={isMessageSending}
+				>
+					<Icon as={BiSend} />
+				</Button>
+			</HStack>
+		</>
 	);
 }
 

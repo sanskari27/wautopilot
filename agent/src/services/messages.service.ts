@@ -221,4 +221,42 @@ export default class MessagesService {
 			return false;
 		}
 	}
+
+	static async fetchQuickReplies() {
+		try {
+			const { data } = await APIInstance.get('/users/quick-replies');
+			return (data.quickReplies ?? []).map((reply: any) => {
+				return {
+					id: reply.id,
+					message: reply.message,
+				};
+			});
+		} catch (err) {
+			return [];
+		}
+	}
+
+	static async addQuickReply(message: string) {
+		const { data } = await APIInstance.post('/users/quick-replies', {
+			message,
+		});
+		return {
+			id: data.id,
+			message: data.message,
+		};
+	}
+
+	static async editQuickReply({ id, message }: { id: string; message: string }) {
+		const { data } = await APIInstance.put(`/users/quick-replies/${id}`, {
+			message,
+		});
+		return {
+			id: data.id,
+			message: data.message,
+		};
+	}
+
+	static async deleteQuickReply(id: string) {
+		await APIInstance.delete(`/users/quick-replies/${id}`);
+	}
 }
