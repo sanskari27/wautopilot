@@ -21,8 +21,8 @@ import {
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { FaFacebook } from 'react-icons/fa';
 import { MdDataSaverOff } from 'react-icons/md';
-import { Link, useNavigate } from 'react-router-dom';
-import { NAVIGATION, WEBPAGE_URL } from '../../../config/const';
+import { Link } from 'react-router-dom';
+import { WEBPAGE_URL } from '../../../config/const';
 import DeviceService from '../../../services/device.service';
 
 export type AddDeviceHandle = {
@@ -36,7 +36,6 @@ export type AddDeviceProps = {
 const AddDevice = forwardRef<AddDeviceHandle, AddDeviceProps>(
 	({ onDeviceAdded }: AddDeviceProps, ref) => {
 		const [isOpen, setIsOpen] = useBoolean(false);
-		const navigate = useNavigate();
 		const [loading, setLoading] = useBoolean();
 		const [facebookSignupLoading, setFacebookSignupLoading] = useBoolean();
 		const toast = useToast();
@@ -85,10 +84,9 @@ const AddDevice = forwardRef<AddDeviceHandle, AddDeviceProps>(
 				});
 			}
 			setIsOpen.off();
-		}, [details, toast, setLoading, setIsOpen]);
+		}, [setLoading, details, setIsOpen, toast, onDeviceAdded]);
 
 		const onClose = () => {
-			navigate(`${NAVIGATION.APP}/${NAVIGATION.PHONEBOOK}`);
 			setIsOpen.off();
 		};
 
