@@ -28,6 +28,7 @@ import MessagesService from '../../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../../store';
 import {
 	addMessageList,
+	selectQuickReply,
 	setMessageLabels,
 	setMessageList,
 	setMessageSending,
@@ -213,7 +214,7 @@ function MessageBox() {
 	const toast = useToast();
 	const dispatch = useDispatch();
 
-	const [quickReply, setQuickReply] = useBoolean(false);
+	const [quickReply, setQuickReply] = useBoolean(true);
 	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
@@ -230,6 +231,7 @@ function MessageBox() {
 			text: textMessage,
 		}).then((data) => {
 			dispatch(setMessageSending(false));
+			dispatch(selectQuickReply(''));
 			if (!data) {
 				return toast({
 					title: 'Error',
@@ -246,6 +248,12 @@ function MessageBox() {
 	const handleMessageInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		e.target.style.height = '5px';
 		e.target.style.height = e.target.scrollHeight + 'px';
+	};
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			sendTextMessage();
+		}
 	};
 	return (
 		<>
@@ -264,6 +272,7 @@ function MessageBox() {
 					bg={'transparent'}
 				/>
 				<Textarea
+					onKeyDown={handleKeyDown}
 					onInput={handleMessageInput}
 					maxHeight={'150px'}
 					minHeight={'40px'}
@@ -301,7 +310,7 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 
 	const sendAttachmentMessage = (type: string, attachments: string[]) => {
 		if (attachments.length === 0) return;
-		
+
 		const _type = type === 'PHOTOS' ? 'image' : type.toLowerCase();
 
 		for (let i = 0; i < attachments.length; i++) {

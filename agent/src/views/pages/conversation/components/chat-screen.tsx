@@ -246,6 +246,12 @@ function MessageBox() {
 		e.target.style.height = '5px';
 		e.target.style.height = e.target.scrollHeight + 'px';
 	};
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			sendTextMessage();
+		}
+	};
 	return (
 		<>
 			<QuickReply
@@ -263,6 +269,7 @@ function MessageBox() {
 					bg={'transparent'}
 				/>
 				<Textarea
+					onKeyDown={handleKeyDown}
 					onInput={handleMessageInput}
 					maxHeight={'150px'}
 					minHeight={'40px'}
