@@ -10,7 +10,13 @@ import AgentService from '../../../services/agent.service';
 import AuthService from '../../../services/auth.service';
 import MessagesService from '../../../services/messages.service';
 import { StoreNames, StoreState } from '../../../store';
-import { addMessage, reset, updateMessage } from '../../../store/reducers/MessagesReducers';
+import {
+	addMessage,
+	reset,
+	selectQuickReply,
+	setTextMessage,
+	updateMessage,
+} from '../../../store/reducers/MessagesReducers';
 import {
 	addUnreadConversation,
 	clearSelectedRecipientList,
@@ -70,6 +76,8 @@ const Conversation = () => {
 		setListExpanded.off();
 		if (selected_recipient._id === item._id) return;
 		dispatch(setSelectedRecipient(item));
+		dispatch(selectQuickReply(''));
+		dispatch(setTextMessage(''));
 	};
 
 	const handleAddRecipientLabel = (label: string) => {
