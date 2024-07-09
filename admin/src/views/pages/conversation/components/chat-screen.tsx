@@ -224,7 +224,7 @@ function MessageBox() {
 	} = useSelector((state: StoreState) => state[StoreNames.MESSAGES]);
 
 	const sendTextMessage = () => {
-		if (!textMessage) return;
+		if (!textMessage.trim()) return;
 		dispatch(setMessageSending(true));
 		MessagesService.sendConversationMessage(selected_device_id, selected_recipient._id, {
 			type: 'text',
