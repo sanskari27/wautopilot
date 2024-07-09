@@ -57,6 +57,8 @@ export type MessageState = {
 			}[];
 		}[];
 	};
+	quickReplyList: QuickReply[];
+	quickReplyDetails: QuickReply;
 };
 
 export type Message = {
@@ -144,4 +146,9 @@ export type Message = {
 		id: string;
 		name: string;
 	};
+};
+
+export type QuickReply = {
+	id: string;
+	message: string;
 };

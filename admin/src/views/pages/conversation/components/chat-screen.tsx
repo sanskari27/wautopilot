@@ -6,6 +6,7 @@ import {
 	Flex,
 	HStack,
 	Icon,
+	IconButton,
 	Menu,
 	MenuButton,
 	MenuItem,
@@ -13,6 +14,7 @@ import {
 	Tag,
 	Text,
 	Textarea,
+	useBoolean,
 	useToast,
 } from '@chakra-ui/react';
 import { ReactNode, useEffect, useRef, useState } from 'react';
@@ -43,7 +45,7 @@ import ContactSelectorDialog, {
 import AddMedia, { AddMediaHandle } from './add-media';
 import MessageTagsView, { MessageTagsViewHandle } from './message-tag-view';
 import { default as MessagesList } from './MessagesList';
-import QuickReplyDialog, { QuickReplyHandle } from './QuickReplyDialog';
+import QuickReply from './QuickReply';
 
 type ChatScreenProps = {
 	closeChat: () => void;
@@ -199,6 +201,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 				>
 					<MessagesList list={messageList} onLastReached={loadMore} />
 				</Flex>
+
 				<MessageBox />
 			</Flex>
 			<MessageTagsView ref={messageTaggingRef} />
@@ -210,6 +213,7 @@ function MessageBox() {
 	const toast = useToast();
 	const dispatch = useDispatch();
 
+	const [quickReply, setQuickReply] = useBoolean(false);
 	const { selected_recipient } = useSelector((state: StoreState) => state[StoreNames.RECIPIENT]);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
 
@@ -244,30 +248,41 @@ function MessageBox() {
 		e.target.style.height = e.target.scrollHeight + 'px';
 	};
 	return (
-		<HStack bg={'white'} width={'full'} p={'0.5rem'} alignItems={'flex-end'}>
-			<AttachmentSelectorPopover>
-				<Icon as={AttachmentIcon} bgColor={'transparent'} />
-			</AttachmentSelectorPopover>
-
-			<Textarea
-				onInput={handleMessageInput}
-				maxHeight={'150px'}
-				minHeight={'40px'}
-				height={'40px'}
-				resize={'none'}
-				value={textMessage}
-				onChange={(e) => dispatch(setTextMessage(e.target.value))}
-				placeholder='Type a message'
+		<>
+			<QuickReply
+				hidden={quickReply}
+				handleChangeMessage={(message) => dispatch(setTextMessage(message))}
 			/>
-			<Button
-				colorScheme='green'
-				px={'1rem'}
-				onClick={sendTextMessage}
-				isLoading={isMessageSending}
-			>
-				<Icon as={BiSend} />
-			</Button>
-		</HStack>
+			<HStack bg={'white'} width={'full'} p={'0.5rem'} alignItems={'flex-end'}>
+				<AttachmentSelectorPopover>
+					<Icon as={AttachmentIcon} bgColor={'transparent'} />
+				</AttachmentSelectorPopover>
+				<IconButton
+					aria-label='toggle quick reply'
+					icon={<MdQuickreply />}
+					onClick={setQuickReply.toggle}
+					bg={'transparent'}
+				/>
+				<Textarea
+					onInput={handleMessageInput}
+					maxHeight={'150px'}
+					minHeight={'40px'}
+					height={'40px'}
+					resize={'none'}
+					value={textMessage}
+					onChange={(e) => dispatch(setTextMessage(e.target.value))}
+					placeholder='Type a message'
+				/>
+				<Button
+					colorScheme='green'
+					px={'1rem'}
+					onClick={sendTextMessage}
+					isLoading={isMessageSending}
+				>
+					<Icon as={BiSend} />
+				</Button>
+			</HStack>
+		</>
 	);
 }
 
@@ -276,7 +291,6 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 	const toast = useToast();
 	const attachmentSelectorHandle = useRef<AttachmentDialogHandle>(null);
 	const addMediaHandle = useRef<AddMediaHandle>(null);
-	const quickReplyRef = useRef<QuickReplyHandle>(null);
 
 	const contactDialogHandle = useRef<ContactSelectorHandle>(null);
 	const { selected_device_id } = useSelector((state: StoreState) => state[StoreNames.USER]);
@@ -398,17 +412,6 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 							<Text>Upload File</Text>
 						</Flex>
 					</MenuItem>
-					<MenuItem
-						rounded={'none'}
-						width={'full'}
-						justifyContent={'flex-start'}
-						onClick={() => quickReplyRef.current?.open()}
-					>
-						<Flex gap={2} alignItems={'center'}>
-							<Icon as={MdQuickreply} />
-							<Text>Quick Reply</Text>
-						</Flex>
-					</MenuItem>
 				</MenuList>
 			</Menu>
 
@@ -426,7 +429,6 @@ const AttachmentSelectorPopover = ({ children }: { children: ReactNode }) => {
 				}}
 			/>
 			<ContactSelectorDialog ref={contactDialogHandle} onConfirm={sendContactMessage} />
-			<QuickReplyDialog ref={quickReplyRef} />
 		</>
 	);
 };

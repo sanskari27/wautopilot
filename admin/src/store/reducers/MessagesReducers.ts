@@ -24,6 +24,11 @@ const initialState: MessageState = {
 		},
 		contactCard: [],
 	},
+	quickReplyDetails: {
+		id: '',
+		message: '',
+	},
+	quickReplyList: [],
 };
 
 const Slice = createSlice({
@@ -39,6 +44,31 @@ const Slice = createSlice({
 		},
 		setMessageList: (state, action: PayloadAction<typeof initialState.messageList>) => {
 			state.messageList = action.payload;
+		},
+		setQuickReplyList: (state, action: PayloadAction<typeof initialState.quickReplyList>) => {
+			state.quickReplyList = action.payload;
+		},
+		deleteQuickReply: (state, action: PayloadAction<string>) => {
+			state.quickReplyList = state.quickReplyList.filter((item) => item.id !== action.payload);
+			state.quickReplyDetails = initialState.quickReplyDetails;
+		},
+		addQuickReply: (state, action: PayloadAction<(typeof initialState.quickReplyList)[0]>) => {
+			state.quickReplyList.push(action.payload);
+		},
+		updateQuickReply: (state, action: PayloadAction<{ id: string; message: string }>) => {
+			state.quickReplyList = state.quickReplyList.map((item) =>
+				item.id === action.payload.id ? { ...item, message: action.payload.message } : item
+			);
+			state.quickReplyDetails = {
+				id: action.payload.id,
+				message: action.payload.message,
+			};
+		},
+		selectQuickReply: (state, action: PayloadAction<string>) => {
+			state.quickReplyDetails = state.quickReplyList.find((item) => item.id === action.payload) || {
+				id: '',
+				message: '',
+			};
 		},
 		addMessageList: (state, action: PayloadAction<typeof initialState.messageList>) => {
 			state.messageList.push(...action.payload);
@@ -152,6 +182,11 @@ export const {
 	resetMessage,
 	setMessageLabels,
 	setNewMessageLabels,
+	addQuickReply,
+	deleteQuickReply,
+	setQuickReplyList,
+	updateQuickReply,
+	selectQuickReply,
 } = Slice.actions;
 
 export default Slice.reducer;

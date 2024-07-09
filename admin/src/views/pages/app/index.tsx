@@ -39,6 +39,7 @@ import {
 import { Contact } from '../../../store/types/ContactState';
 import AppNavbar from '../../components/navbar/AppNavbar';
 import NavigationDrawer from '../../components/navbar/NavigationDrawer';
+import { setQuickReplyList } from '../../../store/reducers/MessagesReducers';
 
 const AppPage = () => {
 	const outlet = useOutlet();
@@ -64,11 +65,12 @@ const AppPage = () => {
 		try {
 			AuthService.userDetails().then((user) => user && dispatch(setUserDetails(user)));
 
-			const promises = [APIInstance.get(`/contacts`), AgentService.getAgent()];
+			const promises = [APIInstance.get(`/contacts`), AgentService.getAgent(), MessagesService.fetchQuickReplies()];
 
 			const results = await Promise.all(promises);
 			dispatch(setContactList(results[0].data.contacts as Contact[]));
 			dispatch(setAgentList(results[1]));
+			dispatch(setQuickReplyList(results[2]));
 		} catch (e) {
 			return;
 		}
