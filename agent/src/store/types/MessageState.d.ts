@@ -147,3 +147,8 @@ export type Message = {
 		name: string;
 	};
 };
+
+export type QuickReply = {
+	id: string;
+	message: string;
+};
