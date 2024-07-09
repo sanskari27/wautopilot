@@ -245,7 +245,9 @@ const MediaMessage = ({ message }: { message: TMessage }) => {
 							onClick={handlePreview}
 						>
 							<Icon as={DownloadIcon} color={'white'} />
-							<Text color={'white'}>{getFileSize(media.size)}</Text>
+							<Text color={'white'} fontSize={'sm'}>
+								{getFileSize(media.size)}
+							</Text>
 						</Flex>
 					</AbsoluteCenter>
 				</Box>
