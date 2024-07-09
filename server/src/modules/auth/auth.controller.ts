@@ -138,12 +138,29 @@ async function register(req: Request, res: Response, next: NextFunction) {
 			level: UserLevel.Admin,
 		});
 
+		const { authToken, refreshToken } = await UserService.login(email, password, {
+			platform: req.useragent?.platform || '',
+			browser: req.useragent?.browser || '',
+		});
+
+		setCookie(res, {
+			key: Cookie.Auth,
+			value: authToken,
+			expires: JWT_EXPIRE_TIME,
+		});
+
+		setCookie(res, {
+			key: Cookie.Refresh,
+			value: refreshToken,
+			expires: SESSION_EXPIRE_TIME,
+		});
+
 		return Respond({
 			res,
 			status: 200,
 		});
 	} catch (err) {
-		return next(new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR));
+		return next(new CustomError(AUTH_ERRORS.USER_ALREADY_EXISTS));
 	}
 }
 

@@ -9,6 +9,7 @@ import {
 	reset,
 	setConfirmPassword,
 	setError,
+	setIsAuthenticated,
 	setName,
 	setNewEmail,
 	setNewPassword,
@@ -134,6 +135,7 @@ export default function SignupTab() {
 			status: 'success',
 			duration: 5000,
 		});
+		dispatch(setIsAuthenticated(true));
 	};
 	return (
 		<>
