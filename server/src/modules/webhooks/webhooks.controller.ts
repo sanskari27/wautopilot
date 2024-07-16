@@ -92,6 +92,7 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 			conversation_id: c_id,
 			meta_message_id: meta_message_id,
 			recipient,
+			recipient_name: contact.profile.name,
 		});
 	}
 
@@ -142,6 +143,7 @@ function processIncomingMessage(details: {
 	conversation_id: Types.ObjectId;
 	meta_message_id: string;
 	recipient: string;
+	recipient_name: string;
 }) {
 	const { message, user, link, conversation_id, meta_message_id, recipient } = details;
 	const conversationService = new ConversationService(user, link);
@@ -282,6 +284,7 @@ function processIncomingMessage(details: {
 			message_id: meta_message_id,
 			context: message.context,
 			data,
+			recipient_name: details.recipient_name,
 		});
 	} else {
 		conversationService.addMessageToConversation(conversation_id, {

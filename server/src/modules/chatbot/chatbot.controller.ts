@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { WhatsappFlowResponseDB } from '../../../mongo/repo';
+import IWhatsappFlowResponse from '../../../mongo/types/whatsappFlowResponse';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import ChatBotService from '../../services/chatbot';
@@ -298,14 +299,25 @@ async function deleteFlow(req: Request, res: Response, next: NextFunction) {
 async function exportWhatsappFlow(req: Request, res: Response, next: NextFunction) {
 	const { serviceAccount: account } = req.locals;
 
-	const docs = await WhatsappFlowResponseDB.find({ linked_to: account._id });
+	const docs = await WhatsappFlowResponseDB.find({ linked_to: account._id }).sort({
+		'data.flow_token': 1,
+		received_at: -1,
+	});
 
-	return Respond({
+	const parsableData = docs.map((doc) => {
+		const data = doc.toObject() as IWhatsappFlowResponse;
+		return {
+			recipient: data.recipient,
+			recipient_name: data.recipient_name,
+			received_at: data.received_at,
+			...data.data,
+		};
+	});
+
+	return RespondCSV({
 		res,
-		status: 200,
-		data: {
-			docs,
-		},
+		filename: 'whatsapp-flow-responses.csv',
+		data: CSVHelper.exportWhatsappFlowResponse(parsableData),
 	});
 }
 

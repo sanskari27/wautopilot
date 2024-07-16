@@ -177,8 +177,10 @@ export default class CSVHelper {
 	static exportConversation(
 		data: {
 			recipient: string | undefined;
+			recipient_name: string | undefined;
 			header_type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | undefined;
 			header_content: string | undefined;
+			body_type: string | undefined;
 			body: string;
 			footer: string | undefined;
 			buttonsCount: number;
@@ -198,12 +200,20 @@ export default class CSVHelper {
 				label: 'Recipient',
 			},
 			{
+				value: 'recipient_name',
+				label: 'Recipient Name',
+			},
+			{
 				value: 'header_type',
 				label: 'Header Type',
 			},
 			{
 				value: 'header_content',
 				label: 'Header Content',
+			},
+			{
+				value: 'body_type',
+				label: 'Body Type',
 			},
 			{
 				value: 'body',
@@ -217,7 +227,6 @@ export default class CSVHelper {
 				value: 'buttonsCount',
 				label: 'Buttons Count',
 			},
-
 			{
 				value: 'sent_at',
 				label: 'Sent At',
@@ -255,6 +264,44 @@ export default class CSVHelper {
 		});
 
 		const csv = json2csvParser.parse(data);
+
+		return csv;
+	}
+
+	static exportWhatsappFlowResponse(
+		records: {
+			recipient: string;
+			recipient_name: string;
+			received_at: Date;
+			[key: string]: any;
+		}[]
+	): string {
+		const allKeys = [...new Set(records.flatMap((record) => Object.keys(record)))];
+		const keysWithoutLabel = allKeys.filter(
+			(key) => key !== 'recipient' && key !== 'recipient_name' && key !== 'received_at'
+		);
+
+		const keysWithTags = [
+			{
+				value: 'recipient',
+				label: 'Recipient',
+			},
+			{
+				value: 'recipient_name',
+				label: 'Recipient Name',
+			},
+			{
+				value: 'received_at',
+				label: 'Received At',
+			},
+			...keysWithoutLabel.map((key) => ({
+				value: key,
+				label: key,
+			})),
+		];
+		// Create the parser with the values (unique keys)
+		const json2csvParser = new Parser({ fields: keysWithTags });
+		const csv = json2csvParser.parse(records);
 
 		return csv;
 	}

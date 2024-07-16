@@ -12,6 +12,7 @@ const schema = new mongoose.Schema<IWhatsappFlowResponse>({
 	},
 
 	recipient: String,
+	recipient_name: String,
 	received_at: Date,
 	message_id: String,
 	context: {

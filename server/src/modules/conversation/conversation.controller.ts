@@ -295,9 +295,16 @@ async function exportConversationsFromPhonebook(req: Request, res: Response, nex
 	const parsableData = messages.map((message) => {
 		return {
 			recipient: message.recipient,
+			recipient_name: conversation.profile_name,
 			header_type: message.header_type,
 			header_content: message.header_type === 'TEXT' ? message.header_content : '',
-			body: message.body?.body_type === 'TEXT' ? message.body.text : '',
+			body_type: message.body?.body_type,
+			body:
+				message.body?.body_type === 'TEXT'
+					? message.body.text
+					: message.body?.body_type === 'LOCATION'
+					? `Latitude: ${message.body.location.latitude} \nLongitude: ${message.body.location.longitude}`
+					: '',
 			footer: message.footer_content,
 			buttonsCount: message.buttons?.length ?? 0,
 			sent_at: message.sent_at

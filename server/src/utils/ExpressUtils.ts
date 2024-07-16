@@ -29,7 +29,8 @@ export const Respond = ({ res, status, data = {} }: ResponseData) => {
 };
 
 export const RespondCSV = ({ res, filename, data }: CSVResponseData) => {
-	res.setHeader('Content-Disposition', `attachment; filename="${filename}.csv"`);
+	filename = filename.includes('.csv') ? filename : filename + '.csv';
+	res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 	res.set('Content-Type', 'text/csv');
 	res.status(200).send(data);
 };

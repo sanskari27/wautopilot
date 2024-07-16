@@ -5,6 +5,7 @@ export default interface IWhatsappFlowResponse extends Document {
 	linked_to: Types.ObjectId;
 
 	recipient: string;
+	recipient_name: string;
 	received_at: Date;
 	message_id: string;
 	context: {
