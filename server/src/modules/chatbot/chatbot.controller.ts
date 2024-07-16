@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { WhatsappFlowResponseDB } from '../../../mongo/repo';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import ChatBotService from '../../services/chatbot';
@@ -294,6 +295,20 @@ async function deleteFlow(req: Request, res: Response, next: NextFunction) {
 	});
 }
 
+async function exportWhatsappFlow(req: Request, res: Response, next: NextFunction) {
+	const { serviceAccount: account } = req.locals;
+
+	const docs = await WhatsappFlowResponseDB.find({ linked_to: account._id });
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			docs,
+		},
+	});
+}
+
 const Controller = {
 	createBot,
 	listBots,
@@ -307,6 +322,7 @@ const Controller = {
 	listFlows,
 	downloadResponses,
 	chatBotFlowDetails,
+	exportWhatsappFlow,
 };
 
 export default Controller;

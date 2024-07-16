@@ -21,4 +21,5 @@ export { default as ShortenLinkDB } from './ShortenLink';
 export { default as StorageDB } from './Storage';
 export { default as SubscriptionDetailsDB } from './SubscriptionDetails';
 export { default as WalletTransactionDB } from './WalletTransaction';
+export { default as WhatsappFlowResponseDB } from './WhatsappFlowResponse';
 export { default as WhatsappLinkDB } from './WhatsappLink';

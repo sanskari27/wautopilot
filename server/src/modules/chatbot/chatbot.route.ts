@@ -7,6 +7,8 @@ import { CreateBotValidator, CreateFlowValidator, UpdateFlowValidator } from './
 
 const router = express.Router();
 
+router.route('/whatsapp-flows/export').get(Controller.exportWhatsappFlow);
+
 router
 	.route('/flows/:id')
 	.all(IDValidator)

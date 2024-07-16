@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
 import { AccountDB, WhatsappLinkDB } from '../../../mongo';
+import { WhatsappFlowResponseDB } from '../../../mongo/repo';
 import IAccount from '../../../mongo/types/account';
 import IWhatsappLink from '../../../mongo/types/whatsappLink';
 import {
@@ -96,28 +97,6 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 
 	return res.status(200).send('OK');
 }
-
-async function test() {
-	const waid = '171113502760309';
-	const phone_number_id = '158944380644785';
-
-	const link = await WhatsappLinkDB.findOne({ waid, phoneNumberId: phone_number_id });
-	if (!link) {
-		return;
-	}
-
-	const user = await AccountDB.findOne({ _id: link.linked_to });
-	if (!user) {
-		return;
-	}
-	const chatBotService = new ChatBotService(user, link);
-	chatBotService.checkForFlowKeyword(
-		'916205667548',
-		// 'wamid.HBgMOTE2MjA1NjY3NTQ4FQIAEhgWM0VCMEVBRUZBMkVBNUE0NEUzQjE2MwA=',
-		'asdaaaasdaa'
-	);
-}
-test();
 
 async function razorpayPayment(req: Request, res: Response) {
 	const data = req.body;
@@ -286,6 +265,23 @@ function processIncomingMessage(details: {
 			recipient,
 			context_meta_message_id: message.context.id,
 			responseAt: timestamp,
+		});
+	} else if (message.interactive && message.interactive.type === 'nfm_reply') {
+		const nfm_reply = message.interactive.nfm_reply as {
+			response_json: string;
+			body: string;
+			name: string;
+		};
+
+		const data = JSON.parse(nfm_reply.response_json);
+
+		WhatsappFlowResponseDB.create({
+			linked_to: user._id,
+			recipient,
+			received_at: timestamp,
+			message_id: meta_message_id,
+			context: message.context,
+			data,
 		});
 	} else {
 		conversationService.addMessageToConversation(conversation_id, {
