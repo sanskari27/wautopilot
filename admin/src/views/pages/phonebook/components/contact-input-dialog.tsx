@@ -8,7 +8,6 @@ import {
 	DrawerFooter,
 	DrawerHeader,
 	DrawerOverlay,
-	Flex,
 	HStack,
 	IconButton,
 	Input,
@@ -26,7 +25,7 @@ import {
 	useToast,
 } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle } from 'react';
-import { MdAdd, MdRemove } from 'react-icons/md';
+import { MdRemove } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFetchLabels } from '../../../../hooks/useFetchLabels';
 import useFilterLabels from '../../../../hooks/useFilterLabels';
@@ -43,7 +42,6 @@ import {
 	setBirthday,
 	setEmail,
 	setError,
-	setFieldName,
 	setFirstName,
 	setLastName,
 	setMiddleName,
@@ -76,7 +74,7 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 		},
 	}));
 
-	const { details, uiDetails, field_name, label_input } = useSelector(
+	const { details, uiDetails, label_input } = useSelector(
 		(state: StoreState) => state[StoreNames.PHONEBOOK]
 	);
 	const {
@@ -307,27 +305,6 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 								</Box>
 							)}
 						/>
-
-						<Flex gap={3}>
-							<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
-								<Input
-									type='text'
-									placeholder='Enter new field name'
-									value={field_name ?? ''}
-									onChange={(e) => dispatch(setFieldName(e.target.value))}
-								/>
-							</InputGroup>
-							<Button
-								colorScheme='teal'
-								leftIcon={<MdAdd color='white' fontSize={'1.2rem'} />}
-								onClick={() => {
-									dispatch(setOthers({ key: field_name, value: '' }));
-									dispatch(setFieldName(''));
-								}}
-							>
-								Add Field
-							</Button>
-						</Flex>
 					</VStack>
 				</DrawerBody>
 

@@ -260,4 +260,30 @@ export default class MessagesService {
 	static async deleteQuickReply(id: string) {
 		await APIInstance.delete(`/users/quick-replies/${id}`);
 	}
+
+	static async exportConversations(deviceId: string, phonebook_id: string) {
+		const response = await APIInstance.get(
+			`/${deviceId}/conversation/export-from-phonebook/${phonebook_id}`,
+			{
+				responseType: 'blob',
+			}
+		);
+		const blob = new Blob([response.data]);
+
+		const contentDisposition = response.headers['content-disposition'];
+		const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.*)"/);
+		const filename = filenameMatch ? filenameMatch[1] : `Conversations-${phonebook_id}.csv`;
+
+		// Create a temporary link element
+		const downloadLink = document.createElement('a');
+		downloadLink.href = window.URL.createObjectURL(blob);
+		downloadLink.download = filename; // Specify the filename
+
+		// Append the link to the body and trigger the download
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+
+		// Clean up - remove the link
+		document.body.removeChild(downloadLink);
+	}
 }

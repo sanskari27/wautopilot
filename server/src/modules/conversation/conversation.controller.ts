@@ -5,7 +5,9 @@ import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import ConversationService from '../../services/conversation';
 import PhoneBookService from '../../services/phonebook';
-import { Respond } from '../../utils/ExpressUtils';
+import CSVHelper from '../../utils/CSVHelper';
+import DateUtils from '../../utils/DateUtils';
+import { Respond, RespondCSV } from '../../utils/ExpressUtils';
 import { NumbersValidationResult, SendMessageValidationResult } from './conversation.validator';
 
 async function fetchConversations(req: Request, res: Response, next: NextFunction) {
@@ -264,6 +266,70 @@ async function removeConversationFromAgent(req: Request, res: Response, next: Ne
 	});
 }
 
+async function exportConversationsFromPhonebook(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount: account,
+		user,
+		device: { device },
+		id,
+	} = req.locals;
+
+	if (user.userLevel <= UserLevel.Agent) {
+		return next(new CustomError(AUTH_ERRORS.PERMISSION_DENIED));
+	}
+	const phoneBookService = new PhoneBookService(account);
+	const records = await phoneBookService.findRecordsByIds([id]);
+	const numbers = records.map((record) => record.phone_number);
+	if (numbers.length === 0) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	const conversationService = new ConversationService(account, device);
+	const conversation = await conversationService.findConversation(numbers[0]);
+	if (!conversation) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	const messages = await conversationService.fetchConversationMessages(conversation._id);
+
+	const parsableData = messages.map((message) => {
+		return {
+			recipient: message.recipient,
+			header_type: message.header_type,
+			header_content: message.header_type === 'TEXT' ? message.header_content : '',
+			body: message.body?.body_type === 'TEXT' ? message.body.text : '',
+			footer: message.footer_content,
+			buttonsCount: message.buttons?.length ?? 0,
+			sent_at: message.sent_at
+				? DateUtils.getMoment(message.sent_at).format('DD/MM/YYYY HH:mm:ss')
+				: '',
+			delivered_at: message.delivered_at
+				? DateUtils.getMoment(message.delivered_at).format('DD/MM/YYYY HH:mm:ss')
+				: '',
+			read_at: message.read_at
+				? DateUtils.getMoment(message.read_at).format('DD/MM/YYYY HH:mm:ss')
+				: '',
+			seen_at: message.seen_at
+				? DateUtils.getMoment(message.seen_at).format('DD/MM/YYYY HH:mm:ss')
+				: '',
+			received_at: message.received_at
+				? DateUtils.getMoment(message.received_at).format('DD/MM/YYYY HH:mm:ss')
+				: '',
+			failed_at: message.failed_at
+				? DateUtils.getMoment(message.failed_at).format('DD/MM/YYYY HH:mm:ss')
+				: '',
+			failed_reason: message.failed_reason,
+			sent_by: message.sender?.name ?? '',
+		};
+	});
+
+	return RespondCSV({
+		res,
+		filename: `conversation-${conversation.recipient}.csv`,
+		data: CSVHelper.exportConversation(parsableData),
+	});
+}
+
 const Controller = {
 	fetchConversations,
 	fetchConversationMessages,
@@ -274,6 +340,7 @@ const Controller = {
 	markRead,
 	assignLabelToMessage,
 	sendMessageToConversation,
+	exportConversationsFromPhonebook,
 };
 
 export default Controller;

@@ -21,6 +21,11 @@ router
 	.all(AgentValidator)
 	.post(Controller.transferAgentConversation);
 
+router
+	.route('/export-from-phonebook/:id')
+	.all(IDValidator)
+	.get(Controller.exportConversationsFromPhonebook);
+
 router.route('/:id/messages').all(IDValidator).get(Controller.fetchConversationMessages);
 
 router

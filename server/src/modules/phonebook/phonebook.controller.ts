@@ -2,12 +2,13 @@ import csv from 'csvtojson/v2';
 import { NextFunction, Request, Response } from 'express';
 import FileUpload, { ONLY_CSV_ALLOWED, SingleFileUploadOptions } from '../../config/FileUpload';
 import { UserLevel } from '../../config/const';
-import { CustomError } from '../../errors';
+import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import PhoneBookService from '../../services/phonebook';
 import CSVHelper from '../../utils/CSVHelper';
 import { Respond, RespondCSV, intersection } from '../../utils/ExpressUtils';
 import {
+	FieldsResult,
 	MultiDeleteValidationResult,
 	RecordsValidationResult,
 	SetLabelValidationResult,
@@ -426,6 +427,29 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 	}
 }
 
+export async function addFields(req: Request, res: Response, next: NextFunction) {
+	const { serviceAccount, user, data } = req.locals;
+
+	if (user.userLevel === UserLevel.Agent) {
+		return next(new CustomError(AUTH_ERRORS.PERMISSION_DENIED));
+	}
+
+	try {
+		const phoneBookService = new PhoneBookService(serviceAccount);
+		phoneBookService.addFields(data as FieldsResult);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err: unknown) {
+		if (err instanceof CustomError) {
+			return next(err);
+		}
+		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR, err));
+	}
+}
+
 const Controller = {
 	addRecords,
 	records,
@@ -439,6 +463,7 @@ const Controller = {
 	getAllLabels,
 	setLabelsByPhone,
 	bulkUpload,
+	addFields,
 };
 
 export default Controller;

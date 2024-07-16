@@ -4,6 +4,7 @@ import { IDValidator } from '../../middleware';
 import VerifyPermissions from '../../middleware/VerifyPermissions';
 import Controller from './phonebook.controller';
 import {
+	FieldsValidator,
 	LabelValidator,
 	MultiDeleteValidator,
 	RecordUpdateValidator,
@@ -22,6 +23,11 @@ router
 	.route('/set-labels')
 	.all(VerifyPermissions(Permissions.phonebook.update), LabelValidator)
 	.post(Controller.setLabels);
+router
+	.route('/add-fields')
+	.all(VerifyPermissions(Permissions.phonebook.update), FieldsValidator)
+	.post(Controller.addFields);
+
 router
 	.route('/add-labels')
 	.all(VerifyPermissions(Permissions.phonebook.update), LabelValidator)

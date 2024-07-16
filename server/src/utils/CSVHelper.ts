@@ -173,4 +173,89 @@ export default class CSVHelper {
 
 		return csv;
 	}
+
+	static exportConversation(
+		data: {
+			recipient: string | undefined;
+			header_type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | undefined;
+			header_content: string | undefined;
+			body: string;
+			footer: string | undefined;
+			buttonsCount: number;
+			sent_at: string | Date;
+			delivered_at: string | Date;
+			read_at: string | Date;
+			seen_at: string | Date;
+			received_at: string | Date;
+			failed_at: string | Date;
+			failed_reason: string | undefined;
+			sent_by: string;
+		}[]
+	): string {
+		const keys = [
+			{
+				value: 'recipient',
+				label: 'Recipient',
+			},
+			{
+				value: 'header_type',
+				label: 'Header Type',
+			},
+			{
+				value: 'header_content',
+				label: 'Header Content',
+			},
+			{
+				value: 'body',
+				label: 'Body',
+			},
+			{
+				value: 'footer',
+				label: 'Footer',
+			},
+			{
+				value: 'buttonsCount',
+				label: 'Buttons Count',
+			},
+
+			{
+				value: 'sent_at',
+				label: 'Sent At',
+			},
+			{
+				value: 'delivered_at',
+				label: 'Delivered At',
+			},
+			{
+				value: 'read_at',
+				label: 'Read At',
+			},
+			{
+				value: 'received_at',
+				label: 'Received At',
+			},
+			{
+				value: 'failed_at',
+				label: 'Failed At',
+			},
+			{
+				value: 'failed_reason',
+				label: 'Failed Reason',
+			},
+			{
+				value: 'sent_by',
+				label: 'Sent By',
+			},
+		];
+
+		const json2csvParser = new Parser({
+			header: true,
+			fields: keys,
+			defaultValue: '',
+		});
+
+		const csv = json2csvParser.parse(data);
+
+		return csv;
+	}
 }

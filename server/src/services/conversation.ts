@@ -87,6 +87,16 @@ export default class ConversationService extends WhatsappLinkService {
 		}
 	}
 
+	public async findConversation(recipient: string) {
+		const doc = await ConversationDB.findOne({
+			linked_to: this.userId,
+			device_id: this.deviceId,
+			recipient,
+		});
+		if (!doc) return null;
+		return doc;
+	}
+
 	public async updateConversation(
 		recipient: string,
 		details: {

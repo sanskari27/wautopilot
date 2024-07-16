@@ -4,6 +4,7 @@ import IAccount from '../../mongo/types/account';
 import IPhoneBook from '../../mongo/types/phonebook';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
+import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import UserService from './user';
 
 type Record = {
@@ -40,7 +41,7 @@ function processPhonebookDocs(
 		email: doc.email ?? '',
 		birthday: doc.birthday ?? '',
 		anniversary: doc.anniversary ?? '',
-		others: doc.others ?? {},
+		others: (filterUndefinedKeys(doc.others as object) ?? {}) as Record['others'],
 		labels: doc.labels ?? [],
 	}));
 }
@@ -77,6 +78,13 @@ export default class PhoneBookService extends UserService {
 						update: {
 							$set: {
 								phone_number: record.phone_number?.replace(/\D/g, '') ?? '',
+								salutation: record.salutation ?? existingRecord.salutation,
+								first_name: record.first_name ?? existingRecord.first_name,
+								last_name: record.last_name ?? existingRecord.last_name,
+								middle_name: record.middle_name ?? existingRecord.middle_name,
+								email: record.email ?? existingRecord.email,
+								birthday: record.birthday ?? existingRecord.birthday,
+								anniversary: record.anniversary ?? existingRecord.anniversary,
 								others: { ...existingRecord.others, ...record.others },
 							},
 							$addToSet: { labels: { $each: record.labels ?? [] } },
@@ -205,5 +213,20 @@ export default class PhoneBookService extends UserService {
 		});
 
 		return processPhonebookDocs(records);
+	}
+
+	public async addFields({ name, defaultValue }: { name: string; defaultValue: string }) {
+		const key = `others.${name}`;
+		await PhoneBookDB.updateMany(
+			{
+				linked_to: this.userId,
+				[key]: { $exists: false },
+			},
+			{
+				$set: {
+					[key]: defaultValue,
+				},
+			}
+		);
 	}
 }

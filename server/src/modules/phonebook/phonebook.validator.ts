@@ -47,6 +47,10 @@ export type RecordsValidationResult = {
 };
 
 export type LabelsResult = string[];
+export type FieldsResult = {
+	name: string;
+	defaultValue: string;
+};
 
 export async function RecordUpdateValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
@@ -166,6 +170,33 @@ export async function RecordsValidator(req: Request, res: Response, next: NextFu
 			})
 			.array()
 			.default([]),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function FieldsValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z.object({
+		name: z.string(),
+		defaultValue: z.string().default(''),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

@@ -64,4 +64,8 @@ export default class PhoneBookService {
 			},
 		});
 	}
+
+	static async addFields(data: { name: string; defaultValue: string }) {
+		await APIInstance.post(`/phonebook/add-fields`, data);
+	}
 }

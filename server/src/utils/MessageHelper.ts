@@ -121,7 +121,7 @@ export function extractInteractiveButtons(components: Record<string, any>) {
 	}));
 }
 
-export function generateHeader(type: 'image' | 'video' | 'document', media_id: string) {
+export function generateHeader(type: 'image' | 'video' | 'document' | 'text', media_id: string) {
 	return {
 		header: {
 			type: type,

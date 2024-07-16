@@ -120,7 +120,7 @@ export function validatePhoneNumber(num: string) {
 
 export function filterUndefinedKeys<T extends object>(opt: T): T {
 	const entries = Object.entries(opt);
-	const filteredEntries = entries.filter(([key, value]) => value !== undefined);
+	const filteredEntries = entries.filter(([key, value]) => value !== undefined || !key);
 	const filteredOpt = Object.fromEntries(filteredEntries);
 	return filteredOpt as T;
 }

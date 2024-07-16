@@ -16,17 +16,20 @@ import {
 	useToast,
 } from '@chakra-ui/react';
 import { useEffect, useRef } from 'react';
-import { BiExport, BiLabel, BiLeftArrow, BiPlus, BiRightArrow, BiSupport } from 'react-icons/bi';
+import { BiLabel, BiLeftArrow, BiPlus, BiRightArrow, BiSupport } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import APIInstance from '../../../config/APIInstance';
 import useFilteredList from '../../../hooks/useFilteredList';
 import { StoreNames, StoreState } from '../../../store';
 
 import { DeleteIcon } from '@chakra-ui/icons';
+import { FaCloudDownloadAlt } from 'react-icons/fa';
 import { HiUpload } from 'react-icons/hi';
+import { MdOutlineTextFields } from 'react-icons/md';
 import { useFetchLabels } from '../../../hooks/useFetchLabels';
 import useFilterLabels from '../../../hooks/useFilterLabels';
 import AgentService from '../../../services/agent.service';
+import MessagesService from '../../../services/messages.service';
 import PhoneBookService from '../../../services/phonebook.service';
 import {
 	addSelected,
@@ -49,6 +52,7 @@ import DeleteAlert, { DeleteAlertHandle } from '../../components/delete-alert';
 import LabelFilter from '../../components/labelFilter';
 import SearchBar from '../../components/searchBar';
 import Each from '../../components/utils/Each';
+import AddFieldDialog, { AddFieldDialogHandle } from './components/addField';
 import AssignLabelDialog, { AssignLabelDialogHandle } from './components/assign-label';
 import ContactInputDialog, { ContactInputDialogHandle } from './components/contact-input-dialog';
 import UploadPhonebookDialog, { UploadPhonebookDialogHandle } from './components/upload-csv';
@@ -58,6 +62,7 @@ export default function Phonebook() {
 	const toast = useToast();
 	const drawerRef = useRef<ContactInputDialogHandle>(null);
 	const uploadCSVDialog = useRef<UploadPhonebookDialogHandle>(null);
+	const addFieldDialog = useRef<AddFieldDialogHandle>(null);
 	const assignLabelDialog = useRef<AssignLabelDialogHandle>(null);
 	const deleteDialog = useRef<DeleteAlertHandle>(null);
 
@@ -226,6 +231,26 @@ export default function Phonebook() {
 		);
 	};
 
+	const exportChats = () => {
+		const promises = selected.map(
+			async (id) => await MessagesService.exportConversations(selected_device_id, id)
+		);
+
+		toast.promise(Promise.all(promises), {
+			success: () => {
+				return {
+					title: 'Files exported successfully',
+				};
+			},
+			error: {
+				title: 'Failed to export files',
+			},
+			loading: {
+				title: 'Exporting...',
+			},
+		});
+	};
+
 	const allChecked = filtered.every((item) => selected.includes(item.id));
 	const allIntermediate = filtered.some((item) => selected.includes(item.id));
 
@@ -250,6 +275,14 @@ export default function Phonebook() {
 							</Button>
 							<Button
 								size={'sm'}
+								colorScheme='orange'
+								leftIcon={<FaCloudDownloadAlt color='white' fontSize={'1.2rem'} />}
+								onClick={exportChats}
+							>
+								Export Chat
+							</Button>
+							<Button
+								size={'sm'}
 								colorScheme='teal'
 								leftIcon={<BiLabel color='white' fontSize={'1.2rem'} />}
 								onClick={() => {
@@ -268,14 +301,26 @@ export default function Phonebook() {
 							/>
 						</>
 					) : (
-						<Button
-							size={'sm'}
-							colorScheme='teal'
-							leftIcon={<BiExport color='white' fontSize={'1.2rem'} />}
-							onClick={handleExport}
-						>
-							Export
-						</Button>
+						<>
+							<Button
+								size={'sm'}
+								colorScheme='purple'
+								leftIcon={<MdOutlineTextFields color='white' fontSize={'1.2rem'} />}
+								onClick={() => {
+									addFieldDialog.current?.open();
+								}}
+							>
+								Add Fields
+							</Button>
+							<Button
+								size={'sm'}
+								colorScheme='teal'
+								leftIcon={<FaCloudDownloadAlt color='white' fontSize={'1.2rem'} />}
+								onClick={handleExport}
+							>
+								Export
+							</Button>
+						</>
 					)}
 					<Button
 						size={'sm'}
@@ -428,6 +473,7 @@ export default function Phonebook() {
 			<DeleteAlert ref={deleteDialog} onConfirm={handleDelete} type='Records' />
 			<ContactInputDialog ref={drawerRef} />
 			<UploadPhonebookDialog ref={uploadCSVDialog} />
+			<AddFieldDialog ref={addFieldDialog} />
 		</Box>
 	);
 }
