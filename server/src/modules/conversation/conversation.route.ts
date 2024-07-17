@@ -2,6 +2,7 @@ import express from 'express';
 import { AgentValidator, IDValidator } from '../../middleware';
 import Controller from './conversation.controller';
 import { LabelValidator, NumbersValidator, SendMessageValidator } from './conversation.validator';
+import { IDsValidator } from '../../middleware/idValidator';
 
 const router = express.Router();
 
@@ -22,9 +23,9 @@ router
 	.post(Controller.transferAgentConversation);
 
 router
-	.route('/export-from-phonebook/:id')
-	.all(IDValidator)
-	.get(Controller.exportConversationsFromPhonebook);
+	.route('/export-from-phonebook')
+	.all(IDsValidator)
+	.post(Controller.exportConversationsFromPhonebook);
 
 router.route('/:id/messages').all(IDValidator).get(Controller.fetchConversationMessages);
 

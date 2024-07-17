@@ -261,9 +261,12 @@ export default class MessagesService {
 		await APIInstance.delete(`/users/quick-replies/${id}`);
 	}
 
-	static async exportConversations(deviceId: string, phonebook_id: string) {
-		const response = await APIInstance.get(
-			`/${deviceId}/conversation/export-from-phonebook/${phonebook_id}`,
+	static async exportConversations(deviceId: string, phonebook_ids: string[]) {
+		const response = await APIInstance.post(
+			`/${deviceId}/conversation/export-from-phonebook`,
+			{
+				ids: phonebook_ids,
+			},
 			{
 				responseType: 'blob',
 			}
@@ -272,7 +275,7 @@ export default class MessagesService {
 
 		const contentDisposition = response.headers['content-disposition'];
 		const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.*)"/);
-		const filename = filenameMatch ? filenameMatch[1] : `Conversations-${phonebook_id}.csv`;
+		const filename = filenameMatch ? filenameMatch[1] : `Conversations.csv`;
 
 		// Create a temporary link element
 		const downloadLink = document.createElement('a');

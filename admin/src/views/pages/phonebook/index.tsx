@@ -232,11 +232,9 @@ export default function Phonebook() {
 	};
 
 	const exportChats = () => {
-		const promises = selected.map(
-			async (id) => await MessagesService.exportConversations(selected_device_id, id)
-		);
+		const promise = MessagesService.exportConversations(selected_device_id, selected);
 
-		toast.promise(Promise.all(promises), {
+		toast.promise(promise, {
 			success: () => {
 				return {
 					title: 'Files exported successfully',

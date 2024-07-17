@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { Types } from 'mongoose';
 import MetaAPI from '../../config/MetaAPI';
 import { UserLevel } from '../../config/const';
 import { AUTH_ERRORS, CustomError } from '../../errors';
@@ -271,69 +272,77 @@ async function exportConversationsFromPhonebook(req: Request, res: Response, nex
 		serviceAccount: account,
 		user,
 		device: { device },
-		id,
+		data,
 	} = req.locals;
 
 	if (user.userLevel <= UserLevel.Agent) {
 		return next(new CustomError(AUTH_ERRORS.PERMISSION_DENIED));
 	}
 	const phoneBookService = new PhoneBookService(account);
-	const records = await phoneBookService.findRecordsByIds([id]);
+
+	const records = await phoneBookService.findRecordsByIds(data as Types.ObjectId[]);
 	const numbers = records.map((record) => record.phone_number);
 	if (numbers.length === 0) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 
 	const conversationService = new ConversationService(account, device);
-	const conversation = await conversationService.findConversation(numbers[0]);
-	if (!conversation) {
-		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
-	}
 
-	const messages = await conversationService.fetchConversationMessages(conversation._id);
+	const dataPromise = numbers.map(async (number) => {
+		const conversation = await conversationService.findConversation(number);
+		if (!conversation) {
+			return [];
+		}
 
-	const parsableData = messages.map((message) => {
-		return {
-			recipient: message.recipient,
-			recipient_name: conversation.profile_name,
-			header_type: message.header_type,
-			header_content: message.header_type === 'TEXT' ? message.header_content : '',
-			body_type: message.body?.body_type,
-			body:
-				message.body?.body_type === 'TEXT'
-					? message.body.text
-					: message.body?.body_type === 'LOCATION'
-					? `Latitude: ${message.body.location.latitude} \nLongitude: ${message.body.location.longitude}`
+		const messages = await conversationService.fetchConversationMessages(conversation._id);
+
+		const parsableData = messages.map((message) => {
+			return {
+				recipient: message.recipient,
+				recipient_name: conversation.profile_name,
+				header_type: message.header_type,
+				header_content: message.header_type === 'TEXT' ? message.header_content : '',
+				body_type: message.body?.body_type,
+				body:
+					message.body?.body_type === 'TEXT'
+						? message.body.text
+						: message.body?.body_type === 'LOCATION'
+						? `Latitude: ${message.body.location.latitude} \nLongitude: ${message.body.location.longitude}`
+						: '',
+				footer: message.footer_content,
+				buttonsCount: message.buttons?.length ?? 0,
+				sent_at: message.sent_at
+					? DateUtils.getMoment(message.sent_at).format('DD/MM/YYYY HH:mm:ss')
 					: '',
-			footer: message.footer_content,
-			buttonsCount: message.buttons?.length ?? 0,
-			sent_at: message.sent_at
-				? DateUtils.getMoment(message.sent_at).format('DD/MM/YYYY HH:mm:ss')
-				: '',
-			delivered_at: message.delivered_at
-				? DateUtils.getMoment(message.delivered_at).format('DD/MM/YYYY HH:mm:ss')
-				: '',
-			read_at: message.read_at
-				? DateUtils.getMoment(message.read_at).format('DD/MM/YYYY HH:mm:ss')
-				: '',
-			seen_at: message.seen_at
-				? DateUtils.getMoment(message.seen_at).format('DD/MM/YYYY HH:mm:ss')
-				: '',
-			received_at: message.received_at
-				? DateUtils.getMoment(message.received_at).format('DD/MM/YYYY HH:mm:ss')
-				: '',
-			failed_at: message.failed_at
-				? DateUtils.getMoment(message.failed_at).format('DD/MM/YYYY HH:mm:ss')
-				: '',
-			failed_reason: message.failed_reason,
-			sent_by: message.sender?.name ?? '',
-		};
+				delivered_at: message.delivered_at
+					? DateUtils.getMoment(message.delivered_at).format('DD/MM/YYYY HH:mm:ss')
+					: '',
+				read_at: message.read_at
+					? DateUtils.getMoment(message.read_at).format('DD/MM/YYYY HH:mm:ss')
+					: '',
+				seen_at: message.seen_at
+					? DateUtils.getMoment(message.seen_at).format('DD/MM/YYYY HH:mm:ss')
+					: '',
+				received_at: message.received_at
+					? DateUtils.getMoment(message.received_at).format('DD/MM/YYYY HH:mm:ss')
+					: '',
+				failed_at: message.failed_at
+					? DateUtils.getMoment(message.failed_at).format('DD/MM/YYYY HH:mm:ss')
+					: '',
+				failed_reason: message.failed_reason,
+				sent_by: message.sender?.name ?? '',
+			};
+		});
+
+		return parsableData;
 	});
+
+	const conversationsData = (await Promise.all(dataPromise)).flat();
 
 	return RespondCSV({
 		res,
-		filename: `conversation-${conversation.recipient}.csv`,
-		data: CSVHelper.exportConversation(parsableData),
+		filename: `conversations.csv`,
+		data: CSVHelper.exportConversation(conversationsData),
 	});
 }
 
