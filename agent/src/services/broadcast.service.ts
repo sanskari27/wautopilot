@@ -204,7 +204,7 @@ export default class BroadcastService {
 
 	static async broadcastReport(deviceId: string) {
 		try {
-			const { data } = await APIInstance.get(`/${deviceId}/broadcast/broadcast/reports`);
+			const { data } = await APIInstance.get(`/${deviceId}/broadcast/reports`);
 			return data.reports as ScheduledBroadcast[];
 		} catch (err) {
 			return [];
@@ -213,7 +213,7 @@ export default class BroadcastService {
 
 	static async pauseBroadcast(deviceId: string, broadcastId: string) {
 		try {
-			await APIInstance.post(`/${deviceId}/broadcast/broadcast/${broadcastId}/pause`);
+			await APIInstance.post(`/${deviceId}/broadcast/${broadcastId}/pause`);
 			return true;
 		} catch (err) {
 			return false;
@@ -222,7 +222,7 @@ export default class BroadcastService {
 
 	static async resumeBroadcast(deviceId: string, broadcastId: string) {
 		try {
-			await APIInstance.post(`/${deviceId}/broadcast/broadcast/${broadcastId}/resume`);
+			await APIInstance.post(`/${deviceId}/broadcast/${broadcastId}/resume`);
 			return true;
 		} catch (err) {
 			return false;
@@ -231,7 +231,7 @@ export default class BroadcastService {
 
 	static async deleteBroadcast(deviceId: string, broadcastId: string) {
 		try {
-			await APIInstance.post(`/${deviceId}/broadcast/broadcast/${broadcastId}/delete`);
+			await APIInstance.post(`/${deviceId}/broadcast/${broadcastId}/delete`);
 			return true;
 		} catch (err) {
 			return false;
@@ -240,7 +240,7 @@ export default class BroadcastService {
 
 	static async resendFailedBroadcast(deviceId: string, broadcastId: string) {
 		try {
-			await APIInstance.post(`/${deviceId}/broadcast/broadcast/${broadcastId}/resend`);
+			await APIInstance.post(`/${deviceId}/broadcast/${broadcastId}/resend`);
 			return true;
 		} catch (err) {
 			return false;
@@ -248,12 +248,9 @@ export default class BroadcastService {
 	}
 
 	static async downloadBroadcast(deviceId: string, broadcastId: string) {
-		const response = await APIInstance.get(
-			`/${deviceId}/broadcast/broadcast/${broadcastId}/download`,
-			{
-				responseType: 'blob',
-			}
-		);
+		const response = await APIInstance.get(`/${deviceId}/broadcast/${broadcastId}/download`, {
+			responseType: 'blob',
+		});
 		const blob = new Blob([response.data]);
 
 		const contentDisposition = response.headers['content-disposition'];
@@ -275,7 +272,7 @@ export default class BroadcastService {
 
 	static async assignMessageLabels(deviceId: string, messageId: string, labels: string[]) {
 		try {
-			await APIInstance.post(`/${deviceId}/broadcast/broadcast/${messageId}/assign-labels`, {
+			await APIInstance.post(`/${deviceId}/broadcast/${messageId}/assign-labels`, {
 				labels,
 			});
 			return true;
