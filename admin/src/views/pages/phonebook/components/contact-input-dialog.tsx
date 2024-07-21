@@ -34,7 +34,6 @@ import { StoreNames, StoreState } from '../../../../store';
 import {
 	addDetailsLabel,
 	addLabelInput,
-	addPhonebookRecord,
 	clearDetails,
 	removeDetailsLabel,
 	removeOtherKey,
@@ -49,7 +48,6 @@ import {
 	setPhoneNumber,
 	setSalutation,
 	setSaving,
-	updatePhonebookRecord,
 } from '../../../../store/reducers/PhonebookReducer';
 import LabelFilter from '../../../components/labelFilter';
 import Each from '../../../components/utils/Each';
@@ -59,7 +57,11 @@ export type ContactInputDialogHandle = {
 	close: () => void;
 };
 
-const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
+export type ContactInputDialogProps = {
+	onSave?: () => void;
+};
+
+const ContactInputDialog = forwardRef<ContactInputDialogHandle,ContactInputDialogProps>(({onSave}, ref) => {
 	const dispatch = useDispatch();
 	const toast = useToast();
 
@@ -125,13 +127,9 @@ const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
 			: PhoneBookService.addRecord(details);
 
 		toast.promise(promise, {
-			success: (data) => {
-				if (id) {
-					dispatch(updatePhonebookRecord({ id, details: data }));
-				} else {
-					dispatch(addPhonebookRecord(data));
-				}
+			success: () => {
 				dispatch(setSaving(false));
+				onSave && onSave();
 				handleClose();
 				return {
 					title: 'Record saved successfully',

@@ -145,22 +145,26 @@ export default function Phonebook() {
 		dispatch(setLabels([]));
 	};
 
+	const refresh = () => {
+		dispatch(setFetching(true));
+		APIInstance.get(`/phonebook`, {
+			params: {
+				page: pagination.page,
+				limit: 20,
+				labels: labels.join(','),
+			},
+		})
+			.then(({ data }) => {
+				dispatch(setPhonebookList(data.records as PhonebookRecord[]));
+				dispatch(setMaxPage(Math.ceil(data.totalRecords / 20)));
+			})
+			.finally(() => dispatch(setFetching(false)));
+	};
+
 	const handleDelete = () => {
 		toast.promise(PhoneBookService.deleteRecords(selected), {
 			success: () => {
-				dispatch(setFetching(true));
-				APIInstance.get(`/phonebook`, {
-					params: {
-						page: pagination.page,
-						limit: 20,
-						labels: labels.join(','),
-					},
-				})
-					.then(({ data }) => {
-						dispatch(setPhonebookList(data.records as PhonebookRecord[]));
-						dispatch(setMaxPage(Math.ceil(data.totalRecords / 20)));
-					})
-					.finally(() => dispatch(setFetching(false)));
+				refresh();
 
 				return {
 					title: 'Deleted successfully',
@@ -338,7 +342,7 @@ export default function Phonebook() {
 							drawerRef.current?.open();
 						}}
 					>
-						Add Records
+						Add Record
 					</Button>
 				</Flex>
 			</Flex>
@@ -469,7 +473,7 @@ export default function Phonebook() {
 			</TableContainer>
 			<AssignLabelDialog ref={assignLabelDialog} />
 			<DeleteAlert ref={deleteDialog} onConfirm={handleDelete} type='Records' />
-			<ContactInputDialog ref={drawerRef} />
+			<ContactInputDialog ref={drawerRef} onSave={refresh} />
 			<UploadPhonebookDialog ref={uploadCSVDialog} />
 			<AddFieldDialog ref={addFieldDialog} />
 		</Box>

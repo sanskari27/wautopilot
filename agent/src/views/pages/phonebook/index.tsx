@@ -279,7 +279,7 @@ export default function Phonebook() {
 									drawerRef.current?.open();
 								}}
 							>
-								Add Records
+								Add Record
 							</Button>
 						</Show.When>
 					</Show>
