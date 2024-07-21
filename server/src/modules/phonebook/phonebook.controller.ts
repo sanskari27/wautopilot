@@ -68,6 +68,7 @@ async function records(req: Request, res: Response, next: NextFunction) {
 	const page = req.query.page ? parseInt(req.query.page as string) || 1 : 1;
 	const limit = req.query.limit ? parseInt(req.query.limit as string) || 20 : 20;
 	let labels = req.query.labels ? (req.query.labels as string).split(',') : [];
+	const search = req.query.search ? (req.query.search as string) : '';
 
 	if (user.userLevel === UserLevel.Agent) {
 		const permissions = await user.getPermissions();
@@ -97,9 +98,10 @@ async function records(req: Request, res: Response, next: NextFunction) {
 			page,
 			limit,
 			labels,
+			search,
 		});
 
-		const totalRecords = await phoneBookService.totalRecords(labels);
+		const totalRecords = await phoneBookService.totalRecords(labels, search);
 
 		return Respond({
 			res,

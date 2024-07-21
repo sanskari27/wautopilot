@@ -1,5 +1,4 @@
 import APIInstance from '../config/APIInstance';
-import { PhonebookRecord } from '../store/types/PhonebookState';
 
 export default class PhoneBookService {
 	static async allLabels() {
@@ -27,18 +26,16 @@ export default class PhoneBookService {
 	}
 
 	static async addRecord(record: Record<string, string | string[] | Record<string, string>>) {
-		const { data } = await APIInstance.post(`/phonebook`, {
+		await APIInstance.post(`/phonebook`, {
 			records: [record],
 		});
-		return data.records[0] as PhonebookRecord;
 	}
 
 	static async updateRecord(
 		id: string,
 		record: Record<string, string | string[] | Record<string, string>>
 	) {
-		const { data } = await APIInstance.put(`/phonebook/${id}`, record);
-		return data.records as PhonebookRecord;
+		await APIInstance.put(`/phonebook/${id}`, record);
 	}
 
 	static async deleteRecords(ids: string[]) {

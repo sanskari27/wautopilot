@@ -15,11 +15,10 @@ import {
 	Tr,
 	useToast,
 } from '@chakra-ui/react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BiLabel, BiLeftArrow, BiPlus, BiRightArrow, BiSupport } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import APIInstance from '../../../config/APIInstance';
-import useFilteredList from '../../../hooks/useFilteredList';
 import { StoreNames, StoreState } from '../../../store';
 
 import { DeleteIcon } from '@chakra-ui/icons';
@@ -65,6 +64,7 @@ export default function Phonebook() {
 	const addFieldDialog = useRef<AddFieldDialogHandle>(null);
 	const assignLabelDialog = useRef<AssignLabelDialogHandle>(null);
 	const deleteDialog = useRef<DeleteAlertHandle>(null);
+	const [searchText, setSearchText] = useState('');
 
 	const { selectedLabels, onAddLabel, onClear, onRemoveLabel } = useFilterLabels();
 
@@ -86,6 +86,7 @@ export default function Phonebook() {
 			params: {
 				page: pagination.page,
 				limit: 20,
+				search: searchText,
 				labels: labels.join(','),
 			},
 			signal: cancelToken.signal,
@@ -99,7 +100,7 @@ export default function Phonebook() {
 		return () => {
 			cancelToken.abort();
 		};
-	}, [pagination.page, labels, dispatch]);
+	}, [pagination.page, labels, dispatch, searchText]);
 
 	useEffect(() => {
 		dispatch(clearSelection());
@@ -118,12 +119,6 @@ export default function Phonebook() {
 			},
 		});
 	};
-
-	const { filtered, setSearchText } = useFilteredList(list, {
-		first_name: 1,
-		phone_number: 1,
-		email: 1,
-	});
 
 	function openRecord(record: PhonebookRecord): void {
 		dispatch(selectPhonebook(record.id));
@@ -151,6 +146,7 @@ export default function Phonebook() {
 			params: {
 				page: pagination.page,
 				limit: 20,
+				search: searchText,
 				labels: labels.join(','),
 			},
 		})
@@ -181,9 +177,9 @@ export default function Phonebook() {
 
 	const toggleAllSelected = (allSelected: boolean) => {
 		if (allSelected) {
-			dispatch(addSelectedList(filtered.map((el) => el.id)));
+			dispatch(addSelectedList(list.map((el) => el.id)));
 		} else {
-			dispatch(removeSelectedList(filtered.map((el) => el.id)));
+			dispatch(removeSelectedList(list.map((el) => el.id)));
 		}
 	};
 
@@ -253,8 +249,8 @@ export default function Phonebook() {
 		});
 	};
 
-	const allChecked = filtered.every((item) => selected.includes(item.id));
-	const allIntermediate = filtered.some((item) => selected.includes(item.id));
+	const allChecked = list.every((item) => selected.includes(item.id));
+	const allIntermediate = list.some((item) => selected.includes(item.id));
 
 	return (
 		<Box padding={'1rem'}>
@@ -427,7 +423,7 @@ export default function Phonebook() {
 									)}
 								/>
 							</>
-						) : filtered.length === 0 ? (
+						) : list.length === 0 ? (
 							<Tr>
 								<Td colSpan={8} textAlign={'center'}>
 									No records found
@@ -435,7 +431,7 @@ export default function Phonebook() {
 							</Tr>
 						) : (
 							<Each
-								items={filtered}
+								items={list}
 								render={(record, index) => (
 									<Tr cursor={'pointer'}>
 										<Td width={'5%'}>

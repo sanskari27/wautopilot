@@ -114,19 +114,31 @@ export default class PhoneBookService extends UserService {
 			page,
 			limit,
 			labels,
+			search,
 		}: {
 			page: number;
 			limit: number;
 			labels: string[];
+			search?: string;
 		} = {
 			page: 1,
 			limit: 2000000,
 			labels: [],
+			search: '',
 		}
 	) {
 		const records = await PhoneBookDB.find({
 			linked_to: this.userId,
 			...(labels.length > 0 ? { labels: { $in: labels } } : {}),
+			...(search
+				? {
+						$or: [
+							{ first_name: { $regex: search, $options: 'i' } },
+							{ phone_number: { $regex: search, $options: 'i' } },
+							{ email: { $regex: search, $options: 'i' } },
+						],
+				  }
+				: {}),
 		})
 			.sort({ createdAt: -1, _id: 1 })
 			.skip((page - 1) * limit)
@@ -134,10 +146,19 @@ export default class PhoneBookService extends UserService {
 		return processPhonebookDocs(records);
 	}
 
-	public async totalRecords(labels: string[] = []): Promise<number> {
+	public async totalRecords(labels: string[] = [], search = ''): Promise<number> {
 		const records = await PhoneBookDB.count({
 			linked_to: this.userId,
 			...(labels.length > 0 ? { labels: { $in: labels } } : {}),
+			...(search
+				? {
+						$or: [
+							{ first_name: { $regex: search, $options: 'i' } },
+							{ phone_number: { $regex: search, $options: 'i' } },
+							{ email: { $regex: search, $options: 'i' } },
+						],
+				  }
+				: {}),
 		});
 		return records;
 	}

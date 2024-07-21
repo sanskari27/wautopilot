@@ -15,11 +15,10 @@ import {
 	Tr,
 	useToast,
 } from '@chakra-ui/react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BiExport, BiLabel, BiLeftArrow, BiPlus, BiRightArrow } from 'react-icons/bi';
 import { useDispatch, useSelector } from 'react-redux';
 import APIInstance from '../../../config/APIInstance';
-import useFilteredList from '../../../hooks/useFilteredList';
 import { StoreNames, StoreState } from '../../../store';
 
 import { DeleteIcon } from '@chakra-ui/icons';
@@ -61,6 +60,7 @@ export default function Phonebook() {
 	const uploadCSVDialog = useRef<UploadPhonebookDialogHandle>(null);
 	const assignLabelDialog = useRef<AssignLabelDialogHandle>(null);
 	const deleteDialog = useRef<DeleteAlertHandle>(null);
+	const [searchText, setSearchText] = useState('');
 
 	const { selectedLabels, onAddLabel, onClear, onRemoveLabel } = useFilterLabels();
 
@@ -84,6 +84,7 @@ export default function Phonebook() {
 		APIInstance.get(`/phonebook`, {
 			params: {
 				page: pagination.page,
+				search: searchText,
 				limit: 20,
 				labels: labels.join(','),
 			},
@@ -98,7 +99,7 @@ export default function Phonebook() {
 		return () => {
 			cancelToken.abort();
 		};
-	}, [pagination.page, labels, dispatch]);
+	}, [pagination.page, labels, dispatch, searchText]);
 
 	useEffect(() => {
 		dispatch(clearSelection());
@@ -117,12 +118,6 @@ export default function Phonebook() {
 			},
 		});
 	};
-
-	const { filtered, setSearchText } = useFilteredList(list, {
-		first_name: 1,
-		phone_number: 1,
-		email: 1,
-	});
 
 	function openRecord(record: PhonebookRecord): void {
 		dispatch(selectPhonebook(record.id));
@@ -144,22 +139,27 @@ export default function Phonebook() {
 		dispatch(setLabels([]));
 	};
 
+	const refreshList = () => {
+		dispatch(setFetching(true));
+		APIInstance.get(`/phonebook`, {
+			params: {
+				page: pagination.page,
+				search: searchText,
+				limit: 20,
+				labels: labels.join(','),
+			},
+		})
+			.then(({ data }) => {
+				dispatch(setPhonebookList(data.records as PhonebookRecord[]));
+				dispatch(setMaxPage(Math.ceil(data.totalRecords / 20)));
+			})
+			.finally(() => dispatch(setFetching(false)));
+	};
+
 	const handleDelete = () => {
 		toast.promise(PhoneBookService.deleteRecords(selected), {
 			success: () => {
-				dispatch(setFetching(true));
-				APIInstance.get(`/phonebook`, {
-					params: {
-						page: pagination.page,
-						limit: 20,
-						labels: labels.join(','),
-					},
-				})
-					.then(({ data }) => {
-						dispatch(setPhonebookList(data.records as PhonebookRecord[]));
-						dispatch(setMaxPage(Math.ceil(data.totalRecords / 20)));
-					})
-					.finally(() => dispatch(setFetching(false)));
+				refreshList();
 
 				return {
 					title: 'Deleted successfully',
@@ -176,9 +176,9 @@ export default function Phonebook() {
 
 	const toggleAllSelected = (allSelected: boolean) => {
 		if (allSelected) {
-			dispatch(addSelectedList(filtered.map((el) => el.id)));
+			dispatch(addSelectedList(list.map((el) => el.id)));
 		} else {
-			dispatch(removeSelectedList(filtered.map((el) => el.id)));
+			dispatch(removeSelectedList(list.map((el) => el.id)));
 		}
 	};
 	const handleAllSelected = () => {
@@ -208,8 +208,8 @@ export default function Phonebook() {
 		);
 	};
 
-	const allChecked = filtered.every((item) => selected.includes(item.id));
-	const allIntermediate = filtered.some((item) => selected.includes(item.id));
+	const allChecked = list.every((item) => selected.includes(item.id));
+	const allIntermediate = list.some((item) => selected.includes(item.id));
 
 	return (
 		<Box padding={'1rem'}>
@@ -366,7 +366,7 @@ export default function Phonebook() {
 									)}
 								/>
 							</>
-						) : filtered.length === 0 ? (
+						) : list.length === 0 ? (
 							<Tr>
 								<Td colSpan={8} textAlign={'center'}>
 									No records found
@@ -374,7 +374,7 @@ export default function Phonebook() {
 							</Tr>
 						) : (
 							<Each
-								items={filtered}
+								items={list}
 								render={(record, index) => (
 									<Tr cursor={'pointer'} userSelect={'none'}>
 										<Td width={'5%'}>
@@ -414,7 +414,7 @@ export default function Phonebook() {
 			</TableContainer>
 			<AssignLabelDialog ref={assignLabelDialog} />
 			<DeleteAlert ref={deleteDialog} onConfirm={handleDelete} type='Records' />
-			<ContactInputDialog ref={drawerRef} />
+			<ContactInputDialog ref={drawerRef} onSave={refreshList} />
 			<UploadPhonebookDialog ref={uploadCSVDialog} />
 		</Box>
 	);

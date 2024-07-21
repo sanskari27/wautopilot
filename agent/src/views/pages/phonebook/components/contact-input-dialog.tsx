@@ -35,7 +35,6 @@ import { StoreNames, StoreState } from '../../../../store';
 import {
 	addDetailsLabel,
 	addLabelInput,
-	addPhonebookRecord,
 	clearDetails,
 	removeDetailsLabel,
 	removeOtherKey,
@@ -50,7 +49,6 @@ import {
 	setPhoneNumber,
 	setSalutation,
 	setSaving,
-	updatePhonebookRecord,
 } from '../../../../store/reducers/PhonebookReducer';
 import LabelFilter from '../../../components/labelFilter';
 import Each from '../../../components/utils/Each';
@@ -61,283 +59,285 @@ export type ContactInputDialogHandle = {
 	close: () => void;
 };
 
-const ContactInputDialog = forwardRef<ContactInputDialogHandle>((_, ref) => {
-	const dispatch = useDispatch();
-	const toast = useToast();
+type ContactInputDialogProps = {
+	onSave: () => void;
+};
 
-	const { isOpen, onOpen, onClose } = useDisclosure();
+const ContactInputDialog = forwardRef<ContactInputDialogHandle, ContactInputDialogProps>(
+	({ onSave }, ref) => {
+		const dispatch = useDispatch();
+		const toast = useToast();
 
-	useImperativeHandle(ref, () => ({
-		open: () => {
-			onOpen();
-		},
-		close: () => {
+		const { isOpen, onOpen, onClose } = useDisclosure();
+
+		useImperativeHandle(ref, () => ({
+			open: () => {
+				onOpen();
+			},
+			close: () => {
+				onClose();
+			},
+		}));
+
+		const {
+			phonebook: { update: update_phonebook },
+		} = usePermissions();
+
+		const { details, uiDetails, label_input } = useSelector(
+			(state: StoreState) => state[StoreNames.PHONEBOOK]
+		);
+		const {
+			salutation,
+			first_name,
+			last_name,
+			middle_name,
+			phone_number,
+			email,
+			birthday,
+			anniversary,
+			others,
+			id,
+			labels,
+		} = details;
+
+		const { selectedLabels, onAddLabel, onClear, onRemoveLabel } = useFilterLabels();
+
+		const { all_labels } = useFetchLabels();
+
+		const { error, isSaving } = uiDetails;
+
+		const handleClose = () => {
+			dispatch(clearDetails());
 			onClose();
-		},
-	}));
+		};
 
-	const {
-		phonebook: { update: update_phonebook },
-	} = usePermissions();
+		const handleClearContactCard = () => {
+			dispatch(clearDetails());
+		};
 
-	const { details, uiDetails, label_input } = useSelector(
-		(state: StoreState) => state[StoreNames.PHONEBOOK]
-	);
-	const {
-		salutation,
-		first_name,
-		last_name,
-		middle_name,
-		phone_number,
-		email,
-		birthday,
-		anniversary,
-		others,
-		id,
-		labels,
-	} = details;
+		const handleAddLabel = (label: string) => {
+			onAddLabel(label);
+			dispatch(addDetailsLabel(label));
+		};
 
-	const { selectedLabels, onAddLabel, onClear, onRemoveLabel } = useFilterLabels();
+		const handleRemoveLabel = (label: string) => {
+			onRemoveLabel(label);
+			dispatch(removeDetailsLabel(label));
+		};
 
-	const { all_labels } = useFetchLabels();
+		const handleSave = () => {
+			dispatch(setError(''));
+			dispatch(setSaving(true));
 
-	const { error, isSaving } = uiDetails;
+			const promise = id
+				? PhoneBookService.updateRecord(id, details)
+				: PhoneBookService.addRecord(details);
 
-	const handleClose = () => {
-		dispatch(clearDetails());
-		onClose();
-	};
+			toast.promise(promise, {
+				success: () => {
+					dispatch(setSaving(false));
+					onSave();
+					handleClose();
+					return {
+						title: 'Record saved successfully',
+						description: 'Please refresh the page to see the changes.',
+					};
+				},
+				error: (err) => {
+					dispatch(setSaving(false));
+					return {
+						title: 'Failed to save record.',
+						description: err.message,
+					};
+				},
+				loading: {
+					title: 'Saving record',
+					description: 'Please wait',
+				},
+			});
+		};
 
-	const handleClearContactCard = () => {
-		dispatch(clearDetails());
-	};
+		return (
+			<Drawer
+				isOpen={isOpen}
+				placement='right'
+				onClose={onClose}
+				size={'lg'}
+				onCloseComplete={handleClose}
+			>
+				<DrawerOverlay />
+				<DrawerContent>
+					<DrawerCloseButton onClick={handleClearContactCard} />
+					<DrawerHeader>Phonebook Record</DrawerHeader>
 
-	const handleAddLabel = (label: string) => {
-		onAddLabel(label);
-		dispatch(addDetailsLabel(label));
-	};
-
-	const handleRemoveLabel = (label: string) => {
-		onRemoveLabel(label);
-		dispatch(removeDetailsLabel(label));
-	};
-
-	const handleSave = () => {
-		dispatch(setError(''));
-		dispatch(setSaving(true));
-
-		const promise = id
-			? PhoneBookService.updateRecord(id, details)
-			: PhoneBookService.addRecord(details);
-
-		toast.promise(promise, {
-			success: (data) => {
-				if (id) {
-					dispatch(updatePhonebookRecord({ id, details: data }));
-				} else {
-					dispatch(addPhonebookRecord(data));
-				}
-				dispatch(setSaving(false));
-				handleClose();
-				return {
-					title: 'Record saved successfully',
-					description: 'Please refresh the page to see the changes.',
-				};
-			},
-			error: (err) => {
-				dispatch(setSaving(false));
-				return {
-					title: 'Failed to save record.',
-					description: err.message,
-				};
-			},
-			loading: {
-				title: 'Saving record',
-				description: 'Please wait',
-			},
-		});
-	};
-
-	return (
-		<Drawer
-			isOpen={isOpen}
-			placement='right'
-			onClose={onClose}
-			size={'lg'}
-			onCloseComplete={handleClose}
-		>
-			<DrawerOverlay />
-			<DrawerContent>
-				<DrawerCloseButton onClick={handleClearContactCard} />
-				<DrawerHeader>Phonebook Record</DrawerHeader>
-
-				<DrawerBody>
-					<VStack width={'full'} alignItems={'stretch'} gap={4}>
-						<Box>
-							<Text>Prefix</Text>
-							<Input
-								placeholder='Mr. Mrs. Dr. etc.'
-								type='text'
-								onChange={(e) => dispatch(setSalutation(e.target.value))}
-								value={salutation ?? ''}
-							/>
-						</Box>
-						<Box>
-							<Text>First name</Text>
-							<Input
-								placeholder='First name'
-								type='text'
-								onChange={(e) => dispatch(setFirstName(e.target.value))}
-								value={first_name ?? ''}
-							/>
-						</Box>
-						<HStack>
-							<Box width={'full'}>
-								<Text>Middle name</Text>
+					<DrawerBody>
+						<VStack width={'full'} alignItems={'stretch'} gap={4}>
+							<Box>
+								<Text>Prefix</Text>
 								<Input
-									placeholder='Middle name'
+									placeholder='Mr. Mrs. Dr. etc.'
 									type='text'
-									value={middle_name ?? ''}
-									onChange={(e) => dispatch(setMiddleName(e.target.value))}
+									onChange={(e) => dispatch(setSalutation(e.target.value))}
+									value={salutation ?? ''}
 								/>
 							</Box>
-							<Box width={'full'}>
-								<Text>Last name</Text>
+							<Box>
+								<Text>First name</Text>
 								<Input
-									placeholder='Last name'
+									placeholder='First name'
 									type='text'
-									value={last_name ?? ''}
-									onChange={(e) => dispatch(setLastName(e.target.value))}
+									onChange={(e) => dispatch(setFirstName(e.target.value))}
+									value={first_name ?? ''}
 								/>
 							</Box>
-						</HStack>
-						<Box>
-							<Text>Email</Text>
-							<Input
-								placeholder='Email'
-								type='email'
-								value={email ?? ''}
-								onChange={(e) => dispatch(setEmail(e.target.value))}
-							/>
-						</Box>
-
-						<Box>
-							<Text>Phone Number</Text>
-							<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
-								<Input
-									type='tel'
-									placeholder='Phone number with country code'
-									value={phone_number ?? ''}
-									onChange={(e) => dispatch(setPhoneNumber(e.target.value))}
-								/>
-							</InputGroup>
-						</Box>
-						<Box>
-							<Text>Birthday</Text>
-							<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
-								<Input
-									type='date'
-									value={birthday ?? ''}
-									onChange={(e) => dispatch(setBirthday(e.target.value))}
-								/>
-							</InputGroup>
-						</Box>
-						<Box>
-							<Text>Anniversary</Text>
-							<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
-								<Input
-									type='date'
-									value={anniversary ?? ''}
-									onChange={(e) => dispatch(setAnniversary(e.target.value))}
-								/>
-							</InputGroup>
-						</Box>
-						<Box>
-							<Text>Tags</Text>
-							<Wrap borderWidth={'1px'} borderColor={'gray.300'} p={'0.5rem'} rounded={'md'}>
-								<Each
-									items={labels}
-									render={(label) => (
-										<WrapItem>
-											<Tag borderRadius='full' variant='solid' colorScheme='green'>
-												<TagLabel>{label}</TagLabel>
-												<TagCloseButton onClick={() => handleRemoveLabel(label)} />
-											</Tag>
-										</WrapItem>
-									)}
-								/>
-							</Wrap>
-							<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
-								<Input
-									type='text'
-									placeholder='Select tags'
-									value={label_input}
-									disabled
-									onChange={(e) => dispatch(addLabelInput(e.target.value))}
-								/>
-								<InputRightAddon px={0}>
-									<LabelFilter
-										labels={all_labels}
-										onAddLabel={(label) => handleAddLabel(label)}
-										onRemoveLabel={(label) => handleRemoveLabel(label)}
-										onClear={onClear}
-										selectedLabels={selectedLabels}
-									/>
-								</InputRightAddon>
-							</InputGroup>
-						</Box>
-
-						<Each
-							items={Object.keys(others)}
-							render={(key) => (
+							<HStack>
 								<Box width={'full'}>
-									<Text>{key}</Text>
-									<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
-										<Input
-											placeholder={`Enter ${key} value`}
-											type='text'
-											value={others[key] ?? ''}
-											onChange={(e) => dispatch(setOthers({ key, value: e.target.value }))}
-										/>
-										<InputRightElement>
-											<IconButton
-												aria-label='Remove field'
-												icon={<MdRemove />}
-												h='1.75rem'
-												size='sm'
-												onClick={() => dispatch(removeOtherKey(key))}
-											/>
-										</InputRightElement>
-									</InputGroup>
+									<Text>Middle name</Text>
+									<Input
+										placeholder='Middle name'
+										type='text'
+										value={middle_name ?? ''}
+										onChange={(e) => dispatch(setMiddleName(e.target.value))}
+									/>
 								</Box>
-							)}
-						/>
-					</VStack>
-				</DrawerBody>
+								<Box width={'full'}>
+									<Text>Last name</Text>
+									<Input
+										placeholder='Last name'
+										type='text'
+										value={last_name ?? ''}
+										onChange={(e) => dispatch(setLastName(e.target.value))}
+									/>
+								</Box>
+							</HStack>
+							<Box>
+								<Text>Email</Text>
+								<Input
+									placeholder='Email'
+									type='email'
+									value={email ?? ''}
+									onChange={(e) => dispatch(setEmail(e.target.value))}
+								/>
+							</Box>
 
-				<DrawerFooter width={'full'} justifyContent={'space-between'}>
-					<Text textColor='tomato'>{error ? error : ''}</Text>
-					<HStack>
-						<Button variant='outline' colorScheme='red' mr={3} onClick={handleClose}>
-							Cancel
-						</Button>
-						<Show>
-							<Show.When condition={update_phonebook && !!id}>
-								<Button isLoading={isSaving} colorScheme='green' onClick={handleSave}>
-									Save
-								</Button>
-							</Show.When>
-							<Show.When condition={!id}>
-								<Button isLoading={isSaving} colorScheme='green' onClick={handleSave}>
-									Save
-								</Button>
-							</Show.When>
-						</Show>
-					</HStack>
-				</DrawerFooter>
-			</DrawerContent>
-		</Drawer>
-	);
-});
+							<Box>
+								<Text>Phone Number</Text>
+								<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
+									<Input
+										type='tel'
+										placeholder='Phone number with country code'
+										value={phone_number ?? ''}
+										onChange={(e) => dispatch(setPhoneNumber(e.target.value))}
+									/>
+								</InputGroup>
+							</Box>
+							<Box>
+								<Text>Birthday</Text>
+								<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
+									<Input
+										type='date'
+										value={birthday ?? ''}
+										onChange={(e) => dispatch(setBirthday(e.target.value))}
+									/>
+								</InputGroup>
+							</Box>
+							<Box>
+								<Text>Anniversary</Text>
+								<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
+									<Input
+										type='date'
+										value={anniversary ?? ''}
+										onChange={(e) => dispatch(setAnniversary(e.target.value))}
+									/>
+								</InputGroup>
+							</Box>
+							<Box>
+								<Text>Tags</Text>
+								<Wrap borderWidth={'1px'} borderColor={'gray.300'} p={'0.5rem'} rounded={'md'}>
+									<Each
+										items={labels}
+										render={(label) => (
+											<WrapItem>
+												<Tag borderRadius='full' variant='solid' colorScheme='green'>
+													<TagLabel>{label}</TagLabel>
+													<TagCloseButton onClick={() => handleRemoveLabel(label)} />
+												</Tag>
+											</WrapItem>
+										)}
+									/>
+								</Wrap>
+								<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
+									<Input
+										type='text'
+										placeholder='Select tags'
+										value={label_input}
+										disabled
+										onChange={(e) => dispatch(addLabelInput(e.target.value))}
+									/>
+									<InputRightAddon px={0}>
+										<LabelFilter
+											labels={all_labels}
+											onAddLabel={(label) => handleAddLabel(label)}
+											onRemoveLabel={(label) => handleRemoveLabel(label)}
+											onClear={onClear}
+											selectedLabels={selectedLabels}
+										/>
+									</InputRightAddon>
+								</InputGroup>
+							</Box>
+
+							<Each
+								items={Object.keys(others)}
+								render={(key) => (
+									<Box width={'full'}>
+										<Text>{key}</Text>
+										<InputGroup bgColor={'transparent'} borderWidth={'1px'} rounded={'md'}>
+											<Input
+												placeholder={`Enter ${key} value`}
+												type='text'
+												value={others[key] ?? ''}
+												onChange={(e) => dispatch(setOthers({ key, value: e.target.value }))}
+											/>
+											<InputRightElement>
+												<IconButton
+													aria-label='Remove field'
+													icon={<MdRemove />}
+													h='1.75rem'
+													size='sm'
+													onClick={() => dispatch(removeOtherKey(key))}
+												/>
+											</InputRightElement>
+										</InputGroup>
+									</Box>
+								)}
+							/>
+						</VStack>
+					</DrawerBody>
+
+					<DrawerFooter width={'full'} justifyContent={'space-between'}>
+						<Text textColor='tomato'>{error ? error : ''}</Text>
+						<HStack>
+							<Button variant='outline' colorScheme='red' mr={3} onClick={handleClose}>
+								Cancel
+							</Button>
+							<Show>
+								<Show.When condition={update_phonebook && !!id}>
+									<Button isLoading={isSaving} colorScheme='green' onClick={handleSave}>
+										Save
+									</Button>
+								</Show.When>
+								<Show.When condition={!id}>
+									<Button isLoading={isSaving} colorScheme='green' onClick={handleSave}>
+										Save
+									</Button>
+								</Show.When>
+							</Show>
+						</HStack>
+					</DrawerFooter>
+				</DrawerContent>
+			</Drawer>
+		);
+	}
+);
 
 export default ContactInputDialog;
