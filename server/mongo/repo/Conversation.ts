@@ -34,6 +34,7 @@ const schema = new mongoose.Schema<IConversation>(
 		assigned_to: mongoose.Schema.Types.ObjectId,
 		origin: String,
 		last_message_at: Date,
+		note: String,
 	},
 	{
 		timestamps: { createdAt: true },

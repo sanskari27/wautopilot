@@ -44,6 +44,7 @@ import ContactSelectorDialog, {
 	ContactSelectorHandle,
 } from '../../../components/selector-dialog/ContactSelectorDialog';
 import AddMedia, { AddMediaHandle } from './add-media';
+import ConversationNotes, { ConversationNotesHandle } from './conversations-notes';
 import MessageTagsView, { MessageTagsViewHandle } from './message-tag-view';
 import { default as MessagesList } from './MessagesList';
 import QuickReply from './QuickReply';
@@ -56,6 +57,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 	const dispatch = useDispatch();
 
 	const messageTaggingRef = useRef<MessageTagsViewHandle>(null);
+	const conversationNotesRef = useRef<ConversationNotesHandle>(null);
 	const pagination = useRef({
 		page: 1,
 		loadMore: true,
@@ -175,6 +177,13 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 									>
 										View Messages Tags
 									</MenuItem>
+									<MenuItem
+										onClick={() => {
+											conversationNotesRef.current?.open();
+										}}
+									>
+										Conversation Notes
+									</MenuItem>
 								</MenuList>
 							</Menu>
 						)}
@@ -206,6 +215,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 				<MessageBox />
 			</Flex>
 			<MessageTagsView ref={messageTaggingRef} />
+			<ConversationNotes ref={conversationNotesRef} />
 		</>
 	);
 };

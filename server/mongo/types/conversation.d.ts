@@ -16,4 +16,5 @@ export default interface IConversation extends Document {
 	last_message_at: Date;
 	createdAt: Date;
 	assigned_to: Types.ObjectId;
+	note: string;
 }

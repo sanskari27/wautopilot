@@ -46,6 +46,7 @@ import AddMedia, { AddMediaHandle } from './add-media';
 import MessageTagsView, { MessageTagsViewHandle } from './message-tag-view';
 import { default as MessagesList } from './MessagesList';
 import QuickReply from './QuickReply';
+import ConversationNotes, { ConversationNotesHandle } from './conversations-notes';
 
 type ChatScreenProps = {
 	closeChat: () => void;
@@ -55,6 +56,8 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 	const dispatch = useDispatch();
 
 	const messageTaggingRef = useRef<MessageTagsViewHandle>(null);
+	const conversationNotesRef = useRef<ConversationNotesHandle>(null);
+
 	const pagination = useRef({
 		page: 1,
 		loadMore: true,
@@ -204,6 +207,7 @@ const ChatScreen = ({ closeChat }: ChatScreenProps) => {
 				<MessageBox />
 			</Flex>
 			<MessageTagsView ref={messageTaggingRef} />
+			<ConversationNotes ref={conversationNotesRef} />
 		</>
 	);
 };

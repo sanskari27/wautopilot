@@ -192,6 +192,24 @@ export default class MessagesService {
 		}
 	}
 
+	static async setNote(deviceId: string, recipientId: string, note: string) {
+		try {
+			await APIInstance.post(`/${deviceId}/conversation/${recipientId}/note`, { note });
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	static async getNote(deviceId: string, recipientId: string) {
+		try {
+			const { data } = await APIInstance.get(`/${deviceId}/conversation/${recipientId}/note`);
+			return data.note ?? '';
+		} catch (err) {
+			return '';
+		}
+	}
+
 	static async ConversationLabels(phone_number: string, labels: string[]) {
 		try {
 			await APIInstance.post(`/phonebook/set-labels/phone/${phone_number}`, {

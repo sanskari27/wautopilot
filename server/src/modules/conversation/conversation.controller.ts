@@ -346,6 +346,46 @@ async function exportConversationsFromPhonebook(req: Request, res: Response, nex
 	});
 }
 
+async function addNote(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount: account,
+		device: { device },
+		id,
+	} = req.locals;
+	const note = req.body.note;
+	if (note === undefined) {
+		return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
+	}
+	const conversationService = new ConversationService(account, device);
+	await conversationService.setNote(id, note);
+
+	return Respond({
+		res,
+		status: 200,
+	});
+}
+
+async function getNote(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount: account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	try {
+		const conversationService = new ConversationService(account, device);
+		const note = await conversationService.getNote(id);
+
+		return Respond({
+			res,
+			status: 200,
+			data: { note },
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 const Controller = {
 	fetchConversations,
 	fetchConversationMessages,
@@ -357,6 +397,8 @@ const Controller = {
 	assignLabelToMessage,
 	sendMessageToConversation,
 	exportConversationsFromPhonebook,
+	addNote,
+	getNote,
 };
 
 export default Controller;

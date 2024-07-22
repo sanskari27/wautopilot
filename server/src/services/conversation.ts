@@ -5,6 +5,8 @@ import IConversation from '../../mongo/types/conversation';
 import IConversationMessage from '../../mongo/types/conversationMessage';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
 import { MESSAGE_STATUS } from '../config/const';
+import { CustomError } from '../errors';
+import COMMON_ERRORS from '../errors/common-errors';
 import SocketServer from '../socket';
 import DateUtils from '../utils/DateUtils';
 import { filterUndefinedKeys } from '../utils/ExpressUtils';
@@ -652,5 +654,34 @@ export default class ConversationService extends WhatsappLinkService {
 				},
 			}
 		);
+	}
+
+	public async setNote(c_id: Types.ObjectId, note: string) {
+		await ConversationDB.updateOne(
+			{
+				linked_to: this.userId,
+				device_id: this.deviceId,
+				_id: c_id,
+			},
+			{
+				$set: {
+					note,
+				},
+			}
+		);
+	}
+
+	public async getNote(c_id: Types.ObjectId) {
+		const doc = await ConversationDB.findOne({
+			linked_to: this.userId,
+			device_id: this.deviceId,
+			_id: c_id,
+		});
+
+		if (!doc) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+
+		return doc.note;
 	}
 }
