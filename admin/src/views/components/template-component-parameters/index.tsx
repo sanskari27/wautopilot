@@ -107,8 +107,9 @@ const TemplateComponentParameter = ({
 				<Text fontSize={'2xl'} fontWeight={'medium'}>
 					Template details
 				</Text>
-				<FormControl hidden={!header || header.type === 'TEXT' || header.type === ''} mt={'1rem'}>
-					{/* <FormLabel hidden={true}>Header media link</FormLabel>
+				{header && (
+					<FormControl hidden={!header || header.type === 'TEXT' || header.type === ''} mt={'1rem'}>
+						{/* <FormLabel hidden={true}>Header media link</FormLabel>
 					<Input
 						hidden={true}
 						placeholder='Media file link'
@@ -143,35 +144,36 @@ const TemplateComponentParameter = ({
 							or
 						</AbsoluteCenter>
 					</Box> */}
-					<Box marginTop={'0.5rem'}>
-						<FormLabel mb={'0.5rem'}>Select header media</FormLabel>
-						<Button
-							width={'full'}
-							variant={'outline'}
-							colorScheme='teal'
-							onClick={() =>
-								attachmentSelectorRef.current?.open({
-									type:
-										header.type === 'IMAGE'
-											? 'PHOTOS'
-											: header.type === 'VIDEO'
-											? 'VIDEO'
-											: 'DOCUMENT',
-									ids: [],
-								})
-							}
-							textTransform={'capitalize'}
-						>
-							Select {header.type.toLowerCase()}
-						</Button>
-						<AttachmentSelectorDialog
-							onConfirm={attachmentSelectorId}
-							ref={attachmentSelectorRef}
-							selectButtonText='Select'
-							returnType='id'
-						/>
-					</Box>
-				</FormControl>
+						<Box marginTop={'0.5rem'}>
+							<FormLabel mb={'0.5rem'}>Select header media</FormLabel>
+							<Button
+								width={'full'}
+								variant={'outline'}
+								colorScheme='teal'
+								onClick={() =>
+									attachmentSelectorRef.current?.open({
+										type:
+											header.type === 'IMAGE'
+												? 'PHOTOS'
+												: header.type === 'VIDEO'
+												? 'VIDEO'
+												: 'DOCUMENT',
+										ids: [],
+									})
+								}
+								textTransform={'capitalize'}
+							>
+								Select {header.type.toLowerCase()}
+							</Button>
+							<AttachmentSelectorDialog
+								onConfirm={attachmentSelectorId}
+								ref={attachmentSelectorRef}
+								selectButtonText='Select'
+								returnType='id'
+							/>
+						</Box>
+					</FormControl>
+				)}
 				<FormControl gap={3} mt={'1rem'} hidden={body.length === 0}>
 					<FormLabel>Template body details</FormLabel>
 					<Each

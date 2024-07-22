@@ -9,6 +9,7 @@ import SocketServer from '../socket';
 import DateUtils from '../utils/DateUtils';
 import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import PhoneBookService from './phonebook';
+import UserService from './user';
 import WhatsappLinkService from './whatsappLink';
 
 function processConversationDocs(
@@ -58,10 +59,17 @@ export default class ConversationService extends WhatsappLinkService {
 
 	public async createConversation(recipient: string, name?: string) {
 		try {
+			const agents = (await (await UserService.findById(this.userId)).getAgents()).filter(
+				(val) => val.permissions.auto_assign_chats
+			);
+
+			const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+
 			const doc = await ConversationDB.create({
 				linked_to: this.userId,
 				device_id: this.deviceId,
 				recipient,
+				assigned_to: randomAgent.id,
 			});
 
 			const phoneBookService = new PhoneBookService(this.account);

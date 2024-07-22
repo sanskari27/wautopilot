@@ -180,7 +180,7 @@ const CreateRecurring = () => {
 			});
 			hasError = true;
 		}
-		if (delay < 1) {
+		if (isNaN(Number(delay))) {
 			toast({
 				title: 'Invalid Delay',
 				status: 'error',
@@ -208,7 +208,11 @@ const CreateRecurring = () => {
 			});
 			hasError = true;
 		}
-		if (template_header.type === ('IMAGE' || 'VIDEO' || 'DOCUMENT') && !template_header.media_id) {
+		if (
+			template_header &&
+			template_header.type === ('IMAGE' || 'VIDEO' || 'DOCUMENT') &&
+			!template_header.media_id
+		) {
 			toast({
 				title: 'Header media is required',
 				status: 'error',
@@ -371,7 +375,6 @@ const CreateRecurring = () => {
 					<FormLabel>Delay (in days)</FormLabel>
 					<Input
 						type={'number'}
-						min={'0'}
 						placeholder={'eg. 3'}
 						value={Number(delay)}
 						onChange={(e) => dispatch(setRecurringDelay(e.target.value))}

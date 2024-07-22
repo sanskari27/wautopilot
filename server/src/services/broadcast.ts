@@ -784,7 +784,7 @@ export default class BroadcastService extends WhatsappLinkService {
 			linked_to: IAccount;
 		}>('device_id linked_to');
 
-		const today = DateUtils.getDate('YYYY-MM-DD');
+		const today = DateUtils.getDate('MM-DD');
 
 		recurringBroadcasts.forEach(async (broadcast) => {
 			const phoneBook = new PhoneBookService(broadcast.linked_to);
@@ -803,16 +803,20 @@ export default class BroadcastService extends WhatsappLinkService {
 				if (!record.phone_number) {
 					return false;
 				}
-				if (
-					broadcast.wish_from === 'birthday' &&
-					DateUtils.getMoment(record.birthday).format('YYYY-MM-DD') === today
-				) {
-					return true;
-				} else if (
-					broadcast.wish_from === 'anniversary' &&
-					DateUtils.getMoment(record.anniversary).format('YYYY-MM-DD') === today
-				) {
-					return true;
+				if (broadcast.wish_from === 'birthday') {
+					if (
+						DateUtils.getMoment(record.birthday).add(broadcast.delay, 'days').format('MM-DD') ===
+						today
+					) {
+						return true;
+					}
+				} else if (broadcast.wish_from === 'anniversary') {
+					if (
+						DateUtils.getMoment(record.anniversary).add(broadcast.delay, 'days').format('MM-DD') ===
+						today
+					) {
+						return true;
+					}
 				}
 				return false;
 			});

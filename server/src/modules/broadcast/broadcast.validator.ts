@@ -148,7 +148,7 @@ export async function CreateRecurringValidator(req: Request, res: Response, next
 				})
 			)
 			.default([]),
-		delay: z.number().nonnegative().default(0),
+		delay: z.number().default(0),
 		startTime: z.string().trim().default('00:01'),
 		endTime: z.string().trim().default('23:59'),
 	});
