@@ -24,7 +24,7 @@ export default function PhoneNumberButton({ disabled }: { disabled: boolean }) {
 	const dispatch = useDispatch();
 
 	const onSave = () => {
-		dispatch(addPhoneNumberButton({ text, phoneNumber }));
+		dispatch(addPhoneNumberButton({ text, phone_number: phoneNumber }));
 		onClose();
 	};
 

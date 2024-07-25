@@ -42,10 +42,32 @@ export default class TemplateService {
 	}
 
 	static async addTemplate(device_id: string, template: Record<string, unknown>) {
-		await APIInstance.post(`/${device_id}/template/add-template`, template);
+		let error = '';
+		try {
+			const { data } = await APIInstance.post(`/${device_id}/template/add-template`, template);
+			if (data.error) {
+				error = data.error;
+			}
+		} catch (err) {
+			throw new Error('Unable to add template');
+		}
+		if (error) {
+			throw new Error(error);
+		}
 	}
 
 	static async editTemplate(device_id: string, template: Record<string, unknown>) {
-		await APIInstance.post(`/${device_id}/template/edit-template`, template);
+		let error = '';
+		try {
+			const { data } = await APIInstance.post(`/${device_id}/template/edit-template`, template);
+			if (data.error) {
+				error = data.error;
+			}
+		} catch (err) {
+			throw new Error('Unable to add template');
+		}
+		if (error) {
+			throw new Error(error);
+		}
 	}
 }

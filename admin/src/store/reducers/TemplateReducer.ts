@@ -162,14 +162,14 @@ const Slice = createSlice({
 			state,
 			action: PayloadAction<{
 				text: string;
-				phoneNumber: string;
+				phone_number: string;
 			}>
 		) => {
 			const button = state.details.components.find((c: any) => c.type === 'BUTTONS');
 			if (button) {
 				button.buttons.push({
 					text: action.payload.text,
-					phoneNumber: action.payload.phoneNumber,
+					phone_number: action.payload.phone_number,
 					type: 'PHONE_NUMBER',
 				});
 			} else {
@@ -178,7 +178,7 @@ const Slice = createSlice({
 					buttons: [
 						{
 							text: action.payload.text,
-							phoneNumber: action.payload.phoneNumber,
+							phone_number: action.payload.phone_number,
 							type: 'PHONE_NUMBER',
 						},
 					],

@@ -158,8 +158,11 @@ export default function EditTemplate() {
 					isClosable: true,
 				};
 			},
-			error: {
-				title: 'Failed to save template',
+			error: (err) => {
+				return {
+					title: 'Failed to save template',
+					description: err.message || 'An error occurred while saving the template',
+				};
 			},
 			loading: {
 				title: 'Saving Template',

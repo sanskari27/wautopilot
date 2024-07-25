@@ -16,10 +16,16 @@ async function addTemplate(req: Request, res: Response, next: NextFunction) {
 
 	try {
 		const templateService = new TemplateService(account, device);
-		const success = await templateService.addTemplate(data as Template);
+		const error = await templateService.addTemplate(data as Template);
 
-		if (!success) {
-			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+		if (error) {
+			return Respond({
+				res,
+				status: 200,
+				data: {
+					error,
+				},
+			});
 		}
 
 		agentLogService?.addLog({
@@ -46,10 +52,15 @@ async function editTemplate(req: Request, res: Response, next: NextFunction) {
 		const { id, ...data } = req.locals.data as Template & { id: string };
 
 		const templateService = new TemplateService(account, device);
-		const success = await templateService.editTemplate(id, data);
-
-		if (!success) {
-			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+		const error = await templateService.editTemplate(id, data);
+		if (error) {
+			return Respond({
+				res,
+				status: 200,
+				data: {
+					error,
+				},
+			});
 		}
 
 		agentLogService?.addLog({
@@ -64,6 +75,8 @@ async function editTemplate(req: Request, res: Response, next: NextFunction) {
 			status: 200,
 		});
 	} catch (err) {
+		console.log(err);
+
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }

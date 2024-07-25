@@ -1,3 +1,4 @@
+import axios from 'axios';
 import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
 import MetaAPI from '../config/MetaAPI';
@@ -18,18 +19,22 @@ export default class TemplateService extends WhatsappLinkService {
 	public async addTemplate(details: Template) {
 		try {
 			await MetaAPI(this.accessToken).post(`/${this.waid}/message_templates`, details);
-			return true;
 		} catch (err) {
-			return false;
+			if (axios.isAxiosError(err)) {
+				return (err.response as any).data.error.error_user_msg;
+			}
+			return 'An error occurred';
 		}
 	}
 
 	public async editTemplate(id: string, details: Template) {
 		try {
 			await MetaAPI(this.accessToken).post(`/${id}`, details);
-			return true;
 		} catch (err) {
-			return false;
+			if (axios.isAxiosError(err)) {
+				return (err.response as any).data.error.error_user_msg;
+			}
+			return 'An error occurred';
 		}
 	}
 
