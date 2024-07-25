@@ -302,7 +302,7 @@ export default function EditTemplate() {
 						<InputGroup size='sm' my={'0.25rem'} hidden={bodyVariables === 0}>
 							<InputLeftAddon>Example Values (Total:- {bodyVariables})</InputLeftAddon>
 							<Input
-								placeholder='eg. Dave'
+								placeholder='eg. Dave, John, 1234567890 (Comma separated)'
 								onChange={(e) => dispatch(setBodyExample(e.target.value))}
 							/>
 						</InputGroup>

@@ -244,7 +244,7 @@ const AssignConversationLabelDialog = forwardRef<AssignConversationLabelDialogHa
 				</ModalBody>
 
 				<ModalFooter>
-					<HStack width={'full'} justifyContent={'flex-end'}>
+					<HStack width={'full'} justifyContent={'flex-start'}>
 						<Button onClick={onClose} colorScheme='red' isDisabled={isSaving}>
 							Cancel
 						</Button>

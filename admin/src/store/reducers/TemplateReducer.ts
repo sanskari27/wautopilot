@@ -62,7 +62,7 @@ const Slice = createSlice({
 			state.details.category = action.payload;
 		},
 		setTemplateName: (state, action: PayloadAction<string>) => {
-			state.details.name = action.payload.replace(/ /g, '_');
+			state.details.name = action.payload.replace(/ /g, '_').toLowerCase();
 		},
 		setHeaderType: (state, action: PayloadAction<string>) => {
 			state.details.components = state.details.components.filter(
@@ -140,19 +140,23 @@ const Slice = createSlice({
 			});
 		},
 		addQuickReply: (state, action: PayloadAction<string>) => {
-			state.details.components = state.details.components.map((c: any) => {
-				if (c.type !== 'BUTTONS') return c;
-				return {
+			const button = state.details.components.find((c: any) => c.type === 'BUTTONS');
+			if (button) {
+				button.buttons.push({
+					text: action.payload,
+					type: 'QUICK_REPLY',
+				});
+			} else {
+				state.details.components.push({
 					type: 'BUTTONS',
 					buttons: [
-						...c.buttons,
 						{
 							text: action.payload,
 							type: 'QUICK_REPLY',
 						},
 					],
-				};
-			});
+				});
+			}
 		},
 		addPhoneNumberButton: (
 			state,
@@ -161,20 +165,25 @@ const Slice = createSlice({
 				phoneNumber: string;
 			}>
 		) => {
-			state.details.components = state.details.components.map((c: any) => {
-				if (c.type !== 'BUTTONS') return c;
-				return {
+			const button = state.details.components.find((c: any) => c.type === 'BUTTONS');
+			if (button) {
+				button.buttons.push({
+					text: action.payload.text,
+					phoneNumber: action.payload.phoneNumber,
+					type: 'PHONE_NUMBER',
+				});
+			} else {
+				state.details.components.push({
 					type: 'BUTTONS',
 					buttons: [
-						...c.buttons,
 						{
 							text: action.payload.text,
-							phone_number: action.payload.phoneNumber,
+							phoneNumber: action.payload.phoneNumber,
 							type: 'PHONE_NUMBER',
 						},
 					],
-				};
-			});
+				});
+			}
 		},
 		addURLButton: (
 			state,
@@ -183,20 +192,25 @@ const Slice = createSlice({
 				url: string;
 			}>
 		) => {
-			state.details.components = state.details.components.map((c: any) => {
-				if (c.type !== 'BUTTONS') return c;
-				return {
+			const button = state.details.components.find((c: any) => c.type === 'BUTTONS');
+			if (button) {
+				button.buttons.push({
+					text: action.payload.text,
+					url: action.payload.url,
+					type: 'URL',
+				});
+			} else {
+				state.details.components.push({
 					type: 'BUTTONS',
 					buttons: [
-						...c.buttons,
 						{
 							text: action.payload.text,
 							url: action.payload.url,
 							type: 'URL',
 						},
 					],
-				};
-			});
+				});
+			}
 		},
 	},
 });

@@ -30,11 +30,13 @@ export default function SampleMessage({ components }: Props) {
 		>
 			<Box height={'full'} bgColor={'white'} rounded={'2xl'} overflow={'hidden'}>
 				<Box bgColor={'teal.900'} height={'20px'} borderTopRadius={'2xl'} />
-				<Flex bgColor={'teal.700'} height={'50px'} alignItems={'center'} px={'0.5rem'} gap={3}>
-					<Avatar name='Dan Abrahmov' src='https://bit.ly/dan-abramov' size={'sm'} />
-					<Text color={'white'}>Dan Abrahmov</Text>
+				<Flex bgColor={'teal.700'} height={'90px'} alignItems={'center'} px={'0.5rem'} gap={3}>
+					<Avatar name='Prashant Varma' src='https://bit.ly/dan-abramov' size={'lg'} />
+					<Text color={'white'} fontSize={'1.25rem'} fontWeight={'medium'}>
+						Prashant Varma
+					</Text>
 				</Flex>
-				<Box padding={'1rem'} height={'500px'} bgColor={'#ece9e2'}>
+				<Box padding={'1rem'} height={'700px'} bgColor={'#ece9e2'}>
 					<Box bgColor={'white'} rounded={'2xl'} p={'0.5rem'}>
 						<Box hidden={!header}>
 							{header?.format === 'TEXT' && <Text fontWeight={'medium'}>{header.text}</Text>}
