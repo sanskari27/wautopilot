@@ -62,6 +62,8 @@ export default function AllResponders() {
 		navigate(`${NAVIGATION.APP}/${NAVIGATION.CHATBOT}/${id}`);
 	};
 
+	console.log(isLoading);
+
 	return (
 		<>
 			<TableContainer border={'1px dashed gray'} rounded={'2xl'}>

@@ -28,6 +28,7 @@ import {
 } from '../../../store/reducers/DevicesReducers';
 import { setLoadingLinks, setShortenLinksList } from '../../../store/reducers/LinkShortenerReducer';
 import { setMediaFetching, setMediaList } from '../../../store/reducers/MediaReducer';
+import { setQuickReplyList } from '../../../store/reducers/MessagesReducers';
 import { setRecipientsList, setRecipientsLoading } from '../../../store/reducers/RecipientReducer';
 import { setRecurringList } from '../../../store/reducers/RecurringReducer';
 import { setTemplateFetching, setTemplatesList } from '../../../store/reducers/TemplateReducer';
@@ -39,7 +40,6 @@ import {
 import { Contact } from '../../../store/types/ContactState';
 import AppNavbar from '../../components/navbar/AppNavbar';
 import NavigationDrawer from '../../components/navbar/NavigationDrawer';
-import { setQuickReplyList } from '../../../store/reducers/MessagesReducers';
 
 const AppPage = () => {
 	const outlet = useOutlet();
@@ -65,7 +65,11 @@ const AppPage = () => {
 		try {
 			AuthService.userDetails().then((user) => user && dispatch(setUserDetails(user)));
 
-			const promises = [APIInstance.get(`/contacts`), AgentService.getAgent(), MessagesService.fetchQuickReplies()];
+			const promises = [
+				APIInstance.get(`/contacts`),
+				AgentService.getAgent(),
+				MessagesService.fetchQuickReplies(),
+			];
 
 			const results = await Promise.all(promises);
 			dispatch(setContactList(results[0].data.contacts as Contact[]));
@@ -84,6 +88,8 @@ const AppPage = () => {
 				dispatch(setMediaFetching(false));
 				dispatch(setTemplateFetching(false));
 				dispatch(setLoadingLinks(true));
+				dispatch(setChatbotLoading(true));
+				dispatch(setLoading(true));
 
 				const promises = [
 					MessagesService.fetchAllConversation(selected_device_id),

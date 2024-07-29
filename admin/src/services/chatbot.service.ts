@@ -71,6 +71,10 @@ const validateChatBot = (bots: any) => {
 					},
 				};
 			}),
+			forward: {
+				number: bot.forward?.number ?? '',
+				message: bot.forward?.message ?? '',
+			},
 			isActive: bot.isActive ?? true,
 		};
 	});
@@ -138,6 +142,10 @@ export default class ChatBotService {
 					media_id?: string;
 				};
 			}[];
+			forward:{
+				number: string;
+				message: string;
+			}
 		};
 	}) {
 		if (details.respond_type === 'normal') {
@@ -253,6 +261,10 @@ export default class ChatBotService {
 					media_id?: string;
 				};
 			}[];
+			forward:{
+				number: string;
+				message: string;
+			}
 		};
 	}) {
 		if (details.respond_type === 'normal') {

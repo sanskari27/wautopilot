@@ -47,7 +47,7 @@ export type ChatBot = {
 		fallback_value: string;
 	}[];
 	template_header: {
-		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | '' ;
+		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | '';
 		link: string;
 		media_id: string;
 	};
@@ -73,4 +73,8 @@ export type ChatBot = {
 			media_id: string;
 		};
 	}[];
+	forward: {
+		number: string;
+		message: string;
+	};
 };

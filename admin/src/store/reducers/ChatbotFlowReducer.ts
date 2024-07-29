@@ -15,7 +15,7 @@ const initState: ChatbotFlowState = {
 	ui: {
 		isAddingBot: false,
 		isEditingBot: false,
-		isLoading: true,
+		isLoading: false,
 	},
 };
 

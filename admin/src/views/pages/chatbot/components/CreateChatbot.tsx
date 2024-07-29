@@ -1,6 +1,8 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import { CheckIcon, ChevronLeftIcon } from '@chakra-ui/icons';
 import {
+	AbsoluteCenter,
+	Box,
 	Button,
 	Divider,
 	Flex,
@@ -33,6 +35,8 @@ import {
 	setChatbot,
 	setCondition,
 	setEndAt,
+	setForwardMessage,
+	setForwardNumber,
 	setHeaderFile,
 	setRespondTo,
 	setRespondType,
@@ -53,7 +57,7 @@ import {
 } from '../../../../store/reducers/ChatBotReducer';
 import TemplateComponentParameter from '../../../components/template-component-parameters';
 import Each from '../../../components/utils/Each';
-import { NumberInput, SelectElement, TextAreaElement } from './Inputs';
+import { NumberInput, SelectElement, TextAreaElement, TextInput } from './Inputs';
 import LeadsNurturing, { LeadsNurturingHandle } from './LeadsNurturingDialog';
 import StaticMessageInput from './StaticMessageInput';
 
@@ -95,6 +99,7 @@ export default function CreateChatBot() {
 		template_id,
 		respond_type,
 		nurturing,
+		forward,
 	} = details;
 	const { isAddingBot, isEditingBot } = ui;
 
@@ -535,6 +540,33 @@ export default function CreateChatBot() {
 						Leads Nurturing ({nurturing.length})
 					</Button>
 					<LeadsNurturing ref={leadsNurtureRef} />
+				</Flex>
+				{/* -------------------------------- FORWARD SECTION -------------------------- */}
+				<Flex direction={'column'} gap={2} mt={'1rem'}>
+					<Box position='relative'>
+						<Divider height='2px' />
+						<AbsoluteCenter bg='white' px='4' color='gray.500'>
+							Forward Leads
+						</AbsoluteCenter>
+					</Box>
+					<Box flex={1} mt={'0.5rem'}>
+						<Text className='text-gray-700 dark:text-gray-400'>Forward To (without +)</Text>
+						<TextInput
+							placeholder='ex 9175XXXXXX68'
+							value={forward.number ?? ''}
+							onChangeText={(text) => dispatch(setForwardNumber(text))}
+						/>
+					</Box>
+
+					<Box flex={1}>
+						<Text className='text-gray-700 dark:text-gray-400'>Forward Message</Text>
+						<TextAreaElement
+							value={forward.message ?? ''}
+							onChange={(e) => dispatch(setForwardMessage(e.target.value))}
+							isInvalid={false}
+							placeholder={'ex. Forwarded Lead'}
+						/>
+					</Box>
 				</Flex>
 
 				<Divider my={'1rem'} />

@@ -33,6 +33,10 @@ const initState: ChatBotState = {
 			link: '',
 			media_id: '',
 		},
+		forward: {
+			number: '',
+			message: '',
+		},
 	},
 	trigger_gap: {
 		time: 1,
@@ -46,7 +50,7 @@ const initState: ChatBotState = {
 	ui: {
 		isAddingBot: false,
 		isEditingBot: false,
-		isLoading: true,
+		isLoading: false,
 	},
 };
 
@@ -374,6 +378,12 @@ const Slice = createSlice({
 		setChatbotLoading: (state, action: PayloadAction<boolean>) => {
 			state.ui.isLoading = action.payload;
 		},
+		setForwardMessage: (state, action: PayloadAction<string>) => {
+			state.details.forward.message = action.payload;
+		},
+		setForwardNumber: (state, action: PayloadAction<string>) => {
+			state.details.forward.number = action.payload;
+		},
 	},
 });
 
@@ -425,6 +435,8 @@ export const {
 	setHeaderMediaId,
 	reset,
 	setChatbotLoading,
+	setForwardMessage,
+	setForwardNumber,
 } = Slice.actions;
 
 export default Slice.reducer;
