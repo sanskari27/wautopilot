@@ -9,7 +9,7 @@ import useFilterLabels from './hooks/useFilterLabels';
 import usePermissions from './hooks/usePermissions';
 import InvalidPage from './views/components/invalid-page';
 
-const BroadcastReport = lazy(() => import('./views/pages/broadcast-report'));
+// const BroadcastReport = lazy(() => import('./views/pages/broadcast-report'));
 const AppPage = lazy(() => import('./views/pages/app'));
 const Conversation = lazy(() => import('./views/pages/conversation'));
 const ContactPage = lazy(() => import('./views/pages/contacts'));
@@ -76,13 +76,13 @@ function App() {
 								)}
 								{recurring.update && <Route path={':id'} element={<CreateRecurring />} />}
 							</Route>
-							{broadcast.report && (
+							{/* {broadcast.report && (
 								<Route path={NAVIGATION.BROADCAST_REPORT} element={<BroadcastReport />}>
 									{buttons.read && (
 										<Route path={'button-report/:campaignId'} element={<ButtonResponseReport />} />
 									)}
 								</Route>
-							)}
+							)} */}
 							<Route path={NAVIGATION.CONTACT} element={<ContactPage />} />
 							<Route path={NAVIGATION.INBOX} element={<Conversation />} />
 							<Route path={NAVIGATION.CHATBOT} element={<ChatBot />}>

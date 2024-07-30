@@ -5,7 +5,7 @@ import { FaTasks } from 'react-icons/fa';
 import { IconType } from 'react-icons/lib';
 import { MdContacts, MdOutlineDashboard, MdOutlinePermMedia, MdSettings } from 'react-icons/md';
 import { RiContactsBook2Line, RiFlowChart } from 'react-icons/ri';
-import { TbLogout2, TbMessage2Plus, TbReportSearch, TbTemplate } from 'react-icons/tb';
+import { TbLogout2, TbMessage2Plus, TbTemplate } from 'react-icons/tb';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { NAVIGATION, WEBPAGE_URL } from '../../../config/const';
@@ -109,14 +109,14 @@ export default function NavigationDrawer({
 								icon={BiCake}
 								name='Recurring'
 							/>
-							{broadcast.report && (
+							{/* {broadcast.report && (
 								<MenuButton
 									setDrawerExpanded={setDrawerExpanded}
 									route={NAVIGATION.BROADCAST_REPORT}
 									icon={TbReportSearch}
 									name='Report'
 								/>
-							)}
+							)} */}
 							<MenuButton
 								setDrawerExpanded={setDrawerExpanded}
 								route={NAVIGATION.INBOX}
