@@ -256,7 +256,7 @@ export default class SchedulerService extends WhatsappLinkService {
 					media_id: ['image', 'video', 'document', 'audio', 'MEDIA'].includes(data.type)
 						? data[data.type]?.id
 						: undefined,
-					text: data.text,
+					text: data.text?.body,
 					contacts: data.contacts,
 					location: data.location,
 				},
