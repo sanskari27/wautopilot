@@ -45,7 +45,7 @@ export default function SignupPage() {
 		const success = await AuthService.register(values);
 		setLoading(false);
 		if (success) {
-			router.push(searchParams.get('callback') ?? '/dashboard');
+			router.push(searchParams.get('callback') ?? '/');
 		} else {
 			setError('email', { message: 'User already exists...' });
 		}

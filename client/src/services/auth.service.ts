@@ -160,6 +160,7 @@ export default class AuthService {
 			return null;
 		}
 	}
+
 	static async confirmPayment(transaction_id: string) {
 		try {
 			await api.post(`/payment/confirm-transaction/${transaction_id}`);

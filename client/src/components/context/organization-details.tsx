@@ -2,54 +2,34 @@
 
 import * as React from 'react';
 
-export type OrganizationDetailsType = {
-	id: string;
+export type UserDetailsType = {
 	name: string;
-	domain: string;
-	industry: string;
-	logo: string;
-	timezone: string;
-	address: {
-		street: string;
-		city: string;
-		state: string;
-		country: string;
-		zip: string;
-	};
-	is_owner: boolean;
-	categories: string[];
+	email: string;
+	phone: string;
+	isSubscribed: boolean;
+	subscription_expiry: string;
+	walletBalance: number;
+	no_of_devices: number;
 };
 
-const OrganizationDetailsContext = React.createContext<OrganizationDetailsType>({
-	id: '',
+const UserDetailsContext = React.createContext<UserDetailsType>({
 	name: '',
-	domain: '',
-	industry: '',
-	logo: '',
-	timezone: '',
-	address: {
-		street: '',
-		city: '',
-		state: '',
-		country: '',
-		zip: '',
-	},
-	categories: [],
-	is_owner: false,
+	email: '',
+	phone: '',
+	isSubscribed: false,
+	subscription_expiry: '',
+	walletBalance: 0,
+	no_of_devices: 0,
 });
 
-export function OrganizationDetailsProvider({
+export function UserDetailsProvider({
 	children,
 	data,
 }: {
 	children: React.ReactNode;
-	data: OrganizationDetailsType;
+	data: UserDetailsType;
 }) {
-	return (
-		<OrganizationDetailsContext.Provider value={data}>
-			{children}
-		</OrganizationDetailsContext.Provider>
-	);
+	return <UserDetailsContext.Provider value={data}>{children}</UserDetailsContext.Provider>;
 }
 
-export const useOrganizationDetails = () => React.useContext(OrganizationDetailsContext);
+export const useUserDetails = () => React.useContext(UserDetailsContext);

@@ -9,15 +9,8 @@ export async function middleware(request: NextRequest) {
 		master,
 	} = await AuthService.isAuthenticated();
 
-	console.log('middleware', isAuthenticated, admin, agent, master);
-
 	const pathname = request.nextUrl.pathname;
 
-	if (pathname.startsWith('/dashboard')) {
-		if (!admin && !agent) {
-			return Response.redirect(new URL(`/auth/login?callback=${pathname}`, request.url));
-		}
-	}
 	if (pathname.startsWith('/auth')) {
 		if (isAuthenticated) {
 			const callback = request.nextUrl.searchParams.get('callback');
@@ -28,11 +21,27 @@ export async function middleware(request: NextRequest) {
 			}
 		}
 	}
-	if (pathname.startsWith('/admin')) {
+
+	const subpath = master ? '/master' : admin ? '/admin' : agent ? '/agent' : '';
+	if (pathname === '/') {
 		if (!isAuthenticated) {
 			return Response.redirect(new URL(`/auth/login?callback=${pathname}`, request.url));
-		} else if (!admin) {
-			return Response.redirect(new URL(`/dashboard`, request.url));
+		} else {
+			return Response.redirect(new URL(`${subpath}/dashboard`, request.url));
+		}
+	}
+
+	if (pathname.startsWith('/admin')) {
+		if (!admin) {
+			return Response.redirect(new URL(`${subpath}/dashboard`, request.url));
+		}
+	} else if (pathname.startsWith('/master')) {
+		if (!master) {
+			return Response.redirect(new URL(`${subpath}/dashboard`, request.url));
+		}
+	} else if (pathname.startsWith('/agent')) {
+		if (!agent) {
+			return Response.redirect(new URL(`${subpath}/dashboard`, request.url));
 		}
 	}
 }

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LOGO_PRIMARY } from '@/lib/consts';
 import { loginSchema } from '@/schema/auth';
+import AuthService from '@/services/auth.service';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
@@ -16,7 +17,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import AuthService from '@/services/auth.service';
 
 export default function LoginForm() {
 	const router = useRouter();
@@ -42,7 +42,7 @@ export default function LoginForm() {
 		const success = await AuthService.login(values.email, values.password);
 		setLoading(false);
 		if (success) {
-			router.push(searchParams.get('callback') ?? '/dashboard');
+			router.push(searchParams.get('callback') ?? '/');
 		} else {
 			setError('password', { message: 'Invalid Credentials' });
 		}

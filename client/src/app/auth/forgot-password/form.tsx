@@ -7,17 +7,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LOGO_PRIMARY } from '@/lib/consts';
 import { forgotSchema } from '@/schema/auth';
+import AuthService from '@/services/auth.service';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
 import { z } from 'zod';
 
 export default function ForgotPassword() {
 	const router = useRouter();
+	const pathname = usePathname();
 	const [loading, setLoading] = useState(false);
 	const {
 		handleSubmit,
@@ -33,15 +36,18 @@ export default function ForgotPassword() {
 	});
 
 	async function formSubmit(values: z.infer<typeof forgotSchema>) {
-		// setLoading(true);
-		// const success = await AuthService.forgotPassword(values.email);
-		// setLoading(false);
-		// if (success) {
-		// 	toast.success('Password reset link sent to your email');
-		// 	router.push('/auth/login');
-		// } else {
-		// 	setError('email', { message: 'Invalid Credentials' });
-		// }
+		setLoading(true);
+		const success = await AuthService.forgotPassword(
+			values.email,
+			window.location.origin + '/auth/reset-password'
+		);
+		setLoading(false);
+		if (success) {
+			toast.success('Password reset link sent to your email');
+			router.push('/auth/login');
+		} else {
+			setError('email', { message: 'Invalid Credentials' });
+		}
 	}
 
 	return (
