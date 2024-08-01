@@ -11,20 +11,7 @@ import {
 
 const router = express.Router();
 
-router
-	.route('/validate-auth/master')
-	.all(VerifySession, VerifyMinLevel(UserLevel.Master))
-	.get(Controller.validateAuth);
-
-router
-	.route('/validate-auth/admin')
-	.all(VerifySession, VerifyMinLevel(UserLevel.Admin))
-	.get(Controller.validateAuth);
-
-router
-	.route('/validate-auth/agent')
-	.all(VerifySession, VerifyMinLevel(UserLevel.Agent))
-	.get(Controller.validateAuth);
+router.route('/validate-auth').all(VerifySession).get(Controller.validateAuth);
 
 router.route('/details').all(VerifySession).get(Controller.details);
 

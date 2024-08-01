@@ -165,9 +165,15 @@ async function register(req: Request, res: Response, next: NextFunction) {
 }
 
 async function validateAuth(req: Request, res: Response, next: NextFunction) {
+	const { user } = req.locals;
 	return Respond({
 		res,
 		status: 200,
+		data: {
+			isAdmin: user.userLevel === UserLevel.Admin,
+			isAgent: user.userLevel === UserLevel.Agent,
+			isMaster: user.userLevel === UserLevel.Master,
+		},
 	});
 }
 

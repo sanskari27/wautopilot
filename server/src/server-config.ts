@@ -13,6 +13,7 @@ import BroadcastService from './services/broadcast';
 import SchedulerService from './services/scheduler';
 
 const allowlist = [
+	'http://localhost:3001',
 	'http://localhost:5173',
 	'http://localhost:5273',
 	'http://localhost:5274',
