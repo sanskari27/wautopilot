@@ -10,7 +10,6 @@ import { WhatsappLinkCreateValidationResult } from './whatsappLink.validator';
 
 async function getAllLinkedDevices(req: Request, res: Response, next: NextFunction) {
 	try {
-		//TODO: Implement for agents too
 		const devices = await WhatsappLinkService.fetchRecords(req.locals.serviceAccount._id);
 
 		return Respond({
@@ -18,6 +17,7 @@ async function getAllLinkedDevices(req: Request, res: Response, next: NextFuncti
 			status: 200,
 			data: {
 				devices,
+				currentDevice: req.cookies[Cookie.Device],
 			},
 		});
 	} catch (err) {
@@ -95,6 +95,19 @@ async function removeDevice(req: Request, res: Response, next: NextFunction) {
 
 	try {
 		await WhatsappLinkService.deleteRecord(account._id, id);
+
+		if (req.cookies[Cookie.Device] === id) {
+			const devices = await WhatsappLinkService.fetchRecords(account._id);
+			if (devices.length > 0) {
+				setCookie(res, {
+					key: Cookie.Device,
+					value: devices[0].id,
+					expires: SESSION_EXPIRE_TIME,
+				});
+			} else {
+				res.clearCookie(Cookie.Device);
+			}
+		}
 		return Respond({
 			res,
 			status: 200,
@@ -104,13 +117,31 @@ async function removeDevice(req: Request, res: Response, next: NextFunction) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }
-async function fetchMessageHealth(req: Request, res: Response, next: NextFunction) {
-	const {
-		device: { device },
-		serviceAccount: account,
-	} = req.locals;
+
+async function setCurrentDevice(req: Request, res: Response, next: NextFunction) {
+	const { serviceAccount: account, id } = req.locals;
 
 	try {
+		const device = await WhatsappLinkService.fetchDeviceDoc(id, account._id);
+		setCookie(res, {
+			key: Cookie.Device,
+			value: device.id,
+			expires: SESSION_EXPIRE_TIME,
+		});
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
+async function fetchMessageHealth(req: Request, res: Response, next: NextFunction) {
+	const { serviceAccount: account, id } = req.locals;
+
+	try {
+		const device = await WhatsappLinkService.fetchDeviceDoc(id, account._id);
 		return Respond({
 			res,
 			status: 200,
@@ -128,6 +159,7 @@ const Controller = {
 	getAllLinkedDevices,
 	removeDevice,
 	fetchMessageHealth,
+	setCurrentDevice,
 };
 
 export default Controller;

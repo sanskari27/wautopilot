@@ -67,8 +67,8 @@ export default function Navbar() {
 					<MenubarLink href={getLink('/tasks')}>Tasks</MenubarLink>
 					<MenubarSeparator />
 					<MenubarLink href={getLink('/agents')}>Agents</MenubarLink>
-					<MenubarLink href={getLink('/dashboard?devices=true')}>Devices</MenubarLink>
-					<MenubarLink href={getLink('/dashboard?settings=true')}>Settings</MenubarLink>
+					<MenubarLink href={`${pathname}?devices=true`}>Devices</MenubarLink>
+					<MenubarLink href={`${pathname}?settings=true`}>Settings</MenubarLink>
 				</MenubarContent>
 			</MenubarMenu>
 			<MenubarMenu>

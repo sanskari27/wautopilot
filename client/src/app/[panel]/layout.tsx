@@ -9,6 +9,7 @@ import TemplateService from '@/services/template.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { Providers } from './providers';
+import DevicesDialog from '@/components/elements/dialogs/devices';
 
 export const metadata: Metadata = {
 	title: 'Dashboard • Wautopilot',
@@ -38,6 +39,7 @@ export default async function Layout({
 						agents={agents}
 					>
 						{children}
+						<DevicesDialog />
 					</Providers>
 				</PageLayout>
 			</main>
