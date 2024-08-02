@@ -17,7 +17,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import Each from '../containers/each';
-import { useOrganizationDetails } from '../context/organization-details';
+import { useOrganizationDetails } from '../context/user-details';
 import { Badge } from '../ui/badge';
 
 export function ManageCategoriesDialog() {

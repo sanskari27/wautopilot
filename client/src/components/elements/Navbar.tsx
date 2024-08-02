@@ -3,7 +3,7 @@ import { CircleUserRound } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
-import { useUserDetails } from '../context/organization-details';
+import { useUserDetails } from '../context/user-details';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import {
 	Menubar,
@@ -58,7 +58,7 @@ export default function Navbar() {
 	}
 
 	return (
-		<Menubar className=' backdrop-blur-sm px-[2%] py-4 border-t-0 border-x-0 border-b'>
+		<Menubar className=' backdrop-blur-sm px-[2%] py-4 border-t-0 border-x-0 border-b fixed top-0 w-full'>
 			<MenubarMenu>
 				<MenubarTrigger>Home</MenubarTrigger>
 				<MenubarContent>

@@ -34,7 +34,6 @@ export default class TaskService extends UserService {
 		await TaskDB.updateOne(
 			{
 				_id: id,
-				linked_to: this.userId,
 			},
 			{
 				hidden: true,

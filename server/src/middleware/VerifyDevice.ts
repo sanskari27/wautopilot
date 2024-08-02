@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
+import { Cookie } from '../config/const';
 import { AUTH_ERRORS, CustomError } from '../errors';
 import WhatsappLinkService from '../services/whatsappLink';
 import { idValidator } from '../utils/ExpressUtils';
 
 export default async function VerifyDevice(req: Request, res: Response, next: NextFunction) {
-	const device_id = req.params.device_id;
+	const device_id = req.cookies[Cookie.Device];
 	const [valid, id] = idValidator(device_id);
 
 	if (!valid) {

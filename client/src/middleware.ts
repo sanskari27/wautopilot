@@ -10,19 +10,19 @@ export async function middleware(request: NextRequest) {
 	} = await AuthService.isAuthenticated();
 
 	const pathname = request.nextUrl.pathname;
+	const subpath = master ? '/master' : admin ? '/admin' : agent ? '/agent' : '';
 
 	if (pathname.startsWith('/auth')) {
 		if (isAuthenticated) {
 			const callback = request.nextUrl.searchParams.get('callback');
 			if (admin || agent) {
-				return Response.redirect(new URL(callback || '/dashboard', request.url));
+				return Response.redirect(new URL(callback || `${subpath}/dashboard`, request.url));
 			} else if (master) {
 				return Response.redirect(new URL(callback || '/admin/dashboard', request.url));
 			}
 		}
 	}
 
-	const subpath = master ? '/master' : admin ? '/admin' : agent ? '/agent' : '';
 	if (pathname === '/') {
 		if (!isAuthenticated) {
 			return Response.redirect(new URL(`/auth/login?callback=${pathname}`, request.url));

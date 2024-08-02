@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import MetaAPI from '../../config/MetaAPI';
-import { UserLevel } from '../../config/const';
+import { Cookie, UserLevel } from '../../config/const';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import WhatsappLinkService from '../../services/whatsappLink';
-import { Respond } from '../../utils/ExpressUtils';
+import { Respond, setCookie } from '../../utils/ExpressUtils';
+import { SESSION_EXPIRE_TIME } from '../auth/auth.controller';
 import { WhatsappLinkCreateValidationResult } from './whatsappLink.validator';
 
 async function getAllLinkedDevices(req: Request, res: Response, next: NextFunction) {
@@ -68,6 +69,15 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 			phoneNumberId,
 			waid,
 			accessToken,
+		});
+		if (!device) {
+			return next(new CustomError(COMMON_ERRORS.ALREADY_EXISTS));
+		}
+
+		setCookie(res, {
+			key: Cookie.Device,
+			value: device.id,
+			expires: SESSION_EXPIRE_TIME,
 		});
 		return Respond({
 			res,

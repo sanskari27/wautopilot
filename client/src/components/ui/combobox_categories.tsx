@@ -15,7 +15,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import Each from '../containers/each';
-import { useOrganizationDetails } from '../context/organization-details';
+import { useOrganizationDetails } from '../context/user-details';
 
 export default function ComboboxCategories({
 	placeholder,

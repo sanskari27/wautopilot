@@ -28,6 +28,7 @@ export const SHORT_LINK_REDIRECT = 'https://open.wautopilot.com/';
 export enum Cookie {
 	Auth = 'auth-cookie',
 	Refresh = 'refresh-cookie',
+	Device = 'device-cookie',
 }
 export enum UserLevel {
 	Agent = 10,

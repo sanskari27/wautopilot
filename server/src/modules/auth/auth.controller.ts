@@ -6,6 +6,7 @@ import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import { sendPasswordResetEmail } from '../../provider/email';
 import { UserService } from '../../services';
+import WhatsappLinkService from '../../services/whatsappLink';
 import { Respond, setCookie } from '../../utils/ExpressUtils';
 import {
 	LoginValidationResult,
@@ -20,7 +21,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
 	const { email, password, latitude, longitude } = req.locals.data as LoginValidationResult;
 
 	try {
-		const { authToken, refreshToken } = await UserService.login(email, password, {
+		const { authToken, refreshToken, userService } = await UserService.login(email, password, {
 			latitude: latitude ?? 0,
 			longitude: longitude ?? 0,
 			platform: req.useragent?.platform || '',
@@ -38,6 +39,16 @@ async function login(req: Request, res: Response, next: NextFunction) {
 			value: refreshToken,
 			expires: SESSION_EXPIRE_TIME,
 		});
+
+		const devices = await WhatsappLinkService.fetchRecords(userService.userId);
+
+		if (devices.length > 0) {
+			setCookie(res, {
+				key: Cookie.Device,
+				value: devices[0].id,
+				expires: SESSION_EXPIRE_TIME,
+			});
+		}
 
 		return Respond({
 			res,
