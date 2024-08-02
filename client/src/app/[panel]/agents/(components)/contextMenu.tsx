@@ -1,5 +1,6 @@
 'use client';
 import DeleteDialog from '@/components/elements/dialogs/delete';
+import NumberInputDialog from '@/components/elements/dialogs/numberInput';
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -53,6 +54,14 @@ export function AgentContextMenu({
 		});
 	};
 
+	const handleAssignChats = (numbers: string[]) => {
+		toast.promise(AgentService.assignConversationsToAgent(id, { numbers }), {
+			success: 'Chats assigned successfully',
+			error: 'Failed to assign chats',
+			loading: 'Assigning chats...',
+		});
+	};
+
 	if (disabled) {
 		return <>{children}</>;
 	}
@@ -64,9 +73,11 @@ export function AgentContextMenu({
 				<ContextMenuLink href={`${pathname}/${id}/logs`} inset>
 					View Logs
 				</ContextMenuLink>
-				<ContextMenuLink href={`?assign-chats=${id}`} inset>
-					Assign Chats
-				</ContextMenuLink>
+				<NumberInputDialog onSubmit={handleAssignChats}>
+					<ContextMenuLabel className='font-normal' inset>
+						Assign Chats
+					</ContextMenuLabel>
+				</NumberInputDialog>
 				<ContextMenuLink
 					href={`?permissions=${id}&data=${JSON.stringify(agent.permissions)}`}
 					inset
@@ -85,7 +96,7 @@ export function AgentContextMenu({
 						<ContextMenuLink onClick={openServiceAccount}>Service Account</ContextMenuLink>
 						<ContextMenuSeparator />
 						<DeleteDialog onDelete={deleteAgent}>
-							<ContextMenuLabel className='hover:text-red-400 cursor-pointer hover:bg-accent'>
+							<ContextMenuLabel className='hover:text-red-400 cursor-pointer hover:bg-accent font-normal'>
 								Delete
 							</ContextMenuLabel>
 						</DeleteDialog>

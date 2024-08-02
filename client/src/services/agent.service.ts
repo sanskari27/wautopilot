@@ -69,36 +69,27 @@ export default class AgentService {
 	}
 
 	static async assignConversationToAgent({
-		device_id,
 		agentId,
 		conversationId,
 	}: {
-		device_id: string;
 		agentId: string;
 		conversationId: string;
 	}) {
-		await api.post(`/${device_id}/conversation/${conversationId}/assign-agent/${agentId}`);
+		await api.post(`/conversation/${conversationId}/assign-agent/${agentId}`);
 	}
 
 	static async assignConversationsToAgent(
-		device_id: string,
 		agentId: string,
 		details: {
 			phonebook_ids?: string[];
 			numbers?: string[];
 		}
 	) {
-		await api.post(`/${device_id}/conversation/assign-agent/${agentId}`, details);
+		await api.post(`/conversation/assign-agent/${agentId}`, details);
 	}
 
-	static async removeConversationFromAgent({
-		device_id,
-		conversationId,
-	}: {
-		device_id: string;
-		conversationId: string;
-	}) {
-		api.post(`/${device_id}/conversation/${conversationId}/remove-agent`);
+	static async removeConversationFromAgent(conversationId: string) {
+		api.post(`/conversation/${conversationId}/remove-agent`);
 	}
 
 	static async assignAgentPermission(agentId: string, permission: Permissions) {

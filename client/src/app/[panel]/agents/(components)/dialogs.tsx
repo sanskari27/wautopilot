@@ -723,6 +723,26 @@ export function PermissionDialog() {
 							</TableRow>
 						</TableBody>
 					</Table>
+
+					<p className='font-medium text-lg'>Extras</p>
+
+					<div className='flex items-center justify-between py-5 px-4 border-b '>
+						<label
+							htmlFor='auto_assign_chats'
+							className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+						>
+							Auto assign chats
+						</label>
+						<Checkbox
+							id='auto_assign_chats'
+							defaultChecked={data.auto_assign_chats}
+							{...register('auto_assign_chats')}
+							onCheckedChange={(e) => {
+								setValue('auto_assign_chats', Boolean(e));
+							}}
+						/>
+					</div>
+
 					<DialogFooter className='mt-2'>
 						<Button type='submit'>Save changes</Button>
 					</DialogFooter>
