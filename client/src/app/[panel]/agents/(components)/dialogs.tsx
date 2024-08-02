@@ -82,7 +82,7 @@ export function DetailsDialog() {
 				success: () => {
 					router.replace(pathname);
 					router.refresh();
-					return 'Agent create successfully';
+					return 'Agent created successfully';
 				},
 				error: (err) => {
 					return err.message || 'Failed to create agent';
