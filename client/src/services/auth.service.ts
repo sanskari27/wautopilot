@@ -1,5 +1,6 @@
 import api from '@/lib/api';
 import { signupSchema } from '@/schema/auth';
+import { Permissions } from '@/types/permissions';
 import { z } from 'zod';
 
 export default class AuthService {
@@ -100,6 +101,10 @@ export default class AuthService {
 				subscription_expiry: data.account.subscription_expiry ?? '',
 				walletBalance: data.account.walletBalance ?? 0,
 				no_of_devices: data.account.no_of_devices ?? 0,
+				permissions: data.account.permissions ?? {},
+				isMaster: data.account.isMaster ?? false,
+				isAdmin: data.account.isAdmin ?? false,
+				isAgent: data.account.isAgent ?? false,
 			} as {
 				name: string;
 				email: string;
@@ -108,6 +113,10 @@ export default class AuthService {
 				subscription_expiry: string;
 				walletBalance: number;
 				no_of_devices: number;
+				permissions: Permissions;
+				isMaster: boolean;
+				isAdmin: boolean;
+				isAgent: boolean;
 			};
 		} catch (err) {
 			return null;
@@ -164,6 +173,15 @@ export default class AuthService {
 	static async confirmPayment(transaction_id: string) {
 		try {
 			await api.post(`/payment/confirm-transaction/${transaction_id}`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	static async serviceAccount(id: string) {
+		try {
+			await api.post(`/sessions/service-account/${id}`);
 			return true;
 		} catch (err) {
 			return false;

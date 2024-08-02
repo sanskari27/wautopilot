@@ -16,7 +16,6 @@ export default class AgentService {
 				};
 			});
 		} catch (err) {
-			//ignore
 			return [];
 		}
 	}
@@ -102,13 +101,7 @@ export default class AgentService {
 		api.post(`/${device_id}/conversation/${conversationId}/remove-agent`);
 	}
 
-	static async assignAgentPermission({
-		agentId,
-		permission,
-	}: {
-		agentId: string;
-		permission: Permissions;
-	}) {
+	static async assignAgentPermission(agentId: string, permission: Permissions) {
 		try {
 			const { data } = await api.post(`/users/agents/${agentId}/permissions`, permission);
 			return {

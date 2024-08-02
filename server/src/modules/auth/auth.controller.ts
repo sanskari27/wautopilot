@@ -195,6 +195,7 @@ async function details(req: Request, res: Response, next: NextFunction) {
 		...details,
 		walletBalance: details.walletBalance.toFixed(2),
 		permissions: {
+			auto_assign_chats: true,
 			assigned_labels: [] as string[],
 			phonebook: {
 				create: true,
@@ -246,6 +247,9 @@ async function details(req: Request, res: Response, next: NextFunction) {
 				export: true,
 			},
 		},
+		isAdmin: user.userLevel === UserLevel.Admin,
+		isAgent: user.userLevel === UserLevel.Agent,
+		isMaster: user.userLevel === UserLevel.Master,
 	};
 
 	if (user.userLevel === UserLevel.Agent) {

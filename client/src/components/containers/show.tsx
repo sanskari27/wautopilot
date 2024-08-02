@@ -13,7 +13,18 @@ interface ElseProps {
 	children: ReactNode;
 }
 
-const Show: FC<ShowProps> & { When: FC<WhenProps>; Else: FC<ElseProps> } = ({ children }) => {
+interface ShowIfProps extends WhenProps {}
+
+const ShowIf: FC<ShowIfProps> = ({ condition, children }) => {
+	if (!condition) return null;
+	return <>{children}</>;
+};
+
+const Show: FC<ShowProps> & {
+	When: FC<WhenProps>;
+	Else: FC<ElseProps>;
+	ShowIf: FC<ShowIfProps>;
+} = ({ children }) => {
 	let elseChild: ReactNode = null;
 
 	for (const child of React.Children.toArray(children)) {
@@ -35,5 +46,6 @@ const Else: FC<ElseProps> = ({ children }) => <>{children}</>;
 
 Show.When = When;
 Show.Else = Else;
+Show.ShowIf = ShowIf;
 
 export default Show;

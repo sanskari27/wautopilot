@@ -27,8 +27,6 @@ export default async function Tasks({
 		date_to: endDate.toISOString(),
 	});
 
-	console.log(tasks);
-
 	const filteredList = tasks.filter((item) => showHidden || item.hidden === showHidden);
 
 	return (

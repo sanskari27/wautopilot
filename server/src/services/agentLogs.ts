@@ -35,7 +35,7 @@ export default class AgentLogService extends UserService {
 			agent_name: log.agent_name,
 			text: log.text,
 			data: log.data as object,
-			createdAt: DateUtils.getMoment(log.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+			createdAt: DateUtils.getMoment(log.createdAt).format('YYYY-MM-DD hh:mm:ss A'),
 		}));
 	}
 }
