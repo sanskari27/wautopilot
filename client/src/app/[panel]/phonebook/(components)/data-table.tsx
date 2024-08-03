@@ -1,5 +1,7 @@
 'use client';
 
+import Show from '@/components/containers/show';
+import FieldSearch from '@/components/elements/filters/fieldSearch';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -46,6 +48,8 @@ import {
 } from '@tanstack/react-table';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import { AssignAgent, DeleteButton, ExportButton, ExportChatButton, TagsFilter } from './buttons';
+import { AddFields, AssignTags } from './dialogs';
 
 function generateColumns(keys: string[]): ColumnDef<PhonebookRecord>[] {
 	return [
@@ -214,9 +218,17 @@ export function DataTable({
 	const [rowSelection, setRowSelection] = React.useState({});
 	const searchParams = useSearchParams();
 	const router = useRouter();
-	const limit = searchParams.get('limit') || '10';
+	const limit = searchParams.get('limit') || '20';
 	const maxPage = Math.ceil(maxRecord / parseInt(limit, 10));
 	const page = Math.min(parseInt(searchParams.get('page') || '1', 10), maxPage);
+
+	React.useEffect(() => {
+		if (parseInt(searchParams.get('page') || '1', 10) > maxPage) {
+			const url = new URL((window as any).location);
+			url.searchParams.set('page', maxPage.toString());
+			router.replace(url.toString());
+		}
+	}, [maxPage, router, searchParams]);
 
 	const columns = React.useMemo(() => generateColumns(keys), [keys]);
 
@@ -250,150 +262,176 @@ export function DataTable({
 	}
 
 	return (
-		<div className='w-full'>
-			<div className='flex flex-wrap items-center justify-between px-2 mt-3'>
-				<div className='inline-flex  flex-1 items-center flex-wrap gap-x-2'>
-					<div className=' text-sm text-muted-foreground'>
-						{table.getFilteredSelectedRowModel().rows.length} of{' '}
-						{table.getFilteredRowModel().rows.length} row(s) selected.
-					</div>
-					<div className=' text-sm text-muted-foreground'>
-						Total {Object.keys(rowSelection).length} row(s) selected.
-					</div>
+		<div className='flex flex-col gap-4 justify-center p-4'>
+			<div className='justify-between flex'>
+				<h2 className='text-2xl font-bold'>Phonebook</h2>
+				<div className='flex gap-x-2 gap-y-1 flex-wrap '>
+					<Show.ShowIf condition={Object.keys(rowSelection).length === 0}>
+						<AddFields />
+						<ExportButton labels={searchParams.getAll('tags') ?? []} />
+					</Show.ShowIf>
+					<Show.ShowIf condition={Object.keys(rowSelection).length !== 0}>
+						<DeleteButton ids={Object.keys(rowSelection)} />
+						<ExportChatButton ids={Object.keys(rowSelection)} />
+						<AssignTags ids={Object.keys(rowSelection)} />
+						<AssignAgent ids={Object.keys(rowSelection)} />
+					</Show.ShowIf>
 				</div>
-				<div className='flex items-center space-x-3 lg:space-x-5'>
-					<div className='flex items-center space-x-2'>
-						<p className='text-sm font-medium'>Rows</p>
-						<Select
-							value={limit}
-							onValueChange={(value) => {
-								if (limit !== value) {
-									const url = new URL((window as any).location);
-									url.searchParams.set('limit', value);
-									router.replace(url.toString());
-								}
-								table.setPageSize(Number(value));
-							}}
-						>
-							<SelectTrigger className='h-8 w-[70px] text-black dark:text-white'>
-								<SelectValue placeholder={limit} />
-							</SelectTrigger>
-							<SelectContent side='top'>
-								{[10, 20, 50, 100, 200, 500].map((pageSize) => (
-									<SelectItem key={pageSize} value={`${pageSize}`}>
-										{pageSize}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</div>
-					<div className='text-sm font-medium'>
-						Page {page} of {maxPage}
-					</div>
-					<div className='flex items-center space-x-2'>
-						<Button
-							variant='outline'
-							className='hidden h-8 w-8 p-0 lg:flex'
-							onClick={() => setPage(1)}
-							disabled={page === 1}
-						>
-							<span className='sr-only'>Go to first page</span>
-							<DoubleArrowLeftIcon className='h-4 w-4' />
-						</Button>
-						<Button
-							variant='outline'
-							className='h-8 w-8 p-0'
-							onClick={() => setPage(page - 1)}
-							disabled={page === 1}
-						>
-							<span className='sr-only'>Go to previous page</span>
-							<ChevronLeftIcon className='h-4 w-4' />
-						</Button>
-						<Button
-							variant='outline'
-							className='h-8 w-8 p-0'
-							onClick={() => setPage(page + 1)}
-							disabled={page === maxPage}
-						>
-							<span className='sr-only'>Go to next page</span>
-							<ChevronRightIcon className='h-4 w-4' />
-						</Button>
-						<Button
-							variant='outline'
-							className='hidden h-8 w-8 p-0 lg:flex'
-							onClick={() => setPage(maxPage)}
-							disabled={page === maxPage}
-						>
-							<span className='sr-only'>Go to last page</span>
-							<DoubleArrowRightIcon className='h-4 w-4' />
-						</Button>
-					</div>
-					<div>
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button variant='outline' className='ml-auto'>
-									Columns <ChevronDownIcon className='ml-2 h-4 w-4' />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align='end'>
-								{table
-									.getAllColumns()
-									.filter((column) => column.getCanHide())
-									.map((column) => {
-										return (
-											<DropdownMenuCheckboxItem
-												key={column.id}
-												className='capitalize'
-												checked={column.getIsVisible()}
-												onCheckedChange={(value) => column.toggleVisibility(!!value)}
-											>
-												{column.id.replace(/_/g, ' ')}
-											</DropdownMenuCheckboxItem>
-										);
-									})}
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</div>
+			</div>
+			<div className='flex items-start gap-3'>
+				<div className='flex-1'>
+					<FieldSearch />
+				</div>
+				<div>
+					<TagsFilter />
 				</div>
 			</div>
 
-			<div className='rounded-md border'>
-				<Table>
-					<TableHeader>
-						{table.getHeaderGroups().map((headerGroup) => (
-							<TableRow key={headerGroup.id}>
-								{headerGroup.headers.map((header) => {
-									return (
-										<TableHead key={header.id}>
-											{header.isPlaceholder
-												? null
-												: flexRender(header.column.columnDef.header, header.getContext())}
-										</TableHead>
-									);
-								})}
-							</TableRow>
-						))}
-					</TableHeader>
-					<TableBody>
-						{table.getRowModel().rows?.length ? (
-							table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id} className='p-2'>
-											{flexRender(cell.column.columnDef.cell, cell.getContext())}
-										</TableCell>
+			<div className='w-full'>
+				<div className='flex flex-wrap items-center justify-between px-2 mt-3'>
+					<div className='inline-flex  flex-1 items-center flex-wrap gap-x-2'>
+						<div className=' text-sm text-muted-foreground'>
+							{table.getFilteredSelectedRowModel().rows.length} of{' '}
+							{table.getFilteredRowModel().rows.length} row(s) selected.
+						</div>
+						<div className=' text-sm text-muted-foreground'>
+							Total {Object.keys(rowSelection).length} row(s) selected.
+						</div>
+					</div>
+					<div className='flex items-center space-x-3 lg:space-x-5'>
+						<div className='flex items-center space-x-2'>
+							<p className='text-sm font-medium'>Rows</p>
+							<Select
+								value={limit}
+								onValueChange={(value) => {
+									if (limit !== value) {
+										const url = new URL((window as any).location);
+										url.searchParams.set('limit', value);
+										router.replace(url.toString());
+									}
+									table.setPageSize(Number(value));
+								}}
+							>
+								<SelectTrigger className='h-8 w-[70px] text-black dark:text-white'>
+									<SelectValue placeholder={limit} />
+								</SelectTrigger>
+								<SelectContent side='top'>
+									{[10, 20, 50, 100, 200, 500].map((pageSize) => (
+										<SelectItem key={pageSize} value={`${pageSize}`}>
+											{pageSize}
+										</SelectItem>
 									))}
+								</SelectContent>
+							</Select>
+						</div>
+						<div className='text-sm font-medium'>
+							Page {page} of {maxPage}
+						</div>
+						<div className='flex items-center space-x-2'>
+							<Button
+								variant='outline'
+								className='hidden h-8 w-8 p-0 lg:flex'
+								onClick={() => setPage(1)}
+								disabled={page === 1}
+							>
+								<span className='sr-only'>Go to first page</span>
+								<DoubleArrowLeftIcon className='h-4 w-4' />
+							</Button>
+							<Button
+								variant='outline'
+								className='h-8 w-8 p-0'
+								onClick={() => setPage(page - 1)}
+								disabled={page === 1}
+							>
+								<span className='sr-only'>Go to previous page</span>
+								<ChevronLeftIcon className='h-4 w-4' />
+							</Button>
+							<Button
+								variant='outline'
+								className='h-8 w-8 p-0'
+								onClick={() => setPage(page + 1)}
+								disabled={page === maxPage}
+							>
+								<span className='sr-only'>Go to next page</span>
+								<ChevronRightIcon className='h-4 w-4' />
+							</Button>
+							<Button
+								variant='outline'
+								className='hidden h-8 w-8 p-0 lg:flex'
+								onClick={() => setPage(maxPage)}
+								disabled={page === maxPage}
+							>
+								<span className='sr-only'>Go to last page</span>
+								<DoubleArrowRightIcon className='h-4 w-4' />
+							</Button>
+						</div>
+						<div>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button variant='outline' className='ml-auto'>
+										Columns <ChevronDownIcon className='ml-2 h-4 w-4' />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align='end'>
+									{table
+										.getAllColumns()
+										.filter((column) => column.getCanHide())
+										.map((column) => {
+											return (
+												<DropdownMenuCheckboxItem
+													key={column.id}
+													className='capitalize'
+													checked={column.getIsVisible()}
+													onCheckedChange={(value) => column.toggleVisibility(!!value)}
+												>
+													{column.id.replace(/_/g, ' ')}
+												</DropdownMenuCheckboxItem>
+											);
+										})}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
+					</div>
+				</div>
+
+				<div className='rounded-md border'>
+					<Table>
+						<TableHeader>
+							{table.getHeaderGroups().map((headerGroup) => (
+								<TableRow key={headerGroup.id}>
+									{headerGroup.headers.map((header) => {
+										return (
+											<TableHead key={header.id}>
+												{header.isPlaceholder
+													? null
+													: flexRender(header.column.columnDef.header, header.getContext())}
+											</TableHead>
+										);
+									})}
 								</TableRow>
-							))
-						) : (
-							<TableRow>
-								<TableCell colSpan={columns.length} className='h-24 text-center'>
-									No results.
-								</TableCell>
-							</TableRow>
-						)}
-					</TableBody>
-				</Table>
+							))}
+						</TableHeader>
+						<TableBody>
+							{table.getRowModel().rows?.length ? (
+								table.getRowModel().rows.map((row) => (
+									<TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id} className='p-2'>
+												{flexRender(cell.column.columnDef.cell, cell.getContext())}
+											</TableCell>
+										))}
+									</TableRow>
+								))
+							) : (
+								<TableRow>
+									<TableCell colSpan={columns.length} className='h-24 text-center'>
+										No results.
+									</TableCell>
+								</TableRow>
+							)}
+						</TableBody>
+					</Table>
+				</div>
 			</div>
 		</div>
 	);

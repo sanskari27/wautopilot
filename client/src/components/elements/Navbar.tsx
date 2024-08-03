@@ -2,7 +2,6 @@
 import { CircleUserRound } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
 import { useUserDetails } from '../context/user-details';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import {
@@ -21,37 +20,6 @@ export default function Navbar() {
 	const userDetails = useUserDetails();
 	const pathname = usePathname();
 	let panel_id = pathname.split('/')[1];
-
-	useEffect(() => {
-		function handleKeyDown(e: KeyboardEvent) {
-			if (e.key === 'm' && e.metaKey) {
-				e.preventDefault();
-				window.location.href = `/${panel_id}/dashboard`;
-			}
-			if (e.key === ';' && e.metaKey) {
-				e.preventDefault();
-				window.location.href = `/${panel_id}/settings`;
-			}
-			if (e.key === '/' && e.metaKey) {
-				e.preventDefault();
-				window.location.href = `/${panel_id}/phonebook`;
-			}
-			if (e.key === 'k' && e.metaKey) {
-				e.preventDefault();
-				window.location.href = `/${panel_id}/tasks/create`;
-			}
-			if (e.key === 'j' && e.metaKey) {
-				e.preventDefault();
-				window.location.href = `/${panel_id}`;
-			}
-		}
-
-		document.addEventListener('keydown', handleKeyDown);
-
-		return () => {
-			document.removeEventListener('keydown', handleKeyDown);
-		};
-	}, [panel_id]);
 
 	function getLink(link: string) {
 		return `/${panel_id}${link}`;

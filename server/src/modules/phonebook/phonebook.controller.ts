@@ -74,6 +74,7 @@ async function records(req: Request, res: Response, next: NextFunction) {
 		: typeof req.query.labels === 'string' && req.query.labels
 		? [req.query.labels]
 		: [];
+
 	const search = Array.isArray(req.query.search)
 		? (req.query.search as string[]).reduce(
 				(acc, val) => ({
