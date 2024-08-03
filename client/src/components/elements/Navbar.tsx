@@ -30,7 +30,7 @@ export default function Navbar() {
 			}
 			if (e.key === ';' && e.metaKey) {
 				e.preventDefault();
-				window.location.href = `/${panel_id}/dashboard?settings=true`;
+				window.location.href = `/${panel_id}/settings`;
 			}
 			if (e.key === '/' && e.metaKey) {
 				e.preventDefault();
@@ -54,7 +54,7 @@ export default function Navbar() {
 	}, [panel_id]);
 
 	function getLink(link: string) {
-		return `/${panel_id}/${link}`;
+		return `/${panel_id}${link}`;
 	}
 
 	return (
@@ -68,7 +68,7 @@ export default function Navbar() {
 					<MenubarSeparator />
 					<MenubarLink href={getLink('/agents')}>Agents</MenubarLink>
 					<MenubarLink href={`${pathname}?devices=true`}>Devices</MenubarLink>
-					<MenubarLink href={`${pathname}?settings=true`}>Settings</MenubarLink>
+					<MenubarLink href={getLink('/settings')}>Settings</MenubarLink>
 				</MenubarContent>
 			</MenubarMenu>
 			<MenubarMenu>

@@ -41,15 +41,15 @@
 		@apply bg-background text-foreground;
 	}
 	::-webkit-scrollbar {
-		@apply w-[0.2em];
+		@apply w-[0.2em] h-[0.2em];
 	}
 	::-webkit-scrollbar-button {
-		@apply h-0;
+		@apply h-1;
 	}
 	::-webkit-scrollbar-track-piece {
 		@apply bg-muted;
 	}
 	::-webkit-scrollbar-thumb {
-		@apply bg-foreground rounded-full w-[0.2em];
+		@apply bg-gray-500 rounded-full w-[0.2em] h-[0.2em];
 	}
 }

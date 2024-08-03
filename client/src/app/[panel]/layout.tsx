@@ -1,15 +1,16 @@
 import PageLayout from '@/components/containers/page-layout';
+import DevicesDialog from '@/components/elements/dialogs/devices';
 import Loading from '@/components/elements/loading';
 import Navbar from '@/components/elements/Navbar';
 import AgentService from '@/services/agent.service';
 import AuthService from '@/services/auth.service';
 import ChatbotFlowService from '@/services/chatbot-flow.service';
 import ChatBotService from '@/services/chatbot.service';
+import PhoneBookService from '@/services/phonebook.service';
 import TemplateService from '@/services/template.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { Providers } from './providers';
-import DevicesDialog from '@/components/elements/dialogs/devices';
 
 export const metadata: Metadata = {
 	title: 'Dashboard • Wautopilot',
@@ -25,6 +26,7 @@ export default async function Layout({
 	const chatBots = (await ChatBotService.listChatBots())!;
 	const chatBotFlows = (await ChatbotFlowService.listChatBots())!;
 	const agents = (await AgentService.getAgents())!;
+	const { labels, fields } = (await PhoneBookService.allLabels())!;
 
 	return (
 		<Suspense fallback={<Loading />}>
@@ -32,11 +34,15 @@ export default async function Layout({
 				<Navbar />
 				<PageLayout className='mt-[60px]'>
 					<Providers
-						userDetails={userDetails}
-						templates={templates}
-						chatBots={chatBots}
-						chatBotFlows={chatBotFlows}
-						agents={agents}
+						{...{
+							userDetails,
+							templates,
+							chatBots,
+							chatBotFlows,
+							agents,
+							labels,
+							fields,
+						}}
 					>
 						{children}
 						<DevicesDialog />

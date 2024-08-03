@@ -42,8 +42,6 @@ export function AgentContextMenu({
 	};
 
 	const deleteAgent = () => {
-		console.log('delete agent');
-
 		const promise = AgentService.deleteAgent(id);
 
 		toast.promise(promise, {

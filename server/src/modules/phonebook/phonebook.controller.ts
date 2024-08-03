@@ -20,6 +20,7 @@ async function getAllLabels(req: Request, res: Response, next: NextFunction) {
 	try {
 		const phoneBookService = new PhoneBookService(serviceAccount);
 		let labels = await phoneBookService.getAllLabels();
+		const fields = await phoneBookService.getFields();
 
 		if (user.userLevel === UserLevel.Agent) {
 			const permissions = await user.getPermissions();
@@ -32,6 +33,7 @@ async function getAllLabels(req: Request, res: Response, next: NextFunction) {
 			status: 200,
 			data: {
 				labels,
+				fields,
 			},
 		});
 	} catch (err) {
@@ -67,8 +69,22 @@ async function records(req: Request, res: Response, next: NextFunction) {
 	const { user, serviceAccount } = req.locals;
 	const page = req.query.page ? parseInt(req.query.page as string) || 1 : 1;
 	const limit = req.query.limit ? parseInt(req.query.limit as string) || 20 : 20;
-	let labels = req.query.labels ? (req.query.labels as string).split(',') : [];
-	const search = req.query.search ? (req.query.search as string) : '';
+	let labels = Array.isArray(req.query.labels)
+		? (req.query.labels as string[])
+		: typeof req.query.labels === 'string' && req.query.labels
+		? [req.query.labels]
+		: [];
+	const search = Array.isArray(req.query.search)
+		? (req.query.search as string[]).reduce(
+				(acc, val) => ({
+					...acc,
+					[val.split('=')[0]]: val.split('=')[1],
+				}),
+				{} as {
+					[key: string]: string;
+				}
+		  )
+		: {};
 
 	if (user.userLevel === UserLevel.Agent) {
 		const permissions = await user.getPermissions();

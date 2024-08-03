@@ -1,4 +1,4 @@
-import { Types } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 import { PhoneBookDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import IPhoneBook from '../../mongo/types/phonebook';
@@ -114,53 +114,109 @@ export default class PhoneBookService extends UserService {
 			page,
 			limit,
 			labels,
-			search,
+			search = {},
 		}: {
 			page: number;
 			limit: number;
 			labels: string[];
-			search?: string;
+			search?: {
+				[key: string]: string;
+			};
 		} = {
 			page: 1,
 			limit: 2000000,
 			labels: [],
-			search: '',
+			search: {},
 		}
 	) {
-		const records = await PhoneBookDB.find({
-			linked_to: this.userId,
-			...(labels.length > 0 ? { labels: { $in: labels } } : {}),
-			...(search
-				? {
-						$or: [
-							{ first_name: { $regex: search, $options: 'i' } },
-							{ phone_number: { $regex: search, $options: 'i' } },
-							{ email: { $regex: search, $options: 'i' } },
-						],
-				  }
-				: {}),
-		})
+		const query = await this.buildQuery({ labels, search });
+		const records = await PhoneBookDB.find(query)
 			.sort({ createdAt: -1, _id: 1 })
 			.skip((page - 1) * limit)
 			.limit(limit);
 		return processPhonebookDocs(records);
 	}
 
-	public async totalRecords(labels: string[] = [], search = ''): Promise<number> {
-		const records = await PhoneBookDB.count({
+	public async totalRecords(
+		labels: string[] = [],
+		search: {
+			[key: string]: string;
+		} = {}
+	): Promise<number> {
+		const query = await this.buildQuery({ labels, search });
+		const records = await PhoneBookDB.count(query);
+		return records;
+	}
+
+	async buildQuery({
+		labels = [],
+		search = {},
+	}: {
+		labels: string[];
+		search: {
+			[key: string]: string;
+		};
+	}) {
+		const q = {
+			$or: [] as FilterQuery<IPhoneBook>[],
+			$and: [] as FilterQuery<IPhoneBook>[],
+		};
+
+		if (search.all) {
+			const records = await PhoneBookDB.find({ linked_to: this.userId });
+
+			const fields = records.reduce<Set<string>>((acc, record) => {
+				Object.keys(record.others).forEach((field) => acc.add(field));
+				return acc;
+			}, new Set<string>());
+
+			const otherKeys = Array.from(fields);
+			q.$or.push(
+				...[
+					{ first_name: { $regex: search.all, $options: 'i' } },
+					{ phone_number: { $regex: search.all, $options: 'i' } },
+					{ email: { $regex: search.all, $options: 'i' } },
+					{ salutation: { $regex: search.all, $options: 'i' } },
+					{ last_name: { $regex: search.all, $options: 'i' } },
+					{ middle_name: { $regex: search.all, $options: 'i' } },
+					{ birthday: { $regex: search.all, $options: 'i' } },
+					{ anniversary: { $regex: search.all, $options: 'i' } },
+					...otherKeys.map((k) => ({
+						[`others.${k}`]: { $regex: search.all, $options: 'i' },
+					})),
+				]
+			);
+		}
+
+		Object.keys(search).forEach((key) => {
+			if (key == 'all') {
+				return;
+			}
+			if (
+				[
+					'salutation',
+					'first_name',
+					'last_name',
+					'middle_name',
+					'phone_number',
+					'email',
+					'birthday',
+					'anniversary',
+				].includes(key)
+			) {
+				q.$and.push({ [key]: { $regex: search[key], $options: 'i' } });
+			} else {
+				q.$and.push({ [`others.${key}`]: { $regex: search[key], $options: 'i' } });
+			}
+		});
+
+		const $and = [...q.$and, ...(q.$or.length > 0 ? [{ $or: q.$or }] : [])];
+
+		return {
 			linked_to: this.userId,
 			...(labels.length > 0 ? { labels: { $in: labels } } : {}),
-			...(search
-				? {
-						$or: [
-							{ first_name: { $regex: search, $options: 'i' } },
-							{ phone_number: { $regex: search, $options: 'i' } },
-							{ email: { $regex: search, $options: 'i' } },
-						],
-				  }
-				: {}),
-		});
-		return records;
+			...(q.$or.length > 0 || q.$and.length > 0 ? { $and } : {}),
+		};
 	}
 
 	public async updateRecord(recordId: Types.ObjectId, details: Partial<Record>) {
@@ -203,6 +259,62 @@ export default class PhoneBookService extends UserService {
 		}, new Set<string>());
 
 		return Array.from(labels);
+	}
+
+	public async getFields() {
+		const records = await PhoneBookDB.find({ linked_to: this.userId });
+
+		const fields = records.reduce<Set<string>>((acc, record) => {
+			Object.keys(record.others).forEach((field) => acc.add(field));
+			return acc;
+		}, new Set<string>());
+
+		const list = Array.from(fields).map((field) => ({ value: field, label: field }));
+
+		list.push(
+			...[
+				{
+					value: 'all',
+					label: 'All',
+				},
+				{
+					value: 'salutation',
+					label: 'Salutation',
+				},
+				{
+					value: 'first_name',
+					label: 'First Name',
+				},
+				{
+					value: 'last_name',
+					label: 'Last Name',
+				},
+				{
+					value: 'middle_name',
+					label: 'Middle Name',
+				},
+				{
+					value: 'phone_number',
+					label: 'Phone Number',
+				},
+				{
+					value: 'email',
+					label: 'Email',
+				},
+				{
+					value: 'birthday',
+					label: 'Birthday',
+				},
+				{
+					value: 'anniversary',
+					label: 'Anniversary',
+				},
+			]
+		);
+
+		list.sort((a, b) => a.label.localeCompare(b.label));
+
+		return list;
 	}
 
 	public async findRecordByPhone(phone: string) {

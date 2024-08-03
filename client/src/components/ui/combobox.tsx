@@ -21,12 +21,14 @@ export default function Combobox({
 	value,
 	disabled,
 	onChange,
+	buttonVariant = 'outline',
 }: {
 	placeholder: string;
 	items: { value: string; label: string }[];
 	value: string;
 	onChange: (value: string) => void;
 	disabled?: boolean;
+	buttonVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
 }) {
 	const [open, setOpen] = React.useState(false);
 
@@ -34,7 +36,7 @@ export default function Combobox({
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button
-					variant='outline'
+					variant={buttonVariant}
 					role='combobox'
 					disabled={disabled}
 					aria-expanded={open}
