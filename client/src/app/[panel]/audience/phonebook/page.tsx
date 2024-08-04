@@ -1,6 +1,6 @@
 import api from '@/lib/api';
 import { PhonebookRecord } from '@/types/phonebook';
-import { DataTable } from './(components)/data-table';
+import { DataTable } from './_components/data-table';
 
 export default async function Phonebook({
 	searchParams,

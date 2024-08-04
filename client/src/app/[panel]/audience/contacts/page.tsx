@@ -7,8 +7,8 @@ import ContactService from '@/services/contact.service';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
-import { AddContact } from './(components)/buttons';
-import { DataTable } from './(components)/data-table';
+import { AddContact } from './_components/buttons';
+import { DataTable } from './_components/data-table';
 
 export default function Contacts() {
 	const router = useRouter();

@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { DetailsDialog, PasswordDialog, PermissionDialog } from './(components)/dialogs';
-import Agents from './(components)/table';
+import { DetailsDialog, PasswordDialog, PermissionDialog } from './_components/dialogs';
+import Agents from './_components/table';
 
 export default function AgentPage() {
 	const searchParams = useSearchParams();
