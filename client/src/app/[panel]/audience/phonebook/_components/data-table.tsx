@@ -284,7 +284,6 @@ export function DataTable({
 		toast.promise(promise, {
 			loading: 'Saving Phonebook...',
 			success: () => {
-				console.log('success')
 				router.replace(pathname);
 				router.refresh();
 				return 'Phonebook saved successfully';
