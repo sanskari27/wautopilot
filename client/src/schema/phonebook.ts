@@ -46,3 +46,17 @@ export const contactSchema = z.object({
 		})
 	),
 });
+
+export const phonebookSchema = z.object({
+	id: z.string(),
+	salutation: z.string(),
+	first_name: z.string().min(1, 'First name is required'),
+	last_name: z.string(),
+	middle_name: z.string(),
+	phone_number: z.string(),
+	email: z.string(),
+	birthday: z.string(),
+	anniversary: z.string(),
+	others: z.record(z.string(), z.string().optional()),
+	labels: z.array(z.string()),
+});

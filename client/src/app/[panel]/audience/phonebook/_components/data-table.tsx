@@ -26,6 +26,8 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
+import { phonebookSchema } from '@/schema/phonebook';
+import PhoneBookService from '@/services/phonebook.service';
 import { PhonebookRecord } from '@/types/phonebook';
 import {
 	CaretSortIcon,
@@ -47,8 +49,10 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from '@tanstack/react-table';
-import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import { z } from 'zod';
 import {
 	AddRecord,
 	AssignAgent,
@@ -58,6 +62,7 @@ import {
 	TagsFilter,
 } from './buttons';
 import { AddFields, AssignTags, UploadCSV } from './dialogs';
+import toast from 'react-hot-toast';
 
 function generateColumns(keys: string[]): ColumnDef<PhonebookRecord>[] {
 	return [
@@ -204,6 +209,7 @@ export function DataTable({
 	records: PhonebookRecord[];
 	maxRecord: number;
 }) {
+	const pathname = usePathname();
 	const fields = records.reduce<Set<string>>((acc, record) => {
 		Object.keys(record.others).forEach((field) => acc.add(field));
 		return acc;
@@ -268,6 +274,24 @@ export function DataTable({
 		url.searchParams.set('page', page.toString());
 		router.replace(url.toString());
 	}
+
+	const handlePhonebookInput = (phonebook: z.infer<typeof phonebookSchema>) => {
+		const id = searchParams.get('add-phonebook');
+		const promise =
+			id && id !== 'true'
+				? PhoneBookService.updateRecord(id, phonebook)
+				: PhoneBookService.addRecord(phonebook);
+		toast.promise(promise, {
+			loading: 'Saving Phonebook...',
+			success: () => {
+				console.log('success')
+				router.replace(pathname);
+				router.refresh();
+				return 'Phonebook saved successfully';
+			},
+			error: 'Failed to save phonebook',
+		});
+	};
 
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
@@ -427,7 +451,12 @@ export function DataTable({
 									<TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
 										{row.getVisibleCells().map((cell) => (
 											<TableCell key={cell.id} className='p-2'>
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
+												<Link
+													href={`?add-phonebook=${row.id}&data=${JSON.stringify(row.original)}`}
+													className=''
+												>
+													{flexRender(cell.column.columnDef.cell, cell.getContext())}
+												</Link>
 											</TableCell>
 										))}
 									</TableRow>
@@ -444,7 +473,10 @@ export function DataTable({
 				</div>
 			</div>
 			<Show.ShowIf condition={!!searchParams.get('add-phonebook')}>
-				<PhonebookDialog />
+				<PhonebookDialog
+					defaultValues={searchParams.get('data') ? JSON.parse(searchParams.get('data')!) : null}
+					onSave={handlePhonebookInput}
+				/>
 			</Show.ShowIf>
 		</div>
 	);

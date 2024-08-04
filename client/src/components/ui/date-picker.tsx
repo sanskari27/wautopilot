@@ -11,9 +11,11 @@ import { cn } from '@/lib/utils';
 export function DatePickerDemo({
 	value,
 	onChange,
+	disablePreviousDates = false,
 }: {
-	value: Date;
+	value?: Date;
 	onChange: (date?: Date) => void;
+	disablePreviousDates?: boolean;
 }) {
 	return (
 		<Popover>
@@ -35,8 +37,7 @@ export function DatePickerDemo({
 					selected={value}
 					onSelect={onChange}
 					disabled={(date) =>
-						date < new Date(new Date().setDate(new Date().getDate() - 1)) ||
-						date < new Date('1900-01-01')
+						disablePreviousDates ? date.getTime() < new Date().getTime() : false
 					}
 					initialFocus
 				/>
