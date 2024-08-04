@@ -257,7 +257,7 @@ function ContactForm({
 
 				<div className='w-full'>
 					<div className='flex justify-between'>
-						<h4>Phone Numbers</h4>
+						<h4 className='text-primary'>Phone Numbers</h4>
 						<Button
 							size={'icon'}
 							variant={'secondary'}
@@ -318,7 +318,7 @@ function ContactForm({
 
 				<div className='w-full'>
 					<div className='flex justify-between'>
-						<h4>Emails</h4>
+						<h4 className='text-primary'>Emails</h4>
 						<Button
 							size={'icon'}
 							variant={'secondary'}
@@ -378,7 +378,7 @@ function ContactForm({
 
 				<div className='w-full'>
 					<div className='flex justify-between'>
-						<h4>Links</h4>
+						<h4 className='text-primary'>Links</h4>
 						<Button
 							size={'icon'}
 							variant={'secondary'}
@@ -438,7 +438,7 @@ function ContactForm({
 
 				<div className='w-full'>
 					<div className='flex justify-between'>
-						<h4>Addresses</h4>
+						<h4 className='text-primary'>Addresses</h4>
 						<Button
 							size={'icon'}
 							variant={'secondary'}
