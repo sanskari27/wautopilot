@@ -46,7 +46,7 @@ export default function ContactDialog({
 	defaultValues = _defaultValues,
 	onSave = () => {},
 }: {
-	defaultValues?: z.infer<typeof contactSchema>;
+	defaultValues?: z.infer<typeof contactSchema> | null;
 	onSave?: (data: z.infer<typeof contactSchema>) => void;
 }) {
 	const router = useRouter();
@@ -54,13 +54,17 @@ export default function ContactDialog({
 
 	const isMobile = mobileCheck();
 
+	function handleClose() {
+		router.replace(pathname);
+	}
+
 	if (isMobile) {
 		return (
 			<Drawer
 				open
 				onOpenChange={(open) => {
 					if (!open) {
-						router.replace(pathname);
+						handleClose();
 					}
 				}}
 			>
@@ -68,7 +72,7 @@ export default function ContactDialog({
 					<DrawerHeader>
 						<DrawerTitle>Contact Card</DrawerTitle>
 					</DrawerHeader>
-					<ContactForm onSave={onSave} defaultValues={defaultValues} />
+					<ContactForm onSave={onSave} defaultValues={defaultValues || _defaultValues} />
 				</DrawerContent>
 			</Drawer>
 		);
@@ -78,7 +82,7 @@ export default function ContactDialog({
 				open
 				onOpenChange={(open) => {
 					if (!open) {
-						router.replace(pathname);
+						handleClose();
 					}
 				}}
 			>
@@ -86,7 +90,7 @@ export default function ContactDialog({
 					<SheetHeader>
 						<SheetTitle className='text-center'>Contact Card</SheetTitle>
 					</SheetHeader>
-					<ContactForm onSave={onSave} defaultValues={defaultValues} />
+					<ContactForm onSave={onSave} defaultValues={defaultValues || _defaultValues} />
 				</SheetContent>
 			</Sheet>
 		);
@@ -110,9 +114,13 @@ function ContactForm({
 	const phones = form.watch('phones');
 	const addresses = form.watch('addresses');
 
+	function handleSave(data: z.infer<typeof contactSchema>) {
+		onSave(data);
+	}
+
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSave)} className='w-full space-y-2'>
+			<form onSubmit={form.handleSubmit(handleSave)} className='w-full space-y-2'>
 				<h3 className='font-medium text-lg'>Personal Details</h3>
 
 				<div>

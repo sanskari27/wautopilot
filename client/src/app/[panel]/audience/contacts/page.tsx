@@ -4,7 +4,7 @@ import { useContacts } from '@/components/context/contact';
 import ContactDialog from '@/components/elements/dialogs/contact';
 import { contactSchema } from '@/schema/phonebook';
 import ContactService from '@/services/contact.service';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
 import { AddContact } from './(components)/buttons';
@@ -12,17 +12,20 @@ import { DataTable } from './(components)/data-table';
 
 export default function Contacts() {
 	const router = useRouter();
+	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const contacts = useContacts();
 
 	const handleContactInput = (contact: z.infer<typeof contactSchema>) => {
 		const id = searchParams.get('contact');
-		const promise = id
-			? ContactService.updateContact({ ...contact, id })
-			: ContactService.addContact(contact);
+		const promise =
+			id && id !== 'new'
+				? ContactService.updateContact({ ...contact, id })
+				: ContactService.addContact(contact);
 		toast.promise(promise, {
 			loading: 'Saving contact...',
 			success: () => {
+				router.replace(pathname);
 				router.refresh();
 				return 'Contact saved successfully';
 			},
@@ -45,7 +48,7 @@ export default function Contacts() {
 			<Show.ShowIf condition={!!searchParams.get('contact')}>
 				<ContactDialog
 					onSave={handleContactInput}
-					defaultValues={JSON.parse(searchParams.get('data') ?? '{}')}
+					defaultValues={searchParams.get('data') ? JSON.parse(searchParams.get('data')!) : null}
 				/>
 			</Show.ShowIf>
 		</div>

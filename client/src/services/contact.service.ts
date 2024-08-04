@@ -8,11 +8,11 @@ const formatContact = (contact: any) => {
 		formatted_name: contact.formatted_name ?? '',
 		name: {
 			formatted_name: contact.formatted_name ?? '',
-			first_name: contact.first_name ?? '',
-			last_name: contact.last_name ?? '',
-			middle_name: contact.middle_name ?? '',
-			suffix: contact.suffix ?? '',
-			prefix: contact.prefix ?? '',
+			first_name: contact.name.first_name ?? '',
+			last_name: contact.name.last_name ?? '',
+			middle_name: contact.name.middle_name ?? '',
+			suffix: contact.name.suffix ?? '',
+			prefix: contact.name.prefix ?? '',
 		},
 		phones:
 			contact.phones ??
@@ -53,9 +53,9 @@ const formatContact = (contact: any) => {
 				};
 			}),
 		org: {
-			company: contact.company ?? '',
-			department: contact.department ?? '',
-			title: contact.title ?? '',
+			company: contact.org.company ?? '',
+			department: contact.org.department ?? '',
+			title: contact.org.title ?? '',
 		},
 		birthday: contact.birthday ?? '',
 	};

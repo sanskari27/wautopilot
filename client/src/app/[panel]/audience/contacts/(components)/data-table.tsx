@@ -5,6 +5,8 @@ import { Contact } from '@/types/phonebook';
 import Link from 'next/link';
 
 export function DataTable({ records }: { records: Contact[] }) {
+	console.log(records);
+
 	return (
 		<div className='w-full'>
 			<div className='rounded-md border'>
