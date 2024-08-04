@@ -1,6 +1,7 @@
 'use client';
 
 import Show from '@/components/containers/show';
+import PhonebookDialog from '@/components/elements/dialogs/phonebook';
 import FieldSearch from '@/components/elements/filters/fieldSearch';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -48,8 +49,15 @@ import {
 } from '@tanstack/react-table';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
-import { AssignAgent, DeleteButton, ExportButton, ExportChatButton, TagsFilter } from './buttons';
-import { AddFields, AssignTags } from './dialogs';
+import {
+	AddRecord,
+	AssignAgent,
+	DeleteButton,
+	ExportButton,
+	ExportChatButton,
+	TagsFilter,
+} from './buttons';
+import { AddFields, AssignTags, UploadCSV } from './dialogs';
 
 function generateColumns(keys: string[]): ColumnDef<PhonebookRecord>[] {
 	return [
@@ -269,6 +277,8 @@ export function DataTable({
 					<Show.ShowIf condition={Object.keys(rowSelection).length === 0}>
 						<AddFields />
 						<ExportButton labels={searchParams.getAll('tags') ?? []} />
+						<UploadCSV />
+						<AddRecord />
 					</Show.ShowIf>
 					<Show.ShowIf condition={Object.keys(rowSelection).length !== 0}>
 						<DeleteButton ids={Object.keys(rowSelection)} />
@@ -433,6 +443,9 @@ export function DataTable({
 					</Table>
 				</div>
 			</div>
+			<Show.ShowIf condition={!!searchParams.get('add-phonebook')}>
+				<PhonebookDialog />
+			</Show.ShowIf>
 		</div>
 	);
 }

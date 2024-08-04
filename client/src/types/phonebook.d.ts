@@ -14,8 +14,6 @@ export type PhonebookRecord = {
 	labels: string[];
 };
 
-
-
 export type Contact = {
 	id: string;
 	formatted_name: string;

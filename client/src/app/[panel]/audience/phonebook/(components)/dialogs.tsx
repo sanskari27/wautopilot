@@ -13,8 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import PhoneBookService from '@/services/phonebook.service';
-import { Library, Tags } from 'lucide-react';
-import { useState } from 'react';
+import { CircleX, Library, Tags } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
 export function AddFields() {
@@ -88,6 +88,114 @@ export function AddFields() {
 	);
 }
 
+export function UploadCSV() {
+	const [tags, setTags] = useState('');
+	const [file, setFile] = useState<File | null>(null);
+	const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+	function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+		const files = event.target.files;
+		if (files && files.length > 0) {
+			const file = files[0];
+			setFile(file);
+		}
+		if (fileInputRef.current) {
+			fileInputRef.current.value = '';
+		}
+	}
+
+	async function submit() {
+		if (!file) return;
+		const _tags = tags.split(',').map((t) => t.trim());
+		toast.promise(PhoneBookService.bulkUpload(file, _tags), {
+			success: 'Field added successfully.',
+			error: 'Failed to add field.',
+			loading: 'Adding field...',
+		});
+	}
+
+	return (
+		<Dialog
+			onOpenChange={(open) => {
+				if (open) {
+					setTags('');
+					setFile(null);
+				}
+			}}
+		>
+			<DialogTrigger asChild>
+				<Button className='bg-lime-600 hover:bg-lime-700' size={'sm'}>
+					<Tags className='w-4 h-4 mr-2' />
+					Upload CSV
+				</Button>
+			</DialogTrigger>
+			<DialogContent className='sm:max-w-[425px] md:max-w-lg lg:max-w-xl'>
+				<DialogHeader>
+					<DialogTitle>Upload CSV</DialogTitle>
+				</DialogHeader>
+				<div className='grid gap-4'>
+					<div className='grid gap-2'>
+						{file ? (
+							<div className='flex items-center justify-between border-b border-dashed'>
+								<span>
+									File Selected : <span className='font-medium'>{file.name}</span>
+								</span>
+								<CircleX
+									className='w-4 h-4 text-red-500 cursor-pointer'
+									onClick={() => setFile(null)}
+								/>
+							</div>
+						) : (
+							<Label
+								htmlFor='logo'
+								className={
+									'!cursor-pointer text-center border border-gray-400 border-dashed py-12 rounded-lg text-normal text-primary'
+								}
+							>
+								<>Drag and drop file here, or click to select file</>
+							</Label>
+						)}
+						<Input
+							id='logo'
+							className='hidden'
+							type='file'
+							ref={fileInputRef}
+							onChange={handleFileChange}
+							accept='.csv'
+						/>
+					</div>
+					<div className='grid gap-2'>
+						<Label className='text-primary' htmlFor='tags'>
+							Tags (comma separated)
+						</Label>
+						<Textarea
+							id='tags'
+							value={tags}
+							placeholder='should only contain letters, numbers, and underscores.'
+							onChange={(e) =>
+								setTags(
+									e.target.value
+										.split(',')
+										.map((t) => t.trim())
+										.join(', ')
+								)
+							}
+						/>
+					</div>
+				</div>
+				<DialogFooter className='mt-2'>
+					<DialogClose asChild>
+						<Button variant='secondary'>Cancel</Button>
+					</DialogClose>
+					<DialogClose asChild>
+						<Button onClick={submit}>Save</Button>
+					</DialogClose>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
 export function AssignTags({ ids }: { ids: string[] }) {
 	const [tags, setTags] = useState('');
 
@@ -150,7 +258,7 @@ export function AssignTags({ ids }: { ids: string[] }) {
 						<Button variant='secondary'>Cancel</Button>
 					</DialogClose>
 					<DialogClose asChild>
-						<Button onClick={submit}>Save changes</Button>
+						<Button onClick={submit}>Save</Button>
 					</DialogClose>
 				</DialogFooter>
 			</DialogContent>

@@ -1,10 +1,13 @@
 'use client';
+import DeleteDialog from '@/components/elements/dialogs/delete';
+import AgentSelector from '@/components/elements/popover/agents';
 import TagsSelector from '@/components/elements/popover/tags';
 import { Button } from '@/components/ui/button';
 import AgentService from '@/services/agent.service';
 import MessagesService from '@/services/messages.service';
 import PhoneBookService from '@/services/phonebook.service';
-import { FolderDown, Headset, ListFilter, Trash } from 'lucide-react';
+import { Database, FolderDown, Headset, ListFilter, Trash } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -45,7 +48,7 @@ export function ExportChatButton({ ids }: { ids: string[] }) {
 
 export function DeleteButton({ ids }: { ids: string[] }) {
 	const router = useRouter();
-	function handleExport() {
+	function handleDelete() {
 		toast.promise(PhoneBookService.deleteRecords(ids), {
 			success: () => {
 				router.refresh();
@@ -57,10 +60,12 @@ export function DeleteButton({ ids }: { ids: string[] }) {
 	}
 
 	return (
-		<Button size={'sm'} className='bg-red-600 hover:bg-red-700' onClick={handleExport}>
-			<Trash className='w-4 h-4 mr-2' />
-			Delete
-		</Button>
+		<DeleteDialog onDelete={handleDelete}>
+			<Button size={'sm'} className='bg-red-600 hover:bg-red-700'>
+				<Trash className='w-4 h-4 mr-2' />
+				Delete
+			</Button>
+		</DeleteDialog>
 	);
 }
 
@@ -79,12 +84,12 @@ export function AssignAgent({ ids }: { ids: string[] }) {
 	}
 
 	return (
-		<TagsSelector onChange={([id]) => handleAssign(id)}>
-			<Button  size={'sm'} className='bg-purple-600 hover:bg-purple-700'>
+		<AgentSelector onSubmit={([id]) => handleAssign(id)}>
+			<Button size={'sm'} className='bg-purple-600 hover:bg-purple-700'>
 				<Headset className='w-4 h-4 mr-2' />
 				Assign Agent
 			</Button>
-		</TagsSelector>
+		</AgentSelector>
 	);
 }
 
@@ -113,5 +118,16 @@ export function TagsFilter() {
 				<ListFilter className='w-4 h-4' strokeWidth={3} />
 			</Button>
 		</TagsSelector>
+	);
+}
+
+export function AddRecord() {
+	return (
+		<Link href='?add-phonebook=true'>
+			<Button className='bg-indigo-600 hover:bg-indigo-700' size={'sm'}>
+				<Database className='w-4 h-4 mr-2' />
+				Add Record
+			</Button>
+		</Link>
 	);
 }

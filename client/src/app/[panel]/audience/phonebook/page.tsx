@@ -2,7 +2,7 @@ import api from '@/lib/api';
 import { PhonebookRecord } from '@/types/phonebook';
 import { DataTable } from './(components)/data-table';
 
-export default async function Tasks({
+export default async function Phonebook({
 	searchParams,
 }: {
 	searchParams: {
@@ -31,5 +31,9 @@ export default async function Tasks({
 	const records = data.records as PhonebookRecord[];
 	const totalRecords = data.totalRecords as number;
 
-	return <DataTable records={records} maxRecord={totalRecords} />;
+	return (
+		<>
+			<DataTable records={records} maxRecord={totalRecords} />
+		</>
+	);
 }

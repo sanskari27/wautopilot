@@ -35,7 +35,7 @@ export function AgentContextMenu({
 		toast.loading('Switching account...');
 		const status = await AuthService.serviceAccount(id);
 		if (status) {
-			router.push('/agent/dashboard');
+			router.push('/agent/home/dashboard');
 		} else {
 			toast.error('Unable to switch account.');
 		}

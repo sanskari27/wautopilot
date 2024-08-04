@@ -6,6 +6,8 @@ import AgentService from '@/services/agent.service';
 import AuthService from '@/services/auth.service';
 import ChatbotFlowService from '@/services/chatbot-flow.service';
 import ChatBotService from '@/services/chatbot.service';
+import ContactService from '@/services/contact.service';
+import MediaService from '@/services/media.service';
 import PhoneBookService from '@/services/phonebook.service';
 import TemplateService from '@/services/template.service';
 import { Metadata } from 'next';
@@ -27,6 +29,8 @@ export default async function Layout({
 	const chatBotFlows = (await ChatbotFlowService.listChatBots())!;
 	const agents = (await AgentService.getAgents())!;
 	const { labels, fields } = (await PhoneBookService.allLabels())!;
+	const media = (await MediaService.getMedias())!;
+	const contacts = (await ContactService.listContacts())!;
 
 	return (
 		<Suspense fallback={<Loading />}>
@@ -42,6 +46,8 @@ export default async function Layout({
 							agents,
 							labels,
 							fields,
+							media,
+							contacts,
 						}}
 					>
 						{children}

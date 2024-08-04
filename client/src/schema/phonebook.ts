@@ -1,0 +1,48 @@
+import { z } from 'zod';
+
+export const contactSchema = z.object({
+	addresses: z.array(
+		z.object({
+			type: z.string(),
+			street: z.string(),
+			city: z.string(),
+			state: z.string(),
+			zip: z.string(),
+			country: z.string(),
+			country_code: z.string(),
+		})
+	),
+	birthday: z.string(),
+	emails: z.array(
+		z.object({
+			email: z.string().email('Invalid email address'),
+			type: z.string(),
+		})
+	),
+	name: z.object({
+		formatted_name: z.string().min(1, 'Display name is required'),
+		first_name: z.string().min(1, 'First name is required'),
+		last_name: z.string(),
+		middle_name: z.string(),
+		suffix: z.string(),
+		prefix: z.string(),
+	}),
+	org: z.object({
+		company: z.string(),
+		department: z.string(),
+		title: z.string(),
+	}),
+	phones: z.array(
+		z.object({
+			phone: z.string(),
+			wa_id: z.string(),
+			type: z.string(),
+		})
+	),
+	urls: z.array(
+		z.object({
+			url: z.string().url('Invalid URL'),
+			type: z.string(),
+		})
+	),
+});

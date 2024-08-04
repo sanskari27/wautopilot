@@ -30,22 +30,22 @@ export default function Navbar() {
 			<MenubarMenu>
 				<MenubarTrigger>Home</MenubarTrigger>
 				<MenubarContent>
-					<MenubarLink href={getLink('/dashboard')}>Dashboard</MenubarLink>
+					<MenubarLink href={getLink('/home/dashboard')}>Dashboard</MenubarLink>
 					<MenubarSeparator />
-					<MenubarLink href={getLink('/tasks')}>Tasks</MenubarLink>
+					<MenubarLink href={getLink('/home/tasks')}>Tasks</MenubarLink>
 					<MenubarSeparator />
-					<MenubarLink href={getLink('/agents')}>Agents</MenubarLink>
+					<MenubarLink href={getLink('/home/agents')}>Agents</MenubarLink>
 					<MenubarLink href={`${pathname}?devices=true`}>Devices</MenubarLink>
-					<MenubarLink href={getLink('/settings')}>Settings</MenubarLink>
+					<MenubarLink href={getLink('/home/settings')}>Settings</MenubarLink>
 				</MenubarContent>
 			</MenubarMenu>
 			<MenubarMenu>
 				<MenubarTrigger>Audience & Media</MenubarTrigger>
 				<MenubarContent>
-					<MenubarLink href={getLink('/phonebook')}>Phonebook</MenubarLink>
+					<MenubarLink href={getLink('/audience/phonebook')}>Phonebook</MenubarLink>
 					<MenubarSeparator />
-					<MenubarLink href={getLink('/agents')}>Media</MenubarLink>
-					<MenubarLink href={getLink('/contacts')}>Contacts</MenubarLink>
+					<MenubarLink href={getLink('/audience/media')}>Media</MenubarLink>
+					<MenubarLink href={getLink('/audience/contacts')}>Contacts</MenubarLink>
 				</MenubarContent>
 			</MenubarMenu>
 			<MenubarMenu>

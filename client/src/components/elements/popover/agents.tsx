@@ -1,53 +1,36 @@
 'use client';
 import Each from '@/components/containers/each';
 import { useAgents } from '@/components/context/agents';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { PopoverClose } from '@radix-ui/react-popover';
 import { X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function AgentSelector({
 	children,
 	selected = [],
-	onChange = () => {},
-	onClose = () => {},
+	onSubmit = () => {},
 	isMultiSelect = true,
 }: {
 	children: React.ReactNode;
 	selected?: string[];
-	onChange?: (selected: string[]) => void;
-	onClose?: (selected: string[]) => void;
+	onSubmit?: (selected: string[]) => void;
 	isMultiSelect?: boolean;
 }) {
 	const [selectedTags, setSelectedTags] = useState<string[]>(selected);
 	const agents = useAgents();
 
-	useEffect(() => {
-		setSelectedTags(selected);
-	}, [selected]);
-
 	return (
-		<Popover
-			onOpenChange={(open) => {
-				if (!open) {
-					onClose(selectedTags);
-				}
-			}}
-		>
+		<Popover>
 			<PopoverTrigger asChild>
 				<div>{children}</div>
 			</PopoverTrigger>
 			<PopoverContent className='w-80'>
 				<div className='grid gap-4'>
 					<div className='flex justify-between items-center'>
-						<p
-							className='underline cursor-pointer'
-							onClick={() => {
-								setSelectedTags([]);
-								onChange([]);
-							}}
-						>
+						<p className='underline cursor-pointer' onClick={() => setSelectedTags([])}>
 							Clear
 						</p>
 						<h4 className='font-medium leading-none'>Select Agent</h4>
@@ -66,7 +49,6 @@ export default function AgentSelector({
 									onCheckedChange={(e) => {
 										if (!isMultiSelect) {
 											setSelectedTags(Boolean(e) ? [id] : []);
-											onChange([id]);
 											return;
 										}
 
@@ -74,7 +56,6 @@ export default function AgentSelector({
 											? [...selectedTags, id]
 											: selectedTags.filter((tag) => tag !== id);
 										setSelectedTags(_tags);
-										onChange(_tags);
 									}}
 								/>
 								<label htmlFor={id} className='text-sm font-medium leading-none'>
@@ -84,6 +65,19 @@ export default function AgentSelector({
 						)}
 					/>
 				</div>
+				<PopoverClose asChild>
+					<Button
+						className='w-full mt-3'
+						onClick={() => {
+							onSubmit(selectedTags);
+							setSelectedTags([]);
+						}}
+						size={'sm'}
+						disabled={selectedTags.length === 0 || (selectedTags.length > 1 && !isMultiSelect)}
+					>
+						Submit
+					</Button>
+				</PopoverClose>
 			</PopoverContent>
 		</Popover>
 	);

@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
 	} = await AuthService.isAuthenticated();
 
 	const pathname = request.nextUrl.pathname;
-	const subpath = master ? '/master' : admin ? '/admin' : agent ? '/agent' : '';
+	const subpath = master ? '/master/home' : admin ? '/admin/home' : agent ? '/agent/home' : '';
 
 	if (pathname.startsWith('/auth')) {
 		if (isAuthenticated) {

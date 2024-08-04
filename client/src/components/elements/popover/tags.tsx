@@ -5,7 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { PopoverClose } from '@radix-ui/react-popover';
 import { X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function TagsSelector({
 	children,
@@ -20,10 +20,6 @@ export default function TagsSelector({
 }) {
 	const [selectedTags, setSelectedTags] = useState<string[]>(selected);
 	const labels = useTags();
-
-	useEffect(() => {
-		setSelectedTags(selected);
-	}, [selected]);
 
 	return (
 		<Popover
