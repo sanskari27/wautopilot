@@ -71,14 +71,14 @@ export default class ContactService {
 		}
 	}
 
-	static async addContact(contact: Omit<Contact, 'id'>) {
+	static async addContact(contact: Omit<Contact, 'id' | 'formatted_name'>) {
 		const { data } = await api.post(`/contacts`, contact);
 		return formatContact(data.contact);
 	}
 	static async deleteContact(ids: string[]) {
 		await api.delete(`/contacts`, { data: { ids } });
 	}
-	static async updateContact(contact: Contact) {
+	static async updateContact(contact: Omit<Contact, 'formatted_name'>) {
 		const { data } = await api.put(`/contacts/${contact.id}`, contact);
 		return formatContact(data.contact);
 	}
