@@ -42,10 +42,10 @@ export function ResetPassword() {
 		}
 		setLoading(true);
 		const success = await AuthService.resetPassword(values.password, code);
-		setLoading(false);
 		if (success) {
 			router.push('/auth/login');
 		} else {
+			setLoading(false);
 			setError('password', { message: 'Invalid password reset token.' });
 		}
 	}

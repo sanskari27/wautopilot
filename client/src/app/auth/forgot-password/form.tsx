@@ -41,11 +41,11 @@ export default function ForgotPassword() {
 			values.email,
 			window.location.origin + '/auth/reset-password'
 		);
-		setLoading(false);
 		if (success) {
 			toast.success('Password reset link sent to your email');
 			router.push('/auth/login');
 		} else {
+			setLoading(false);
 			setError('email', { message: 'Invalid Credentials' });
 		}
 	}
