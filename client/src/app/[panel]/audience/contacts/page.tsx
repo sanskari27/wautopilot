@@ -43,7 +43,10 @@ export default function Contacts() {
 
 			<DataTable records={contacts} />
 			<Show.ShowIf condition={!!searchParams.get('contact')}>
-				<ContactDialog onSave={handleContactInput} />
+				<ContactDialog
+					onSave={handleContactInput}
+					defaultValues={JSON.parse(searchParams.get('data') ?? '{}')}
+				/>
 			</Show.ShowIf>
 		</div>
 	);

@@ -30,11 +30,14 @@ export function DataTable({ records }: { records: Contact[] }) {
 									render={(record, index) => (
 										<TableRow>
 											<TableCell>{index + 1}.</TableCell>
-											<TableCell>
-												<Link href={`?contact=${record.id}`} className='w-full'>
+											<Link
+												href={`?contact=${record.id}&data=${JSON.stringify(record)}`}
+												className='w-full h-full  inline-block'
+											>
+												<TableCell className='w-full inline-block'>
 													{record.formatted_name}
-												</Link>
-											</TableCell>
+												</TableCell>
+											</Link>
 										</TableRow>
 									)}
 								/>

@@ -41,10 +41,10 @@ export function ResetPassword() {
 			return setError('password', { message: 'Passwords do not match' });
 		}
 		setLoading(true);
-		const success = await AuthService.resetPassword(code, values.password);
+		const success = await AuthService.resetPassword(values.password, code);
 		setLoading(false);
 		if (success) {
-			router.push('/organizations');
+			router.push('/auth/login');
 		} else {
 			setError('password', { message: 'Invalid password reset token.' });
 		}
