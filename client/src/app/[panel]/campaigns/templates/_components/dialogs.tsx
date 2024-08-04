@@ -1,164 +1,189 @@
 'use client';
-import PreviewFile from '@/components/elements/preview-file';
-import { Button } from '@/components/ui/button';
 import {
-	Dialog,
-	DialogClose,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from '@/components/ui/dialog';
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import MediaService from '@/services/media.service';
-import { FileUp } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { Textarea } from '@/components/ui/textarea';
+import {} from '@radix-ui/react-alert-dialog';
+import { Link, MessageCircleReply, PhoneCall } from 'lucide-react';
+import { useState } from 'react';
 
-export function UploadMedia() {
-	const router = useRouter();
-	const [name, setName] = useState('');
-	const [selectedFile, setFile] = useState<{
-		file: File;
-		type: string;
-		size: string;
-		url: string;
-	} | null>(null);
-	const fileInputRef = useRef<HTMLInputElement | null>(null);
+export function AddQuickReply({
+	onSubmit,
+	disabled,
+}: {
+	disabled?: boolean;
+	onSubmit: (text: string) => void;
+}) {
+	const [text, setText] = useState('');
 
-	function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-		const files = event.target.files;
-		if (!files || files.length === 0) return;
-
-		const file = files[0];
-		const fileSizeBytes = file.size;
-		if (fileSizeBytes > 62914560) {
-			return;
-		}
-
-		const url = window.URL.createObjectURL(file);
-
-		const fileSizeKB = fileSizeBytes / 1024; // Convert bytes to kilobytes
-		const fileSizeMB = fileSizeKB / 1024;
-
-		let type = '';
-
-		if (file.type.includes('image')) {
-			type = 'image';
-		} else if (file.type.includes('video')) {
-			type = 'video';
-		} else if (file.type.includes('pdf')) {
-			type = 'PDF';
-		} else if (file.type.includes('audio')) {
-			type = file.type;
-		}
-
-		setFile({
-			file,
-			type,
-			size: fileSizeMB > 1 ? `${fileSizeMB.toFixed(2)} MB` : `${fileSizeKB.toFixed(2)} KB`,
-			url,
-		});
-		if (fileInputRef.current) {
-			fileInputRef.current.value = '';
-		}
+	function submit() {
+		onSubmit(text);
+		setText('');
 	}
-
-	async function submit() {
-		if (!selectedFile) return;
-		const filename = name || selectedFile.file.name;
-
-		toast.promise(MediaService.uploadMedia(selectedFile.file, filename), {
-			success: () => {
-				router.refresh();
-				return 'File uploaded successfully.';
-			},
-			error: 'Failed to upload file.',
-			loading: 'Uploading file...',
-		});
-	}
-
-	const removeSelectedFile = () => {
-		setFile(null);
-	};
 
 	return (
-		<Dialog
-			onOpenChange={(open) => {
-				if (open) {
-					setName('');
-					setFile(null);
-				}
-			}}
-		>
-			<DialogTrigger asChild>
+		<AlertDialog>
+			<AlertDialogTrigger asChild disabled={disabled}>
 				<Button size={'sm'} variant={'outline'} className='border-primary text-primary'>
-					<FileUp className='w-4 h-4 mr-2' />
-					Upload Media
+					<MessageCircleReply className='w-4 h-4 mr-2' />
+					Add Quick Reply
 				</Button>
-			</DialogTrigger>
-			<DialogContent className='sm:max-w-[425px] md:max-w-lg lg:max-w-xl'>
-				<DialogHeader>
-					<DialogTitle>Upload Media</DialogTitle>
-				</DialogHeader>
+			</AlertDialogTrigger>
+			<AlertDialogContent className='sm:max-w-[425px] md:max-w-lg lg:max-w-xl'>
+				<AlertDialogHeader>
+					<AlertDialogTitle>Quick Reply Details</AlertDialogTitle>
+				</AlertDialogHeader>
 				<div className='grid gap-4'>
 					<div className='grid gap-2'>
-						{selectedFile ? (
-							<div className='w-full gap-2'>
-								<p>Selected file : {selectedFile.file.name}</p>
-								<div className='flex justify-between items-center'>
-									<p>Selected file size : {selectedFile.size}</p>
-									<p
-										onClick={removeSelectedFile}
-										className='cursor-pointer font-normal text-red-400'
-									>
-										Remove
-									</p>
-								</div>
-								<PreviewFile data={selectedFile} />
-							</div>
-						) : (
-							<Label
-								htmlFor='logo'
-								className={
-									'!cursor-pointer text-center border border-gray-400 border-dashed py-12 rounded-lg text-normal text-primary'
-								}
-							>
-								<>Drag and drop file here, or click to select file</>
-							</Label>
-						)}
+						<Label className='text-primary' htmlFor='name'>
+							Text
+						</Label>
+						<Textarea
+							id='name'
+							className='h-48'
+							value={text}
+							placeholder='enter preferred text'
+							onChange={(e) => setText(e.target.value)}
+						/>
+					</div>
+				</div>
+				<AlertDialogFooter className='mt-2'>
+					<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<AlertDialogAction onClick={submit}>Save</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
+	);
+}
+
+export function PhoneNumberButton({
+	onSubmit,
+	disabled,
+}: {
+	disabled?: boolean;
+	onSubmit: (details: { phone_number: string; text: string }) => void;
+}) {
+	const [text, setText] = useState('');
+	const [phone_number, setPhoneNumber] = useState('');
+
+	function submit() {
+		onSubmit({ text, phone_number });
+		setText('');
+		setPhoneNumber('');
+	}
+
+	return (
+		<AlertDialog>
+			<AlertDialogTrigger asChild disabled={disabled}>
+				<Button size={'sm'} variant={'outline'} className='border-primary text-primary'>
+					<PhoneCall className='w-4 h-4 mr-2' />
+					Phone Number
+				</Button>
+			</AlertDialogTrigger>
+			<AlertDialogContent className='sm:max-w-[425px] md:max-w-lg lg:max-w-xl'>
+				<AlertDialogHeader>
+					<AlertDialogTitle>Phone Number Details</AlertDialogTitle>
+				</AlertDialogHeader>
+				<div className='grid gap-3'>
+					<div className='grid gap-2'>
+						<Label className='text-primary' htmlFor='name'>
+							Text to be displayed
+						</Label>
 						<Input
-							id='logo'
-							className='hidden'
-							type='file'
-							ref={fileInputRef}
-							onChange={handleFileChange}
+							id='name'
+							value={text}
+							placeholder='enter preferred text'
+							onChange={(e) => setText(e.target.value)}
 						/>
 					</div>
 					<div className='grid gap-2'>
 						<Label className='text-primary' htmlFor='name'>
-							Filename
+							Phone Number (with country code)
 						</Label>
 						<Input
 							id='name'
-							value={name}
-							placeholder='enter preferred filename'
-							onChange={(e) => setName(e.target.value)}
+							value={phone_number}
+							placeholder='9199XXXXXX89'
+							onChange={(e) => setPhoneNumber(e.target.value)}
 						/>
 					</div>
 				</div>
-				<DialogFooter className='mt-2'>
-					<DialogClose asChild>
-						<Button variant='secondary'>Cancel</Button>
-					</DialogClose>
-					<DialogClose asChild>
-						<Button onClick={submit}>Save</Button>
-					</DialogClose>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+				<AlertDialogFooter className='mt-2'>
+					<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<AlertDialogAction onClick={submit}>Save</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
+	);
+}
+
+export function URLButton({
+	onSubmit,
+	disabled,
+}: {
+	disabled?: boolean;
+	onSubmit: (details: { url: string; text: string }) => void;
+}) {
+	const [text, setText] = useState('');
+	const [link, setLink] = useState('');
+
+	function submit() {
+		onSubmit({ text, url: link });
+		setText('');
+		setLink('');
+	}
+
+	return (
+		<AlertDialog>
+			<AlertDialogTrigger asChild disabled={disabled}>
+				<Button size={'sm'} variant={'outline'} className='border-primary text-primary'>
+					<Link className='w-4 h-4 mr-2' />
+					URL
+				</Button>
+			</AlertDialogTrigger>
+			<AlertDialogContent className='sm:max-w-[425px] md:max-w-lg lg:max-w-xl'>
+				<AlertDialogHeader>
+					<AlertDialogTitle>URL Details</AlertDialogTitle>
+				</AlertDialogHeader>
+				<div className='grid gap-3'>
+					<div className='grid gap-2'>
+						<Label className='text-primary' htmlFor='name'>
+							Text to be displayed
+						</Label>
+						<Input
+							id='name'
+							value={text}
+							placeholder='enter preferred text'
+							onChange={(e) => setText(e.target.value)}
+						/>
+					</div>
+					<div className='grid gap-2'>
+						<Label className='text-primary' htmlFor='link'>
+							Link
+						</Label>
+						<Input
+							id='link'
+							value={link}
+							placeholder='enter your link'
+							onChange={(e) => setLink(e.target.value)}
+						/>
+					</div>
+				</div>
+				<AlertDialogFooter className='mt-2'>
+					<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<AlertDialogAction onClick={submit}>Save</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
 	);
 }

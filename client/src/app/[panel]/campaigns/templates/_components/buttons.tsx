@@ -28,7 +28,11 @@ export function RowButton({ id, children }: { id: string; children: React.ReactN
 		router.push(`/${params.panel}/campaigns/templates/${id}`);
 	}
 
-	return <TableRow onClick={handleClick}>{children}</TableRow>;
+	return (
+		<TableRow onClick={handleClick} className='cursor-pointer'>
+			{children}
+		</TableRow>
+	);
 }
 
 export function DeleteButton({ id }: { id: string }) {
