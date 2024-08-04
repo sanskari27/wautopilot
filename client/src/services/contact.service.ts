@@ -64,7 +64,12 @@ const formatContact = (contact: any) => {
 export default class ContactService {
 	static async listContacts() {
 		try {
-			const { data } = await api.get(`/contacts`);
+			const { data } = await api.get(`/contacts`, {
+				params: {
+					page: 1,
+					limit: 1000,
+				},
+			});
 			return data.contacts.map(formatContact);
 		} catch (error) {
 			return [];
