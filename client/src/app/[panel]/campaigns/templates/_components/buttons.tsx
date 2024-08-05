@@ -20,21 +20,6 @@ export function AddTemplate() {
 	);
 }
 
-export function RowButton({ id, children }: { id: string; children: React.ReactNode }) {
-	const params = useParams();
-	const router = useRouter();
-
-	function handleClick() {
-		router.push(`/${params.panel}/campaigns/templates/${id}`);
-	}
-
-	return (
-		<TableRow onClick={handleClick} className='cursor-pointer'>
-			{children}
-		</TableRow>
-	);
-}
-
 export function DeleteButton({ id }: { id: string }) {
 	const router = useRouter();
 	function handleExport() {

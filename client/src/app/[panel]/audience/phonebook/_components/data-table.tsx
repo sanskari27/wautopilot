@@ -1,5 +1,6 @@
 'use client';
 
+import { RowButton } from '@/components/containers/row-button';
 import Show from '@/components/containers/show';
 import PhonebookDialog from '@/components/elements/dialogs/phonebook';
 import FieldSearch from '@/components/elements/filters/fieldSearch';
@@ -49,9 +50,9 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from '@tanstack/react-table';
-import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import toast from 'react-hot-toast';
 import { z } from 'zod';
 import {
 	AddRecord,
@@ -62,7 +63,6 @@ import {
 	TagsFilter,
 } from './buttons';
 import { AddFields, AssignTags, UploadCSV } from './dialogs';
-import toast from 'react-hot-toast';
 
 function generateColumns(keys: string[]): ColumnDef<PhonebookRecord>[] {
 	return [
@@ -447,18 +447,17 @@ export function DataTable({
 						<TableBody>
 							{table.getRowModel().rows?.length ? (
 								table.getRowModel().rows.map((row) => (
-									<TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+									<RowButton
+										href={`?add-phonebook=${row.id}&data=${JSON.stringify(row.original)}`}
+										key={row.id}
+										data-state={row.getIsSelected() && 'selected'}
+									>
 										{row.getVisibleCells().map((cell) => (
 											<TableCell key={cell.id} className='p-2'>
-												<Link
-													href={`?add-phonebook=${row.id}&data=${JSON.stringify(row.original)}`}
-													className=''
-												>
-													{flexRender(cell.column.columnDef.cell, cell.getContext())}
-												</Link>
+												{flexRender(cell.column.columnDef.cell, cell.getContext())}
 											</TableCell>
 										))}
-									</TableRow>
+									</RowButton>
 								))
 							) : (
 								<TableRow>
