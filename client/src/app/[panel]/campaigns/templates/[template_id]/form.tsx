@@ -1,7 +1,7 @@
 'use client';
 
+import { Template } from '@/schema/template';
 import TemplateService from '@/services/template.service';
-import { Template } from '@/types/template';
 import { toast } from 'react-hot-toast';
 import DataForm from '../_components/data-form';
 

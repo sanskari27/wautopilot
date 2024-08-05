@@ -19,10 +19,9 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { permissionsSchema } from '@/schema/access';
+import { Permissions, permissionsSchema } from '@/schema/access';
 import { profileSchema, resetSchema } from '@/schema/auth';
 import AgentService from '@/services/agent.service';
-import { Permissions } from '@/types/permissions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';

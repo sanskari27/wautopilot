@@ -1,16 +1,16 @@
 'use client';
 
-import { Template } from '@/types/template';
+import { TemplateWithID } from '@/schema/template';
 import * as React from 'react';
 
-const TemplatesContext = React.createContext<Template[]>([]);
+const TemplatesContext = React.createContext<TemplateWithID[]>([]);
 
 export function TemplatesProvider({
 	children,
 	data,
 }: {
 	children: React.ReactNode;
-	data: Template[];
+	data: TemplateWithID[];
 }) {
 	return <TemplatesContext.Provider value={data}>{children}</TemplatesContext.Provider>;
 }

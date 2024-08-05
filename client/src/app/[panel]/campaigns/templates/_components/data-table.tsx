@@ -2,11 +2,10 @@ import Each from '@/components/containers/each';
 import { RowButton } from '@/components/containers/row-button';
 import Show from '@/components/containers/show';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
-import { Template } from '@/types/template';
+import { Template } from '@/schema/template';
 import { useParams } from 'next/navigation';
 
 export function DataTable({ records }: { records: Template[] }) {
-
 	const params = useParams();
 
 	return (

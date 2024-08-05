@@ -495,7 +495,6 @@ function ContactForm({
 									<div className='flex gap-3 w-full'>
 										<FormField
 											control={form.control}
-											name={`addresses.${index}.street`}
 											render={({ field }) => (
 												<FormItem className='space-y-0  flex-1'>
 													<FormControl>

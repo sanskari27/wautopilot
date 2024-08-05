@@ -3,7 +3,7 @@ import { useChatbotFlows } from '@/components/context/chatbotFlows';
 import { useChatbots } from '@/components/context/chatbots';
 import { useTemplates } from '@/components/context/templates';
 import { useUserDetails } from '@/components/context/user-details';
-import { getFormattedDate, getMonth } from '@/lib/utils';
+import { getFormattedDay, getMonth } from '@/lib/utils';
 import { Chart } from 'react-google-charts';
 import StatsTemplate from './statsTemplate';
 
@@ -67,7 +67,7 @@ export function MessagesOverview({
 		if (data.length === 0) return [];
 		const keys = ['DAY', 'COUNT'];
 		const _data = data.map((message) => {
-			return [getFormattedDate(message.day), message.count];
+			return [getFormattedDay(message.day), message.count];
 		});
 
 		return [keys, ..._data];

@@ -1,8 +1,8 @@
 'use client';
+import { Template } from '@/schema/template';
 import TemplateService from '@/services/template.service';
 import { toast } from 'react-hot-toast';
 import DataForm from '../_components/data-form';
-import { Template } from '@/types/template';
 
 export default function CreateTemplate() {
 	function handleSave(details: Template) {

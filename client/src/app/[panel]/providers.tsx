@@ -9,10 +9,10 @@ import { FieldsContextProvider, TagsProvider } from '@/components/context/tags';
 import { TemplatesProvider } from '@/components/context/templates';
 import { UserDetailsProvider, UserDetailsType } from '@/components/context/user-details';
 import { Contact } from '@/schema/phonebook';
+import { TemplateWithID } from '@/schema/template';
 import { Agent } from '@/types/agent';
 import { ChatBot, ChatbotFlow } from '@/types/chatbot';
 import { Media } from '@/types/media';
-import { Template } from '@/types/template';
 
 export function Providers({
 	children,
@@ -28,7 +28,7 @@ export function Providers({
 }: {
 	children: React.ReactNode;
 	userDetails: UserDetailsType;
-	templates: Template[];
+	templates: TemplateWithID[];
 	chatBots: ChatBot[];
 	chatBotFlows: ChatbotFlow[];
 	agents: Agent[];

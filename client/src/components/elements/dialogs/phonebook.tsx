@@ -2,7 +2,7 @@
 import Each from '@/components/containers/each';
 import { useFields } from '@/components/context/tags';
 import { Button } from '@/components/ui/button';
-import { DatePickerDemo } from '@/components/ui/date-picker';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import {
 	Form,
@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { mobileCheck } from '@/lib/utils';
+import { getDateObject, getFormattedDate, mobileCheck } from '@/lib/utils';
 import { PhonebookRecord, phonebookSchema } from '@/schema/phonebook';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePathname, useRouter } from 'next/navigation';
@@ -125,7 +125,7 @@ export function PhonebookForm({
 	});
 
 	const handleChangeDate = (key: 'anniversary' | 'birthday', date?: Date) => {
-		const formattedDate = date ? date.toLocaleDateString() : '';
+		const formattedDate = date ? getFormattedDate(date) : '';
 		form.setValue(key, formattedDate);
 	};
 
@@ -231,9 +231,9 @@ export function PhonebookForm({
 							<FormItem className='space-y-0'>
 								<FormLabel className='text-primary'>Birthday</FormLabel>
 								<FormControl>
-									<DatePickerDemo
+									<DatePicker
 										onChange={(date) => handleChangeDate('birthday', date)}
-										value={birthday ? new Date(birthday) : undefined}
+										value={birthday ? getDateObject(birthday) : undefined}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -249,9 +249,9 @@ export function PhonebookForm({
 							<FormItem className='space-y-0'>
 								<FormLabel className='text-primary'>Anniversary</FormLabel>
 								<FormControl>
-									<DatePickerDemo
+									<DatePicker
 										onChange={(date) => handleChangeDate('anniversary', date)}
-										value={anniversary ? new Date(anniversary) : undefined}
+										value={anniversary ? getDateObject(anniversary) : undefined}
 									/>
 								</FormControl>
 								<FormMessage />

@@ -53,3 +53,6 @@ export const permissionsSchema = z.object({
 	auto_assign_chats: z.boolean(),
 	assigned_labels: z.array(z.string()),
 });
+
+
+export type Permissions = z.infer<typeof permissionsSchema>;

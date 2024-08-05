@@ -9,7 +9,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { Permissions } from '@/types/permissions';
+import { Permissions } from '@/schema/access';
 import { AgentContextMenu } from './contextMenu';
 
 export default function Agents({

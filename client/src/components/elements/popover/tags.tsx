@@ -29,9 +29,7 @@ export default function TagsSelector({
 				}
 			}}
 		>
-			<PopoverTrigger asChild>
-				<div>{children}</div>
-			</PopoverTrigger>
+			<PopoverTrigger asChild>{children}</PopoverTrigger>
 			<PopoverContent className='w-80'>
 				<div className='grid gap-4'>
 					<div className='flex justify-between items-center'>

@@ -50,8 +50,22 @@ export const getMonth = (month: number, fullName = false) => {
 	return fullName ? name! : name!.substring(0, 3);
 };
 
-export const getFormattedDate = (date: number) => {
+export const getFormattedDay = (date: number) => {
 	return date < 10 ? `0${date}` : date.toString();
+};
+
+export const getFormattedDate = (date: Date) => {
+	const day = getFormattedDay(date.getDate());
+	const month = getFormattedDay(date.getMonth() + 1);
+	const year = date.getFullYear();
+	return `${year}-${month}-${day}`;
+};
+
+export const getDateObject = (dateStr: string) => {
+	const year = parseInt(dateStr.split('-')[0]);
+	const month = parseInt(dateStr.split('-')[1]);
+	const day = parseInt(dateStr.split('-')[2]);
+	return new Date(year, month - 1, day);
 };
 
 export const formatPhoneNumber = (phoneNumber: string) => {

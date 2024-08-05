@@ -15,19 +15,19 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import Each from '../containers/each';
-import { useOrganizationDetails } from '../context/user-details';
+import { useTemplates } from '../context/templates';
 
-export default function ComboboxCategories({
+export default function ComboboxTemplates({
 	placeholder,
 	value,
 	onChange,
 }: {
 	placeholder: string;
 	value: string;
-	onChange: (value: string) => void;
+	onChange: (details: { id: string; name: string } | null) => void;
 }) {
 	const [open, setOpen] = React.useState(false);
-	const { categories: items } = useOrganizationDetails();
+	const items = useTemplates();
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -44,31 +44,34 @@ export default function ComboboxCategories({
 			</PopoverTrigger>
 			<PopoverContent className='w-full p-0'>
 				<Command>
-					<CommandInput placeholder='Search Category...' />
-					<CommandEmpty>No categories found.</CommandEmpty>
+					<CommandInput placeholder='Search templates...' />
+					<CommandEmpty>No templates found.</CommandEmpty>
 					<CommandList>
 						<CommandGroup>
 							<Each
 								items={items}
 								render={(item) => (
 									<CommandItem
-										value={item}
+										value={item.id}
 										onSelect={(currentValue) => {
 											if (currentValue === value) {
-												onChange('');
+												onChange(null);
 												return;
 											}
-											onChange(currentValue);
+											onChange({
+												id: item.id,
+												name: item.name,
+											});
 										}}
 										className={cn('cursor-pointer z-10')}
 									>
 										<Check
 											className={cn(
 												'mr-2 h-4 w-4',
-												value.includes(item) ? 'opacity-100' : 'opacity-0'
+												value === item.name ? 'opacity-100' : 'opacity-0'
 											)}
 										/>
-										{item}
+										{item.name}
 									</CommandItem>
 								)}
 							/>

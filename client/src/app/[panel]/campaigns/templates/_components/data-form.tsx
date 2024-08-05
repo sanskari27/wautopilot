@@ -19,15 +19,13 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn, countOccurrences } from '@/lib/utils';
-import { templateSchema } from '@/schema/template';
+import { Template, templateSchema } from '@/schema/template';
 import UploadService from '@/services/upload.service';
-import { Template } from '@/types/template';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleMinus } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { z } from 'zod';
 import { AddQuickReply, PhoneNumberButton, URLButton } from './dialogs';
 
 export default function DataForm({
@@ -172,7 +170,7 @@ export default function DataForm({
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSave)} className='w-full space-y-2'>
 				<div className='flex flex-col lg:flex-row w-full justify-between gap-3'>
-					<div className='fle flex-col w-full lg:w-[70%] space-y-2'>
+					<div className='flex flex-col w-full lg:w-[70%] space-y-2'>
 						<div>
 							<FormField
 								rules={{ pattern: /^[a-z0-9_]+$/ }}

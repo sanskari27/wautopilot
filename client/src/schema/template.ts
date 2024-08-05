@@ -58,3 +58,6 @@ export const templateSchema = z.object({
 	language: z.string().default('en_US'),
 	components: z.array(componentSchema),
 });
+
+export type Template = z.infer<typeof templateSchema>;
+export type TemplateWithID = Template & { id: string };

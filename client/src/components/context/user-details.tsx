@@ -1,6 +1,6 @@
 'use client';
 
-import { Permissions } from '@/types/permissions';
+import { Permissions } from '@/schema/access';
 import * as React from 'react';
 
 export type UserDetailsType = {
