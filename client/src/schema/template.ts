@@ -60,4 +60,4 @@ export const templateSchema = z.object({
 });
 
 export type Template = z.infer<typeof templateSchema>;
-export type TemplateWithID = Template & { id: string };
+export type TemplateWithID = Template & { id: string; status: string };

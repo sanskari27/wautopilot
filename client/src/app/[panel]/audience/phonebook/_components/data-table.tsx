@@ -1,6 +1,5 @@
 'use client';
 
-import { RowButton } from '@/components/containers/row-button';
 import Show from '@/components/containers/show';
 import PhonebookDialog from '@/components/elements/dialogs/phonebook';
 import FieldSearch from '@/components/elements/filters/fieldSearch';
@@ -23,11 +22,13 @@ import {
 	Table,
 	TableBody,
 	TableCell,
+	TableCellLink,
 	TableHead,
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { PhonebookRecord, PhonebookRecordWithID } from '@/schema/phonebook';
+import { parseToObject } from '@/lib/utils';
+import { PhonebookRecord, PhonebookRecordWithID, phonebookSchema } from '@/schema/phonebook';
 import PhoneBookService from '@/services/phonebook.service';
 import {
 	CaretSortIcon,
@@ -290,6 +291,8 @@ export function DataTable({
 		});
 	};
 
+	const phonebookData = phonebookSchema.safeParse(parseToObject(searchParams.get('data')));
+
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
 			<div className='justify-between flex'>
@@ -444,19 +447,18 @@ export function DataTable({
 						</TableHeader>
 						<TableBody>
 							{table.getRowModel().rows?.length ? (
-								table.getRowModel().rows.map((row) => (
-									<RowButton
-										href={`?add-phonebook=${row.id}&data=${JSON.stringify(row.original)}`}
-										key={row.id}
-										data-state={row.getIsSelected() && 'selected'}
-									>
-										{row.getVisibleCells().map((cell) => (
-											<TableCell key={cell.id} className='p-2'>
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
-											</TableCell>
-										))}
-									</RowButton>
-								))
+								table.getRowModel().rows.map((row) => {
+									const link = `?add-phonebook=${row.id}&data=${JSON.stringify(row.original)}`;
+									return (
+										<TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+											{row.getVisibleCells().map((cell) => (
+												<TableCellLink href={link} key={cell.id} className='p-2'>
+													{flexRender(cell.column.columnDef.cell, cell.getContext())}
+												</TableCellLink>
+											))}
+										</TableRow>
+									);
+								})
 							) : (
 								<TableRow>
 									<TableCell colSpan={columns.length} className='h-24 text-center'>
@@ -468,11 +470,8 @@ export function DataTable({
 					</Table>
 				</div>
 			</div>
-			<Show.ShowIf condition={!!searchParams.get('add-phonebook')}>
-				<PhonebookDialog
-					defaultValues={searchParams.get('data') ? JSON.parse(searchParams.get('data')!) : null}
-					onSave={handlePhonebookInput}
-				/>
+			<Show.ShowIf condition={phonebookData.success}>
+				<PhonebookDialog defaultValues={phonebookData.data!} onSave={handlePhonebookInput} />
 			</Show.ShowIf>
 		</div>
 	);

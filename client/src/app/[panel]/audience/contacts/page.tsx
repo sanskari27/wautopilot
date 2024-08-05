@@ -2,6 +2,7 @@
 import Show from '@/components/containers/show';
 import { useContacts } from '@/components/context/contact';
 import ContactDialog from '@/components/elements/dialogs/contact';
+import { parseToObject } from '@/lib/utils';
 import { contactSchema } from '@/schema/phonebook';
 import ContactService from '@/services/contact.service';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -32,6 +33,8 @@ export default function Contacts() {
 			error: 'Failed to save contact',
 		});
 	};
+	const raw = parseToObject(searchParams.get('data'));
+	const data = contactSchema.safeParse(raw);
 
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
@@ -48,7 +51,7 @@ export default function Contacts() {
 			<Show.ShowIf condition={!!searchParams.get('contact')}>
 				<ContactDialog
 					onSave={handleContactInput}
-					defaultValues={searchParams.get('data') ? JSON.parse(searchParams.get('data')!) : null}
+					defaultValues={data.success ? data.data : null}
 				/>
 			</Show.ShowIf>
 		</div>

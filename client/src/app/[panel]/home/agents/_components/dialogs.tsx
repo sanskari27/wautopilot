@@ -19,7 +19,8 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { Permissions, permissionsSchema } from '@/schema/access';
+import { parseToObject } from '@/lib/utils';
+import { permissionsSchema } from '@/schema/access';
 import { profileSchema, resetSchema } from '@/schema/auth';
 import AgentService from '@/services/agent.service';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -278,71 +279,69 @@ export function PermissionDialog() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const id = searchParams.get('permissions');
-	const data = JSON.parse(searchParams.get('data') ?? '{}') as Permissions;
+	const res = permissionsSchema.safeParse(parseToObject(searchParams.get('data')));
+	const data = res.success
+		? res.data
+		: {
+				phonebook: {
+					create: false,
+					update: false,
+					delete: false,
+					export: false,
+				},
+				broadcast: {
+					create: false,
+					update: false,
+					report: false,
+					export: false,
+				},
+				recurring: {
+					create: false,
+					update: false,
+					delete: false,
+					export: false,
+				},
+				media: {
+					create: false,
+					update: false,
+					delete: false,
+				},
+				contacts: {
+					create: false,
+					update: false,
+					delete: false,
+				},
+				template: {
+					create: false,
+					update: false,
+					delete: false,
+				},
+				buttons: {
+					read: false,
+					export: false,
+				},
+				chatbot: {
+					create: false,
+					update: false,
+					delete: false,
+					export: false,
+				},
+				chatbot_flow: {
+					create: false,
+					update: false,
+					delete: false,
+					export: false,
+				},
+				auto_assign_chats: false,
+				assigned_labels: [],
+		  };
 
-	const {
-		handleSubmit,
-		register,
-		setError,
-		setValue,
-		clearErrors: resetErrors,
-		formState: { errors },
-	} = useForm<z.infer<typeof permissionsSchema>>({
-		resolver: zodResolver(permissionsSchema),
-		defaultValues: {
-			phonebook: {
-				create: data.phonebook?.create ?? false,
-				update: data.phonebook?.update ?? false,
-				delete: data.phonebook?.delete ?? false,
-				export: data.phonebook?.export ?? false,
-			},
-			broadcast: {
-				create: data.broadcast?.create ?? false,
-				update: data.broadcast?.update ?? false,
-				report: data.broadcast?.report ?? false,
-				export: data.broadcast?.export ?? false,
-			},
-			recurring: {
-				create: data.recurring?.create ?? false,
-				update: data.recurring?.update ?? false,
-				delete: data.recurring?.delete ?? false,
-				export: data.recurring?.export ?? false,
-			},
-			media: {
-				create: data.media?.create ?? false,
-				update: data.media?.update ?? false,
-				delete: data.media?.delete ?? false,
-			},
-			contacts: {
-				create: data.contacts?.create ?? false,
-				update: data.contacts?.update ?? false,
-				delete: data.contacts?.delete ?? false,
-			},
-			template: {
-				create: data.template?.create ?? false,
-				update: data.template?.update ?? false,
-				delete: data.template?.delete ?? false,
-			},
-			buttons: {
-				read: data.buttons?.read ?? false,
-				export: data.buttons?.export ?? false,
-			},
-			chatbot: {
-				create: data.chatbot?.create ?? false,
-				update: data.chatbot?.update ?? false,
-				delete: data.chatbot?.delete ?? false,
-				export: data.chatbot?.export ?? false,
-			},
-			chatbot_flow: {
-				create: data.chatbot_flow?.create ?? false,
-				update: data.chatbot_flow?.update ?? false,
-				delete: data.chatbot_flow?.delete ?? false,
-				export: data.chatbot_flow?.export ?? false,
-			},
-			auto_assign_chats: data.auto_assign_chats ?? false,
-			assigned_labels: data.assigned_labels ?? [],
-		},
-	});
+	const { handleSubmit, register, setError, setValue } = useForm<z.infer<typeof permissionsSchema>>(
+		{
+			resolver: zodResolver(permissionsSchema),
+			defaultValues: data,
+		}
+	);
 
 	async function formSubmit(values: z.infer<typeof permissionsSchema>) {
 		if (!id) {

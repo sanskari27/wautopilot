@@ -33,7 +33,7 @@ import { Broadcast, broadcastSchema } from '@/schema/broadcastSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-export default function Media() {
+export default function BroadcastPage() {
 	const templates = useTemplates();
 	let phonebook_fields = useFields();
 	phonebook_fields = phonebook_fields.filter((field) => field.value !== 'all');

@@ -88,7 +88,7 @@ function processRecurringDocs(docs: IRecurringBroadcast[]) {
 		labels: doc.labels,
 		template_id: doc.template_id,
 		template_name: doc.template_name,
-		template_header: doc.template_header,
+		template_header: doc.template_header?.type ? doc.template_header : undefined,
 		template_body: doc.template_body,
 		delay: doc.delay,
 		startTime: doc.startTime,
