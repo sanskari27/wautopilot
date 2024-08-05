@@ -1,17 +1,13 @@
 import api from '@/lib/api';
+import { templateSchema } from '@/schema/template';
+import { z } from 'zod';
 
 export default class TemplateService {
 	static async listTemplates() {
 		try {
 			const { data } = await api.get(`/template`);
 
-			const templates = data.templates as {
-				id: string;
-				name: string;
-				status: string;
-				category: string;
-				components: Record<string, unknown>[];
-			}[];
+			const templates = data.templates as z.infer<typeof templateSchema>[];
 
 			return templates;
 		} catch (err) {
@@ -22,13 +18,7 @@ export default class TemplateService {
 		try {
 			const { data } = await api.get(`/template/${template_id}`);
 
-			return data.template as {
-				id: string;
-				name: string;
-				status: string;
-				category: string;
-				components: Record<string, unknown>[];
-			};
+			return data.template as z.infer<typeof templateSchema>;
 		} catch (err) {
 			return null;
 		}

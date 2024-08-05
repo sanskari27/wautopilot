@@ -1,5 +1,5 @@
 import Each from '@/components/containers/each';
-import AgentService from '../../../services/agent.service';
+import AgentService from '@/services/agent.service';
 import { FilterAgent, FilterDate } from './filter';
 import TaskItem from './item';
 

@@ -2,6 +2,7 @@
 
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
+import TemplatePreview from '@/components/elements/template-preview';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,22 +20,31 @@ import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn, countOccurrences } from '@/lib/utils';
 import { templateSchema } from '@/schema/template';
+import UploadService from '@/services/upload.service';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleMinus } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
 import { z } from 'zod';
 import { AddQuickReply, PhoneNumberButton, URLButton } from './dialogs';
 
-export default function DataForm() {
+export default function DataForm({
+	onSave,
+	defaultValues,
+}: {
+	onSave: (data: z.infer<typeof templateSchema>) => void;
+	defaultValues?: z.infer<typeof templateSchema>;
+}) {
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
 	const [file, setFile] = useState<File | null>(null);
 	const form = useForm<z.infer<typeof templateSchema>>({
 		resolver: zodResolver(templateSchema),
-		defaultValues: {
+		defaultValues: defaultValues ?? {
 			name: '',
 			category: 'MARKETING',
 			components: [],
+			allow_category_change: true,
 		},
 	});
 
@@ -57,8 +67,43 @@ export default function DataForm() {
 	const buttons =
 		components.filter((component) => component.type === 'BUTTONS')?.[0]?.buttons ?? [];
 
+	const saveTemplate = async (data: z.infer<typeof templateSchema>, handle?: string) => {
+		const buttons =
+			data.components.filter((component) => component.type === 'BUTTONS')?.[0]?.buttons ?? [];
+
+		if (buttons.length === 0) {
+			data.components = data.components.filter((c: { type: string }) => c.type !== 'BUTTONS');
+		}
+
+		if (handle) {
+			data.components = data.components.map((component) => {
+				if (component.type === 'HEADER' && component.format !== 'TEXT') {
+					return {
+						...component,
+						example: {
+							header_handle: [handle],
+						},
+					};
+				}
+				return component;
+			});
+		}
+		onSave(data);
+	};
+
 	function handleSave(data: z.infer<typeof templateSchema>) {
-		// onSave(data);
+		if (file) {
+			toast.promise(UploadService.generateMetaHandle(file), {
+				success: (handle) => {
+					saveTemplate(data, handle);
+					return 'File uploaded';
+				},
+				error: 'Failed to upload file',
+				loading: 'Uploading file',
+			});
+		} else {
+			saveTemplate(data);
+		}
 	}
 
 	const bodyVariables = countOccurrences(body?.text ?? '');
@@ -126,7 +171,7 @@ export default function DataForm() {
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSave)} className='w-full space-y-2'>
 				<div className='flex flex-col lg:flex-row w-full justify-between gap-3'>
-					<div className='fle flex-col w-full md:w-[70%] space-y-2'>
+					<div className='fle flex-col w-full lg:w-[70%] space-y-2'>
 						<div>
 							<FormField
 								rules={{ pattern: /^[a-z0-9_]+$/ }}
@@ -413,15 +458,18 @@ export default function DataForm() {
 								/>
 							</div>
 
-							<div className='flex gap-3'>
+							<div className='flex flex-col md:flex-row gap-3'>
 								<AddQuickReply disabled={buttons.length >= 3} onSubmit={addQuickReply} />
 								<PhoneNumberButton disabled={buttons.length >= 3} onSubmit={addPhoneNumberButton} />
 								<URLButton disabled={buttons.length >= 3} onSubmit={addURLButton} />
 							</div>
 						</div>
 					</div>
-					<div className='w-full md:w-[30%] flex flex-col-reverse lg:flex-col justify-start'>
-						<Button type='submit'>Save</Button>
+					<div className='w-full lg:w-[30%] flex flex-col-reverse lg:flex-col justify-start items-start gap-3'>
+						<Button type='submit' className='w-[80%] mx-auto'>
+							Save
+						</Button>
+						<TemplatePreview components={components} />
 					</div>
 				</div>
 

@@ -6,8 +6,8 @@ const headerSchema = z.object({
 	text: z.string().optional(),
 	example: z
 		.object({
-			header_text: z.array(z.string()).default([]),
-			header_handle: z.array(z.string()).default([]),
+			header_text: z.array(z.string()).default([]).optional(),
+			header_handle: z.array(z.string()).default([]).optional(),
 		})
 		.optional(),
 });
