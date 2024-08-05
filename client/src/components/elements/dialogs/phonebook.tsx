@@ -253,7 +253,6 @@ export function PhonebookForm({
 									<DatePickerDemo
 										onChange={(date) => handleChangeDate('anniversary', date)}
 										value={anniversary ? new Date(anniversary) : undefined}
-										disablePreviousDates={true}
 									/>
 								</FormControl>
 								<FormMessage />

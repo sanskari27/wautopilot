@@ -16,9 +16,9 @@ type Fields = {
 
 export default function FieldSearch() {
 	const loaded = useRef(false);
-	const [fieldName, setFieldName] = useState('');
 	const router = useRouter();
 	const fieldsList = useFields();
+	const [fieldName, setFieldName] = useState('');
 	const [search, setSearch] = useState('');
 	const [fields, setFields] = useState<Fields>({});
 
@@ -54,7 +54,7 @@ export default function FieldSearch() {
 			}
 		});
 		if (!url.searchParams.has(`search_${key}`)) {
-			url.searchParams.set(`search_${key}`, fields[key]);
+			url.searchParams.set(`search_${key}`, value);
 		}
 		router.push(url.toString());
 	}
@@ -124,7 +124,7 @@ export default function FieldSearch() {
 						items={Object.keys(fields) as Array<keyof Fields>}
 						render={(key) => (
 							<Badge className='text-sm font-normal'>
-								<span>{key}</span>
+								<span className='capitalize'>{key.toString().replaceAll('_', ' ')}</span>
 								<span className='mx-1'>:</span>
 								<span>{fields[key]}</span>
 								<CircleMinus
