@@ -8,10 +8,10 @@ import { MediaProvider } from '@/components/context/media';
 import { FieldsContextProvider, TagsProvider } from '@/components/context/tags';
 import { TemplatesProvider } from '@/components/context/templates';
 import { UserDetailsProvider, UserDetailsType } from '@/components/context/user-details';
+import { Contact } from '@/schema/phonebook';
 import { Agent } from '@/types/agent';
 import { ChatBot, ChatbotFlow } from '@/types/chatbot';
 import { Media } from '@/types/media';
-import { Contact } from '@/types/phonebook';
 import { Template } from '@/types/template';
 
 export function Providers({

@@ -21,6 +21,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn, countOccurrences } from '@/lib/utils';
 import { templateSchema } from '@/schema/template';
 import UploadService from '@/services/upload.service';
+import { Template } from '@/types/template';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleMinus } from 'lucide-react';
 import { useRef, useState } from 'react';
@@ -33,12 +34,12 @@ export default function DataForm({
 	onSave,
 	defaultValues,
 }: {
-	onSave: (data: z.infer<typeof templateSchema>) => void;
-	defaultValues?: z.infer<typeof templateSchema>;
+	onSave: (data: Template) => void;
+	defaultValues?: Template;
 }) {
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
 	const [file, setFile] = useState<File | null>(null);
-	const form = useForm<z.infer<typeof templateSchema>>({
+	const form = useForm<Template>({
 		resolver: zodResolver(templateSchema),
 		defaultValues: defaultValues ?? {
 			name: '',
@@ -67,7 +68,7 @@ export default function DataForm({
 	const buttons =
 		components.filter((component) => component.type === 'BUTTONS')?.[0]?.buttons ?? [];
 
-	const saveTemplate = async (data: z.infer<typeof templateSchema>, handle?: string) => {
+	const saveTemplate = async (data: Template, handle?: string) => {
 		const buttons =
 			data.components.filter((component) => component.type === 'BUTTONS')?.[0]?.buttons ?? [];
 
@@ -91,7 +92,7 @@ export default function DataForm({
 		onSave(data);
 	};
 
-	function handleSave(data: z.infer<typeof templateSchema>) {
+	function handleSave(data: Template) {
 		if (file) {
 			toast.promise(UploadService.generateMetaHandle(file), {
 				success: (handle) => {

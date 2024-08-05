@@ -1,12 +1,11 @@
 'use client';
-import { templateSchema } from '@/schema/template';
 import TemplateService from '@/services/template.service';
 import { toast } from 'react-hot-toast';
-import { z } from 'zod';
 import DataForm from '../_components/data-form';
+import { Template } from '@/types/template';
 
 export default function CreateTemplate() {
-	function handleSave(details: z.infer<typeof templateSchema>) {
+	function handleSave(details: Template) {
 		toast.promise(TemplateService.addTemplate(details), {
 			success: 'Template created successfully',
 			error: (err) => {

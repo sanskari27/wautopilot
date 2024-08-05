@@ -27,9 +27,8 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { phonebookSchema } from '@/schema/phonebook';
+import { PhonebookRecord, phonebookSchema } from '@/schema/phonebook';
 import PhoneBookService from '@/services/phonebook.service';
-import { PhonebookRecord } from '@/types/phonebook';
 import {
 	CaretSortIcon,
 	ChevronDownIcon,

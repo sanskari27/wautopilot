@@ -1,6 +1,6 @@
 'use client';
 
-import { Contact } from '@/types/phonebook';
+import { Contact } from '@/schema/phonebook';
 import * as React from 'react';
 
 const ContactsContext = React.createContext<Contact[]>([]);

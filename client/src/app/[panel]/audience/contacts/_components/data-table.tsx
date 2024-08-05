@@ -1,11 +1,10 @@
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
-import { Contact } from '@/types/phonebook';
+import { Contact } from '@/schema/phonebook';
 import Link from 'next/link';
 
 export function DataTable({ records }: { records: Contact[] }) {
-
 	return (
 		<div className='w-full'>
 			<div className='rounded-md border'>

@@ -1,7 +1,4 @@
-export type Template = {
-	id: string;
-	name: string;
-	status: string;
-	category: string;
-	components: Record[];
-};
+import { templateSchema } from '@/schema/template';
+import { z } from 'zod';
+
+export type Template = z.infer<typeof templateSchema>;

@@ -1,5 +1,5 @@
 import api from '@/lib/api';
-import { Contact } from '@/types/phonebook';
+import { Contact } from '@/schema/phonebook';
 
 export default class MessagesService {
 	static async fetchAllConversation(label_filter: string[] = []) {

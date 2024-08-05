@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import api from '@/lib/api';
-import { Contact } from '@/types/phonebook';
+import { Contact } from '@/schema/phonebook';
 
 const formatContact = (contact: any) => {
 	return {
@@ -58,7 +57,7 @@ const formatContact = (contact: any) => {
 			title: contact.org.title ?? '',
 		},
 		birthday: contact.birthday ?? '',
-	};
+	} as Contact;
 };
 
 export default class ContactService {

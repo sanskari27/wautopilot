@@ -60,3 +60,7 @@ export const phonebookSchema = z.object({
 	others: z.record(z.string(), z.string().optional()),
 	labels: z.array(z.string()),
 });
+
+
+export type PhonebookRecord = z.infer<typeof phonebookSchema>;
+export type Contact = z.infer<typeof contactSchema>;
