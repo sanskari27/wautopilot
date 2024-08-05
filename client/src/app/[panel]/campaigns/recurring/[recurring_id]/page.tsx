@@ -3,13 +3,21 @@ import { parseToObject } from '@/lib/utils';
 import { Recurring, recurringSchema } from '@/schema/broadcastSchema';
 import { notFound, useSearchParams } from 'next/navigation';
 import DataForm from '../_components/data-form';
+import RecurringService from '@/services/recurring.service';
 
 export default function EditRecurring() {
 	const searchParams = useSearchParams();
-	function handleSave(data: Recurring) {}
-
 	const raw = parseToObject(searchParams.get('data'));
 	const data = recurringSchema.safeParse(raw);
+
+	function handleSave(data: Recurring) {
+		const isEditingRecurring = !!raw.id;
+		const promise = isEditingRecurring
+			? RecurringService.editRecurring({ deviceId: selected_device_id, details })
+			: RecurringService.createRecurring({ deviceId: selected_device_id, details });
+	}
+
+	
 
 	if (!data.success) {
 		console.log(data.error.errors);

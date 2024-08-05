@@ -3,6 +3,7 @@ import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
 import { useFields } from '@/components/context/tags';
 import { useTemplates } from '@/components/context/templates';
+import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
 import NumberInputDialog from '@/components/elements/dialogs/numberInput';
 import TagsSelector from '@/components/elements/popover/tags';
 import TemplatePreview from '@/components/elements/template-preview';
@@ -28,14 +29,19 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import api from '@/lib/api';
 import { countOccurrences, getDateObject, getFormattedDate } from '@/lib/utils';
 import { Broadcast, broadcastSchema } from '@/schema/broadcastSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { usePathname, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
 export default function BroadcastPage() {
 	const templates = useTemplates();
 	let phonebook_fields = useFields();
+	const router = useRouter();
+	const pathname = usePathname();
 	phonebook_fields = phonebook_fields.filter((field) => field.value !== 'all');
 
 	const form = useForm<Broadcast>({
@@ -63,7 +69,36 @@ export default function BroadcastPage() {
 	const template = templates.find((t) => t.id === fields.template_id);
 	const header = template?.components.find((component) => component.type === 'HEADER');
 
-	function handleSave(data: Broadcast) {}
+	function handleSave(data: Broadcast) {
+		const promise = api.post(`/broadcast/send`, {
+			name: data.name,
+			description: data.description,
+			template_id: data.template_id,
+			template_name: data.template_name,
+			to: data.recipients_from === 'numbers' ? data.to : [],
+			labels: data.recipients_from === 'tags' ? data.labels : [],
+			broadcast_options: data.broadcast_options,
+			body: data.body,
+			...(header
+				? {
+						header: {
+							media_id: data.header?.media_id,
+							link: data.header?.link,
+							type: header.format,
+						},
+				  }
+				: {}),
+		});
+
+		toast.promise(promise, {
+			loading: 'Sending Broadcast...',
+			success: () => {
+				form.reset();
+				return 'Broadcast sent successfully';
+			},
+			error: 'Failed to send broadcast',
+		});
+	}
 
 	function handleTemplateChange(selected: { id: string; name: string } | null) {
 		form.setValue('template_id', selected?.id ?? '');
@@ -290,22 +325,16 @@ export default function BroadcastPage() {
 									className='text-2xl font-medium'
 									hidden={!((!!header && header.format !== 'TEXT') || fields.body.length > 0)}
 								>
-									Template details
+									Template details {header?.format}
 								</p>
 								<Show.ShowIf condition={!!header && header.format !== 'TEXT'}>
-									{/* <FormField
-										control={form.control}
-										name='header.link'
-										render={({ field }) => (
-											<FormItem className='space-y-0'>
-												<FormLabel>Header media link</FormLabel>
-												<FormControl>
-													<Input placeholder='Media file link' type='url' {...field} />
-												</FormControl>
-											</FormItem>
-										)}
-									/> */}
-									<></>
+									<MediaSelectorDialog
+										singleSelect
+										selectedValue={fields.header?.media_id ? [fields.header?.media_id] : []}
+										onConfirm={(media) => form.setValue('header.media_id', media[0])}
+									>
+										<Button className='w-full'>Select Media</Button>
+									</MediaSelectorDialog>
 								</Show.ShowIf>
 								<Show.ShowIf condition={fields.body.length > 0}>
 									<Each
