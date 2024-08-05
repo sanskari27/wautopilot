@@ -1,3 +1,9 @@
+import RecipientsList from './_components/recipientsList';
+
 export default function ConversationsPage() {
-	return <div>conversation</div>;
+	return (
+		<div>
+			<RecipientsList />
+		</div>
+	);
 }

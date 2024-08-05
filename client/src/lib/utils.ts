@@ -107,3 +107,12 @@ export function parseToObject(input: any): object {
 		return {};
 	}
 }
+
+export function getInitials(fullName: string) {
+	return fullName
+		.replaceAll(/[^a-zA-Z ]/g, '')
+		.split(' ')
+		.map((name) => name.charAt(0))
+		.join('')
+		.toUpperCase();
+}

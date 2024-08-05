@@ -26,7 +26,7 @@ export default function Navbar() {
 	}
 
 	return (
-		<Menubar className=' backdrop-blur-sm px-[2%] py-4 border-t-0 border-x-0 border-b fixed top-0 w-full'>
+		<Menubar className=' backdrop-blur-sm px-[2%] py-4 border-t-0 border-x-0 border-b w-full'>
 			<MenubarMenu>
 				<MenubarTrigger>Home</MenubarTrigger>
 				<MenubarContent>

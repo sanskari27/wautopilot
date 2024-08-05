@@ -36,7 +36,7 @@ export default async function Layout({
 		<Suspense fallback={<Loading />}>
 			<main className='w-full h-full '>
 				<Navbar />
-				<PageLayout className='mt-[60px]'>
+				<PageLayout className='overflow-scroll'>
 					<Providers
 						{...{
 							userDetails,

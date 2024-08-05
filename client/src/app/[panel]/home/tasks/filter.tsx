@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import { cn, getInitials } from '@/lib/utils';
 import { format } from 'date-fns';
 import { CalendarIcon, MoveRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -58,7 +58,7 @@ export function FilterAgent() {
 						>
 							<Avatar className='h-6 w-6 -ml-1 mr-2'>
 								<AvatarFallback className={'text-black '}>
-									{item.name.toUpperCase()[0]}
+									{getInitials(item.name) || 'NA'}
 								</AvatarFallback>
 							</Avatar>
 							<span className='font-bold'>{item.name}</span>

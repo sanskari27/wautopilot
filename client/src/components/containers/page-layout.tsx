@@ -1,5 +1,3 @@
-import { BackgroundBeams } from "../ui/background-beams";
-
 export default function PageLayout({
 	children,
 	className = '',
@@ -7,9 +5,5 @@ export default function PageLayout({
 	children: React.ReactNode;
 	className?: string;
 }) {
-	return (
-		<div className={`flex flex-col h-full w-full ${className}`}>
-			{children}
-		</div>
-	);
+	return <div className={`flex flex-col h-[calc(100vh-60px)] w-full ${className}`}>{children}</div>;
 }
