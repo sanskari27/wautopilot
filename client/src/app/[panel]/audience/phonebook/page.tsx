@@ -1,6 +1,6 @@
 import api from '@/lib/api';
+import { PhonebookRecordWithID } from '@/schema/phonebook';
 import { DataTable } from './_components/data-table';
-import { PhonebookRecord } from '@/schema/phonebook';
 
 export default async function Phonebook({
 	searchParams,
@@ -28,7 +28,7 @@ export default async function Phonebook({
 			labels: searchParams.tags || [],
 		},
 	});
-	const records = data.records as PhonebookRecord[];
+	const records = data.records as PhonebookRecordWithID[];
 	const totalRecords = data.totalRecords as number;
 
 	return (

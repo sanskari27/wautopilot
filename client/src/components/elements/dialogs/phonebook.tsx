@@ -15,11 +15,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { mobileCheck } from '@/lib/utils';
-import { phonebookSchema } from '@/schema/phonebook';
+import { PhonebookRecord, phonebookSchema } from '@/schema/phonebook';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePathname, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 const defaultValues = {
 	id: '',
@@ -51,8 +50,8 @@ export default function PhonebookDialog({
 	defaultValues: _defaultValues,
 	onSave,
 }: {
-	defaultValues?: z.infer<typeof phonebookSchema>;
-	onSave: (data: z.infer<typeof phonebookSchema>) => void;
+	defaultValues?: PhonebookRecord;
+	onSave: (data: PhonebookRecord) => void;
 }) {
 	const router = useRouter();
 	const pathname = usePathname();
@@ -108,12 +107,12 @@ export function PhonebookForm({
 	defaultValues: _defaultValues,
 	onSave,
 }: {
-	defaultValues?: z.infer<typeof phonebookSchema>;
-	onSave: (data: z.infer<typeof phonebookSchema>) => void;
+	defaultValues?: PhonebookRecord;
+	onSave: (data: PhonebookRecord) => void;
 }) {
 	const fields = useFields();
 
-	const form = useForm<z.infer<typeof phonebookSchema>>({
+	const form = useForm<PhonebookRecord>({
 		resolver: zodResolver(phonebookSchema),
 		defaultValues: _defaultValues,
 	});
@@ -130,7 +129,7 @@ export function PhonebookForm({
 		form.setValue(key, formattedDate);
 	};
 
-	function handleSave(data: z.infer<typeof phonebookSchema>) {
+	function handleSave(data: PhonebookRecord) {
 		onSave(data);
 	}
 

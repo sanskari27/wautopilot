@@ -48,7 +48,6 @@ export const contactSchema = z.object({
 });
 
 export const phonebookSchema = z.object({
-	id: z.string(),
 	salutation: z.string(),
 	first_name: z.string().min(1, 'First name is required'),
 	last_name: z.string(),
@@ -61,6 +60,6 @@ export const phonebookSchema = z.object({
 	labels: z.array(z.string()),
 });
 
-
 export type PhonebookRecord = z.infer<typeof phonebookSchema>;
+export type PhonebookRecordWithID = PhonebookRecord & { id: string };
 export type Contact = z.infer<typeof contactSchema>;

@@ -82,7 +82,11 @@ export default class ContactService {
 	static async deleteContact(ids: string[]) {
 		await api.delete(`/contacts`, { data: { ids } });
 	}
-	static async updateContact(contact: Omit<Contact, 'formatted_name'>) {
+	static async updateContact(
+		contact: Omit<Contact, 'formatted_name'> & {
+			id: string;
+		}
+	) {
 		const { data } = await api.put(`/contacts/${contact.id}`, contact);
 		return formatContact(data.contact);
 	}

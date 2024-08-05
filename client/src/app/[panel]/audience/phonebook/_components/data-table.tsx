@@ -27,7 +27,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { PhonebookRecord, phonebookSchema } from '@/schema/phonebook';
+import { PhonebookRecord, PhonebookRecordWithID } from '@/schema/phonebook';
 import PhoneBookService from '@/services/phonebook.service';
 import {
 	CaretSortIcon,
@@ -52,7 +52,6 @@ import {
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import toast from 'react-hot-toast';
-import { z } from 'zod';
 import {
 	AddRecord,
 	AssignAgent,
@@ -63,7 +62,7 @@ import {
 } from './buttons';
 import { AddFields, AssignTags, UploadCSV } from './dialogs';
 
-function generateColumns(keys: string[]): ColumnDef<PhonebookRecord>[] {
+function generateColumns(keys: string[]): ColumnDef<PhonebookRecordWithID>[] {
 	return [
 		{
 			id: 'select',
@@ -193,7 +192,7 @@ function generateColumns(keys: string[]): ColumnDef<PhonebookRecord>[] {
 				header: () => {
 					return <Button variant='ghost'>{key}</Button>;
 				},
-				cell: ({ row }: { row: Row<PhonebookRecord> }) => (
+				cell: ({ row }: { row: Row<PhonebookRecordWithID> }) => (
 					<div className='px-4'>{row.original.others[key]}</div>
 				),
 			};
@@ -205,7 +204,7 @@ export function DataTable({
 	records,
 	maxRecord,
 }: {
-	records: PhonebookRecord[];
+	records: PhonebookRecordWithID[];
 	maxRecord: number;
 }) {
 	const pathname = usePathname();
@@ -274,7 +273,7 @@ export function DataTable({
 		router.replace(url.toString());
 	}
 
-	const handlePhonebookInput = (phonebook: z.infer<typeof phonebookSchema>) => {
+	const handlePhonebookInput = (phonebook: PhonebookRecord) => {
 		const id = searchParams.get('add-phonebook');
 		const promise =
 			id && id !== 'true'
