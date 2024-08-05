@@ -69,7 +69,7 @@ export default function RecipientsList() {
 											onClick={handleRecipientClick}
 											recipient={item}
 											isPinned
-											isActive
+											isActive={false}
 											isSelected={selectedConversations.includes(item._id)}
 										/>
 									)}
@@ -80,7 +80,7 @@ export default function RecipientsList() {
 										<Recipient
 											onClick={handleRecipientClick}
 											recipient={item}
-											isActive={index === 0}
+											isActive={false}
 											isSelected={selectedConversations.includes(item._id)}
 										/>
 									)}

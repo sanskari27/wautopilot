@@ -64,8 +64,11 @@ export function RecipientProvider({
 	);
 
 	React.useEffect(() => {
-		localStorage.setItem('pinned', JSON.stringify(pinnedIds));
-	}, [pinnedIds]);
+		try {
+			const pinned = JSON.parse(localStorage.getItem('pinned') ?? '[]');
+			setPinnedIds(pinned || []);
+		} catch (err) {}
+	}, []);
 
 	function setRecipientTags(id: string, tags: string[]) {
 		const newValue = value.map((item) => {
@@ -78,11 +81,12 @@ export function RecipientProvider({
 	}
 
 	function togglePin(id: string) {
-		if (pinnedIds.includes(id)) {
-			setPinnedIds(pinnedIds.filter((item) => item !== id));
-		} else {
-			setPinnedIds([...pinnedIds, id]);
-		}
+		const newPinnedIds = pinnedIds.includes(id)
+			? pinnedIds.filter((item) => item !== id)
+			: [id, ...pinnedIds];
+
+		localStorage.setItem('pinned', JSON.stringify(newPinnedIds));
+		setPinnedIds(newPinnedIds);
 	}
 
 	function markUnread(id: string) {
