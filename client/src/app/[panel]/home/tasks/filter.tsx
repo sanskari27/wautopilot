@@ -41,7 +41,7 @@ export function FilterAgent() {
 					onClick={() => setSelectedAgent('me')}
 				>
 					<Avatar className='h-6 w-6 -ml-1 mr-2'>
-						<AvatarFallback className={'text-black'}>Me</AvatarFallback>
+						<AvatarFallback>Me</AvatarFallback>
 					</Avatar>
 					<span className='font-bold'>Me</span>
 				</Badge>
@@ -57,9 +57,7 @@ export function FilterAgent() {
 							onClick={() => setSelectedAgent(item.id)}
 						>
 							<Avatar className='h-6 w-6 -ml-1 mr-2'>
-								<AvatarFallback className={'text-black '}>
-									{getInitials(item.name) || 'NA'}
-								</AvatarFallback>
+								<AvatarFallback>{getInitials(item.name) || 'NA'}</AvatarFallback>
 							</Avatar>
 							<span className='font-bold'>{item.name}</span>
 						</Badge>

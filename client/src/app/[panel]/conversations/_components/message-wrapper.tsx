@@ -1,6 +1,6 @@
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
@@ -11,7 +11,6 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { cn, getInitials } from '@/lib/utils';
 import { Message } from '@/types/recipient';
-import { AvatarFallback } from '@radix-ui/react-avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@radix-ui/react-tooltip';
 import {
 	CheckCheck,
@@ -113,8 +112,8 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 						)}
 					</div>
 					{sender.id && (
-						<Avatar className='w-8 h-8 bg-white inline-flex justify-center items-center'>
-							<AvatarFallback className='text-sm'>{getInitials(sender.name)}</AvatarFallback>
+						<Avatar className='w-6 h-6 inline-flex justify-center items-center'>
+							<AvatarFallback className='text-xs'>{getInitials(sender.name)}</AvatarFallback>
 						</Avatar>
 					)}
 				</div>
