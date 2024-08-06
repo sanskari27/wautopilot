@@ -136,8 +136,10 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 										<History className='w-4 h-4 self-end text-destructive' />
 									</span>
 								</TooltipTrigger>
-								<TooltipContent>
-									<p>{message.failed_reason}</p>
+								<TooltipContent className='!z-10'>
+									<p className='bg-gray-500 text-white max-w-xs rounded-xl p-2 text-justify text-sm'>
+										{message.failed_reason}
+									</p>
 								</TooltipContent>
 							</Tooltip>
 						</TooltipProvider>

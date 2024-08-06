@@ -1,19 +1,20 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Badge } from '../ui/badge';
 
 export default function ExpiryCountdown({ timeLeft }: { timeLeft: number }) {
 	const [_timeLeft, setTimeLeft] = useState(timeLeft);
+	const intervalRef = useRef<any>();
 
 	useEffect(() => {
 		setTimeLeft(timeLeft);
 	}, [timeLeft]);
 
 	useEffect(() => {
-		const interval = setInterval(() => {
+		intervalRef.current = setInterval(() => {
 			setTimeLeft((prev) => prev - 1);
 		}, 1000);
-		return () => clearInterval(interval);
+		return () => clearInterval(intervalRef.current);
 	}, []);
 
 	const formatTime = (time: number) => {

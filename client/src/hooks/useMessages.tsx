@@ -19,6 +19,7 @@ export default function useMessages(id: string) {
 			page: 1,
 			recipient_id: '',
 		},
+		current_id: '',
 	});
 
 	useEffect(() => {
@@ -35,6 +36,8 @@ export default function useMessages(id: string) {
 		pagination.current.loadMore = true;
 		pagination.current.page = 1;
 		pagination.current.loading = true;
+		setMessages([]);
+		setLoading(true);
 		MessagesService.fetchConversationMessages(id, {
 			page: 1,
 			signal: abortController.signal,
@@ -57,7 +60,10 @@ export default function useMessages(id: string) {
 	}, [id]);
 
 	useEffect(() => {
-		id && markRead(id);
+		if (id && pagination.current.current_id !== id) {
+			pagination.current.current_id = id;
+			markRead(id);
+		}
 	}, [id, markRead]);
 
 	const loadMore = () => {
