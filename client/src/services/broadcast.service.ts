@@ -191,7 +191,7 @@ export default class BroadcastService {
 				name: string;
 				description: string;
 				template_name: string;
-				status: 'ACTIVE' | 'PAUSED' ;
+				status: 'ACTIVE' | 'PAUSED';
 				sent: number;
 				failed: number;
 				pending: number;
@@ -203,7 +203,7 @@ export default class BroadcastService {
 		}
 	}
 
-	static async pauseBroadcast( broadcastId: string) {
+	static async pauseBroadcast(broadcastId: string) {
 		try {
 			await api.post(`/broadcast/${broadcastId}/pause`);
 			return true;
@@ -221,7 +221,7 @@ export default class BroadcastService {
 		}
 	}
 
-	static async deleteBroadcast( broadcastId: string) {
+	static async deleteBroadcast(broadcastId: string) {
 		try {
 			await api.post(`/broadcast/${broadcastId}/delete`);
 			return true;
@@ -230,7 +230,7 @@ export default class BroadcastService {
 		}
 	}
 
-	static async resendFailedBroadcast( broadcastId: string) {
+	static async resendFailedBroadcast(broadcastId: string) {
 		try {
 			await api.post(`/broadcast/${broadcastId}/resend`);
 			return true;
@@ -239,7 +239,7 @@ export default class BroadcastService {
 		}
 	}
 
-	static async downloadBroadcast( broadcastId: string) {
+	static async downloadBroadcast(broadcastId: string) {
 		const response = await api.get(`/broadcast/${broadcastId}/download`, {
 			responseType: 'blob',
 		});
@@ -282,16 +282,14 @@ export default class BroadcastService {
 	}
 
 	static async buttonResponseReport({
-		deviceId,
 		campaignId,
 		exportCSV,
 	}: {
-		deviceId: string;
 		campaignId: string;
 		exportCSV?: boolean;
 	}) {
 		if (!exportCSV) {
-			const { data } = await api.get(`/${deviceId}/broadcast/${campaignId}/button-responses`);
+			const { data } = await api.get(`/broadcast/${campaignId}/button-responses`);
 			return data.responses as {
 				button_text: string;
 				recipient: string;
@@ -299,13 +297,39 @@ export default class BroadcastService {
 				name: string;
 				email: string;
 			}[];
+			// return [
+			// 	{
+			// 		button_text: 'button_text',
+			// 		recipient: 'recipient',
+			// 		responseAt: 'responseAt',
+			// 		name: 'name',
+			// 		email: 'email',
+			// 	},
+			// 	{
+			// 		button_text: 'button_text',
+			// 		recipient: 'recipient',
+			// 		responseAt: 'responseAt',
+			// 		name: 'name',
+			// 		email: 'email',
+			// 	},
+			// 	{
+			// 		button_text: 'button_text',
+			// 		recipient: 'recipient',
+			// 		responseAt: 'responseAt',
+			// 		name: 'name',
+			// 		email: 'email',
+			// 	},
+			// ] as {
+			// 	button_text: string;
+			// 	recipient: string;
+			// 	responseAt: string;
+			// 	name: string;
+			// 	email: string;
+			// }[];
 		} else {
-			const response = await api.get(
-				`/${deviceId}/broadcast/${campaignId}/button-responses?export_csv=true`,
-				{
-					responseType: 'blob',
-				}
-			);
+			const response = await api.get(`/broadcast/${campaignId}/button-responses?export_csv=true`, {
+				responseType: 'blob',
+			});
 			const blob = new Blob([response.data]);
 
 			const contentDisposition = response.headers['content-disposition'];

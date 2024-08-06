@@ -1,6 +1,7 @@
 'use client';
 
 import Each from '@/components/containers/each';
+import { RowButton } from '@/components/containers/row-button';
 import DeleteDialog from '@/components/elements/dialogs/delete';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -13,7 +14,7 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import BroadcastService from '@/services/broadcast.service';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 import toast from 'react-hot-toast';
 
@@ -34,6 +35,8 @@ export default function ReportDataTable({
 	}[];
 }) {
 	const router = useRouter();
+	const params = useParams();
+	const panel = params.panel as string;
 	const [selectedBroadcast, setSelectedBroadcast] = React.useState<string[]>([]);
 
 	const removeCampaignList = (campaign_id: string) => {
@@ -75,7 +78,7 @@ export default function ReportDataTable({
 	return (
 		<div>
 			<div className='justify-between flex'>
-				<h2 className='text-2xl font-bold'>Recurring</h2>
+				<h2 className='text-2xl font-bold'>Campaign Report</h2>
 				<div className='flex gap-x-2 gap-y-1 flex-wrap '>
 					<Button onClick={handleExport} size={'sm'}>
 						Export
@@ -122,7 +125,11 @@ export default function ReportDataTable({
 						items={list}
 						render={(recurring) => {
 							return (
-								<TableRow>
+								<RowButton
+									href={`
+                                    /${panel}/campaigns/report/button-report/${recurring.broadcast_id}
+                                `}
+								>
 									<TableCell className='font-medium'>
 										<Checkbox
 											checked={selectedBroadcast.includes(recurring.broadcast_id)}
@@ -183,7 +190,7 @@ export default function ReportDataTable({
 											'Completed'
 										)}
 									</TableCell>
-								</TableRow>
+								</RowButton>
 							);
 						}}
 					/>
