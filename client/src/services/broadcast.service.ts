@@ -1,4 +1,3 @@
-
 import { Contact } from '@/schema/phonebook';
 import api from '../lib/api';
 
@@ -144,7 +143,7 @@ export default class BroadcastService {
 			};
 		}
 	}
-	
+
 	static async sendConversationMessage(
 		deviceId: string,
 		recipientId: string,
@@ -165,10 +164,7 @@ export default class BroadcastService {
 		}
 	) {
 		try {
-			await api.post(
-				`/${deviceId}/broadcast/conversations/${recipientId}/send-message`,
-				message
-			);
+			await api.post(`/${deviceId}/broadcast/conversations/${recipientId}/send-message`, message);
 			return true;
 		} catch (err) {
 			return false;
@@ -186,53 +182,65 @@ export default class BroadcastService {
 		}
 	}
 
-	static async broadcastReport(deviceId: string) {
+	static async broadcastReport() {
 		try {
-			const { data } = await api.get(`/${deviceId}/broadcast/reports`);
-			return data.reports as ScheduledBroadcast[];
+			const { data } = await api.get(`/broadcast/reports`);
+			console.log(data.reports);
+			return data.reports as {
+				broadcast_id: string;
+				name: string;
+				description: string;
+				template_name: string;
+				status: 'ACTIVE' | 'PAUSED' ;
+				sent: number;
+				failed: number;
+				pending: number;
+				isPaused: boolean;
+				create_at: string;
+			}[];
 		} catch (err) {
 			return [];
 		}
 	}
 
-	static async pauseBroadcast(deviceId: string, broadcastId: string) {
+	static async pauseBroadcast( broadcastId: string) {
 		try {
-			await api.post(`/${deviceId}/broadcast/${broadcastId}/pause`);
+			await api.post(`/broadcast/${broadcastId}/pause`);
 			return true;
 		} catch (err) {
 			return false;
 		}
 	}
 
-	static async resumeBroadcast(deviceId: string, broadcastId: string) {
+	static async resumeBroadcast(broadcastId: string) {
 		try {
-			await api.post(`/${deviceId}/broadcast/${broadcastId}/resume`);
+			await api.post(`/broadcast/${broadcastId}/resume`);
 			return true;
 		} catch (err) {
 			return false;
 		}
 	}
 
-	static async deleteBroadcast(deviceId: string, broadcastId: string) {
+	static async deleteBroadcast( broadcastId: string) {
 		try {
-			await api.post(`/${deviceId}/broadcast/${broadcastId}/delete`);
+			await api.post(`/broadcast/${broadcastId}/delete`);
 			return true;
 		} catch (err) {
 			return false;
 		}
 	}
 
-	static async resendFailedBroadcast(deviceId: string, broadcastId: string) {
+	static async resendFailedBroadcast( broadcastId: string) {
 		try {
-			await api.post(`/${deviceId}/broadcast/${broadcastId}/resend`);
+			await api.post(`/broadcast/${broadcastId}/resend`);
 			return true;
 		} catch (err) {
 			return false;
 		}
 	}
 
-	static async downloadBroadcast(deviceId: string, broadcastId: string) {
-		const response = await api.get(`/${deviceId}/broadcast/${broadcastId}/download`, {
+	static async downloadBroadcast( broadcastId: string) {
+		const response = await api.get(`/broadcast/${broadcastId}/download`, {
 			responseType: 'blob',
 		});
 		const blob = new Blob([response.data]);
@@ -283,9 +291,7 @@ export default class BroadcastService {
 		exportCSV?: boolean;
 	}) {
 		if (!exportCSV) {
-			const { data } = await api.get(
-				`/${deviceId}/broadcast/${campaignId}/button-responses`
-			);
+			const { data } = await api.get(`/${deviceId}/broadcast/${campaignId}/button-responses`);
 			return data.responses as {
 				button_text: string;
 				recipient: string;

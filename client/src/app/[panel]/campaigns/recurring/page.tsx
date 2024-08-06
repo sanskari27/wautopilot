@@ -23,6 +23,7 @@ export default async function Recurring({
 	};
 }) {
 	const list = await RecurringService.getRecurringList();
+	
 
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
