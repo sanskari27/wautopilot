@@ -185,7 +185,6 @@ export default class BroadcastService {
 	static async broadcastReport() {
 		try {
 			const { data } = await api.get(`/broadcast/reports`);
-			console.log(data.reports);
 			return data.reports as {
 				broadcast_id: string;
 				name: string;
@@ -196,7 +195,7 @@ export default class BroadcastService {
 				failed: number;
 				pending: number;
 				isPaused: boolean;
-				create_at: string;
+				createdAt: string;
 			}[];
 		} catch (err) {
 			return [];

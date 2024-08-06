@@ -1,72 +1,12 @@
 'use client';
-import Each from '@/components/containers/each';
-import { useAgents } from '@/components/context/agents';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn, getInitials } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { CalendarIcon, MoveRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-export function FilterAgent() {
-	const router = useRouter();
-	const agents = useAgents();
-	const [selectedAgent, setSelected] = useState<string>('me');
-
-	useEffect(() => {
-		const url = new URL((window as any).location);
-		setSelected(url.searchParams.get('agent') || 'me');
-	}, []);
-
-	function setSelectedAgent(text: string) {
-		setSelected(text);
-		const url = new URL((window as any).location);
-		url.searchParams.set('agent', text);
-		router.push(url.toString());
-	}
-
-	return (
-		<div className='border border-dashed border-gray-700 p-2 rounded-full'>
-			<div className='gap-4 flex-wrap flex'>
-				<Badge
-					className={cn(
-						'rounded-full cursor-pointer',
-						selectedAgent === 'me' ? 'bg-green-500' : 'bg-gray-300',
-						selectedAgent === 'me' ? 'text-white' : 'text-black'
-					)}
-					onClick={() => setSelectedAgent('me')}
-				>
-					<Avatar className='h-6 w-6 -ml-1 mr-2'>
-						<AvatarFallback>Me</AvatarFallback>
-					</Avatar>
-					<span className='font-bold'>Me</span>
-				</Badge>
-				<Each
-					items={agents}
-					render={(item) => (
-						<Badge
-							className={cn(
-								'rounded-full cursor-pointer',
-								selectedAgent === item.id ? 'bg-green-500' : 'bg-gray-300',
-								selectedAgent === item.id ? 'text-white' : 'text-black'
-							)}
-							onClick={() => setSelectedAgent(item.id)}
-						>
-							<Avatar className='h-6 w-6 -ml-1 mr-2'>
-								<AvatarFallback>{getInitials(item.name) || 'NA'}</AvatarFallback>
-							</Avatar>
-							<span className='font-bold'>{item.name}</span>
-						</Badge>
-					)}
-				/>
-			</div>
-		</div>
-	);
-}
 
 export function FilterDate() {
 	const router = useRouter();
@@ -81,6 +21,8 @@ export function FilterDate() {
 		const url = new URL((window as any).location);
 		const startDate = url.searchParams.get('start');
 		const endDate = url.searchParams.get('end');
+		console.log(startDate, endDate);
+
 		setStartDate(
 			startDate
 				? new Date(startDate)

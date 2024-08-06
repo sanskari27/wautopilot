@@ -14,7 +14,6 @@ import {
 import useMessages from '@/hooks/useMessages';
 import { getInitials } from '@/lib/utils';
 import { ChevronLeft, EllipsisVertical } from 'lucide-react';
-import { useEffect } from 'react';
 import MessagesList from './messages-list';
 
 export default function ConversationScreen() {
@@ -27,7 +26,7 @@ export default function ConversationScreen() {
 	return (
 		<div className='w-full'>
 			<div className='flex p-4 border-b-2 justify-between w-full'>
-				<div className='flex gap-3'>
+				<div className='flex gap-3 items-center'>
 					<ChevronLeft className='block md:!hidden' onClick={expand} />
 					<Avatar>
 						<AvatarFallback>{getInitials(recipient.profile_name) || 'Unknown'}</AvatarFallback>

@@ -22,13 +22,15 @@ export default function TaskItem({ id, message, hidden, due_date }: Task) {
 			router.refresh();
 		});
 	};
+
 	return (
 		<div className='px-3 py-2 bg-gray-100 rounded-xl whitespace-pre-wrap'>
 			<span className='font-medium'>{due_date}</span> {message}
 			<Button
+				type='submit'
 				variant={'default'}
 				size={'sm'}
-				className='bg-primary ml-4 '
+				className='ml-4 text-sm'
 				disabled={hidden || loading}
 				onClick={hideTask}
 			>

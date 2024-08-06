@@ -75,7 +75,7 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
 	<td
 		ref={ref}
-		className={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)}
+		className={cn('p-2 align-middle [&:has([role=checkbox])]:pr-0', className)}
 		{...props}
 	/>
 ));
@@ -89,7 +89,7 @@ const TableCellLink = React.forwardRef<
 >(({ className, href, children, ...props }, ref) => (
 	<td ref={ref} className={cn('align-middle [&:has([role=checkbox])]:pr-0', className)} {...props}>
 		<Link href={href}>
-			<div className='p-4'>{children}</div>
+			<div className='p-2'>{children}</div>
 		</Link>
 	</td>
 ));

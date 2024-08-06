@@ -1,7 +1,6 @@
 'use client';
 
 import Each from '@/components/containers/each';
-import { RowButton } from '@/components/containers/row-button';
 import DeleteDialog from '@/components/elements/dialogs/delete';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -9,6 +8,7 @@ import {
 	Table,
 	TableBody,
 	TableCell,
+	TableCellLink,
 	TableHead,
 	TableHeader,
 	TableRow,
@@ -31,7 +31,7 @@ export default function ReportDataTable({
 		failed: number;
 		pending: number;
 		isPaused: boolean;
-		create_at: string;
+		createdAt: string;
 	}[];
 }) {
 	const router = useRouter();
@@ -124,12 +124,9 @@ export default function ReportDataTable({
 					<Each
 						items={list}
 						render={(recurring) => {
+							const link = `/${panel}/campaigns/report/button-report/${recurring.broadcast_id}`;
 							return (
-								<RowButton
-									href={`
-                                    /${panel}/campaigns/report/button-report/${recurring.broadcast_id}
-                                `}
-								>
+								<TableRow>
 									<TableCell className='font-medium'>
 										<Checkbox
 											checked={selectedBroadcast.includes(recurring.broadcast_id)}
@@ -142,12 +139,22 @@ export default function ReportDataTable({
 											}}
 										/>
 									</TableCell>
-									<TableCell className='font-medium'>{recurring.name}</TableCell>
-									<TableCell className='whitespace-pre-wrap'>{recurring.description}</TableCell>
-									<TableCell>{recurring.create_at}</TableCell>
-									<TableCell className='text-right text-primary'>{recurring.sent}</TableCell>
-									<TableCell className='text-right text-destructive'>{recurring.failed}</TableCell>
-									<TableCell className='text-right'>{recurring.pending}</TableCell>
+									<TableCellLink href={link} className='font-medium'>
+										{recurring.name}
+									</TableCellLink>
+									<TableCellLink href={link} className='whitespace-pre-wrap'>
+										{recurring.description}
+									</TableCellLink>
+									<TableCellLink href={link}>{recurring.createdAt}</TableCellLink>
+									<TableCellLink href={link} className='text-right text-primary'>
+										{recurring.sent}
+									</TableCellLink>
+									<TableCellLink href={link} className='text-right text-destructive'>
+										{recurring.failed}
+									</TableCellLink>
+									<TableCellLink href={link} className='text-right'>
+										{recurring.pending}
+									</TableCellLink>
 									<TableCell className='text-center'>
 										{recurring.isPaused ? (
 											<Button
@@ -190,7 +197,7 @@ export default function ReportDataTable({
 											'Completed'
 										)}
 									</TableCell>
-								</RowButton>
+								</TableRow>
 							);
 						}}
 					/>

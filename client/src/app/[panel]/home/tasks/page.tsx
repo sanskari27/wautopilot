@@ -1,7 +1,7 @@
-import Each from '@/components/containers/each';
 import AgentService from '@/services/agent.service';
-import { FilterAgent, FilterDate } from './filter';
-import TaskItem from './item';
+import { FilterAgent } from './_components/filter-agent';
+import { FilterDate } from './_components/filter-date';
+import List from './_components/list';
 
 export default async function Tasks({
 	searchParams,
@@ -35,7 +35,7 @@ export default async function Tasks({
 				<h2 className='text-2xl font-bold'>Tasks</h2>
 			</div>
 
-			<FilterAgent />
+			<FilterAgent selectedAgent={agent} />
 
 			<FilterDate />
 
@@ -49,7 +49,7 @@ export default async function Tasks({
 					{filteredList.length === 0 && (
 						<p className='text-center font-medium'>No tasks assigned .</p>
 					)}
-					<Each items={filteredList} key={'id'} render={(item) => <TaskItem {...item} />} />
+					<List list={filteredList} />
 				</div>
 			</div>
 			<div>

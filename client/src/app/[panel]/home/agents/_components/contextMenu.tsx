@@ -12,11 +12,9 @@ import {
 	ContextMenuSubTrigger,
 	ContextMenuTrigger,
 } from '@/components/ui/context-menu';
-import AgentService from '@/services/agent.service';
-import AuthService from '@/services/auth.service';
 import { Agent } from '@/types/agent';
-import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import { assignConversationsToAgent, deleteAgent, switchServiceAccount } from '../action';
 
 export function AgentContextMenu({
 	children,
@@ -29,33 +27,24 @@ export function AgentContextMenu({
 	disabled?: boolean;
 	agent: Agent;
 }) {
-	const router = useRouter();
-	const pathname = usePathname();
+	// const pathname = usePathname();
 	const openServiceAccount = async () => {
-		toast.loading('Switching account...');
-		const status = await AuthService.serviceAccount(id);
-		if (status) {
-			router.push('/agent/home/dashboard');
-		} else {
-			toast.error('Unable to switch account.');
-		}
+		toast.loading('Switching account...', {
+			duration: 5000,
+		});
+		await switchServiceAccount(id);
 	};
 
-	const deleteAgent = () => {
-		const promise = AgentService.deleteAgent(id);
-
-		toast.promise(promise, {
+	const handleDelete = () => {
+		toast.promise(deleteAgent(id), {
 			loading: 'Deleting...',
-			success: () => {
-				router.refresh();
-				return 'Agent deleted successfully';
-			},
+			success: 'Agent deleted successfully',
 			error: 'Failed to delete agent',
 		});
 	};
 
 	const handleAssignChats = (numbers: string[]) => {
-		toast.promise(AgentService.assignConversationsToAgent(id, { numbers }), {
+		toast.promise(assignConversationsToAgent(id, numbers), {
 			success: 'Chats assigned successfully',
 			error: 'Failed to assign chats',
 			loading: 'Assigning chats...',
@@ -70,7 +59,7 @@ export function AgentContextMenu({
 		<ContextMenu>
 			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 			<ContextMenuContent className='w-64'>
-				<ContextMenuLink href={`${pathname}/${id}/logs`} inset>
+				<ContextMenuLink href={`master/${id}/logs`} inset>
 					View Logs
 				</ContextMenuLink>
 				<NumberInputDialog onSubmit={handleAssignChats}>
@@ -95,7 +84,7 @@ export function AgentContextMenu({
 						<ContextMenuLink href={`?update-password=${id}`}>Change Password</ContextMenuLink>
 						<ContextMenuLink onClick={openServiceAccount}>Service Account</ContextMenuLink>
 						<ContextMenuSeparator />
-						<DeleteDialog onDelete={deleteAgent}>
+						<DeleteDialog onDelete={handleDelete}>
 							<ContextMenuLabel className='hover:text-red-400 cursor-pointer hover:bg-accent font-normal'>
 								Delete
 							</ContextMenuLabel>

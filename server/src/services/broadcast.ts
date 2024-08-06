@@ -490,7 +490,7 @@ export default class BroadcastService extends WhatsappLinkService {
 				sent: message.sent as number,
 				failed: message.failed as number,
 				pending: message.pending as number,
-				createdAt: DateUtils.format(message.createdAt, 'DD-MM-YYYY HH:mm') as string,
+				createdAt: DateUtils.format(message.createdAt, 'MMM Do, YYYY hh:mm A') as string,
 				isPaused: message.isPaused as boolean,
 			}));
 	}
