@@ -1,16 +1,22 @@
+import { cn } from '@/lib/utils';
+import { Progress } from '../ui/progress';
+
 export default function PreviewFile({
 	data,
+	progress = -1,
 }: {
 	data: {
 		url: string;
 		type: string;
 	} | null;
+	progress?: number;
 }) {
 	if (!data) {
 		return (
-			<>
+			<div className='w-full h-full flex flex-col justify-center'>
 				<p className='animate-pulse text-center'>loading...</p>
-			</>
+				<Progress className={cn('mt-1', progress === -1 && 'hidden')} value={progress} />
+			</div>
 		);
 	}
 
@@ -37,7 +43,7 @@ export default function PreviewFile({
 		);
 	} else if (data.type.includes('audio')) {
 		return (
-			<div>
+			<div className='w-full h-full flex flex-col justify-center'>
 				<audio style={{ borderRadius: '0.75rem', width: '100%' }} controls autoPlay={false} muted>
 					<source src={data.url} type={data.type} />
 				</audio>
