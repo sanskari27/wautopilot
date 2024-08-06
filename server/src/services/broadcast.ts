@@ -431,7 +431,7 @@ export default class BroadcastService extends WhatsappLinkService {
 						$sum: {
 							$cond: {
 								if: {
-									$and: [
+									$or: [
 										{ $eq: ['$scheduledMessages.status', MESSAGE_STATUS.FAILED] },
 										{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.FAILED] },
 									],
