@@ -69,6 +69,8 @@ export default function DataForm({
 		onSubmit(data);
 	}
 
+	console.log(form.formState.errors);
+
 	function handleTemplateChange(selected: { id: string; name: string } | null) {
 		form.setValue('template_id', selected?.id ?? '');
 		form.setValue('template_name', selected?.name ?? '');
@@ -186,7 +188,10 @@ export default function DataForm({
 										<FormItem className='space-y-0 flex-1 max-w-xs'>
 											<FormLabel className='text-primary'>Delay (in Days)</FormLabel>
 											<FormControl>
-												<Input {...field} />
+												<Input
+													value={field.value}
+													onChange={(e) => field.onChange(Number(e.target.value))}
+												/>
 											</FormControl>
 											<FormMessage />
 										</FormItem>

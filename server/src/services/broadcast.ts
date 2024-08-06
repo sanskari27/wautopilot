@@ -143,7 +143,7 @@ export default class BroadcastService extends WhatsappLinkService {
 				? BROADCAST_STATUS.PAUSED
 				: BROADCAST_STATUS.ACTIVE;
 		await campaign.save();
-		if (campaign.status === BROADCAST_STATUS.ACTIVE) {
+		if (campaign.status === BROADCAST_STATUS.PAUSED) {
 			await ScheduledMessageDB.updateMany(
 				{ scheduler_id: id, status: MESSAGE_STATUS.PENDING },
 				{

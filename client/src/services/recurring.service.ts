@@ -22,7 +22,7 @@ const validateRecurringResult = (recurring: any): RecurringWithId => {
 		delay: recurring.delay ?? 0,
 		startTime: recurring.startTime ?? '10:00',
 		endTime: recurring.endTime ?? '18:00',
-		active: recurring.active ?? 'ACTIVE',
+		active: recurring.status ?? 'ACTIVE',
 	};
 };
 
@@ -100,7 +100,7 @@ export default class RecurringService {
 	}
 
 	static async toggleRecurring(recurringId: string) {
-		const {data} = await api.post(`/broadcast/recurring/${recurringId}/toggle`);
+		const { data } = await api.post(`/broadcast/recurring/${recurringId}/toggle`);
 		return data;
 	}
 

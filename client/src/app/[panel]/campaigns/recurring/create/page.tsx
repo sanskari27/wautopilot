@@ -1,28 +1,22 @@
 'use client';
 import { Recurring } from '@/schema/broadcastSchema';
 import RecurringService from '@/services/recurring.service';
-import { useParams, usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import DataForm from '../_components/data-form';
 
 export default function CreateRecurring() {
 	const router = useRouter();
-	const params = useParams();
 
 	function handleSave(data: Recurring) {
-
-		RecurringService.createRecurring(data)
-			.then((res) => {
-				if (!res) {
-					return toast.error('Failed to create Recurring Broadcast');
-				}
-				router.refresh();
-				router.push(`/${params.panel}/campaigns/recurring`);
-				return toast.success('Recurring Broadcast created successfully');
-			})
-			.catch((err) => {
-				return toast.error('Failed to create Recurring Broadcast');
-			});
+		toast.promise(RecurringService.createRecurring(data), {
+			loading: 'Creating Recurring Broadcast',
+			success: () => {
+				router.back();
+				return 'Recurring Broadcast created successfully';
+			},
+			error: 'Failed to create Recurring Broadcast',
+		});
 	}
 
 	return (

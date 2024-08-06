@@ -47,11 +47,12 @@ export function Providers({
 					<ContactsProvider data={contacts}>
 						<FieldsContextProvider data={fields}>
 							<TemplatesProvider data={templates}>
-								<ChatbotProvider data={chatBots}>
-									<AgentProvider data={agents}>
-										<ChatbotFlowProvider data={chatBotFlows}>{children}</ChatbotFlowProvider>
-									</AgentProvider>
-								</ChatbotProvider>
+								<AgentProvider data={agents}>
+									<ChatbotProvider data={chatBots}>
+										<ChatbotFlowProvider data={chatBotFlows}>
+											{children}</ChatbotFlowProvider>
+									</ChatbotProvider>
+								</AgentProvider>
 							</TemplatesProvider>
 						</FieldsContextProvider>
 					</ContactsProvider>

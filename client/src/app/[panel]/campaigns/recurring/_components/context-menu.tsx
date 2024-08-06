@@ -17,18 +17,18 @@ import { MdScheduleSend } from 'react-icons/md';
 
 export default function RecurringActionContextMenu({
 	children,
-	CampaignId,
+	campaignId,
 	active,
 }: {
 	children: React.ReactNode;
-	CampaignId: string;
+	campaignId: string;
 	active: 'ACTIVE' | 'PAUSED';
 }) {
 	const router = useRouter();
 	const params = useParams();
 
 	const rescheduleCampaign = () => {
-		const promise = RecurringService.rescheduleRecurring(CampaignId);
+		const promise = RecurringService.rescheduleRecurring(campaignId);
 
 		toast.promise(promise, {
 			loading: 'Rescheduling Campaign...',
@@ -38,7 +38,7 @@ export default function RecurringActionContextMenu({
 	};
 
 	const toggleRecurringCampaign = () => {
-		const promise = RecurringService.toggleRecurring(CampaignId);
+		const promise = RecurringService.toggleRecurring(campaignId);
 
 		toast.promise(promise, {
 			loading: 'Toggling Campaign...',
@@ -52,26 +52,22 @@ export default function RecurringActionContextMenu({
 	};
 
 	const downloadRecurringCampaign = () => {
-		const promise = RecurringService.downloadRecurring(CampaignId);
+		const promise = RecurringService.downloadRecurring(campaignId);
 
 		toast.promise(promise, {
 			loading: 'Downloading Campaign...',
-			success: () => {
-				router.refresh();
-				router.push(`/${params.panel}/campaigns/recurring`);
-				return 'Campaign Downloaded';
-			},
+			success: 'Campaign Downloaded',
 			error: 'Failed to Download Campaign',
 		});
 	};
 
 	const deleteRecurringCampaign = () => {
-		const promise = RecurringService.deleteRecurring(CampaignId);
+		const promise = RecurringService.deleteRecurring(campaignId);
 
 		toast.promise(promise, {
 			loading: 'Deleting Campaign...',
 			success: () => {
-				router.push(`/${params.panel}/campaigns/recurring`);
+				router.refresh();
 				return 'Campaign Deleted';
 			},
 			error: 'Failed to Delete Campaign',
@@ -83,10 +79,10 @@ export default function RecurringActionContextMenu({
 			<DropdownMenuContent className='w-56'>
 				<DropdownMenuItem onClick={toggleRecurringCampaign}>
 					<Show>
-						<Show.ShowIf condition={active === 'ACTIVE'}>
+						<Show.When condition={active === 'ACTIVE'}>
 							<ToggleLeftIcon className='mr-2 h-4 w-4' />
 							<span>Pause</span>
-						</Show.ShowIf>
+						</Show.When>
 						<Show.Else>
 							<ToggleRightIcon className='mr-2 h-4 w-4' />
 							<span>Resume</span>

@@ -2,7 +2,8 @@
 import { parseToObject } from '@/lib/utils';
 import { Recurring, recurringSchema } from '@/schema/broadcastSchema';
 import RecurringService from '@/services/recurring.service';
-import { notFound, useSearchParams } from 'next/navigation';
+import { notFound, useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 import DataForm from '../_components/data-form';
 
 export default function EditRecurring({
@@ -10,20 +11,23 @@ export default function EditRecurring({
 }: {
 	params: { recurring_id: string };
 }) {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const raw = parseToObject(searchParams.get('data'));
 	const data = recurringSchema.safeParse(raw);
 
 	function handleSave(data: Recurring) {
-		const isEditingRecurring = !!raw.id;
-		const promise = isEditingRecurring
-			? RecurringService.editRecurring({ details: data })
-			: RecurringService.createRecurring({ details: data });
+		toast.promise(RecurringService.editRecurring({ ...data, id: recurring_id }), {
+			loading: 'Updating Recurring Broadcast',
+			success: () => {
+				router.back();
+				return 'Recurring Broadcast updated successfully';
+			},
+			error: 'Failed to update Recurring Broadcast',
+		});
 	}
 
 	if (!data.success) {
-		console.log(data.error.errors);
-
 		notFound();
 	}
 

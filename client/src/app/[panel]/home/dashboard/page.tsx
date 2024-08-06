@@ -1,14 +1,7 @@
 import { cn, getFileSize } from '@/lib/utils';
 import { DashboardService } from '@/services/dashboard.service';
 import { notFound } from 'next/navigation';
-import {
-	Chatbots,
-	ConversationOverview,
-	Flows,
-	MessagesOverview,
-	Templates,
-	WalletBalance,
-} from './stats';
+import { ConversationOverview, MessagesOverview, WalletBalance } from './stats';
 import StatsTemplate from './statsTemplate';
 
 export default async function DashboardPage() {
@@ -57,16 +50,11 @@ export default async function DashboardPage() {
 				</div>
 				<div className='flex flex-col gap-4'>
 					<div className='flex gap-4'>
-						<Templates />
 						<StatsTemplate
 							label='Phonebook / Contacts'
 							value={`${dashboardData.phoneRecords}/${dashboardData.contacts}`}
 							className='bg-yellow-200'
 						/>
-					</div>
-					<div className='flex gap-4'>
-						<Chatbots />
-						<Flows />
 					</div>
 				</div>
 			</div>

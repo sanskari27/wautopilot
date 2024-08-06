@@ -33,15 +33,12 @@ import api from '@/lib/api';
 import { countOccurrences, getDateObject, getFormattedDate } from '@/lib/utils';
 import { Broadcast, broadcastSchema } from '@/schema/broadcastSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { usePathname, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 export default function BroadcastPage() {
 	const templates = useTemplates();
 	let phonebook_fields = useFields();
-	const router = useRouter();
-	const pathname = usePathname();
 	phonebook_fields = phonebook_fields.filter((field) => field.value !== 'all');
 
 	const form = useForm<Broadcast>({

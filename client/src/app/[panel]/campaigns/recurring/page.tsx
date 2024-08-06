@@ -68,7 +68,7 @@ export default async function Recurring({
 									</TableCellLink>
 									<TableCellLink href={link}>{recurring.active}</TableCellLink>
 									<TableCell className='text-center'>
-										<RecurringActionContextMenu active={recurring.active} CampaignId={recurring.id}>
+										<RecurringActionContextMenu active={recurring.active} campaignId={recurring.id}>
 											<Button variant={'outline'} size={'sm'}>
 												Actions
 											</Button>

@@ -1,7 +1,4 @@
 'use client';
-import { useChatbotFlows } from '@/components/context/chatbotFlows';
-import { useChatbots } from '@/components/context/chatbots';
-import { useTemplates } from '@/components/context/templates';
 import { useUserDetails } from '@/components/context/user-details';
 import { getFormattedDay, getMonth } from '@/lib/utils';
 import { Chart } from 'react-google-charts';
@@ -14,42 +11,6 @@ export function WalletBalance() {
 			label={'Wallet Balance'}
 			value={'₹' + details.walletBalance}
 			className={'bg-blue-200'}
-		/>
-	);
-}
-
-export function Templates() {
-	const templates = useTemplates();
-	const approvedTemplates = templates.map((template) => template.status === 'approved');
-	return (
-		<StatsTemplate
-			label='Templates(Approved)'
-			value={`${templates.length.toString()}(${approvedTemplates.length.toString()})`}
-			className='bg-blue-200'
-		/>
-	);
-}
-
-export function Chatbots() {
-	const list = useChatbots();
-	const active = list.map((chatbot) => chatbot.isActive);
-	return (
-		<StatsTemplate
-			label='Chatbots(Active)'
-			value={`${list.length.toString()}(${active.length.toString()})`}
-			className='bg-teal-200'
-		/>
-	);
-}
-
-export function Flows() {
-	const list = useChatbotFlows();
-	const active = list.map((chatbot) => chatbot.isActive);
-	return (
-		<StatsTemplate
-			label='Flow (Active)'
-			value={`${list.length.toString()}(${active.length.toString()})`}
-			className='bg-pink-200'
 		/>
 	);
 }
