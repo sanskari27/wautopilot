@@ -32,41 +32,6 @@ function PreviewElement({ media }: { media: Media }) {
 
 	useEffect(() => {
 		api
-			.head(`${SERVER_URL}media/${media.id}/download`, {
-				responseType: 'blob',
-			})
-			.then((response) => {
-				const contentDisposition = response.headers['content-disposition'];
-				const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.*)"/);
-				const filename = filenameMatch ? filenameMatch[1] : 'downloaded-file';
-
-				const fileType = response.headers['content-type'] as string;
-				const fileSizeBytes = parseInt(response.headers['content-length'], 10);
-				let type = '';
-				if (fileType.includes('image')) {
-					type = 'image';
-				} else if (fileType.includes('video')) {
-					type = 'video';
-				} else if (fileType.includes('pdf')) {
-					type = 'PDF';
-				} else if (fileType.includes('audio')) {
-					type = fileType;
-				}
-
-				const fileSizeKB = fileSizeBytes / 1024; // Convert bytes to kilobytes
-				const fileSizeMB = fileSizeKB / 1024;
-				setData({
-					blob: null,
-					url: null,
-					type,
-					size: fileSizeMB > 1 ? `${fileSizeMB.toFixed(2)} MB` : `${fileSizeKB.toFixed(2)} KB`,
-					filename,
-				});
-			});
-	}, [media]);
-
-	useEffect(() => {
-		api
 			.get(`${SERVER_URL}media/${media.id}/download`, {
 				responseType: 'blob',
 				onDownloadProgress: (progressEvent) => {

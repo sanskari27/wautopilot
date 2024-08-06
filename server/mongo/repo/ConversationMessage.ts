@@ -37,10 +37,10 @@ const schema = new mongoose.Schema<IConversationMessage>(
 			enum: Object.keys(MESSAGE_STATUS),
 			default: MESSAGE_STATUS.PENDING,
 		},
-
 		message_id: {
 			type: String,
-			required: true,
+			sparse: true,
+			unique: true,
 		},
 		delivered_at: Date,
 		read_at: Date,
@@ -130,8 +130,6 @@ const schema = new mongoose.Schema<IConversationMessage>(
 		timestamps: { createdAt: true },
 	}
 );
-
-schema.index({ message_id: 1 }, { unique: true });
 
 const ConversationMessageDB = mongoose.model<IConversationMessage>(
 	ConversationMessageDB_name,

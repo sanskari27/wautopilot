@@ -319,19 +319,25 @@ export default function BroadcastPage() {
 						<div className='flex flex-col lg:flex-row w-full justify-between gap-3'>
 							<div className='flex flex-col w-full lg:w-[70%] space-y-2'>
 								<p
-									className='text-2xl font-medium'
+									className='text-lg font-medium'
 									hidden={!((!!header && header.format !== 'TEXT') || fields.body.length > 0)}
 								>
-									Template details {header?.format}
+									Template details
 								</p>
 								<Show.ShowIf condition={!!header && header.format !== 'TEXT'}>
-									<MediaSelectorDialog
-										singleSelect
-										selectedValue={fields.header?.media_id ? [fields.header?.media_id] : []}
-										onConfirm={(media) => form.setValue('header.media_id', media[0])}
-									>
-										<Button className='w-full'>Select Media</Button>
-									</MediaSelectorDialog>
+									<div className='flex items-center gap-6'>
+										<p className='font-medium'>Header Media:- </p>
+										<MediaSelectorDialog
+											singleSelect
+											selectedValue={fields.header?.media_id ? [fields.header?.media_id] : []}
+											onConfirm={(media) => form.setValue('header.media_id', media[0])}
+											returnType='media_id'
+										>
+											<Button variant={'outline'}>Select Media</Button>
+										</MediaSelectorDialog>
+
+										<span>{fields.header?.media_id ? 'Media selected' : 'No media selected'}</span>
+									</div>
 								</Show.ShowIf>
 								<Show.ShowIf condition={fields.body.length > 0}>
 									<Each

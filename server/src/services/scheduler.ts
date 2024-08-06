@@ -143,6 +143,7 @@ export default class SchedulerService extends WhatsappLinkService {
 					} else {
 						failed_reason = (err as any).message as string;
 					}
+					message_id = generateRandomID();
 					failed_at = DateUtils.getMomentNow().toDate();
 					status = MESSAGE_STATUS.FAILED;
 				}
@@ -235,6 +236,7 @@ export default class SchedulerService extends WhatsappLinkService {
 					} else {
 						failed_reason = (err as any).message as string;
 					}
+					message_id = generateRandomID();
 					failed_at = DateUtils.getMomentNow().toDate();
 					status = MESSAGE_STATUS.FAILED;
 				}
@@ -340,6 +342,7 @@ export default class SchedulerService extends WhatsappLinkService {
 					} else {
 						failed_reason = (err as any).message as string;
 					}
+					message_id = generateRandomID();
 					failed_at = DateUtils.getMomentNow().toDate();
 					status = MESSAGE_STATUS.FAILED;
 				}

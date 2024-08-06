@@ -23,6 +23,9 @@ export function extractTemplateHeader(
 			return null;
 		}
 		const parameter = headerMsg.parameters[0];
+		if (!parameter || !parameter[parameter.type.toLowerCase()]) {
+			return null;
+		}
 		const source = parameter[parameter.type.toLowerCase()].id ? 'ID' : 'LINK';
 
 		return {

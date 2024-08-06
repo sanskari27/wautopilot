@@ -13,10 +13,13 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
-import React from 'react';
+import api from '@/lib/api';
+import { SERVER_URL } from '@/lib/consts';
+import { cn } from '@/lib/utils';
+import { Media } from '@/types/media';
+import React, { useEffect, useState } from 'react';
 import PreviewFile from '../preview-file';
 
 export default function MediaSelectorDialog({
@@ -24,11 +27,13 @@ export default function MediaSelectorDialog({
 	singleSelect = false,
 	selectedValue,
 	onConfirm,
+	returnType = 'id',
 }: {
 	children: React.ReactNode;
 	selectedValue?: string[];
 	singleSelect?: boolean;
 	onConfirm: (media: string[]) => void;
+	returnType?: 'id' | 'media_id';
 }) {
 	const buttonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -37,7 +42,8 @@ export default function MediaSelectorDialog({
 	const [previewMode, setPreviewMode] = React.useState(false);
 	const [selectedMedia, setSelectedMedia] = React.useState<string[]>(selectedValue || []);
 
-	const handleAddMedia = (mediaId: string) => {
+	const handleAddMedia = (media: Media) => {
+		const mediaId = returnType === 'id' ? media.id : media.media_id;
 		if (singleSelect) {
 			setSelectedMedia([mediaId]);
 		} else {
@@ -45,9 +51,13 @@ export default function MediaSelectorDialog({
 		}
 	};
 
-	const handleRemoveMedia = (mediaId: string) => {
+	const handleRemoveMedia = (media: Media) => {
+		const mediaId = returnType === 'id' ? media.id : media.media_id;
 		setSelectedMedia(selectedMedia.filter((id) => id !== mediaId));
 	};
+
+	const isSelected = (media: Media) =>
+		selectedMedia.includes(returnType === 'id' ? media.id : media.media_id);
 
 	const handleSave = () => {
 		onConfirm(selectedMedia);
@@ -56,20 +66,19 @@ export default function MediaSelectorDialog({
 	};
 
 	return (
-		<Dialog
-		>
+		<Dialog>
 			<DialogTrigger ref={buttonRef} asChild>
 				{children}
 			</DialogTrigger>
-			<DialogContent>
+			<DialogContent className='sm:max-w-[425px] md:max-w-xl lg:max-w-3xl'>
 				<DialogHeader>
 					<DialogTitle className='flex justify-between'>Select Media</DialogTitle>
 				</DialogHeader>
 				<DialogDescription>
-					<div className='flex items-center gap-2'>
+					<span className='flex items-center gap-2 justify-end'>
 						Preview{' '}
 						<Switch checked={previewMode} onCheckedChange={(checked) => setPreviewMode(checked)} />
-					</div>
+					</span>
 				</DialogDescription>
 				<ScrollArea className='gap-4 h-[400px]'>
 					<Show>
@@ -88,12 +97,12 @@ export default function MediaSelectorDialog({
 											<TableRow>
 												<TableCell>
 													<Checkbox
-														checked={selectedMedia.includes(media.id)}
+														checked={isSelected(media)}
 														onCheckedChange={(checked) => {
 															if (checked) {
-																handleAddMedia(media.id);
+																handleAddMedia(media);
 															} else {
-																handleRemoveMedia(media.id);
+																handleRemoveMedia(media);
 															}
 														}}
 													/>
@@ -106,36 +115,19 @@ export default function MediaSelectorDialog({
 							</Table>
 						</Show.When>
 						<Show.Else>
-							<Each
-								items={mediaList}
-								render={(media) => {
-									return (
-										<>
-											<div
-												className={`p-4 border border-dashed rounded-md cursor-pointer ${
-													selectedMedia.includes(media.id) ? 'bg-primary/10' : ''
-												}`}
-												onClick={() => {
-													if (selectedMedia.includes(media.id)) {
-														handleRemoveMedia(media.id);
-													} else {
-														handleAddMedia(media.id);
-													}
-												}}
-											>
-												<PreviewFile
-													data={{
-														type: media.mime_type,
-														url: `${process.env.NEXT_PUBLIC_API_URL}media/${media.id}`,
-													}}
-												/>
-												<div className='text-center text-sm'>{media.filename}</div>
-											</div>
-											<Separator className='my-2' />
-										</>
-									);
-								}}
-							/>
+							<div className='grid grid-cols-2 gap-3'>
+								<Each
+									items={mediaList}
+									render={(media) => (
+										<PreviewElement
+											isSelected={isSelected(media)}
+											onSelected={handleAddMedia}
+											onRemove={handleRemoveMedia}
+											media={media}
+										/>
+									)}
+								/>
+							</div>
 						</Show.Else>
 					</Show>
 				</ScrollArea>
@@ -150,5 +142,92 @@ export default function MediaSelectorDialog({
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
+	);
+}
+
+function PreviewElement({
+	media,
+	isSelected,
+	onSelected,
+	onRemove,
+}: {
+	media: Media;
+	isSelected?: boolean;
+	onSelected?: (media: Media) => void;
+	onRemove?: (media: Media) => void;
+}) {
+	const [data, setData] = useState<{
+		blob: Blob | MediaSource | null;
+		url: string | null;
+		type: string;
+		size: string;
+		filename: string;
+	} | null>(null);
+
+	const [progress, setProgress] = useState(0);
+
+	useEffect(() => {
+		api
+			.get(`${SERVER_URL}media/${media.id}/download`, {
+				responseType: 'blob',
+				onDownloadProgress: (progressEvent) => {
+					if (progressEvent.total) {
+						setProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+					} else {
+						setProgress(-1);
+					}
+				},
+			})
+			.then((response) => {
+				const contentDisposition = response.headers['content-disposition'];
+				const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.*)"/);
+				const filename = filenameMatch ? filenameMatch[1] : 'downloaded-file';
+
+				const { data: blob } = response;
+				const url = window.URL.createObjectURL(blob);
+				const fileType = blob.type as string;
+				const fileSizeBytes = blob.size as number;
+				let type = '';
+
+				if (fileType.includes('image')) {
+					type = 'image';
+				} else if (fileType.includes('video')) {
+					type = 'video';
+				} else if (fileType.includes('pdf')) {
+					type = 'PDF';
+				} else if (fileType.includes('audio')) {
+					type = fileType;
+				}
+
+				const fileSizeKB = fileSizeBytes / 1024; // Convert bytes to kilobytes
+				const fileSizeMB = fileSizeKB / 1024;
+				setData({
+					blob,
+					url,
+					type,
+					size: fileSizeMB > 1 ? `${fileSizeMB.toFixed(2)} MB` : `${fileSizeKB.toFixed(2)} KB`,
+					filename,
+				});
+			});
+	}, [media]);
+
+	return (
+		<>
+			<div
+				className={cn(
+					'p-4 border border-dashed rounded-md cursor-pointer',
+					isSelected ? 'bg-primary/70' : ''
+				)}
+				onClick={() => {
+					isSelected ? onRemove?.(media) : onSelected?.(media);
+				}}
+			>
+				<PreviewFile
+					data={data?.url ? { url: data.url, type: data.type } : null}
+					progress={progress}
+				/>
+				<div className='text-center text-sm line-clamp-1'>{media.filename}</div>
+			</div>
+		</>
 	);
 }
