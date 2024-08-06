@@ -198,7 +198,11 @@ export default class UserService {
 
 		const token = randomBytes(16).toString('hex');
 
-		await StorageDB.setString(token, user._id.toString());
+		await StorageDB.setString(
+			token,
+			user._id.toString(),
+			DateUtils.getMomentNow().add(20, 'minutes').toDate()
+		);
 		return token;
 	}
 

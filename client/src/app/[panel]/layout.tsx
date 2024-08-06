@@ -9,7 +9,6 @@ import ChatBotService from '@/services/chatbot.service';
 import ContactService from '@/services/contact.service';
 import MediaService from '@/services/media.service';
 import PhoneBookService from '@/services/phonebook.service';
-import TemplateService from '@/services/template.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { Providers } from './providers';
@@ -24,7 +23,7 @@ export default async function Layout({
 	children: React.ReactNode;
 }>) {
 	const userDetails = (await AuthService.userDetails())!;
-	const templates = (await TemplateService.listTemplates())!;
+	const templates = []; // (await TemplateService.listTemplates())!;
 	const chatBots = (await ChatBotService.listChatBots())!;
 	const chatBotFlows = (await ChatbotFlowService.listChatBots())!;
 	const agents = (await AgentService.getAgents())!;

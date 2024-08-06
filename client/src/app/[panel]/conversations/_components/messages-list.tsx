@@ -10,9 +10,15 @@ const MessagesList = memo(
 		const { ref: inViewRef, inView } = useInView({ triggerOnce: true });
 
 		useEffect(() => {
+			let id: NodeJS.Timeout;
 			if (inView) {
-				onLastReached();
+				id = setTimeout(() => {
+					onLastReached();
+				}, 1000);
 			}
+			return () => {
+				clearTimeout(id);
+			};
 		}, [inView, onLastReached]);
 
 		return (

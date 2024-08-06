@@ -6,15 +6,15 @@ export default function ExpiryCountdown({ timeLeft }: { timeLeft: number }) {
 	const [_timeLeft, setTimeLeft] = useState(timeLeft);
 
 	useEffect(() => {
+		setTimeLeft(timeLeft);
+	}, [timeLeft]);
+
+	useEffect(() => {
 		const interval = setInterval(() => {
 			setTimeLeft((prev) => prev - 1);
 		}, 1000);
 		return () => clearInterval(interval);
 	}, []);
-
-	useEffect(() => {
-		setTimeLeft(timeLeft);
-	}, [timeLeft]);
 
 	const formatTime = (time: number) => {
 		const hours = Math.floor(time / 3600);

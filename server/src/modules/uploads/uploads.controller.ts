@@ -2,10 +2,12 @@ import axios from 'axios';
 import { NextFunction, Request, Response } from 'express';
 import FormData from 'form-data';
 import fs from 'fs';
+import { StorageDB } from '../../../mongo';
 import FileUpload, { ResolvedFile } from '../../config/FileUpload';
 import MetaAPI from '../../config/MetaAPI';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
+import DateUtils from '../../utils/DateUtils';
 import { Respond } from '../../utils/ExpressUtils';
 import FileUtils from '../../utils/FileUtils';
 
@@ -110,23 +112,50 @@ async function fetchMetaMediaUrl(req: Request, res: Response, next: NextFunction
 	const media_id = req.params.id;
 	const device = req.locals.device;
 
-	try {
-		const { data } = await MetaAPI(device.accessToken).get(
-			`/${media_id}?phone_number_id=${device.phoneNumberId}`
-		);
+	const { exists, data } = await StorageDB.get(`media:${media_id}`);
 
-		return Respond({
-			res,
-			status: 200,
-			data: {
-				url: data.url,
-				size: data.file_size,
-				mime_type: data.mime_type,
-			},
-		});
-	} catch (e) {
-		next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	const details = {
+		url: '',
+		size: 0,
+		mime_type: '',
+	};
+	if (exists) {
+		const obj = data!.object;
+		if (!obj) {
+			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+		}
+		details.url = obj.url as string;
+		details.size = obj.size as number;
+		details.mime_type = obj.mime_type as string;
+	} else {
+		try {
+			const { data } = await MetaAPI(device.accessToken).get(
+				`/${media_id}?phone_number_id=${device.phoneNumberId}`
+			);
+
+			details.url = data.url;
+			details.size = data.file_size;
+			details.mime_type = data.mime_type;
+
+			await StorageDB.setObject(
+				`media:${media_id}`,
+				details,
+				DateUtils.getMomentNow().add(28, 'days').toDate()
+			);
+		} catch (e) {
+			await StorageDB.setObject(
+				`media:${media_id}`,
+				null,
+				DateUtils.getMomentNow().add(28, 'days').toDate()
+			);
+			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+		}
 	}
+	return Respond({
+		res,
+		status: 200,
+		data: details,
+	});
 }
 
 async function downloadMetaMedia(req: Request, res: Response, next: NextFunction) {

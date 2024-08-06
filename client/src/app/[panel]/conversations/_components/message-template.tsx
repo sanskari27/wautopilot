@@ -143,17 +143,18 @@ const MediaMessage = ({ message }: { message: TMessage }) => {
 	useEffect(() => {
 		if (!message.body?.media_id) {
 			setMedia({
-				...initialState,
 				loaded: true,
 				showPreview: true,
 				mimeType: 'file',
+				size: 0,
+				url: '',
 			});
 			return;
 		}
 		if (!inView) return;
 		MessagesService.getMedia(message.body?.media_id).then((data) => {
 			setMedia({
-				...initialState,
+				showPreview: false,
 				loaded: true,
 				mimeType: data.mime_type,
 				url: data.url,

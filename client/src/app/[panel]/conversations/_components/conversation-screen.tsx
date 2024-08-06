@@ -14,6 +14,7 @@ import {
 import useMessages from '@/hooks/useMessages';
 import { getInitials } from '@/lib/utils';
 import { ChevronLeft, EllipsisVertical } from 'lucide-react';
+import { useEffect } from 'react';
 import MessagesList from './messages-list';
 
 export default function ConversationScreen() {

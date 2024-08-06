@@ -3,11 +3,10 @@ import { useRecipient } from '@/components/context/recipients';
 import MessagesService from '@/services/messages.service';
 import { Message } from '@/types/recipient';
 import { useEffect, useRef, useState } from 'react';
-import useBoolean from './useBoolean';
 
 export default function useMessages(id: string) {
 	const { markRead } = useRecipient();
-	const { value: loading, off: stopLoading, on: startLoading } = useBoolean(true);
+	const [loading, setLoading] = useState(true);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [expiry, setExpiry] = useState<number | 'EXPIRED'>('EXPIRED');
 	const [messageLabels, setMessageLabels] = useState<string[]>([]);
@@ -15,6 +14,7 @@ export default function useMessages(id: string) {
 	const pagination = useRef({
 		page: 1,
 		loadMore: true,
+		loading: false,
 		lastFetched: {
 			page: 1,
 			recipient_id: '',
@@ -22,61 +22,71 @@ export default function useMessages(id: string) {
 	});
 
 	useEffect(() => {
-		if (
-			!id ||
-			(pagination.current.lastFetched.recipient_id === id &&
-				pagination.current.lastFetched.page === 1)
-		) {
+		const _pagination = pagination.current;
+		const _lastFetched = _pagination.lastFetched;
+		const shouldAbort =
+			!id || _pagination.loading || (_lastFetched.recipient_id === id && _lastFetched.page === 1);
+
+		if (shouldAbort) {
 			return;
 		}
+
 		const abortController = new AbortController();
 		pagination.current.loadMore = true;
 		pagination.current.page = 1;
+		pagination.current.loading = true;
 		MessagesService.fetchConversationMessages(id, {
 			page: 1,
 			signal: abortController.signal,
 		}).then((data) => {
-			markRead(id);
 			setMessages(data.messages);
 			setExpiry(data.expiry);
 			setMessageLabels(data.messageLabels);
-			stopLoading();
+			setLoading(false);
 			if (data.messages.length < 50) {
 				pagination.current.loadMore = false;
 			}
-			pagination.current.lastFetched.page = 1;
+			pagination.current.loading = false;
+			pagination.current.lastFetched.page = pagination.current.page;
 			pagination.current.lastFetched.recipient_id = id;
 		});
 
 		return () => {
 			abortController.abort();
 		};
-	}, [id, markRead, stopLoading]);
+	}, [id]);
+
+	useEffect(() => {
+		id && markRead(id);
+	}, [id, markRead]);
 
 	const loadMore = () => {
-		if (!id) {
-			return;
-		} else if (!pagination.current.loadMore) {
-			return;
-		} else if (
-			pagination.current.lastFetched.recipient_id === id &&
-			pagination.current.lastFetched.page === pagination.current.page
-		) {
+		const _pagination = pagination.current;
+		const _lastFetched = _pagination.lastFetched;
+		const shouldAbort =
+			!id ||
+			_pagination.loading ||
+			!_pagination.loadMore ||
+			(_lastFetched.recipient_id === id && _lastFetched.page === _pagination.page + 1);
+
+		if (shouldAbort) {
 			return;
 		}
 
 		pagination.current.page++;
-		startLoading();
+		pagination.current.loading = true;
+		setLoading(true);
 		MessagesService.fetchConversationMessages(id, {
 			page: pagination.current.page,
 		}).then((data) => {
+			setLoading(false);
 			setMessages([...messages, ...data.messages]);
-			stopLoading();
 			if (data.messages.length < 50) {
 				pagination.current.loadMore = false;
 			}
-			pagination.current.lastFetched.page = 1;
+			pagination.current.lastFetched.page = pagination.current.page;
 			pagination.current.lastFetched.recipient_id = id;
+			pagination.current.loading = false;
 		});
 	};
 
