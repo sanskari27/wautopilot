@@ -6,3 +6,5 @@ export const PRASHANT_VARMA = '/images/prashant-varma.png';
 
 export const META_APP_ID = process.env.NEXT_PUBLIC_META_APP_ID;
 export const META_CONFIG_ID = process.env.NEXT_PUBLIC_META_CONFIG_ID;
+
+export const SERVER_URL = process.env.NEXT_PUBLIC_API_URL;

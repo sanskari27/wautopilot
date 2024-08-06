@@ -8,6 +8,7 @@ const RecipientsContext = React.createContext<{
 	pinnedConversations: Recipient[];
 	unpinnedConversations: Recipient[];
 	selectedConversations: string[];
+	selected_recipient: Recipient | null;
 	setRecipientTags: (id: string, tags: string[]) => void;
 	togglePin: (id: string) => void;
 	markUnread: (id: string) => void;
@@ -15,11 +16,13 @@ const RecipientsContext = React.createContext<{
 	toggleSelected: (id: string) => void;
 	setLabelFilter: (labels: string[]) => void;
 	setSearchText: (text: string) => void;
+	setSelectedRecipient: (recipient: Recipient) => void;
 }>({
 	list: [],
 	pinnedConversations: [],
 	unpinnedConversations: [],
 	selectedConversations: [],
+	selected_recipient: null,
 	setRecipientTags: () => {},
 	togglePin: () => {},
 	markUnread: () => {},
@@ -27,6 +30,7 @@ const RecipientsContext = React.createContext<{
 	toggleSelected: () => {},
 	setLabelFilter: () => {},
 	setSearchText: () => {},
+	setSelectedRecipient: () => {},
 });
 
 export function RecipientProvider({
@@ -42,6 +46,7 @@ export function RecipientProvider({
 	const [pinnedIds, setPinnedIds] = React.useState<string[]>([]);
 	const [unReadConversations, setUnReadConversations] = React.useState<string[]>([]);
 	const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
+	const [selected_recipient, setSelectedRecipient] = React.useState<Recipient>(null);
 
 	const filtered = React.useMemo(() => {
 		return value.filter((item) => {
@@ -116,6 +121,7 @@ export function RecipientProvider({
 				pinnedConversations,
 				unpinnedConversations,
 				selectedConversations: selectedIds,
+				selected_recipient,
 				setRecipientTags,
 				togglePin,
 				markUnread,
@@ -123,6 +129,7 @@ export function RecipientProvider({
 				toggleSelected,
 				setLabelFilter,
 				setSearchText,
+				setSelectedRecipient,
 			}}
 		>
 			{children}

@@ -91,12 +91,12 @@ export default function BroadcastPage() {
 		});
 
 		toast.promise(promise, {
-			loading: 'Sending Broadcast...',
+			loading: 'Scheduling campaign...',
 			success: () => {
 				form.reset();
-				return 'Broadcast sent successfully';
+				return 'Campaign scheduled successfully';
 			},
-			error: 'Failed to send broadcast',
+			error: 'Failed to schedule campaign',
 		});
 	}
 

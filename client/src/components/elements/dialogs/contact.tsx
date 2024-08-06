@@ -45,9 +45,13 @@ const _defaultValues = {
 export default function ContactDialog({
 	defaultValues = _defaultValues,
 	onSave = () => {},
+	onClose = () => {},
+	canEdit = true,
 }: {
 	defaultValues?: z.infer<typeof contactSchema> | null;
 	onSave?: (data: z.infer<typeof contactSchema>) => void;
+	onClose?: () => void;
+	canEdit?: boolean;
 }) {
 	const router = useRouter();
 	const pathname = usePathname();
@@ -55,7 +59,11 @@ export default function ContactDialog({
 	const isMobile = mobileCheck();
 
 	function handleClose() {
-		router.replace(pathname);
+		if (onClose) {
+			onClose();
+		} else {
+			router.replace(pathname);
+		}
 	}
 
 	if (isMobile) {
@@ -72,7 +80,11 @@ export default function ContactDialog({
 					<DrawerHeader>
 						<DrawerTitle>Contact Card</DrawerTitle>
 					</DrawerHeader>
-					<ContactForm onSave={onSave} defaultValues={defaultValues || _defaultValues} />
+					<ContactForm
+						onSave={onSave}
+						defaultValues={defaultValues || _defaultValues}
+						canEdit={canEdit}
+					/>
 				</DrawerContent>
 			</Drawer>
 		);
@@ -90,7 +102,11 @@ export default function ContactDialog({
 					<SheetHeader>
 						<SheetTitle className='text-center'>Contact Card</SheetTitle>
 					</SheetHeader>
-					<ContactForm onSave={onSave} defaultValues={defaultValues || _defaultValues} />
+					<ContactForm
+						onSave={onSave}
+						defaultValues={defaultValues || _defaultValues}
+						canEdit={canEdit}
+					/>
 				</SheetContent>
 			</Sheet>
 		);
@@ -100,13 +116,16 @@ export default function ContactDialog({
 function ContactForm({
 	defaultValues = _defaultValues,
 	onSave,
+	canEdit = true,
 }: {
 	defaultValues?: z.infer<typeof contactSchema>;
 	onSave: (data: z.infer<typeof contactSchema>) => void;
+	canEdit?: boolean;
 }) {
 	const form = useForm<z.infer<typeof contactSchema>>({
 		resolver: zodResolver(contactSchema),
 		defaultValues,
+		disabled: !canEdit,
 	});
 
 	const emails = form.watch('emails');
@@ -495,6 +514,7 @@ function ContactForm({
 									<div className='flex gap-3 w-full'>
 										<FormField
 											control={form.control}
+											name={`addresses.${index}.street`}
 											render={({ field }) => (
 												<FormItem className='space-y-0  flex-1'>
 													<FormControl>
@@ -575,7 +595,7 @@ function ContactForm({
 					</div>
 				</div>
 
-				<div className='flex justify-end'>
+				<div className='flex justify-end' hidden={!canEdit}>
 					<Button type='submit'>Save</Button>
 				</div>
 			</form>

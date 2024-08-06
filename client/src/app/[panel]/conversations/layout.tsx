@@ -1,9 +1,9 @@
+import { ChatListExpandedProvider } from '@/components/context/chat-list-expanded';
 import { RecipientProvider } from '@/components/context/recipients';
 import Loading from '@/components/elements/loading';
 import MessagesService from '@/services/messages.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import RecipientsList from './_components/recipientsList';
 
 export const metadata: Metadata = {
 	title: 'Conversations • Wautopilot',
@@ -19,9 +19,9 @@ export default async function Layout({
 	return (
 		<Suspense fallback={<Loading />}>
 			<section>
-				<RecipientProvider data={conversations}>
-					{children}
-				</RecipientProvider>
+				<ChatListExpandedProvider>
+					<RecipientProvider data={conversations}>{children}</RecipientProvider>
+				</ChatListExpandedProvider>
 			</section>
 		</Suspense>
 	);

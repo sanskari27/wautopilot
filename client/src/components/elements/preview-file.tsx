@@ -1,5 +1,3 @@
-import Image from 'next/image';
-
 export default function PreviewFile({
 	data,
 }: {
@@ -17,15 +15,7 @@ export default function PreviewFile({
 	}
 
 	if (data.type === 'image') {
-		return (
-			<Image
-				src={data.url}
-				className='aspect-square rounded-lg'
-				alt={''}
-				width={500}
-				height={500}
-			/>
-		);
+		return <img src={data.url} className='aspect-square rounded-lg' alt={''} />;
 	} else if (data.type === 'video') {
 		return (
 			<div>
@@ -54,5 +44,9 @@ export default function PreviewFile({
 			</div>
 		);
 	}
-	return <p className='text-center text-red-500 my-8'>No Preview Available</p>;
+	return (
+		<p className='text-destructive w-full py-8 h-full inline-flex items-center justify-center'>
+			No Preview Available
+		</p>
+	);
 }

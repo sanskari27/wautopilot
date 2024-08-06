@@ -6,13 +6,13 @@ const nextConfig = {
                 protocol: 'http',
                 hostname: 'localhost',
                 port: '9567',
-                pathname: '/media/**',
+                pathname: '/**',
             },
             {
                 protocol: 'https',
                 hostname: 'api.wautopilot.com',
                 port: '',
-                pathname: '/media/**',
+                pathname: '/**',
             },
             {
                 protocol: 'https',

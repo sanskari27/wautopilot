@@ -108,8 +108,12 @@ async function uploadMetaMedia(req: Request, res: Response, next: NextFunction) 
 
 async function fetchMetaMediaUrl(req: Request, res: Response, next: NextFunction) {
 	const media_id = req.params.id;
+	const device = req.locals.device;
+
 	try {
-		const { data } = await MetaAPI(req.locals.device.accessToken).get(`/${media_id}`);
+		const { data } = await MetaAPI(device.accessToken).get(
+			`/${media_id}?phone_number_id=${device.phoneNumberId}`
+		);
 
 		return Respond({
 			res,

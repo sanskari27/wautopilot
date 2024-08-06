@@ -52,8 +52,8 @@ export default class RecurringService {
 		}[];
 		template_header?: {
 			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | '';
-			link: string;
-			media_id: string;
+			link?: string;
+			media_id?: string;
 		};
 		delay: number;
 		startTime: string;
@@ -85,8 +85,8 @@ export default class RecurringService {
 		}[];
 		template_header?: {
 			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | '';
-			link: string;
-			media_id: string;
+			link?: string;
+			media_id?: string;
 		};
 		delay: number;
 		startTime: string;

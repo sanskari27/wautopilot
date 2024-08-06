@@ -1,9 +1,10 @@
 import axios from 'axios';
+import { SERVER_URL } from './consts';
 
 const isServer = typeof window === 'undefined';
 
 const api = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_API_URL,
+	baseURL: SERVER_URL,
 	withCredentials: true, // This ensures cookies are sent with every request
 });
 
