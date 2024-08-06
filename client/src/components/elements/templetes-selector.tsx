@@ -7,15 +7,17 @@ import { Button } from '@/components/ui/button';
 import {
 	Command,
 	CommandEmpty,
+	CommandGroup,
 	CommandInput,
 	CommandItem,
 	CommandList,
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import Each from '../containers/each';
 import { useTemplates } from '../context/templates';
 
-export default function TemplatesSelector({
+export default function ComboboxTemplates({
 	placeholder,
 	value,
 	onChange,
@@ -26,12 +28,6 @@ export default function TemplatesSelector({
 }) {
 	const [open, setOpen] = React.useState(false);
 	const items = useTemplates();
-	const [search, setSearch] = React.useState('');
-
-	const filteredItems = React.useMemo(() => {
-		if (!search) return items;
-		return items.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()));
-	}, [items, search]);
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -48,35 +44,39 @@ export default function TemplatesSelector({
 			</PopoverTrigger>
 			<PopoverContent className='w-full p-0'>
 				<Command>
-					<CommandInput
-						placeholder='Search templates...'
-						onValueChange={setSearch}
-						value={search}
-					/>
+					<CommandInput placeholder='Search templates...' />
 					<CommandEmpty>No templates found.</CommandEmpty>
 					<CommandList>
-						{filteredItems.map((item) => (
-							<CommandItem
-								key={item.name}
-								value={item.name}
-								onSelect={(currentValue) => {
-									if (currentValue === value) {
-										onChange(null);
-										return;
-									}
-									onChange({
-										id: item.id,
-										name: item.name,
-									});
-								}}
-								className={cn('cursor-pointer z-10')}
-							>
-								<Check
-									className={cn('mr-2 h-4 w-4', value === item.name ? 'opacity-100' : 'opacity-0')}
-								/>
-								{item.name}
-							</CommandItem>
-						))}
+						<CommandGroup>
+							<Each
+								items={items}
+								render={(item) => (
+									<CommandItem
+										key={item.name}
+										value={item.name}
+										onSelect={(currentValue) => {
+											if (currentValue === value) {
+												onChange(null);
+												return;
+											}
+											onChange({
+												id: item.id,
+												name: item.name,
+											});
+										}}
+										className={cn('cursor-pointer z-10')}
+									>
+										<Check
+											className={cn(
+												'mr-2 h-4 w-4',
+												value === item.name ? 'opacity-100' : 'opacity-0'
+											)}
+										/>
+										{item.name}
+									</CommandItem>
+								)}
+							/>
+						</CommandGroup>
 					</CommandList>
 				</Command>
 			</PopoverContent>
