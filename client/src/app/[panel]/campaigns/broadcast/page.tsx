@@ -7,8 +7,8 @@ import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
 import NumberInputDialog from '@/components/elements/dialogs/numberInput';
 import TagsSelector from '@/components/elements/popover/tags';
 import TemplatePreview from '@/components/elements/template-preview';
+import TemplatesSelector from '@/components/elements/templetes-selector';
 import { Button } from '@/components/ui/button';
-import ComboboxTemplates from '@/components/ui/combobox_templates';
 import { DatePicker } from '@/components/ui/date-picker';
 import {
 	Form,
@@ -149,7 +149,7 @@ export default function BroadcastPage() {
 							<FormItem className='space-y-0 flex-1 max-w-sm'>
 								<FormLabel className='text-primary'>Select Template</FormLabel>
 								<FormControl>
-									<ComboboxTemplates
+									<TemplatesSelector
 										placeholder='Select Template'
 										value={fields.template_name}
 										onChange={handleTemplateChange}

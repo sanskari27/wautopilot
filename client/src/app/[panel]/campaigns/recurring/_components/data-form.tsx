@@ -6,8 +6,8 @@ import { useTemplates } from '@/components/context/templates';
 import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
 import TagsSelector from '@/components/elements/popover/tags';
 import TemplatePreview from '@/components/elements/template-preview';
+import TemplatesSelector from '@/components/elements/templetes-selector';
 import { Button } from '@/components/ui/button';
-import ComboboxTemplates from '@/components/ui/combobox_templates';
 import {
 	Form,
 	FormControl,
@@ -119,7 +119,7 @@ export default function DataForm({
 						<FormItem className='space-y-0 flex-1 max-w-sm'>
 							<FormLabel className='text-primary'>Select Template</FormLabel>
 							<FormControl>
-								<ComboboxTemplates
+								<TemplatesSelector
 									placeholder='Select Template'
 									value={fields.template_name}
 									onChange={handleTemplateChange}
@@ -239,22 +239,23 @@ export default function DataForm({
 								Template details
 							</p>
 							<Show.ShowIf condition={!!header && header.format !== 'TEXT'}>
-								<MediaSelectorDialog
-									onConfirm={(media) => {
-										form.setValue('template_header.media_id', media[0]);
-									}}
-									selectedValue={
-										fields.template_header?.media_id ? [fields.template_header?.media_id] : []
-									}
-									singleSelect
-								>
-									<Button>
-										Select Header Media
-										<Show.ShowIf condition={!!fields.template_header?.media_id}>
-											<span className='ml-1 text-sm'>(Selected)</span>
-										</Show.ShowIf>
-									</Button>
-								</MediaSelectorDialog>
+								<div className='flex items-center gap-6'>
+									<p className='font-medium'>Header Media:- </p>
+									<MediaSelectorDialog
+										singleSelect
+										selectedValue={
+											fields.template_header?.media_id ? [fields.template_header?.media_id] : []
+										}
+										onConfirm={(media) => form.setValue('template_header.media_id', media[0])}
+										returnType='media_id'
+									>
+										<Button variant={'outline'}>Select Media</Button>
+									</MediaSelectorDialog>
+
+									<span>
+										{fields.template_header?.media_id ? 'Media selected' : 'No media selected'}
+									</span>
+								</div>
 							</Show.ShowIf>
 							<Show.ShowIf condition={fields.template_body.length > 0}>
 								<Each
