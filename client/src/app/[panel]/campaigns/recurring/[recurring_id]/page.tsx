@@ -15,10 +15,10 @@ export default function EditRecurring({
 	const data = recurringSchema.safeParse(raw);
 
 	function handleSave(data: Recurring) {
-		RecurringService.editRecurring({
-			...data,
-			id: recurring_id,
-		});
+		const isEditingRecurring = !!raw.id;
+		const promise = isEditingRecurring
+			? RecurringService.editRecurring({ details: data })
+			: RecurringService.createRecurring({ details: data });
 	}
 
 	if (!data.success) {

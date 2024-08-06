@@ -3,6 +3,7 @@ import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
 import { useFields } from '@/components/context/tags';
 import { useTemplates } from '@/components/context/templates';
+import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
 import TagsSelector from '@/components/elements/popover/tags';
 import TemplatePreview from '@/components/elements/template-preview';
 import { Button } from '@/components/ui/button';
@@ -233,19 +234,22 @@ export default function DataForm({
 								Template details
 							</p>
 							<Show.ShowIf condition={!!header && header.format !== 'TEXT'}>
-								{/* <FormField
-										control={form.control}
-										name='header.link'
-										render={({ field }) => (
-											<FormItem className='space-y-0'>
-												<FormLabel>Header media link</FormLabel>
-												<FormControl>
-													<Input placeholder='Media file link' type='url' {...field} />
-												</FormControl>
-											</FormItem>
-										)}
-									/> */}
-								<></>
+								<MediaSelectorDialog
+									onConfirm={(media) => {
+										form.setValue('template_header.media_id', media[0]);
+									}}
+									selectedValue={
+										fields.template_header?.media_id ? [fields.template_header?.media_id] : []
+									}
+									singleSelect
+								>
+									<Button>
+										Select Header Media
+										<Show.ShowIf condition={!!fields.template_header?.media_id}>
+											<span className='ml-1 text-sm'>(Selected)</span>
+										</Show.ShowIf>
+									</Button>
+								</MediaSelectorDialog>
 							</Show.ShowIf>
 							<Show.ShowIf condition={fields.template_body.length > 0}>
 								<Each

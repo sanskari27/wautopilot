@@ -100,7 +100,8 @@ export default class RecurringService {
 	}
 
 	static async toggleRecurring(recurringId: string) {
-		await api.post(`/broadcast/recurring/${recurringId}/toggle`);
+		const {data} = await api.post(`/broadcast/recurring/${recurringId}/toggle`);
+		return data;
 	}
 
 	static async deleteRecurring(recurringId: string) {

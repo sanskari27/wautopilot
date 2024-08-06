@@ -92,7 +92,7 @@ export const recurringSchema = z.object({
 		}, 'All body parameters must have a value'),
 	template_header: z
 		.object({
-			type: z.enum(['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT']),
+			type: z.enum(['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT' ,'']),
 			media_id: z.string().optional(),
 			link: z.string().optional(),
 		})

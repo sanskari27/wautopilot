@@ -1,9 +1,11 @@
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
 import { Button } from '@/components/ui/button';
+
 import {
 	Table,
 	TableBody,
+	TableCell,
 	TableCellLink,
 	TableHead,
 	TableHeader,
@@ -11,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import RecurringService from '@/services/recurring.service';
 import Link from 'next/link';
+import RecurringActionContextMenu from './_components/context-menu';
 
 export default async function Recurring({
 	params: { panel },
@@ -20,6 +23,7 @@ export default async function Recurring({
 	};
 }) {
 	const list = await RecurringService.getRecurringList();
+
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
 			<div className='justify-between flex'>
@@ -41,6 +45,8 @@ export default async function Recurring({
 						<TableHead>Description</TableHead>
 						<TableHead>Wish Type</TableHead>
 						<TableHead className='text-right'>Delay</TableHead>
+						<TableHead>Status</TableHead>
+						<TableHead className='text-center'>Action</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -60,6 +66,14 @@ export default async function Recurring({
 									<TableCellLink href={link} className='text-right'>
 										{recurring.delay} Days
 									</TableCellLink>
+									<TableCellLink href={link}>{recurring.active}</TableCellLink>
+									<TableCell className='text-center'>
+										<RecurringActionContextMenu active={recurring.active} CampaignId={recurring.id}>
+											<Button variant={'outline'} size={'sm'}>
+												Actions
+											</Button>
+										</RecurringActionContextMenu>
+									</TableCell>
 								</TableRow>
 							);
 						}}
