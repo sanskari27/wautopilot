@@ -7,6 +7,8 @@ import {
 	ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import { Recipient } from '@/types/recipient';
+import AssignLabelDialog from './assign-label-dialog';
+import { Button } from '@/components/ui/button';
 
 export function RecipientContextMenu({
 	recipient,
@@ -32,6 +34,11 @@ export function RecipientContextMenu({
 				) : (
 					<ContextMenuItem onClick={() => togglePin(recipient._id)}>Pin</ContextMenuItem>
 				)}
+				<AssignLabelDialog recipient={recipient}>
+					<Button size={'sm'} variant={'ghost'} className='w-full p-2 font-normal'>
+						<span className='mr-auto'>Assign Label</span>
+					</Button>
+				</AssignLabelDialog>
 			</ContextMenuContent>
 		</ContextMenu>
 	);
