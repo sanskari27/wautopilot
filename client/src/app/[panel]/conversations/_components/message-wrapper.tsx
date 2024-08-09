@@ -56,10 +56,10 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 						)}
 					>
 						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
+							<DropdownMenuTrigger className='absolute right-2 !border-none !outline-none'>
 								<ChevronDown
 									className={cn(
-										'group-hover:!text-black hidden group-hover:inline-block transition-none absolute right-2',
+										'group-hover:!text-black hidden group-hover:inline-block transition-none ',
 										isMe ? '!text-white' : '!text-[#dcf8c6]'
 									)}
 								/>
