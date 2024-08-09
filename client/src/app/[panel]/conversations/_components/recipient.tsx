@@ -40,7 +40,10 @@ export default function Recipient({
 							<Show.ShowIf condition={isSelected}>
 								<div
 									className='h-12 w-12 bg-primary rounded-full flex items-center justify-center cursor-pointer'
-									onClick={(e) => toggleSelected(recipient._id)}
+									onClick={(e) => {
+										e.stopPropagation();
+										toggleSelected(recipient._id);
+									}}
 								>
 									<Check className='text-white mx-auto h-6 w-6' />
 								</div>
@@ -48,7 +51,10 @@ export default function Recipient({
 							<Show.ShowIf condition={!isSelected}>
 								<Avatar
 									className='h-12 w-12 cursor-pointer'
-									onClick={(e) => toggleSelected(recipient._id)}
+									onClick={(e) => {
+										e.stopPropagation();
+										toggleSelected(recipient._id);
+									}}
 								>
 									<AvatarFallback className='capitalize'>
 										{getInitials(recipient.profile_name) || 'NA'}
