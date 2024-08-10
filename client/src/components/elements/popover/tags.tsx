@@ -12,14 +12,15 @@ export default function TagsSelector({
 	selected = [],
 	onChange = () => {},
 	onClose = () => {},
+	labels = useTags(),
 }: {
 	children: React.ReactNode;
 	selected?: string[];
 	onChange?: (selected: string[]) => void;
 	onClose?: (selected: string[]) => void;
+	labels?: string[];
 }) {
 	const [selectedTags, setSelectedTags] = useState<string[]>(selected);
-	const labels = useTags();
 
 	return (
 		<Popover

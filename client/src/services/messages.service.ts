@@ -219,14 +219,9 @@ export default class MessagesService {
 	}
 
 	static async assignMessageLabels(messageId: string, labels: string[]) {
-		try {
-			await api.post(`/conversation/message/${messageId}/assign-labels`, {
-				labels,
-			});
-			return true;
-		} catch (err) {
-			return false;
-		}
+		await api.post(`/conversation/message/${messageId}/assign-labels`, {
+			labels,
+		});
 	}
 
 	static async markRead(message_id: string) {

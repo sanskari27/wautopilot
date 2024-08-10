@@ -72,9 +72,6 @@ export default function AssignLabelDialog({
 	};
 
 	const handleSave = () => {
-		console.log(
-			newLabel.trim().length !== 0 ? [...selectedLabels, newLabel.trim()] : selectedLabels
-		);
 
 		MessagesService.ConversationLabels(
 			recipient.recipient,

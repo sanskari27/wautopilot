@@ -96,11 +96,27 @@ export default function useMessages(id: string) {
 		});
 	};
 
+	const assignMessageTags = (id: string, tags: string[]) => {
+		setMessages((prev) => {
+			return prev.map((message) => {
+				if (message._id === id) {
+					console.log(message);
+					return {
+						...message,
+						labels: tags,
+					};
+				}
+				return message;
+			});
+		});
+	};
+
 	return {
 		loading,
 		messages,
 		expiry,
 		messageLabels,
 		loadMore,
+		assignMessageTags,
 	};
 }

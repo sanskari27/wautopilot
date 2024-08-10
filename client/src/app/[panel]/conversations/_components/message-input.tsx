@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import QuickReplyDialog from './add-quick-reply-dialog';
 import { UploadMediaDialog } from './dialogs';
 
 export default function MessageBox() {
@@ -45,7 +46,7 @@ export default function MessageBox() {
 	const { value: quickReply, toggle: toggleQuickReply } = useBoolean(true);
 	const { selected_recipient } = useRecipient();
 	const [textMessage, setTextMessage] = useState('');
-	const quickReplyList = useQuickReplies();
+	const { list } = useQuickReplies();
 	const [selectedQuickReply, setSelectedQuickReply] = useState('');
 
 	const handleTextMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -116,13 +117,14 @@ export default function MessageBox() {
 	return (
 		<>
 			<div
-				hidden={!quickReply}
-				className='flex w-full bg-white p-2 border-b border-b-gray-200 gap-x-2'
+				className={`${
+					quickReply ? 'h-0 p-0' : 'p-2'
+				} overflow-hidden flex w-full bg-white border-b border-b-gray-200 gap-x-2`}
 			>
 				<Select
 					value={selectedQuickReply}
 					onValueChange={(val) => {
-						setTextMessage(val);
+						setTextMessage(list.find((item) => item.id === val)?.message ?? '');
 						setSelectedQuickReply(val);
 					}}
 				>
@@ -132,9 +134,9 @@ export default function MessageBox() {
 					<SelectContent>
 						<SelectGroup>
 							<Each
-								items={quickReplyList}
+								items={list}
 								render={(item) => (
-									<SelectItem value={item.message}>{formatMessage(item.message)}</SelectItem>
+									<SelectItem value={item.id}>{formatMessage(item.message)}</SelectItem>
 								)}
 							/>
 						</SelectGroup>
@@ -142,19 +144,21 @@ export default function MessageBox() {
 				</Select>
 
 				{!selectedQuickReply ? (
-					<Button variant={'secondary'} size={'icon'}>
-						<Plus className='w-4 h-4' />
-					</Button>
+					<QuickReplyDialog>
+						<Button variant={'secondary'} size={'icon'}>
+							<Plus className='w-4 h-4' />
+						</Button>
+					</QuickReplyDialog>
 				) : (
-					<Button variant={'secondary'} size={'icon'}>
-						<Pencil className='w-4 h-4' />
-					</Button>
+					<QuickReplyDialog
+						id={selectedQuickReply}
+						message={list.find((item) => item.id === selectedQuickReply)?.message ?? ''}
+					>
+						<Button variant={'secondary'} size={'icon'}>
+							<Pencil className='w-4 h-4' />
+						</Button>
+					</QuickReplyDialog>
 				)}
-				{/* <AddQuickReplyDialog
-					ref={addQuickReplyRef}
-					onConfirm={handleConfirm}
-					onDelete={handleDelete}
-				/> */}
 			</div>
 			<div className='flex bg-white w-full p-2 items-end gap-1'>
 				<DropdownMenu>

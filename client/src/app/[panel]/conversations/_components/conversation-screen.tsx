@@ -11,16 +11,23 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import useBoolean from '@/hooks/useBoolean';
 import useMessages from '@/hooks/useMessages';
 import { getInitials } from '@/lib/utils';
 import { ChevronLeft, EllipsisVertical } from 'lucide-react';
 import MessageBox from './message-input';
+import MessageTagsView from './message-tag-view';
 import MessagesList from './messages-list';
 
 export default function ConversationScreen() {
 	const { selected_recipient: recipient } = useRecipient();
+	const {
+		value: isOpenMessageTagDialog,
+		on: openMessageTagDialog,
+		off: closeMessageTagDialog,
+	} = useBoolean(false);
 	const { expand } = useChatListExpanded();
-	const { loading, expiry, messages, loadMore } = useMessages(recipient?._id ?? '');
+	const { loading, expiry, messages, loadMore, messageLabels } = useMessages(recipient?._id ?? '');
 
 	if (!recipient) return null;
 
@@ -41,14 +48,21 @@ export default function ConversationScreen() {
 					<div className='flex items-center gap-3'>
 						<Show.ShowIf condition={!loading}>
 							<ExpiryCountdown timeLeft={expiry === 'EXPIRED' ? 0 : expiry} />
-							<DropdownMenu>
+							<DropdownMenu modal={true}>
 								<DropdownMenuTrigger asChild>
 									<Button variant='ghost' size={'icon'}>
 										<EllipsisVertical className='w-4 h-4' />
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent className='w-56'>
-									<DropdownMenuItem>View Messages Tags</DropdownMenuItem>
+									<Button
+										variant={'ghost'}
+										className='w-full p-2 font-normal'
+										size={'sm'}
+										onClick={openMessageTagDialog}
+									>
+										<span className='mr-auto'>View Message Tags</span>
+									</Button>
 									<DropdownMenuItem>Conversation Notes</DropdownMenuItem>
 								</DropdownMenuContent>
 							</DropdownMenu>
@@ -64,6 +78,11 @@ export default function ConversationScreen() {
 				</div>
 				<MessageBox />
 			</div>
+			<MessageTagsView
+				isOpen={isOpenMessageTagDialog}
+				onClose={closeMessageTagDialog}
+				id={recipient._id}
+			/>
 		</div>
 	);
 }

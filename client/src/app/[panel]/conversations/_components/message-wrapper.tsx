@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
@@ -22,6 +21,7 @@ import {
 } from 'lucide-react';
 import { ReactNode } from 'react';
 import { toast } from 'react-hot-toast';
+import AssignMessageLabelDialog from './assign-message-label-dialog';
 
 const ChatMessageWrapper = ({ message, children }: { message: Message; children: ReactNode }) => {
 	const isMe = !!message.received_at;
@@ -65,7 +65,11 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 								/>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent className='w-56'>
-								<DropdownMenuItem>Assign Labels</DropdownMenuItem>
+								<AssignMessageLabelDialog selected={message.labels} id={message._id}>
+									<Button variant={'ghost'} className='w-full p-2 font-normal' size={'sm'}>
+										<span className='mr-auto'>Assign Tags</span>
+									</Button>
+								</AssignMessageLabelDialog>
 							</DropdownMenuContent>
 						</DropdownMenu>
 						{message.context.id ? (
