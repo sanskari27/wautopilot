@@ -7,6 +7,7 @@ import COMMON_ERRORS from '../../errors/common-errors';
 import PhoneBookService from '../../services/phonebook';
 import CSVHelper from '../../utils/CSVHelper';
 import { Respond, RespondCSV, intersection } from '../../utils/ExpressUtils';
+import FileUtils from '../../utils/FileUtils';
 import {
 	FieldsResult,
 	MultiDeleteValidationResult,
@@ -384,9 +385,9 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 		},
 	};
 	const { serviceAccount, user, agentLogService } = req.locals;
-
+	let uploadedFile;
 	try {
-		const uploadedFile = await FileUpload.SingleFileUpload(req, res, fileUploadOptions);
+		uploadedFile = await FileUpload.SingleFileUpload(req, res, fileUploadOptions);
 		let labels = req.body.labels ? req.body.labels.split(',') : [];
 
 		if (user.userLevel === UserLevel.Agent) {
@@ -429,6 +430,7 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 		const uniqueData = Array.from(uniqueDataMap.values());
 
 		phoneBookService.addRecords(uniqueData);
+		FileUtils.deleteFile(uploadedFile.path);
 
 		agentLogService?.addLog({
 			text: `Bulk upload phonebook records`,
@@ -439,6 +441,9 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 			status: 200,
 		});
 	} catch (err: unknown) {
+		if (uploadedFile) {
+			FileUtils.deleteFile(uploadedFile.path);
+		}
 		if (err instanceof CustomError) {
 			return next(err);
 		}

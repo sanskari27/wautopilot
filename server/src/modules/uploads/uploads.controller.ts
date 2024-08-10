@@ -55,6 +55,7 @@ async function uploadMetaHandle(req: Request, res: Response, next: NextFunction)
 				'Content-Length': uploadedFile.size,
 			},
 		});
+		FileUtils.deleteFile(uploadedFile.path);
 
 		return Respond({
 			res,
@@ -95,6 +96,7 @@ async function uploadMetaMedia(req: Request, res: Response, next: NextFunction) 
 				},
 			}
 		);
+		FileUtils.deleteFile(uploadedFile.path);
 		return Respond({
 			res,
 			status: 200,

@@ -21,7 +21,7 @@ import FileUpload, { ONLY_MEDIA_ALLOWED, SingleFileUploadOptions } from '../conf
 import { CustomError, ERRORS } from '../errors';
 import { VerifyDevice, VerifySession } from '../middleware';
 import SocketServer from '../socket';
-import { Respond, RespondFile, generateRandomID } from '../utils/ExpressUtils';
+import { Respond, generateRandomID } from '../utils/ExpressUtils';
 
 const router = express.Router();
 
@@ -81,19 +81,6 @@ router.post('/upload-media', async function (req, res, next) {
 		});
 	} catch (err: unknown) {
 		return next(new CustomError(ERRORS.FILE_UPLOAD_ERROR, err));
-	}
-});
-
-router.get('/media/:path/:filename', async function (req, res, next) {
-	try {
-		const path = __basedir + '/static/' + req.params.path + '/' + req.params.filename;
-		return RespondFile({
-			res,
-			filename: req.params.filename,
-			filepath: path,
-		});
-	} catch (err: unknown) {
-		return next(new CustomError(ERRORS.NOT_FOUND));
 	}
 });
 

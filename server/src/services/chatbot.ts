@@ -1366,8 +1366,6 @@ export default class ChatBotService extends WhatsappLinkService {
 			if (err instanceof CustomError) {
 				throw err;
 			}
-			console.log((err as any).response.data);
-
 			throw new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR);
 		}
 	}
