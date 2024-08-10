@@ -1,16 +1,16 @@
 'use client';
 
-import { Contact } from '@/schema/phonebook';
+import { Contact, ContactWithID } from '@/schema/phonebook';
 import * as React from 'react';
 
-const ContactsContext = React.createContext<Contact[]>([]);
+const ContactsContext = React.createContext<ContactWithID[]>([]);
 
 export function ContactsProvider({
 	children,
 	data,
 }: {
 	children: React.ReactNode;
-	data: Contact[];
+	data: ContactWithID[];
 }) {
 	return <ContactsContext.Provider value={data}>{children}</ContactsContext.Provider>;
 }

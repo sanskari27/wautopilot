@@ -61,6 +61,12 @@ export const Permissions = {
 		delete: 'chatbot_flow.delete',
 		export: 'chatbot_flow.export',
 	},
+	whatsapp_flow: {
+		create: 'whatsapp_flow.create',
+		update: 'whatsapp_flow.update',
+		delete: 'whatsapp_flow.delete',
+		export: 'whatsapp_flow.export',
+	},
 	broadcast: {
 		create: 'broadcast.create',
 		update: 'broadcast.update',

@@ -10,6 +10,8 @@ import {
 	CreateBotValidationResult,
 	CreateFlowValidationResult,
 	UpdateFlowValidationResult,
+	UpdateWhatsappFlowValidationResult,
+	WhatsappFlowValidationResult,
 } from './chatbot.validator';
 
 async function createBot(req: Request, res: Response, next: NextFunction) {
@@ -299,7 +301,9 @@ async function deleteFlow(req: Request, res: Response, next: NextFunction) {
 async function exportWhatsappFlow(req: Request, res: Response, next: NextFunction) {
 	const { serviceAccount: account } = req.locals;
 
-	const docs = await WhatsappFlowResponseDB.find({ linked_to: account._id }).sort({
+	const docs = await WhatsappFlowResponseDB.find({
+		linked_to: account._id,
+	}).sort({
 		'data.flow_token': 1,
 		received_at: -1,
 	});
@@ -321,6 +325,214 @@ async function exportWhatsappFlow(req: Request, res: Response, next: NextFunctio
 	});
 }
 
+async function listWhatsappFlows(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount: account,
+		device: { device },
+	} = req.locals;
+
+	const flows = await new ChatBotService(account, device).listWhatsappFlows();
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			flows,
+		},
+	});
+}
+
+async function createWhatsappFlow(req: Request, res: Response, next: NextFunction) {
+	const {
+		device: { device },
+		agentLogService,
+		serviceAccount: account,
+	} = req.locals;
+	const data = req.locals.data as WhatsappFlowValidationResult;
+
+	const id = await new ChatBotService(account, device).createWhatsappFlow(data);
+
+	if (!id) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	agentLogService?.addLog({
+		text: `Create whatsapp flow with id ${id}`,
+		data: {
+			id: id,
+		},
+	});
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			id,
+		},
+	});
+}
+
+async function updateWhatsappFlow(req: Request, res: Response, next: NextFunction) {
+	const {
+		device: { device },
+		agentLogService,
+		serviceAccount: account,
+	} = req.locals;
+	const data = req.locals.data as WhatsappFlowValidationResult;
+	const id = req.params.id;
+
+	if (!id) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	const success = await new ChatBotService(account, device).updateWhatsappFlow(id, data);
+
+	if (!success) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	agentLogService?.addLog({
+		text: `Update whatsapp flow with id ${id}`,
+		data: {
+			id: id,
+		},
+	});
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			id,
+		},
+	});
+}
+
+async function publishWhatsappFlow(req: Request, res: Response, next: NextFunction) {
+	const {
+		device: { device },
+		agentLogService,
+		serviceAccount: account,
+	} = req.locals;
+	const id = req.params.id;
+
+	if (!id) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	const success = await new ChatBotService(account, device).publishWhatsappFlow(id);
+
+	if (!success) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	agentLogService?.addLog({
+		text: `Publish whatsapp flow with id ${id}`,
+		data: {
+			id: id,
+		},
+	});
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			id,
+		},
+	});
+}
+
+async function getWhatsappFlowAssets(req: Request, res: Response, next: NextFunction) {
+	const {
+		device: { device },
+		serviceAccount: account,
+	} = req.locals;
+	const id = req.params.id;
+
+	if (!id) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	const asset = await new ChatBotService(account, device).getWhatsappFlowContents(id);
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			asset,
+		},
+	});
+}
+
+async function deleteWhatsappFlow(req: Request, res: Response, next: NextFunction) {
+	const {
+		device: { device },
+		agentLogService,
+		serviceAccount: account,
+	} = req.locals;
+	const data = req.locals.data as WhatsappFlowValidationResult;
+	const id = req.params.id;
+
+	if (!id) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	const success = await new ChatBotService(account, device).updateWhatsappFlow(id, data);
+
+	if (!success) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	agentLogService?.addLog({
+		text: `Update whatsapp flow with id ${id}`,
+		data: {
+			id: id,
+		},
+	});
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			id,
+		},
+	});
+}
+
+async function updateWhatsappFlowContents(req: Request, res: Response, next: NextFunction) {
+	const {
+		device: { device },
+		agentLogService,
+		serviceAccount: account,
+	} = req.locals;
+	const data = req.locals.data as UpdateWhatsappFlowValidationResult;
+	const id = req.params.id;
+
+	if (!id) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	try {
+		await new ChatBotService(account, device).updateWhatsappFlowContents(id, data);
+	} catch (e) {
+		return next(e);
+	}
+
+	agentLogService?.addLog({
+		text: `Update whatsapp flow with id ${id}`,
+		data: {
+			id: id,
+		},
+	});
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			id,
+		},
+	});
+}
+
 const Controller = {
 	createBot,
 	listBots,
@@ -335,6 +547,13 @@ const Controller = {
 	downloadResponses,
 	chatBotFlowDetails,
 	exportWhatsappFlow,
+	listWhatsappFlows,
+	createWhatsappFlow,
+	updateWhatsappFlow,
+	updateWhatsappFlowContents,
+	deleteWhatsappFlow,
+	getWhatsappFlowAssets,
+	publishWhatsappFlow,
 };
 
 export default Controller;

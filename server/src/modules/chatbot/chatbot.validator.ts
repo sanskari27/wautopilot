@@ -92,6 +92,70 @@ export type CreateFlowValidationResult = {
 
 export type UpdateFlowValidationResult = Partial<CreateFlowValidationResult>;
 
+export type WhatsappFlowValidationResult = {
+	name: string;
+	categories: (
+		| 'SIGN_UP'
+		| 'SIGN_IN'
+		| 'APPOINTMENT_BOOKING'
+		| 'LEAD_GENERATION'
+		| 'CONTACT_US'
+		| 'CUSTOMER_SUPPORT'
+		| 'SURVEY'
+		| 'OTHER'
+	)[];
+};
+
+export type UpdateWhatsappFlowValidationResult = {
+	screens: {
+		title: string;
+		children: (
+			| {
+					type: 'TextBody' | 'TextCaption' | 'TextSubheading' | 'TextHeading';
+					text: string;
+			  }
+			| {
+					type: 'Image';
+					height: number;
+					src: string;
+					'scale-type': 'contain';
+			  }
+			| {
+					type: 'TextInput';
+					name: string;
+					label: string;
+					required: boolean;
+					'input-type': 'number' | 'text' | 'email' | 'password' | 'phone';
+					'helper-text'?: string | undefined;
+			  }
+			| {
+					type: 'TextArea' | 'DatePicker';
+					name: string;
+					label: string;
+					required: boolean;
+					'helper-text'?: string | undefined;
+			  }
+			| {
+					type: 'RadioButtonsGroup' | 'CheckboxGroup' | 'Dropdown';
+					name: string;
+					label: string;
+					required: boolean;
+					'data-source': string[];
+			  }
+			| {
+					type: 'OptIn';
+					name: string;
+					label: string;
+					required: boolean;
+			  }
+			| {
+					type: 'Footer';
+					label: string;
+			  }
+		)[];
+	}[];
+};
+
 export async function CreateBotValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
 		respond_to: z.enum([
@@ -352,6 +416,136 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 				})
 			)
 			.optional(),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function WhatsappFlowValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z.object({
+		name: z.string().min(1),
+		categories: z.array(
+			z.enum([
+				'SIGN_UP',
+				'SIGN_IN',
+				'APPOINTMENT_BOOKING',
+				'LEAD_GENERATION',
+				'CONTACT_US',
+				'CUSTOMER_SUPPORT',
+				'SURVEY',
+				'OTHER',
+			])
+		),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function UpdateWhatsappFlowValidator(req: Request, res: Response, next: NextFunction) {
+	const textType = z.object({
+		type: z.enum(['TextBody', 'TextCaption', 'TextSubheading', 'TextHeading']),
+		text: z.string(),
+	});
+
+	const imageType = z.object({
+		type: z.literal('Image'),
+		src: z.string(),
+		height: z.number().default(300),
+		'scale-type': z.literal('contain'),
+	});
+
+	const inputType = z.object({
+		type: z.literal('TextInput'),
+		name: z.string(),
+		label: z.string(),
+		required: z.boolean(),
+		'input-type': z.enum(['text', 'number', 'email', 'number', 'password', 'phone']),
+		'helper-text': z.string().optional(),
+	});
+
+	const textAreaType = z.object({
+		type: z.enum(['TextArea', 'DatePicker']),
+		name: z.string(),
+		label: z.string(),
+		required: z.boolean(),
+		'helper-text': z.string().optional(),
+	});
+
+	const selectType = z.object({
+		type: z.enum(['RadioButtonsGroup', 'CheckboxGroup', 'Dropdown']),
+		name: z.string(),
+		label: z.string(),
+		required: z.boolean(),
+		'data-source': z.array(z.string()).min(1),
+	});
+
+	const optInType = z.object({
+		type: z.literal('OptIn'),
+		name: z.string(),
+		label: z.string(),
+		required: z.boolean(),
+	});
+
+	const footerType = z.object({
+		type: z.literal('Footer'),
+		label: z.string(),
+	});
+
+	const types = z.discriminatedUnion('type', [
+		textType,
+		imageType,
+		inputType,
+		textAreaType,
+		selectType,
+		optInType,
+		footerType,
+	]);
+
+	const reqValidator = z.object({
+		screens: z
+			.array(
+				z.object({
+					title: z.string(),
+					children: z.array(types),
+				})
+			)
+			.min(1),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

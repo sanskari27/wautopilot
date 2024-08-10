@@ -48,9 +48,9 @@ async function readFile(path: string) {
 	});
 }
 
-async function writeFile(path: string, data: string) {
+async function generateJSONFile(path: string, data: any) {
 	return new Promise<void>((resolve, reject) => {
-		fs.writeFile(path, data, 'utf8', function (err) {
+		fs.writeFile(path, JSON.stringify(data), 'utf8', function (err) {
 			if (err) {
 				reject(err);
 			} else {
@@ -74,7 +74,7 @@ export default {
 	base64ToJPG,
 	base64ToPDF,
 	readFile,
-	writeFile,
+	generateJSONFile,
 	getMimeType,
 	getExt,
 };

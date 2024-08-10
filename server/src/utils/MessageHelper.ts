@@ -184,6 +184,6 @@ export function generateListBody(data: { [key: string]: string }) {
 	};
 }
 
-export function convertToId(text: string) {
-	return text.replace(/\s/g, '-').toLowerCase();
+export function convertToId(text: string, delimiter: string = '-') {
+	return text.replace(/\s/g, delimiter).toLowerCase();
 }

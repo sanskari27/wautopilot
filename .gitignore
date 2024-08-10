@@ -172,3 +172,4 @@ build
 .vscode/settings.json
 backend/static/*
 deploy.sh
+.zed/settings.json

@@ -63,3 +63,4 @@ export const phonebookSchema = z.object({
 export type PhonebookRecord = z.infer<typeof phonebookSchema>;
 export type PhonebookRecordWithID = PhonebookRecord & { id: string };
 export type Contact = z.infer<typeof contactSchema>;
+export type ContactWithID = Contact & { id: string; formatted_name: string };

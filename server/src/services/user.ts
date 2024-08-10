@@ -641,6 +641,12 @@ function processPermissions(permissions: any) {
 			delete: (permissions?.chatbot_flow?.delete as boolean) ?? false,
 			export: (permissions?.chatbot_flow?.export as boolean) ?? false,
 		},
+		whatsapp_flow: {
+			create: (permissions?.chatbot_flow?.create as boolean) ?? false,
+			update: (permissions?.chatbot_flow?.update as boolean) ?? false,
+			delete: (permissions?.chatbot_flow?.delete as boolean) ?? false,
+			export: (permissions?.chatbot_flow?.export as boolean) ?? false,
+		},
 		broadcast: {
 			create: (permissions?.broadcast?.create as boolean) ?? false,
 			update: (permissions?.broadcast?.update as boolean) ?? false,

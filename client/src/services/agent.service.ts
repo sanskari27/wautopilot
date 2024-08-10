@@ -136,6 +136,12 @@ export default class AgentService {
 						delete: data.permissions?.chatbot_flow?.delete ?? false,
 						export: data.permissions?.chatbot_flow?.export ?? false,
 					},
+					whatsapp_flow: {
+						create: data.permissions?.chatbot_flow?.create ?? false,
+						update: data.permissions?.chatbot_flow?.update ?? false,
+						delete: data.permissions?.chatbot_flow?.delete ?? false,
+						export: data.permissions?.chatbot_flow?.export ?? false,
+					},
 					contacts: {
 						create: data.permissions?.contacts?.create ?? false,
 						update: data.permissions?.contacts?.update ?? false,
