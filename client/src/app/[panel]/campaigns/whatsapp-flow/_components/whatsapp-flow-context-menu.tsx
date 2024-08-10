@@ -6,7 +6,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Edit } from 'lucide-react';
+import { Cog, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -52,7 +52,13 @@ export default function WhatsappFlowContextMenu({
 				>
 					<DropdownMenuItem>
 						<Edit className='mr-2 h-4 w-4' />
-						<span>Edit</span>
+						<span>Edit Details</span>
+					</DropdownMenuItem>
+				</Link>
+				<Link href={`/${params.panel}/campaigns/whatsapp-flow/${id}/update-assets`}>
+					<DropdownMenuItem>
+						<Cog className='mr-2 h-4 w-4' />
+						<span>Update Flow Structure</span>
 					</DropdownMenuItem>
 				</Link>
 			</DropdownMenuContent>

@@ -1,5 +1,5 @@
+import WhatsappFlowDialog from '@/app/[panel]/campaigns/whatsapp-flow/_components/whatsappflow';
 import Each from '@/components/containers/each';
-import WhatsappFlowDialog from '@/components/elements/dialogs/whatsappflow';
 import { Button } from '@/components/ui/button';
 import {
 	Table,

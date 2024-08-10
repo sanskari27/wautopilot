@@ -302,7 +302,7 @@ export default class ChatBotService {
 		)[];
 	}) {
 		const { data } = await api.post(`/chatbot/whatsapp-flows`, details);
-		return data;
+		return data.id;
 	}
 
 	static async updateWhatsappFlow(
@@ -321,8 +321,7 @@ export default class ChatBotService {
 			)[];
 		}
 	) {
-		const { data } = await api.patch(`/chatbot/whatsapp-flows/${flowId}`, details);
-		return data.success;
+		await api.patch(`/chatbot/whatsapp-flows/${flowId}`, details);
 	}
 
 	static async listWhatsappFlows() {

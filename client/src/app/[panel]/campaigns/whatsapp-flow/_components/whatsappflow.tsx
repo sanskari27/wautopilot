@@ -1,5 +1,8 @@
 'use client';
-import { updateWhatsappFlow } from '@/app/[panel]/campaigns/whatsapp-flow/action';
+import {
+	createWhatsappFlow,
+	updateWhatsappFlow,
+} from '@/app/[panel]/campaigns/whatsapp-flow/action';
 import { Button } from '@/components/ui/button';
 import ComboboxMultiselect from '@/components/ui/combobox-multiselect';
 import {
@@ -10,7 +13,6 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import ChatBotService from '@/services/chatbot.service';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -98,7 +100,7 @@ function CreateFlow({
 	async function handleSave() {
 		const promise = id
 			? updateWhatsappFlow(id, { name, categories })
-			: ChatBotService.createWhatsappFlow({ name, categories });
+			: createWhatsappFlow({ name, categories });
 
 		toast.promise(promise, {
 			loading: 'Saving...',
