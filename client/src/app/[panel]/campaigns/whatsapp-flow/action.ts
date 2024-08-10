@@ -46,4 +46,12 @@ export async function publishWhatsappFlow(id: string) {
 	if (success) {
 		revalidatePath('[panel]/campaigns/whatsapp-flow', 'page');
 	}
+	console.log('publishWhatsappFlow');
+}
+
+export async function deleteWhatsappFlow(id: string) {
+	const success = await ChatBotService.deleteWhatsappFlow(id);
+	if (success) {
+		revalidatePath('[panel]/campaigns/whatsapp-flow', 'page');
+	}
 }

@@ -351,4 +351,9 @@ export default class ChatBotService {
 		const { data } = await api.post(`/chatbot/whatsapp-flows/${flowId}/publish`);
 		return data.success;
 	}
+
+	static async deleteWhatsappFlow(flowId: string) {
+		const { data } = await api.delete(`/chatbot/whatsapp-flows/${flowId}`);
+		return data.success;
+	}
 }
