@@ -30,7 +30,6 @@ router
 
 router
 	.route('/whatsapp-flows/:id')
-	.get(Controller.chatBotFlowDetails)
 	.delete(VerifyPermissions(Permissions.whatsapp_flow.delete), Controller.deleteWhatsappFlow)
 	.patch(
 		VerifyPermissions(Permissions.whatsapp_flow.update),

@@ -1155,7 +1155,7 @@ export default class ChatBotService extends WhatsappLinkService {
 			for (let i = 0; i < data.categories.length; i++) {
 				formData.append('categories', data.categories[i]);
 			}
-			await MetaAPI(this.accessToken).post(`/${this.waid}/${flow_id}`, formData, {
+			await MetaAPI(this.accessToken).post(`/${flow_id}`, formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},
@@ -1163,6 +1163,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			return true;
 		} catch (err) {
+			console.log((err as any).response.data);
 			return false;
 		}
 	}

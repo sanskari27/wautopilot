@@ -287,4 +287,69 @@ export default class ChatBotService {
 		// Clean up - remove the link
 		document.body.removeChild(downloadLink);
 	}
+
+	static async createWhatsappFlow(details: {
+		name: string;
+		categories: (
+			| 'SIGN_UP'
+			| 'SIGN_IN'
+			| 'APPOINTMENT_BOOKING'
+			| 'LEAD_GENERATION'
+			| 'CONTACT_US'
+			| 'CUSTOMER_SUPPORT'
+			| 'SURVEY'
+			| 'OTHER'
+		)[];
+	}) {
+		const { data } = await api.post(`/chatbot/whatsapp-flows`, details);
+		return data;
+	}
+
+	static async updateWhatsappFlow(
+		flowId: string,
+		details: {
+			name: string;
+			categories: (
+				| 'SIGN_UP'
+				| 'SIGN_IN'
+				| 'APPOINTMENT_BOOKING'
+				| 'LEAD_GENERATION'
+				| 'CONTACT_US'
+				| 'CUSTOMER_SUPPORT'
+				| 'SURVEY'
+				| 'OTHER'
+			)[];
+		}
+	) {
+		const { data } = await api.patch(`/chatbot/whatsapp-flows/${flowId}`, details);
+		return data.success;
+	}
+
+	static async listWhatsappFlows() {
+		try {
+			const { data } = await api.get(`/chatbot/whatsapp-flows`);
+			return data.flows as {
+				id: string;
+				name: string;
+				status: 'DRAFT' | 'PUBLISHED';
+				categories: (
+					| 'SIGN_UP'
+					| 'SIGN_IN'
+					| 'APPOINTMENT_BOOKING'
+					| 'LEAD_GENERATION'
+					| 'CONTACT_US'
+					| 'CUSTOMER_SUPPORT'
+					| 'SURVEY'
+					| 'OTHER'
+				)[];
+			}[];
+		} catch (err) {
+			return null;
+		}
+	}
+
+	static async publishWhatsappFlow(flowId: string) {
+		const { data } = await api.post(`/chatbot/whatsapp-flows/${flowId}/publish`);
+		return data.success;
+	}
 }

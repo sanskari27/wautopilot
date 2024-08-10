@@ -59,6 +59,7 @@ export default function Navbar() {
 					<MenubarSeparator />
 					<MenubarLink href={getLink('/campaigns/chatbot')}>Chatbot</MenubarLink>
 					<MenubarLink href={getLink('/campaigns/recurring')}>Chatbot flow</MenubarLink>
+					<MenubarLink href={getLink('/campaigns/whatsapp-flow')}>Whatsapp flow</MenubarLink>
 				</MenubarContent>
 			</MenubarMenu>
 			<MenubarMenu>
