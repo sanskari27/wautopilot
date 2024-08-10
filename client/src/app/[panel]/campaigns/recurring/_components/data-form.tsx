@@ -69,8 +69,6 @@ export default function DataForm({
 		onSubmit(data);
 	}
 
-	console.log(form.formState.errors);
-
 	function handleTemplateChange(selected: { id: string; name: string } | null) {
 		form.setValue('template_id', selected?.id ?? '');
 		form.setValue('template_name', selected?.name ?? '');
