@@ -1163,7 +1163,20 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			return true;
 		} catch (err) {
-			console.log((err as any).response.data);
+			return false;
+		}
+	}
+
+	public async deleteWhatsappFlow(flow_id: string) {
+		try {
+			const formData = new FormData();
+			formData.append('name', data.name);
+			for (let i = 0; i < data.categories.length; i++) {
+				formData.append('categories', data.categories[i]);
+			}
+			await MetaAPI(this.accessToken).delete(`/${flow_id}`);
+			return true;
+		} catch (err) {
 			return false;
 		}
 	}

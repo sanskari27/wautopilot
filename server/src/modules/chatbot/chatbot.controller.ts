@@ -471,21 +471,20 @@ async function deleteWhatsappFlow(req: Request, res: Response, next: NextFunctio
 		agentLogService,
 		serviceAccount: account,
 	} = req.locals;
-	const data = req.locals.data as WhatsappFlowValidationResult;
 	const id = req.params.id;
 
 	if (!id) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 
-	const success = await new ChatBotService(account, device).updateWhatsappFlow(id, data);
+	const success = await new ChatBotService(account, device).deleteWhatsappFlow(id);
 
 	if (!success) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 
 	agentLogService?.addLog({
-		text: `Update whatsapp flow with id ${id}`,
+		text: `Delete whatsapp flow with id ${id}`,
 		data: {
 			id: id,
 		},
