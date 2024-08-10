@@ -1,5 +1,7 @@
+'use client';
 import Each from '@/components/containers/each';
 import TagsSelector from '@/components/elements/popover/tags';
+import PreviewFile from '@/components/elements/preview-file';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,11 +15,13 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import MessagesService from '@/services/messages.service';
+import UploadService from '@/services/upload.service';
 import { Recipient } from '@/types/recipient';
 import { ListFilter } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoClose } from 'react-icons/io5';
 
@@ -133,6 +137,135 @@ export default function AssignLabelDialog({
 						<Button type='submit' onClick={handleSave}>
 							Save
 						</Button>
+					</DialogClose>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+export function UploadMediaDialog({
+	onConfirm,
+	children,
+}: {
+	onConfirm: (media_id: string) => void;
+	children: React.ReactNode;
+}) {
+	const [selectedFile, setFile] = useState<{
+		file: File;
+		type: string;
+		size: string;
+		url: string;
+	} | null>(null);
+	const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+	function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+		const files = event.target.files;
+		if (!files || files.length === 0) return;
+
+		const file = files[0];
+		const fileSizeBytes = file.size;
+		if (fileSizeBytes > 62914560) {
+			return;
+		}
+
+		const url = window.URL.createObjectURL(file);
+
+		const fileSizeKB = fileSizeBytes / 1024; // Convert bytes to kilobytes
+		const fileSizeMB = fileSizeKB / 1024;
+
+		let type = '';
+
+		if (file.type.includes('image')) {
+			type = 'image';
+		} else if (file.type.includes('video')) {
+			type = 'video';
+		} else if (file.type.includes('pdf')) {
+			type = 'PDF';
+		} else if (file.type.includes('audio')) {
+			type = file.type;
+		}
+
+		setFile({
+			file,
+			type,
+			size: fileSizeMB > 1 ? `${fileSizeMB.toFixed(2)} MB` : `${fileSizeKB.toFixed(2)} KB`,
+			url,
+		});
+		if (fileInputRef.current) {
+			fileInputRef.current.value = '';
+		}
+	}
+
+	async function submit() {
+		if (!selectedFile) return;
+		UploadService.generateMetaMediaId(selectedFile.file)
+			.then((res) => {
+				onConfirm(res);
+			})
+			.catch(() => {
+				toast.error('Failed to upload media');
+			});
+	}
+
+	const removeSelectedFile = () => {
+		setFile(null);
+	};
+
+	return (
+		<Dialog
+			onOpenChange={(open) => {
+				if (open) {
+					setFile(null);
+				}
+			}}
+		>
+			<DialogTrigger asChild>{children}</DialogTrigger>
+			<DialogContent className='sm:max-w-[425px] md:max-w-lg lg:max-w-xl'>
+				<DialogHeader>
+					<DialogTitle>Upload Media</DialogTitle>
+				</DialogHeader>
+				<div className='grid gap-4'>
+					<div className='grid gap-2'>
+						{selectedFile ? (
+							<div className='w-full gap-2'>
+								<p>Selected file : {selectedFile.file.name}</p>
+								<div className='flex justify-between items-center'>
+									<p>Selected file size : {selectedFile.size}</p>
+									<p
+										onClick={removeSelectedFile}
+										className='cursor-pointer font-normal text-red-400'
+									>
+										Remove
+									</p>
+								</div>
+								<PreviewFile data={selectedFile} />
+							</div>
+						) : (
+							<Label
+								htmlFor='logo'
+								className={
+									'!cursor-pointer text-center border border-gray-400 border-dashed py-12 rounded-lg text-normal text-primary'
+								}
+							>
+								<>Drag and drop file here, or click to select file</>
+							</Label>
+						)}
+						<Input
+							id='logo'
+							className='hidden'
+							type='file'
+							ref={fileInputRef}
+							onChange={handleFileChange}
+						/>
+					</div>
+				</div>
+				<DialogFooter className='mt-2'>
+					<DialogClose asChild>
+						<Button variant='secondary'>Cancel</Button>
+					</DialogClose>
+					<DialogClose asChild>
+						<Button onClick={submit}>Save</Button>
 					</DialogClose>
 				</DialogFooter>
 			</DialogContent>

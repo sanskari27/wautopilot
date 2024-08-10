@@ -1,4 +1,5 @@
 import { ChatListExpandedProvider } from '@/components/context/chat-list-expanded';
+import { QuickReplyProvider } from '@/components/context/quick-replies';
 import { RecipientProvider } from '@/components/context/recipients';
 import Loading from '@/components/elements/loading';
 import MessagesService from '@/services/messages.service';
@@ -15,12 +16,14 @@ export default async function Layout({
 	children: React.ReactNode;
 }>) {
 	const conversations = await MessagesService.fetchAllConversation();
-
+	const quickReplies = await MessagesService.fetchQuickReplies();
 	return (
 		<Suspense fallback={<Loading />}>
 			<section>
 				<ChatListExpandedProvider>
-					<RecipientProvider data={conversations}>{children}</RecipientProvider>
+					<QuickReplyProvider data={quickReplies}>
+						<RecipientProvider data={conversations}>{children}</RecipientProvider>
+					</QuickReplyProvider>
 				</ChatListExpandedProvider>
 			</section>
 		</Suspense>

@@ -14,6 +14,7 @@ import {
 import useMessages from '@/hooks/useMessages';
 import { getInitials } from '@/lib/utils';
 import { ChevronLeft, EllipsisVertical } from 'lucide-react';
+import MessageBox from './message-input';
 import MessagesList from './messages-list';
 
 export default function ConversationScreen() {
@@ -61,6 +62,7 @@ export default function ConversationScreen() {
 				<div className='flex flex-col-reverse w-full overflow-y-auto p-4 h-full'>
 					<MessagesList list={messages} onLastReached={loadMore} />
 				</div>
+				<MessageBox />
 			</div>
 		</div>
 	);

@@ -28,16 +28,18 @@ export default function MediaSelectorDialog({
 	selectedValue,
 	onConfirm,
 	returnType = 'id',
+	type = 'all',
 }: {
 	children: React.ReactNode;
 	selectedValue?: string[];
 	singleSelect?: boolean;
 	onConfirm: (media: string[]) => void;
 	returnType?: 'id' | 'media_id';
+	type?: 'all' | 'image' | 'video' | 'audio' | 'document';
 }) {
 	const buttonRef = React.useRef<HTMLButtonElement>(null);
 
-	const mediaList = useMedia();
+	const list = useMedia();
 
 	const [previewMode, setPreviewMode] = React.useState(false);
 	const [selectedMedia, setSelectedMedia] = React.useState<string[]>(selectedValue || []);
@@ -64,6 +66,14 @@ export default function MediaSelectorDialog({
 		buttonRef.current?.click();
 		setSelectedMedia([]);
 	};
+
+	const mediaList = list.filter((media) => {
+		if (type === 'all' || type === 'document') return true;
+		if (type === 'image') return media.mime_type.includes('image');
+		if (type === 'video') return media.mime_type.includes('video');
+		if (type === 'audio') return media.mime_type.includes('audio');
+		return false;
+	});
 
 	return (
 		<Dialog>

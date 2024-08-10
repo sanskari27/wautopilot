@@ -1,5 +1,6 @@
 'use client';
 import { useRecipient } from '@/components/context/recipients';
+import { Button } from '@/components/ui/button';
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -7,8 +8,7 @@ import {
 	ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import { Recipient } from '@/types/recipient';
-import AssignLabelDialog from './assign-label-dialog';
-import { Button } from '@/components/ui/button';
+import AssignLabelDialog from './dialogs';
 
 export function RecipientContextMenu({
 	recipient,
@@ -25,10 +25,6 @@ export function RecipientContextMenu({
 		<ContextMenu>
 			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 			<ContextMenuContent className='w-64'>
-				{/* <TagsSelector onSubmit={handleAssignChats}>
-					<ContextMenuLabel className='font-normal'>Assign Labels</ContextMenuLabel>
-				</TagsSelector> */}
-				{/* TODO add assign label dialog */}
 				{isPinned ? (
 					<ContextMenuItem onClick={() => togglePin(recipient._id)}>Unpin</ContextMenuItem>
 				) : (
