@@ -17,14 +17,14 @@ import { Contact, ContactWithID } from '@/schema/phonebook';
 import React from 'react';
 import ContactDialog from './contact';
 
-export default function ContactSelectorDialog({
+export default function ContactSelectorDialog<T extends ContactWithID | Contact>({
 	children,
 	singleSelect = false,
 	onConfirm,
 }: {
 	children: React.ReactNode;
 	singleSelect?: boolean;
-	onConfirm: (contact: Contact[]) => void;
+	onConfirm: (contact: T[]) => void;
 }) {
 	const buttonRef = React.useRef<HTMLButtonElement>(null);
 	const { value: drawerVisible, on: openDrawer, off: closeDrawer } = useBoolean(false);
@@ -50,14 +50,14 @@ export default function ContactSelectorDialog({
 
 	const handleSave = () => {
 		const selectedContacts = list.filter((contact) => selected.includes(contact.id));
-		onConfirm(selectedContacts);
+		onConfirm(selectedContacts as T[]);
 		buttonRef.current?.click();
 		setSelected([]);
 		closeDrawer();
 	};
 
 	const handleNewContact = (contact: Contact) => {
-		onConfirm([contact]);
+		onConfirm([contact] as T[]);
 		closeDrawer();
 		buttonRef.current?.click();
 		setSelected([]);
