@@ -48,6 +48,8 @@ export async function middleware(request: NextRequest) {
 		if (!agent) {
 			return Response.redirect(new URL(`${subpath}/dashboard`, request.url));
 		}
+	} else {
+		return Response.redirect(new URL(`/`, request.url));
 	}
 }
 

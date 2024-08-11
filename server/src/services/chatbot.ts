@@ -1353,7 +1353,6 @@ export default class ChatBotService extends WhatsappLinkService {
 		const filepath = `${__basedir}${Path.Misc}${id}.json`;
 
 		await FileUtils.generateJSONFile(filepath, object);
-		console.log('Generated JSON file', filepath);
 
 		try {
 			const form = new FormData();
@@ -1365,6 +1364,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					'Content-Type': 'multipart/form-data',
 				},
 			});
+			FileUtils.deleteFile(filepath);
 			if (results.validation_errors.length > 0) {
 				Logger.error('Validation errors', new Error(JSON.stringify(results.validation_errors)), {
 					validations: results.validation_errors,
@@ -1372,6 +1372,7 @@ export default class ChatBotService extends WhatsappLinkService {
 				throw new CustomError(COMMON_ERRORS.INVALID_FIELDS);
 			}
 		} catch (err) {
+			FileUtils.deleteFile(filepath);
 			if (err instanceof CustomError) {
 				throw err;
 			}
@@ -1391,9 +1392,44 @@ export default class ChatBotService extends WhatsappLinkService {
 		}
 		try {
 			const { data } = await axios.get(url);
-			return data;
+			const screens = data.screens.map((screen: any) => {
+				const title = screen.title;
+				const children = screen.layout.children[0].children.map((child: any) => {
+					if (
+						[
+							'TextBody',
+							'TextCaption',
+							'TextSubheading',
+							'TextHeading',
+							'Image',
+							'TextInput',
+							'TextArea',
+							'DatePicker',
+							'OptIn',
+						].includes(child.type)
+					) {
+						return child;
+					} else if (['RadioButtonsGroup', 'CheckboxGroup', 'Dropdown'].includes(child.type)) {
+						return {
+							...child,
+							'data-source': ((child as any)['data-source'] as any[]).map((item) => item.title),
+						};
+					} else if (child.type === 'Footer') {
+						return child;
+					} else {
+						throw new CustomError(COMMON_ERRORS.INVALID_FIELDS);
+					}
+				});
+
+				return {
+					title,
+					children,
+				};
+			}) as UpdateWhatsappFlowValidationResult;
+
+			return screens;
 		} catch (err) {
-			throw new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR);
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
 		}
 	}
 }

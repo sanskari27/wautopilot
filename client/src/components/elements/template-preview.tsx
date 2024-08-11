@@ -29,7 +29,7 @@ export default function TemplatePreview({ components }: Props) {
 					{/* <Avatar name='Prashant Varma' src='https://bit.ly/dan-abramov' size={'lg'} /> */}
 					<p className='text-white text-lg font-medium'>Prashant Varma</p>
 				</div>
-				<div className='p-4 max-h-[700px] min-h-[300px] pb-24 bg-[#ece9e2]'>
+				<div className='p-4 max-h-[700px] min-h-[500px] pb-24 bg-[#ece9e2]'>
 					<div className='bg-white rounded-2xl p-2' hidden={components.length === 0}>
 						<div hidden={!header}>
 							{header?.format === 'TEXT' && <p className='font-medium'>{header.text}</p>}

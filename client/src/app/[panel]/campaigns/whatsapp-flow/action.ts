@@ -1,5 +1,6 @@
 'use server';
 
+import { TWhatsappFlow } from '@/schema/whatsapp-flow';
 import ChatBotService from '@/services/chatbot.service';
 import { revalidatePath } from 'next/cache';
 import { RedirectType, redirect } from 'next/navigation';
@@ -46,6 +47,10 @@ export async function publishWhatsappFlow(id: string) {
 	if (success) {
 		revalidatePath('[panel]/campaigns/whatsapp-flow', 'page');
 	}
+}
+
+export async function saveWhatsappFlowContents(id: string, data: TWhatsappFlow) {
+	await ChatBotService.saveWhatsappFlowContents(id, data);
 }
 
 export async function deleteWhatsappFlow(id: string) {

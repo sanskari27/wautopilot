@@ -1,4 +1,5 @@
 import api from '@/lib/api';
+import { TWhatsappFlow } from '@/schema/whatsapp-flow';
 import { ChatBot } from '@/types/chatbot';
 
 const validateChatBot = (bot: any) => {
@@ -345,6 +346,19 @@ export default class ChatBotService {
 		} catch (err) {
 			return null;
 		}
+	}
+
+	static async whatsappFlowContents(id: string) {
+		try {
+			const { data } = await api.get(`/chatbot/whatsapp-flows/${id}/assets`);
+			return data.screens;
+		} catch (err) {
+			return null;
+		}
+	}
+
+	static async saveWhatsappFlowContents(id: string, data: TWhatsappFlow) {
+		await api.post(`/chatbot/whatsapp-flows/${id}/assets`, data);
 	}
 
 	static async publishWhatsappFlow(flowId: string) {

@@ -453,16 +453,22 @@ async function getWhatsappFlowAssets(req: Request, res: Response, next: NextFunc
 	if (!id) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
-
-	const asset = await new ChatBotService(account, device).getWhatsappFlowContents(id);
-
-	return Respond({
-		res,
-		status: 200,
-		data: {
-			asset,
-		},
-	});
+	try {
+		const screens = await new ChatBotService(account, device).getWhatsappFlowContents(id);
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				screens,
+			},
+		});
+	} catch (e) {
+		if (e instanceof CustomError) {
+			return next(e);
+		} else {
+			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+		}
+	}
 }
 
 async function deleteWhatsappFlow(req: Request, res: Response, next: NextFunction) {

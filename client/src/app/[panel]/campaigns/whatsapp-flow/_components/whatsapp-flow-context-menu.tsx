@@ -46,7 +46,19 @@ export default function WhatsappFlowContextMenu({
 	};
 
 	if (status === 'PUBLISHED') {
-		return null;
+		return (
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+				<DropdownMenuContent className='w-56'>
+					<Link href={`/${params.panel}/campaigns/whatsapp-flow/${id}/update-assets`}>
+						<DropdownMenuItem>
+							<Cog className='mr-2 h-4 w-4' />
+							<span>View Flow Structure</span>
+						</DropdownMenuItem>
+					</Link>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		);
 	}
 
 	return (
@@ -71,7 +83,7 @@ export default function WhatsappFlowContextMenu({
 						<span>Edit Details</span>
 					</DropdownMenuItem>
 				</Link>
-				<Link href={`/${params.panel}/campaigns/whatsapp-flow/${id}/update-assets`}>
+				<Link href={`/${params.panel}/campaigns/whatsapp-flow/${id}/update-assets?can_edit=true`}>
 					<DropdownMenuItem>
 						<Cog className='mr-2 h-4 w-4' />
 						<span>Update Flow Structure</span>
