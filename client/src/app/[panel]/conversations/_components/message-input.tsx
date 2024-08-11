@@ -212,7 +212,7 @@ export default function MessageBox() {
 							</Button>
 						</MediaSelectorDialog>
 
-						<ContactSelectorDialog onConfirm={sendContactMessage}>
+						<ContactSelectorDialog onConfirm={sendContactMessage} newEntryAllowed>
 							<Button variant={'ghost'} size={'sm'} className='w-full justify-start'>
 								<ContactIcon className='w-4 h-4 mr-2' />
 								Contact

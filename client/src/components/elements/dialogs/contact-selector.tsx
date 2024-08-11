@@ -1,4 +1,5 @@
 import Each from '@/components/containers/each';
+import Show from '@/components/containers/show';
 import { useContacts } from '@/components/context/contact';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -20,10 +21,12 @@ import ContactDialog from './contact';
 export default function ContactSelectorDialog<T extends ContactWithID | Contact>({
 	children,
 	singleSelect = false,
+	newEntryAllowed = false,
 	onConfirm,
 }: {
 	children: React.ReactNode;
 	singleSelect?: boolean;
+	newEntryAllowed?: boolean;
 	onConfirm: (contact: T[]) => void;
 }) {
 	const buttonRef = React.useRef<HTMLButtonElement>(null);
@@ -105,9 +108,11 @@ export default function ContactSelectorDialog<T extends ContactWithID | Contact>
 					</Table>
 				</ScrollArea>
 				<DialogFooter>
-					<Button variant={'outline'} onClick={openDrawer}>
-						New Entry
-					</Button>
+					<Show.ShowIf condition={newEntryAllowed}>
+						<Button variant={'outline'} onClick={openDrawer}>
+							New Entry
+						</Button>
+					</Show.ShowIf>
 					<Button
 						type='submit'
 						className='bg-primary text-primary-foreground hover:bg-primary/90'
