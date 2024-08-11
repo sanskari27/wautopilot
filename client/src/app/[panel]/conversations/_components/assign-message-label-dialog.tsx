@@ -12,10 +12,9 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import useMessages from '@/hooks/useMessages';
 import MessagesService from '@/services/messages.service';
 import { ListFilter } from 'lucide-react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { FaSpinner } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
@@ -29,10 +28,8 @@ export default function AssignMessageLabelDialog({
 	children: React.ReactNode;
 	selected: string[];
 }) {
+	const buttonRef = useRef<HTMLButtonElement>(null);
 	const { selected_recipient: recipient } = useRecipient();
-	const { assignMessageTags } = useMessages(id);
-
-	const buttonRef = React.useRef<HTMLButtonElement>(null);
 
 	const [selectedTags, setSelectedTags] = React.useState<string[]>(selected);
 	const [messageLabels, setMessageLabels] = React.useState<string[]>([]);
@@ -91,11 +88,7 @@ export default function AssignMessageLabelDialog({
 				{
 					loading: 'Assigning labels...',
 					success: () => {
-                        console.log('Labels assigned successfully');
-						assignMessageTags(
-							id,
-							newTags.trim().length !== 0 ? [...selectedTags, newTags.trim()] : selectedTags
-						);
+						console.log('Labels assigned successfully');
 						return 'Labels assigned successfully';
 					},
 					error: 'Failed to assign labels',

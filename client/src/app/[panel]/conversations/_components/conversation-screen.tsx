@@ -8,13 +8,13 @@ import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import useBoolean from '@/hooks/useBoolean';
 import useMessages from '@/hooks/useMessages';
 import { getInitials } from '@/lib/utils';
 import { ChevronLeft, EllipsisVertical } from 'lucide-react';
+import { ConversationNoteDialog } from './dialogs';
 import MessageBox from './message-input';
 import MessageTagsView from './message-tag-view';
 import MessagesList from './messages-list';
@@ -26,8 +26,13 @@ export default function ConversationScreen() {
 		on: openMessageTagDialog,
 		off: closeMessageTagDialog,
 	} = useBoolean(false);
+	const {
+		value: isOpenConversationNoteDialog,
+		on: openConversationNoteDialog,
+		off: closeConversationNoteDialog,
+	} = useBoolean(false);
 	const { expand } = useChatListExpanded();
-	const { loading, expiry, messages, loadMore, messageLabels } = useMessages(recipient?._id ?? '');
+	const { loading, expiry, messages, loadMore } = useMessages(recipient?._id ?? '');
 
 	if (!recipient) return null;
 
@@ -63,7 +68,14 @@ export default function ConversationScreen() {
 									>
 										<span className='mr-auto'>View Message Tags</span>
 									</Button>
-									<DropdownMenuItem>Conversation Notes</DropdownMenuItem>
+									<Button
+										variant={'ghost'}
+										className='w-full p-2 font-normal'
+										size={'sm'}
+										onClick={openConversationNoteDialog}
+									>
+										<span className='mr-auto'>Conversation note</span>
+									</Button>
 								</DropdownMenuContent>
 							</DropdownMenu>
 						</Show.ShowIf>
@@ -81,6 +93,11 @@ export default function ConversationScreen() {
 			<MessageTagsView
 				isOpen={isOpenMessageTagDialog}
 				onClose={closeMessageTagDialog}
+				id={recipient._id}
+			/>
+			<ConversationNoteDialog
+				isOpen={isOpenConversationNoteDialog}
+				onClose={closeConversationNoteDialog}
 				id={recipient._id}
 			/>
 		</div>

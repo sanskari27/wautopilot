@@ -190,21 +190,12 @@ export default class MessagesService {
 	}
 
 	static async setNote(recipientId: string, note: string) {
-		try {
-			await api.post(`/conversation/${recipientId}/note`, { note });
-			return true;
-		} catch (err) {
-			return false;
-		}
+		await api.post(`/conversation/${recipientId}/note`, { note });
 	}
 
 	static async getNote(recipientId: string) {
-		try {
-			const { data } = await api.get(`/conversation/${recipientId}/note`);
-			return data.note ?? '';
-		} catch (err) {
-			return '';
-		}
+		const { data } = await api.get(`/conversation/${recipientId}/note`);
+		return data.note ?? '';
 	}
 
 	static async ConversationLabels(phone_number: string, labels: string[]) {

@@ -16,12 +16,13 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import MessagesService from '@/services/messages.service';
 import UploadService from '@/services/upload.service';
 import { Recipient } from '@/types/recipient';
 import { ListFilter } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoClose } from 'react-icons/io5';
 
@@ -72,7 +73,6 @@ export default function AssignLabelDialog({
 	};
 
 	const handleSave = () => {
-
 		MessagesService.ConversationLabels(
 			recipient.recipient,
 			newLabel.trim().length !== 0 ? [...selectedLabels, newLabel.trim()] : selectedLabels
@@ -264,6 +264,66 @@ export function UploadMediaDialog({
 					<DialogClose asChild>
 						<Button onClick={submit}>Save</Button>
 					</DialogClose>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+export function ConversationNoteDialog({
+	isOpen,
+	onClose,
+	id,
+}: {
+	id: string;
+	isOpen: boolean;
+	onClose: () => void;
+}) {
+	const [notes, setNotes] = useState('');
+
+	const handleClose = () => {
+		onClose();
+	};
+
+	const handleSave = () => {
+		toast.promise(MessagesService.setNote(id, notes), {
+			loading: 'Saving note...',
+			success: () => {
+				handleClose();
+				return 'Note saved successfully';
+			},
+			error: 'Failed to save note',
+		});
+	};
+
+	useEffect(() => {
+		MessagesService.getNote(id)
+			.then((res) => {
+				setNotes(res ?? '');
+			})
+			.catch(() => {
+				toast.error('Failed to get note');
+			});
+	}, [id]);
+
+	return (
+		<Dialog
+			open={isOpen}
+			onOpenChange={(value) => {
+				if (!value) {
+					handleClose();
+				}
+			}}
+		>
+			<DialogContent className='max-w-sm md:max-w-lg lg:max-w-2xl'>
+				<DialogHeader>Conversation Note</DialogHeader>
+				<Textarea
+					className='h-[300px]'
+					value={notes}
+					onChange={(e) => setNotes(e.target.value)}
+				/>
+				<DialogFooter>
+					<Button onClick={handleSave}>Save</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
