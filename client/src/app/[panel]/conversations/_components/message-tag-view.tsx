@@ -78,11 +78,16 @@ export default function MessageTagsView({
 						/>
 					</div>
 					<div className='flex flex-col items-end bg-[#ece5dd] w-full h-[500px]'>
-						<div className='flex-col-reverse w-full overflow-y-auto p-4'>
+						<div className='flex flex-col-reverse w-full overflow-y-auto p-4 flex-1'>
 							<Each
 								items={filteredMessages}
-								render={(item) => (
-									<div className='flex w-full'>
+								render={(item, index) => (
+									<div
+										style={{
+											display: 'flex',
+											justifyContent: item.received_at ? 'flex-start' : 'flex-end',
+										}}
+									>
 										<Message message={item} />
 									</div>
 								)}

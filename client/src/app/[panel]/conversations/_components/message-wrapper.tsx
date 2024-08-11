@@ -41,7 +41,7 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 		<>
 			<div
 				className={cn(
-					'max-w-[80%] md:max-w-[45%] flex flex-col mb-4 ',
+					'max-w-xs md:max-w-lg lg:max-w-2xl flex flex-col mb-4 ',
 					isMe ? 'self-start' : 'self-end'
 				)}
 				id={message.message_id}
