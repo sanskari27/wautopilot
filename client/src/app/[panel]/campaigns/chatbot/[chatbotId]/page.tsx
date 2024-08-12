@@ -30,12 +30,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { countOccurrences, parseToObject } from '@/lib/utils';
-import { chatbotSchema } from '@/schema/chatbot';
+import { ChatBot, chatbotSchema } from '@/schema/chatbot';
 import { ContactWithID } from '@/schema/phonebook';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Separator } from '@radix-ui/react-separator';
 import { ChevronLeftIcon } from 'lucide-react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -51,6 +51,39 @@ const tagsVariable = [
 	'{{anniversary}}',
 ];
 
+const DEFAULT_DATA: ChatBot = {
+	id: '',
+	trigger: '',
+	options: 'INCLUDES_IGNORE_CASE',
+	trigger_gap_time: '1',
+	trigger_gap_type: 'SEC',
+	response_delay_time: '1',
+	response_delay_type: 'SEC',
+	startAt: '',
+	endAt: '',
+	respond_type: 'normal',
+	message: '',
+	images: [],
+	videos: [],
+	audios: [],
+	documents: [],
+	contacts: [],
+	template_id: '',
+	template_name: '',
+	template_body: [],
+	template_header: {
+		type: 'TEXT',
+		link: '',
+		media_id: '',
+	},
+	nurturing: [],
+	forward: {
+		number: '',
+		message: '',
+	},
+	isActive: false,
+};
+
 export default function ChatbotForm() {
 	let phonebook_fields = useFields();
 	phonebook_fields = phonebook_fields.filter((field) => field.value !== 'all');
@@ -58,7 +91,6 @@ export default function ChatbotForm() {
 	const messageRef = useRef(0);
 
 	const router = useRouter();
-	const params = useParams();
 	const raw = parseToObject(useSearchParams().get('data'));
 
 	const templates = useTemplates();
@@ -66,45 +98,9 @@ export default function ChatbotForm() {
 	const form = useForm<z.infer<typeof chatbotSchema>>({
 		resolver: zodResolver(chatbotSchema),
 		mode: 'onChange',
-		defaultValues: raw
-			? raw
-			: {
-					id: '',
-					name: '',
-					trigger: '',
-					respond_to: 'ALL',
-					options: 'INCLUDES_IGNORE_CASE',
-					trigger_gap_time: 1,
-					trigger_gap_type: 'SEC',
-					response_delay_time: 1,
-					response_delay_type: 'SEC',
-					startAt: '',
-					endAt: '',
-					respond_type: 'normal',
-					message: '',
-					images: [],
-					videos: [],
-					audios: [],
-					documents: [],
-					contacts: [],
-					template_id: '',
-					template_name: '',
-					template_body: [],
-					template_header: {
-						type: 'TEXT',
-						link: '',
-						media_id: '',
-					},
-					group_respond: false,
-					nurturing: [],
-			  },
+		defaultValues: raw || DEFAULT_DATA,
 	});
 
-	const trigger = form.watch('trigger');
-	const respond_to = form.watch('respond_to');
-	const options = form.watch('options');
-	const trigger_gap_type = form.watch('trigger_gap_type');
-	const response_delay_type = form.watch('response_delay_type');
 	const images = form.watch('images');
 	const videos = form.watch('videos');
 	const audios = form.watch('audios');
@@ -155,10 +151,6 @@ export default function ChatbotForm() {
 		});
 	};
 
-	// if (params.chatbotId === 'create') {
-	// 	return <div>create</div>;
-	// }
-
 	return (
 		<div className='custom-scrollbar flex flex-col gap-2 justify-center p-4'>
 			{/*--------------------------------- TRIGGER SECTION--------------------------- */}
@@ -170,27 +162,31 @@ export default function ChatbotForm() {
 					<div className='flex flex-col gap-2'>
 						<Button className='self-start' variant={'link'} onClick={() => router.back()}>
 							<ChevronLeftIcon className='w-6 h-6' />
-							<span>Back to all chatbots</span>
 						</Button>
 						<div className='flex justify-between items-center'>
 							<p>Trigger</p>
 							<div className='flex gap-2 items-center'>
-								<Checkbox
-									className={`${trigger ? 'bg-[#4CB072]' : 'bg-[#A6A6A6]'} hover:bg-green-700`}
-									checked={!!!trigger}
-									onCheckedChange={(checked) => {
-										if (checked) {
-											form.setValue('trigger', '');
-										}
-									}}
+								<FormField
+									control={form.control}
+									name='trigger'
+									render={({ field }) => (
+										<FormItem className='space-y-0 flex-1 inline-flex items-center gap-2'>
+											<FormControl>
+												<Checkbox
+													checked={field.value === ''}
+													onCheckedChange={(checked) => checked && field.onChange('')}
+												/>
+											</FormControl>
+											<div className='text-sm'>Default Message</div>
+										</FormItem>
+									)}
 								/>
-								<div className='text-sm'>Default Message</div>
 							</div>
 						</div>
 
 						<FormField
 							control={form.control}
-							name='name'
+							name='trigger'
 							render={({ field }) => (
 								<FormItem className='space-y-0 flex-1'>
 									<FormControl>
@@ -207,63 +203,20 @@ export default function ChatbotForm() {
 					<div className='grid grid-cols-2 gap-4'>
 						<FormField
 							control={form.control}
-							name='respond_to'
-							render={({ field }) => (
-								<FormItem className='space-y-0 flex-1'>
-									<FormLabel>Recipients</FormLabel>
-									<FormControl>
-										<Select
-											value={respond_to}
-											onValueChange={(value) =>
-												form.setValue(
-													'respond_to',
-													value as 'ALL' | 'SAVED_CONTACTS' | 'NON_SAVED_CONTACTS'
-												)
-											}
-										>
-											<SelectTrigger>
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												<SelectItem value='ALL'>All</SelectItem>
-												<SelectItem value='SAVED_CONTACTS'>Saved Contacts</SelectItem>
-												<SelectItem value='NON_SAVED_CONTACTS'>Non Saved Contacts</SelectItem>
-											</SelectContent>
-										</Select>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={form.control}
 							name='options'
 							render={({ field }) => (
 								<FormItem className='space-y-0 flex-1'>
 									<FormLabel>Conditions</FormLabel>
 									<FormControl>
-										<Select
-											value={options}
-											onValueChange={(value) =>
-												form.setValue(
-													'options',
-													value as
-														| 'INCLUDES_IGNORE_CASE'
-														| 'INCLUDES_MATCH_CASE'
-														| 'EXACT_IGNORE_CASE'
-														| 'EXACT_MATCH_CASE'
-												)
-											}
-										>
+										<Select value={field.value} onValueChange={field.onChange}>
 											<SelectTrigger>
 												<SelectValue />
 											</SelectTrigger>
 											<SelectContent>
-												<SelectItem value='INCLUDES_IGNORE_CASE'>Includes (Ignore Case)</SelectItem>
-												<SelectItem value='EXACT'>Exact</SelectItem>
-												<SelectItem value='EXACT_IGNORE_CASE'>Exact (Ignore Case)</SelectItem>
-												<SelectItem value='REGEX'>Regex</SelectItem>
+												<SelectItem value='INCLUDES_IGNORE_CASE'>Includes Ignore Case</SelectItem>
+												<SelectItem value='INCLUDES_MATCH_CASE'>Includes Match Case</SelectItem>
+												<SelectItem value='EXACT_IGNORE_CASE'>Exact Ignore Case</SelectItem>
+												<SelectItem value='EXACT_MATCH_CASE'>Exact Match Case</SelectItem>
 											</SelectContent>
 										</Select>
 									</FormControl>
@@ -298,12 +251,7 @@ export default function ChatbotForm() {
 										render={({ field }) => (
 											<FormItem className='space-y-0 flex-1 max-w-md'>
 												<FormControl>
-													<Select
-														value={trigger_gap_type}
-														onValueChange={(value) =>
-															form.setValue('trigger_gap_type', value as 'SEC' | 'MINUTE' | 'HOUR')
-														}
-													>
+													<Select value={field.value} onValueChange={field.onChange}>
 														<SelectTrigger>
 															<SelectValue />
 														</SelectTrigger>
@@ -342,15 +290,7 @@ export default function ChatbotForm() {
 										render={({ field }) => (
 											<FormItem className='space-y-0 flex-1 max-w-md'>
 												<FormControl>
-													<Select
-														value={response_delay_type}
-														onValueChange={(value) =>
-															form.setValue(
-																'response_delay_type',
-																value as 'SEC' | 'MINUTE' | 'HOUR'
-															)
-														}
-													>
+													<Select value={field.value} onValueChange={field.onChange}>
 														<SelectTrigger>
 															<SelectValue />
 														</SelectTrigger>

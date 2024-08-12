@@ -9,8 +9,8 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ChatBot } from '@/schema/chatbot';
 import ChatBotService from '@/services/chatbot.service';
-import { ChatBot } from '@/types/chatbot';
 import { Delete, Download, Edit, Play } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -65,7 +65,7 @@ export default function ChatbotContextMenu({
 					</Link>
 				</DropdownMenuItem>
 				<DeleteDialog
-					actionButton={chatbot.isActive ? 'Stop' : 'Play'}
+					actionButtonText={chatbot.isActive ? 'Stop' : 'Play'}
 					onDelete={toggleBot}
 					message='Are you sure you want to change running status?'
 				>

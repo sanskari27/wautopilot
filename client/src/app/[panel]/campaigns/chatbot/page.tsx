@@ -32,7 +32,6 @@ export default async function ChatbotPage({ params: { panel } }: { params: { pan
 					<TableRow>
 						<TableHead>Trigger</TableHead>
 						<TableHead>Message</TableHead>
-						<TableHead>Recipients</TableHead>
 						<TableHead>Condition</TableHead>
 						<TableHead>Delay</TableHead>
 						<TableHead className='text-center'>Action</TableHead>
@@ -45,20 +44,15 @@ export default async function ChatbotPage({ params: { panel } }: { params: { pan
 							<TableRow>
 								<TableCell className=''>{chatbot.trigger}</TableCell>
 								<TableCell className='whitespace-break-spaces'>{chatbot.message}</TableCell>
-								<TableCell>{chatbot.respond_to.split('_').join(' ')}</TableCell>
 								<TableCell>{chatbot.options.split('_').join(' ')}</TableCell>
-								<TableCell>
-									{chatbot.trigger_gap_seconds < 60
-										? `${chatbot.trigger_gap_seconds} s`
-										: chatbot.trigger_gap_seconds < 3600
-										? `${Math.floor(chatbot.trigger_gap_seconds / 60)} m`
-										: chatbot.trigger_gap_seconds < 86400
-										? `${Math.floor(chatbot.trigger_gap_seconds / 3600)} h`
-										: `${Math.floor(chatbot.trigger_gap_seconds / 86400)} day`}
+								<TableCell className='capitalize'>
+									{chatbot.response_delay_time} {chatbot.response_delay_type}
 								</TableCell>
 								<TableCell className='text-center'>
 									<ChatbotContextMenu panel={panel} chatbot={chatbot}>
-										<Button size={'sm'} variant={'outline'}>Action</Button>
+										<Button size={'sm'} variant={'outline'}>
+											Action
+										</Button>
 									</ChatbotContextMenu>
 								</TableCell>
 							</TableRow>

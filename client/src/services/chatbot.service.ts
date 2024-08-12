@@ -1,14 +1,36 @@
 import api from '@/lib/api';
+import { ChatBot } from '@/schema/chatbot';
 import { TWhatsappFlow } from '@/schema/whatsapp-flow';
-import { ChatBot } from '@/types/chatbot';
 
 const validateChatBot = (bot: any) => {
 	return {
 		id: bot.bot_id ?? '',
 		respond_to: bot.respond_to ?? 'ALL',
 		trigger: bot.trigger ?? '',
-		trigger_gap_seconds: bot.trigger_gap_seconds ?? 1,
-		response_delay_seconds: bot.response_delay_seconds ?? 1,
+		trigger_gap_time: (bot.trigger_gap_seconds % 3600 === 0
+			? bot.trigger_gap_seconds / 3600
+			: bot.trigger_gap_seconds % 60 === 0
+			? bot.trigger_gap_seconds / 60
+			: bot.trigger_gap_seconds
+		).toString(),
+		trigger_gap_type:
+			bot.trigger_gap_seconds % 3600 === 0
+				? 'HOUR'
+				: bot.trigger_gap_seconds % 60 === 0
+				? 'MINUTE'
+				: 'SEC',
+		response_delay_time: (bot.response_delay_seconds % 3600 === 0
+			? bot.response_delay_seconds / 3600
+			: bot.response_delay_seconds % 60 === 0
+			? bot.response_delay_seconds / 60
+			: bot.response_delay_seconds
+		).toString(),
+		response_delay_type:
+			bot.response_delay_seconds % 3600 === 0
+				? 'HOUR'
+				: bot.response_delay_seconds % 60 === 0
+				? 'MINUTE'
+				: 'SEC',
 		options: bot.options ?? 'INCLUDES_IGNORE_CASE',
 		respond_type: bot.respond_type ?? 'template',
 		startAt: bot.startAt ?? '',
@@ -39,12 +61,12 @@ const validateChatBot = (bot: any) => {
 		nurturing: bot.nurturing.map((nurture: any) => {
 			return {
 				after: {
-					value:
-						nurture.after % 86400 === 0
-							? nurture.after / 86400
-							: nurture.after % 3600 === 0
-							? nurture.after / 3600
-							: nurture.after / 60,
+					value: (nurture.after % 86400 === 0
+						? nurture.after / 86400
+						: nurture.after % 3600 === 0
+						? nurture.after / 3600
+						: nurture.after / 60
+					).toString(),
 					type:
 						nurture.after % 86400 === 0 ? 'days' : nurture.after % 3600 === 0 ? 'hours' : 'minutes',
 				},

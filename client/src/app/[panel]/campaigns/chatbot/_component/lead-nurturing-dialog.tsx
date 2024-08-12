@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
 	DialogFooter,
 	DialogHeader,
@@ -30,13 +31,51 @@ import {
 import { Separator } from '@/components/ui/separator';
 import useBoolean from '@/hooks/useBoolean';
 import { countOccurrences } from '@/lib/utils';
-import { chatbotSchema } from '@/schema/chatbot';
+import { chatbotSchema, nurturingSchema } from '@/schema/chatbot';
 import { ChatBot } from '@/types/chatbot';
 import { DialogDescription } from '@radix-ui/react-dialog';
+import { Trash } from 'lucide-react';
 import React from 'react';
 import { useFieldArray, UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 import LeadsTemplateMessageDialog from './leads-template-message';
+
+const DEFAULT_NURTURING = {
+	after: {
+		value: '1',
+		type: 'minutes',
+	},
+	start_from: '00:01',
+	end_at: '23:59',
+	template_body: [],
+	template_header: {
+		type: '',
+		link: '',
+		media_id: '',
+	},
+	template_id: '',
+	template_name: '',
+} as {
+	after: {
+		value: string;
+		type: 'minutes' | 'hours' | 'days';
+	};
+	start_from: string;
+	end_at: string;
+	template_body: {
+		variable_from: 'custom_text' | 'phonebook_data';
+		phonebook_data: string;
+		fallback_value: string;
+		custom_text: string;
+	}[];
+	template_header: {
+		type: '' | 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+		media_id: string;
+		link: string;
+	};
+	template_id: string;
+	template_name: string;
+};
 
 export default function LeadNurturingDialog({
 	children,
@@ -50,20 +89,25 @@ export default function LeadNurturingDialog({
 	const templates = useTemplates();
 
 	const {
-		value: isOpenNurturingTemplateMessage,
-		on: openNurturingTemplateMessage,
-		off: closeNurturingTemplateMessage,
+		value: isTemplateOpen,
+		on: openTemplateDialog,
+		off: closeTemplateDialog,
 	} = useBoolean(false);
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
 		name: 'nurturing',
 	});
 
+	const isNurturingValid = nurturingSchema.safeParse(nurturing).success;
+	const result = nurturingSchema.safeParse(nurturing);
+	if (!result.success) {
+		console.log(result.error.issues);
+	}
+
 	const handleTemplateChange = (details: { id: string; name: string } | null, index: number) => {
 		if (!details) {
 			return;
 		}
-		openNurturingTemplateMessage();
 		const template = templates.find((t) => t.id === details.id);
 		const body = template?.components.find((c) => c.type === 'BODY');
 		const variables = countOccurrences(body?.text ?? '');
@@ -84,10 +128,12 @@ export default function LeadNurturingDialog({
 			link: '',
 			media_id: '',
 		});
+
+		openTemplateDialog();
 	};
 
 	const selectTemplate = (index: number) => {
-		return templates.find((t) => t.id === form.watch(`nurturing.${index}.template_id`));
+		return templates.find((t) => t.id === form.getValues(`nurturing.${index}.template_id`));
 	};
 
 	return (
@@ -98,27 +144,7 @@ export default function LeadNurturingDialog({
 					<DialogTitle>Lead Nurturing</DialogTitle>
 				</DialogHeader>
 				<DialogDescription>
-					<Button
-						type='button'
-						onClick={() =>
-							append({
-								after: {
-									value: '1',
-									type: 'minutes',
-								},
-								start_from: '00:01',
-								end_at: '23:59',
-								template_body: [],
-								template_header: {
-									type: '',
-									link: '',
-									media_id: '',
-								},
-								template_id: '',
-								template_name: '',
-							})
-						}
-					>
+					<Button type='button' className='w-full' onClick={() => append(DEFAULT_NURTURING)}>
 						Add
 					</Button>
 				</DialogDescription>
@@ -128,7 +154,7 @@ export default function LeadNurturingDialog({
 						render={(item, index) => (
 							<>
 								<AccordionItem value={`${index}`}>
-									<AccordionTrigger>{index + 1}</AccordionTrigger>
+									<AccordionTrigger>Nurturing {index + 1}</AccordionTrigger>
 									<AccordionContent>
 										<Separator className='my-2' />
 										<div className='flex justify-start flex-wrap gap-2 items-center'>
@@ -214,8 +240,8 @@ export default function LeadNurturingDialog({
 											header={form.watch(`nurturing.${index}.template_header`)}
 											template_body={form.watch(`nurturing.${index}.template_body`)}
 											form={form}
-											isOpen={isOpenNurturingTemplateMessage}
-											onClose={closeNurturingTemplateMessage}
+											isOpen={isTemplateOpen}
+											onClose={closeTemplateDialog}
 											template={
 												selectTemplate(index) ?? {
 													components: [],
@@ -224,19 +250,12 @@ export default function LeadNurturingDialog({
 											index={index}
 										/>
 										<div className='flex justify-between mt-4'>
-											<Button variant={'outline'} onClick={openNurturingTemplateMessage}>
-												Edit template
+											<Button variant={'outline'} onClick={openTemplateDialog}>
+												Edit Template
 											</Button>
-											<Button
-												type='button'
-												onClick={() => {
-													console.log(form.watch('nurturing'));
-												}}
-											>
-												Check value
-											</Button>
-											<Button variant={'destructive'} onClick={() => remove(index)}>
-												Remove
+
+											<Button variant={'destructive'} size={'icon'} onClick={() => remove(index)}>
+												<Trash className='w-4 h-4' />
 											</Button>
 										</div>
 									</AccordionContent>
@@ -247,7 +266,9 @@ export default function LeadNurturingDialog({
 				</Accordion>
 
 				<DialogFooter>
-					<Button type='submit'>Save</Button>
+					<DialogClose asChild>
+						<Button disabled={!isNurturingValid}>Save</Button>
+					</DialogClose>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

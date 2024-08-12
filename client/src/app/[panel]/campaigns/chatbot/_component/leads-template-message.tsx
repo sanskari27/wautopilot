@@ -14,7 +14,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { chatbotSchema } from '@/schema/chatbot';
+import { chatbotSchema, templateBodySchema, templateHeaderSchema } from '@/schema/chatbot';
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -49,17 +49,16 @@ export default function LeadsTemplateMessageDialog({
 	let phonebook_fields = useFields();
 	phonebook_fields = phonebook_fields.filter((field) => field.value !== 'all');
 
+	const t_header = form.watch(`nurturing.${index}.template_header`);
+	const t_body = form.watch(`nurturing.${index}.template_body`);
+	const isHeaderValid = templateHeaderSchema.safeParse(t_header).success;
+	const isBodyValid = templateBodySchema.safeParse(t_body).success;
 	const handleSubmit = () => {
-
 		onClose();
 	};
 
-    console.log(form.formState);
-
 	return (
-		<Dialog
-			open={isOpen}
-		>
+		<Dialog open={isOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
 			<DialogContent className='sm:max-w-[425px] md:max-w-lg lg:max-w-3xl h-full overflow-y-auto'>
 				<DialogHeader>Leads Template Message</DialogHeader>
 				<div className='flex flex-col w-full justify-between gap-3'>
@@ -85,15 +84,20 @@ export default function LeadsTemplateMessageDialog({
 											<p className='font-medium'>Header Media:- </p>
 											<MediaSelectorDialog
 												singleSelect
-												selectedValue={header?.media_id ? [header?.media_id] : []}
-												onConfirm={(media) =>
-													form.setValue(`nurturing.${index}.template_header.media_id`, media[0])
-												}
+												selectedValue={field.value ? [field.value] : []}
+												onConfirm={(media) => field.onChange(media[0])}
 												returnType='media_id'
+												type={
+													header.type === 'IMAGE'
+														? 'image'
+														: header.type === 'VIDEO'
+														? 'video'
+														: 'document'
+												}
 											>
 												<Button variant={'outline'}>Select Media</Button>
 											</MediaSelectorDialog>
-											<span>{header?.media_id ? 'Media selected' : 'No media selected'}</span>
+											<span>{field.value ? 'Media selected' : 'No media selected'}</span>
 										</div>
 										<FormMessage />
 									</FormItem>
@@ -211,6 +215,7 @@ export default function LeadsTemplateMessageDialog({
 								e.stopPropagation();
 								handleSubmit();
 							}}
+							disabled={!isBodyValid || !isHeaderValid}
 							variant='outline'
 						>
 							Save
