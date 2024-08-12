@@ -22,11 +22,13 @@ import { IoClose } from 'react-icons/io5';
 export default function AssignMessageLabelDialog({
 	id,
 	children,
+	onConfirm,
 	selected,
 }: {
 	id: string;
 	children: React.ReactNode;
 	selected: string[];
+	onConfirm: (labels: string[]) => void;
 }) {
 	const buttonRef = useRef<HTMLButtonElement>(null);
 	const { selected_recipient: recipient } = useRecipient();
@@ -79,24 +81,22 @@ export default function AssignMessageLabelDialog({
 	};
 
 	const handleSave = () => {
-		toast
-			.promise(
-				MessagesService.assignMessageLabels(
-					id,
-					newTags.trim().length !== 0 ? [...selectedTags, newTags.trim()] : selectedTags
-				),
-				{
-					loading: 'Assigning labels...',
-					success: () => {
-						console.log('Labels assigned successfully');
-						return 'Labels assigned successfully';
-					},
-					error: 'Failed to assign labels',
-				}
-			)
-			.then(() => {
-				onClose();
-			});
+		toast.promise(
+			MessagesService.assignMessageLabels(
+				id,
+				newTags.trim().length !== 0 ? [...selectedTags, newTags.trim()] : selectedTags
+			),
+			{
+				loading: 'Assigning labels...',
+				success: () => {
+					onConfirm(selectedTags);
+					onClose();
+					console.log('Labels assigned successfully');
+					return 'Labels assigned successfully';
+				},
+				error: 'Failed to assign labels',
+			}
+		);
 	};
 
 	return (

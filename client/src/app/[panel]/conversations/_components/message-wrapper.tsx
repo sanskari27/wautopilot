@@ -19,13 +19,18 @@ import {
 	MessageCircleReply,
 	PhoneCall,
 } from 'lucide-react';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import AssignMessageLabelDialog from './assign-message-label-dialog';
 
 const ChatMessageWrapper = ({ message, children }: { message: Message; children: ReactNode }) => {
 	const isMe = !!message.received_at;
 	const sender = message.sender;
+	const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+
+	useEffect(() => {
+		setSelectedLabels(message.labels);
+	}, [message.labels]);
 
 	const scrollToContext = () => {
 		if (!message.context || !message.context.id) return;
@@ -65,7 +70,11 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 								/>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent className='w-56'>
-								<AssignMessageLabelDialog selected={message.labels} id={message._id}>
+								<AssignMessageLabelDialog
+									selected={selectedLabels}
+									onConfirm={setSelectedLabels}
+									id={message._id}
+								>
 									<Button variant={'ghost'} className='w-full p-2 font-normal' size={'sm'}>
 										<span className='mr-auto'>Assign Tags</span>
 									</Button>
