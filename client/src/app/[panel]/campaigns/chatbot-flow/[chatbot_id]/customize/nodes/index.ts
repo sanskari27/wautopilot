@@ -6,3 +6,4 @@ export { default as ListNode } from './ListNode';
 export { default as StartNode } from './StartNode';
 export { default as TextNode } from './TextNode';
 export { default as VideoNode } from './VideoNode';
+export { default as WaFlowNode } from './WaFlowNode';

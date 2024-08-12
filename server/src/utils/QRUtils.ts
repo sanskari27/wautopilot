@@ -1,5 +1,4 @@
 import Jimp from 'jimp';
-import Logger from 'n23-logger';
 import qr from 'qrcode';
 import { LOGO_PATH } from '../config/const';
 
@@ -30,7 +29,6 @@ const generateQR = async (text: string, remove_promotion = false) => {
 
 		return await qrJimp.getBufferAsync(Jimp.MIME_PNG);
 	} catch (error: any) {
-		Logger.error('Generate Contact QR', error);
 		return null;
 	}
 };

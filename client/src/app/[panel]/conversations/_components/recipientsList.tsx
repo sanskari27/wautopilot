@@ -7,8 +7,10 @@ import TagsSelector from '@/components/elements/popover/tags';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import AgentService from '@/services/agent.service';
 import { Recipient as TRecipient } from '@/types/recipient';
 import { Headset, ListFilter } from 'lucide-react';
+import toast from 'react-hot-toast';
 import Recipient from './recipient';
 
 export default function RecipientsList() {
@@ -26,6 +28,36 @@ export default function RecipientsList() {
 		collapse();
 		setSelectedRecipient(item);
 		// if (selected_recipient._id === item._id) return;
+	};
+
+	const handleAssignAgent = (agentId: string) => {
+		if (selectedConversations.length === 0) return;
+		if (selectedConversations.length === 0) {
+			const promises = selectedConversations.map((recipient) => {
+				return AgentService.removeConversationFromAgent(recipient);
+			});
+
+			toast.promise(Promise.all(promises), {
+				loading: 'Assigning conversation to agent',
+				success: 'Conversation assigned to agent',
+				error: 'Failed to assign conversation to agent',
+			});
+			return;
+		}
+		const promises = selectedConversations.map((recipient) => {
+			return AgentService.assignConversationToAgent({
+				agentId,
+				conversationId: recipient,
+			});
+		});
+
+		toast.promise(Promise.all(promises), {
+			loading: 'Assigning conversation to agent',
+			success: () => {
+				return 'Conversation assigned to agent';
+			},
+			error: 'Failed to assign conversation to agent',
+		});
 	};
 
 	return (
@@ -51,7 +83,7 @@ export default function RecipientsList() {
 					</Button>
 				</TagsSelector>
 				{selectedConversations.length > 0 && (
-					<AgentSelector onSubmit={([id]) => console.log(id)}>
+					<AgentSelector onSubmit={([id]) => handleAssignAgent(id)}>
 						<Button variant='secondary' size={'icon'}>
 							<Headset className='w-4 h-4' />
 						</Button>

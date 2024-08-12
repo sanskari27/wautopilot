@@ -80,11 +80,13 @@ export default function (app: Express) {
 		};
 		const { headers, body, url } = req;
 
-		Logger.http(url, {
-			type: 'request',
-			headers,
-			body,
-		});
+		if (req.method !== 'GET') {
+			Logger.http(url, {
+				type: 'request',
+				headers,
+				body,
+			});
+		}
 		next();
 	});
 

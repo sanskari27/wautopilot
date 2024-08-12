@@ -381,7 +381,6 @@ async function updateWhatsappFlow(req: Request, res: Response, next: NextFunctio
 	} = req.locals;
 	const data = req.locals.data as WhatsappFlowValidationResult;
 	const id = req.params.id;
-	console.log(id);
 
 	if (!id) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
@@ -389,7 +388,6 @@ async function updateWhatsappFlow(req: Request, res: Response, next: NextFunctio
 
 	const success = await new ChatBotService(account, device).updateWhatsappFlow(id, data);
 
-	console.log(success);
 	if (!success) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}

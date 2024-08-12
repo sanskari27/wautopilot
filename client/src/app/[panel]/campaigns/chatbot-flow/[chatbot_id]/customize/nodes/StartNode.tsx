@@ -13,7 +13,7 @@ export default function StartNode() {
 				style={dotStyle}
 				isConnectable
 			/>
-			<div className='rounded-full bg-gray-100 min-w-200 min-h-min-content shadow-2xl drop-shadow-2xl'>
+			<div className='rounded-full bg-gray-100 min-w-[200px] min-h-min-content shadow-2xl drop-shadow-2xl'>
 				<div className='bg-primary text-center text-white rounded-full h-12 flex justify-center items-center font-medium text-lg'>
 					Start
 				</div>

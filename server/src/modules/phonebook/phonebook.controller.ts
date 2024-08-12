@@ -130,8 +130,6 @@ async function records(req: Request, res: Response, next: NextFunction) {
 			},
 		});
 	} catch (err) {
-		console.log(err);
-
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }

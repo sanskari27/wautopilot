@@ -21,7 +21,6 @@ export function FilterDate() {
 		const url = new URL((window as any).location);
 		const startDate = url.searchParams.get('start');
 		const endDate = url.searchParams.get('end');
-		console.log(startDate, endDate);
 
 		setStartDate(
 			startDate

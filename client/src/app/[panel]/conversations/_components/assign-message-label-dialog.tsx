@@ -91,7 +91,6 @@ export default function AssignMessageLabelDialog({
 				success: () => {
 					onConfirm(selectedTags);
 					onClose();
-					console.log('Labels assigned successfully');
 					return 'Labels assigned successfully';
 				},
 				error: 'Failed to assign labels',

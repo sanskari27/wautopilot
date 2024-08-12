@@ -107,7 +107,28 @@ export function extractInteractiveFooter(components: Record<string, any>) {
 	return footer.text;
 }
 
-export function extractInteractiveButtons(components: Record<string, any>) {
+export function extractInteractiveButtons(components: Record<string, any>): {
+	button_type: 'QUICK_REPLY' | 'URL' | 'PHONE_NUMBER' | 'CTA';
+	button_content: string;
+	button_data: string;
+}[] {
+	if (!components.action) {
+		return [];
+	}
+
+	if (components.type === 'flow') {
+		return [
+			{
+				button_type: 'CTA',
+				button_content: components.action.parameters.flow_cta as string,
+				button_data: components.action.parameters.flow_id as string,
+			},
+		];
+	}
+	if (!components.action.buttons) {
+		return [];
+	}
+
 	const buttons =
 		(components.action.buttons as {
 			type: string;
@@ -118,7 +139,7 @@ export function extractInteractiveButtons(components: Record<string, any>) {
 		}[]) ?? [];
 
 	return buttons.map((button) => ({
-		button_type: 'QUICK_REPLY' as 'QUICK_REPLY' | 'URL' | 'PHONE_NUMBER',
+		button_type: 'QUICK_REPLY',
 		button_content: button.reply.title,
 		button_data: button.reply.id,
 	}));

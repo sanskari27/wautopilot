@@ -75,8 +75,8 @@ export function generateRandomID() {
 	return crypto.randomUUID();
 }
 
-export function generateNewPassword() {
-	return crypto.randomBytes(4).toString('hex');
+export function generateText(bytes: number = 4) {
+	return crypto.randomBytes(bytes).toString('hex');
 }
 
 export function generateInvoiceID(id: string) {

@@ -20,6 +20,7 @@ import WhatsappLinkRoute from './whatsapp-link/whatsappLink.route';
 import FileUpload, { ONLY_MEDIA_ALLOWED, SingleFileUploadOptions } from '../config/FileUpload';
 import { CustomError, ERRORS } from '../errors';
 import { VerifyDevice, VerifySession } from '../middleware';
+import ChatBotService from '../services/chatbot';
 import SocketServer from '../socket';
 import { Respond, generateRandomID } from '../utils/ExpressUtils';
 
@@ -45,6 +46,22 @@ router.use('/uploads', VerifySession, VerifyDevice, UploadsRoute);
 router.use('/users', VerifySession, UsersRoute);
 router.use('/extras', ExtrasRoute);
 router.use('/webhooks', WebhooksRoute);
+
+router.post('/test', VerifySession, VerifyDevice, async function (req, res, next) {
+	const {
+		device: { device },
+		serviceAccount,
+	} = req.locals;
+	const chatbotService = new ChatBotService(serviceAccount, device);
+	await chatbotService.checkForFlowKeyword(req.body.number, req.body.text);
+	Respond({
+		res,
+		status: 200,
+		data: {
+			message: 'success',
+		},
+	});
+});
 
 router
 	.route('/conversation-message-key')

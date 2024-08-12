@@ -2,7 +2,7 @@
 
 import Each from '@/components/containers/each';
 import { useTemplates } from '@/components/context/templates';
-import ComboboxTemplates from '@/components/elements/templetes-selector';
+import TemplateSelector from '@/components/elements/templetes-selector';
 import {
 	Accordion,
 	AccordionContent,
@@ -32,7 +32,7 @@ import { Separator } from '@/components/ui/separator';
 import useBoolean from '@/hooks/useBoolean';
 import { countOccurrences } from '@/lib/utils';
 import { chatbotSchema, nurturingSchema } from '@/schema/chatbot';
-import { ChatBot } from '@/types/chatbot';
+import { ChatBot } from '@/schema/chatbot';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { Trash } from 'lucide-react';
 import React from 'react';
@@ -99,10 +99,6 @@ export default function LeadNurturingDialog({
 	});
 
 	const isNurturingValid = nurturingSchema.safeParse(nurturing).success;
-	const result = nurturingSchema.safeParse(nurturing);
-	if (!result.success) {
-		console.log(result.error.issues);
-	}
 
 	const handleTemplateChange = (details: { id: string; name: string } | null, index: number) => {
 		if (!details) {
@@ -226,7 +222,7 @@ export default function LeadNurturingDialog({
 												render={({ field }) => (
 													<FormItem>
 														<FormControl>
-															<ComboboxTemplates
+															<TemplateSelector
 																onChange={(value) => handleTemplateChange(value, index)}
 																value={field.value}
 																placeholder='Select Template'

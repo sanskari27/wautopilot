@@ -30,6 +30,7 @@ import {
 	StartNode,
 	TextNode,
 	VideoNode,
+	WaFlowNode,
 } from '../nodes';
 import CreateNodeDrawer from './CreateNodeDrawer';
 
@@ -76,6 +77,16 @@ export type ListNodeDetails = {
 		}[];
 	};
 };
+export type FlowNodeDetails = {
+	type: 'WHATSAPP_FLOW';
+	data: {
+		header: string;
+		body: string;
+		footer: string;
+		flow_id: string;
+		button_text: string;
+	};
+};
 
 const nodeTypes = {
 	startNode: StartNode,
@@ -86,6 +97,7 @@ const nodeTypes = {
 	documentNode: DocumentNode,
 	buttonNode: ButtonNode,
 	listNode: ListNode,
+	flowNode: WaFlowNode,
 };
 
 export default function RenderFlow({
@@ -109,6 +121,7 @@ export default function RenderFlow({
 			| DocumentNodeDetails
 			| ButtonNodeDetails
 			| ListNodeDetails
+			| FlowNodeDetails
 	) => {
 		const node: Node = {
 			id: randomString(),
@@ -149,6 +162,9 @@ export default function RenderFlow({
 			node.data = details.data;
 		} else if (details.type === 'LIST') {
 			node.type = 'listNode';
+			node.data = details.data;
+		} else if (details.type === 'WHATSAPP_FLOW') {
+			node.type = 'flowNode';
 			node.data = details.data;
 		}
 		setNodes((prev) => {

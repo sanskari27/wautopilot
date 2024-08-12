@@ -46,7 +46,7 @@ export function RecipientProvider({
 	const [pinnedIds, setPinnedIds] = React.useState<string[]>([]);
 	const [unReadConversations, setUnReadConversations] = React.useState<string[]>([]);
 	const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
-	const [selected_recipient, setSelectedRecipient] = React.useState<Recipient>(null);
+	const [selected_recipient, setSelectedRecipient] = React.useState<Recipient | null>(null);
 
 	const filtered = React.useMemo(() => {
 		return value.filter((item) => {

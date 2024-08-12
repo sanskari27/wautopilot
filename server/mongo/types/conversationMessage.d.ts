@@ -76,7 +76,7 @@ export default interface IConversationMessage extends Document {
 	};
 	footer_content: string;
 	buttons: {
-		button_type: 'URL' | 'PHONE_NUMBER' | 'QUICK_REPLY' | 'VOICE_CALL';
+		button_type: 'URL' | 'PHONE_NUMBER' | 'QUICK_REPLY' | 'VOICE_CALL' | 'CTA';
 		button_content: string;
 		button_data: string;
 	}[];
@@ -88,10 +88,10 @@ export default interface IConversationMessage extends Document {
 		id: Types.ObjectId;
 		name: string;
 	};
-	sender:{
+	sender: {
 		id: Types.ObjectId;
 		name: string;
-	}
+	};
 
 	createdAt: Date;
 	sendAt: Date;

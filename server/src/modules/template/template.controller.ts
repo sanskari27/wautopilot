@@ -75,8 +75,6 @@ async function editTemplate(req: Request, res: Response, next: NextFunction) {
 			status: 200,
 		});
 	} catch (err) {
-		console.log(err);
-
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }

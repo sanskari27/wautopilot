@@ -15,19 +15,19 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import Each from '../containers/each';
-import { useTemplates } from '../context/templates';
+import { useWhatsappFlows } from '../context/whatsappFlows';
 
-export default function TemplateSelector({
+export default function WhatsappFlowSelector({
 	placeholder,
 	value,
 	onChange,
 }: {
 	placeholder: string;
 	value: string;
-	onChange: (details: { id: string; name: string } | null) => void;
+	onChange: (details: { id: string; name: string }) => void;
 }) {
 	const [open, setOpen] = React.useState(false);
-	const items = useTemplates();
+	const items = useWhatsappFlows();
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -38,27 +38,23 @@ export default function TemplateSelector({
 					aria-expanded={open}
 					className='w-full justify-between'
 				>
-					{value ? value : placeholder}
+					{value ? items.find((item) => item.id === value)?.name ?? placeholder : placeholder}
 					<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className='w-full p-0'>
 				<Command>
-					<CommandInput placeholder='Search templates...' />
-					<CommandEmpty>No templates found.</CommandEmpty>
+					<CommandInput placeholder={placeholder} />
+					<CommandEmpty>No Whatsapp Flow found.</CommandEmpty>
 					<CommandList>
 						<CommandGroup>
 							<Each
 								items={items}
 								render={(item) => (
 									<CommandItem
-										key={item.name}
-										value={item.name}
-										onSelect={(currentValue) => {
-											if (currentValue === value) {
-												onChange(null);
-												return;
-											}
+										key={item.id}
+										value={item.id}
+										onSelect={() => {
 											onChange({
 												id: item.id,
 												name: item.name,
@@ -69,7 +65,7 @@ export default function TemplateSelector({
 										<Check
 											className={cn(
 												'mr-2 h-4 w-4',
-												value === item.name ? 'opacity-100' : 'opacity-0'
+												value === item.id ? 'opacity-100' : 'opacity-0'
 											)}
 										/>
 										{item.name}

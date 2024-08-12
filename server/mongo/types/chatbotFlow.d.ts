@@ -20,7 +20,8 @@ export default interface IChatBotFlow extends Document {
 			| 'videoNode'
 			| 'documentNode'
 			| 'buttonNode'
-			| 'listNode';
+			| 'listNode'
+			| 'flowNode';
 		id: string;
 		position: {
 			x: number;

@@ -9,6 +9,7 @@ import { FaGooglePlay, FaImage, FaListAlt, FaVideo } from 'react-icons/fa';
 import { IoMdRadioButtonOn, IoMdText } from 'react-icons/io';
 import { IoDocumentText } from 'react-icons/io5';
 import { MdAudiotrack } from 'react-icons/md';
+import { PiFlowArrowBold } from 'react-icons/pi';
 import {
 	AudioMessage,
 	ButtonMessage,
@@ -17,16 +18,16 @@ import {
 	ListMessage,
 	TextMessage,
 	VideoMessage,
+	WhatsappFlowMessage,
 } from '../message';
 import {
 	ButtonNodeDetails,
 	DocumentNodeDetails,
+	FlowNodeDetails,
 	ListNodeDetails,
 	StartNodeDetails,
 	TextNodeDetails,
 } from './RenderFlow';
-
-type MessageTypes = 'TEXT' | 'IMAGE' | 'AUDIO' | 'VIDEO' | 'DOCUMENT' | 'BUTTON' | 'LIST' | 'START';
 
 type Props = {
 	addNode: (
@@ -36,6 +37,7 @@ type Props = {
 			| DocumentNodeDetails
 			| ButtonNodeDetails
 			| ListNodeDetails
+			| FlowNodeDetails
 	) => void;
 };
 
@@ -45,17 +47,7 @@ type Button = {
 };
 
 export default function CreateNodeDrawer({ addNode }: Props) {
-	const { value: isOpen, on: onOpen, off: onClose, set: setSheetOpen } = useBoolean();
-
-	const handleMessageTypeClick = (type: MessageTypes) => {
-		if (type === 'START') {
-			addNode({
-				type: 'START',
-			});
-		}
-
-		// onClose();
-	};
+	const { value: isOpen, on: onOpen, set: setSheetOpen } = useBoolean();
 
 	const handleTextElement = (text: string) => {
 		addNode({
@@ -103,6 +95,19 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 				caption,
 				buttons,
 			},
+		});
+	};
+
+	const handleWhatsappFlowMessage = (details: {
+		header: string;
+		body: string;
+		footer: string;
+		flow_id: string;
+		button_text: string;
+	}) => {
+		addNode({
+			type: 'WHATSAPP_FLOW',
+			data: details,
 		});
 	};
 
@@ -196,6 +201,13 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 								className={'bg-gray-500'}
 							/>
 						</ListMessage>
+						<WhatsappFlowMessage onWhatsappFlowMessageAdded={handleWhatsappFlowMessage}>
+							<MessageType
+								body={'Whatsapp Flow Message'}
+								icon={<PiFlowArrowBold size={'1.25rem'} />}
+								className={'bg-indigo-500'}
+							/>
+						</WhatsappFlowMessage>
 					</div>
 				</div>
 			</SheetContent>

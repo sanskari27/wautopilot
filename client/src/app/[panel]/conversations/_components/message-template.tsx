@@ -175,7 +175,6 @@ const MediaMessage = ({ message }: { message: TMessage }) => {
 	};
 
 	const handlePreview = () => {
-		// console.log(`${SERVER_URL}uploads/download-meta-media/${message.body?.media_id}`);
 		setMedia((prev) => ({ ...prev, showPreview: true }));
 	};
 

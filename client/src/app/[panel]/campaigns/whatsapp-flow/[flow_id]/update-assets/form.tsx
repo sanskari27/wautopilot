@@ -437,7 +437,6 @@ function ContentEditor({
 					items={children ?? []}
 					id={(t, index) => `${screenIndex}-${t.type}-${index}`}
 					render={(content, index) => {
-						console.log(content);
 						if (
 							content.type === 'TextHeading' ||
 							content.type === 'TextSubheading' ||
@@ -799,7 +798,6 @@ function ContentEditor({
 																			variant='destructive'
 																			size='icon'
 																			onClick={() => {
-																				console.log('clicked');
 																				form.setValue(
 																					`screens.${screenIndex}.children.${index}.data-source`,
 																					content['data-source'].filter((_, i) => i !== opt_index)

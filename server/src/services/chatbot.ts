@@ -2,7 +2,6 @@ import axios from 'axios';
 import FormData from 'form-data';
 import fs from 'fs';
 import { Types } from 'mongoose';
-import Logger from 'n23-logger';
 import { ConversationMessageDB } from '../../mongo';
 import ChatBotDB, { ChatBotDB_name } from '../../mongo/repo/Chatbot';
 import ChatBotFlowDB, { ChatBotFlowDB_name } from '../../mongo/repo/ChatbotFlow';
@@ -19,7 +18,7 @@ import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
 import { UpdateWhatsappFlowValidationResult } from '../modules/chatbot/chatbot.validator';
 import DateUtils from '../utils/DateUtils';
-import { Delay, filterUndefinedKeys } from '../utils/ExpressUtils';
+import { Delay, filterUndefinedKeys, generateText } from '../utils/ExpressUtils';
 import FileUtils from '../utils/FileUtils';
 import {
 	convertToId,
@@ -95,7 +94,8 @@ type CreateFlowData = {
 			| 'videoNode'
 			| 'documentNode'
 			| 'buttonNode'
-			| 'listNode';
+			| 'listNode'
+			| 'flowNode';
 		id: string;
 		position: {
 			x: number;
@@ -329,14 +329,6 @@ export default class ChatBotService extends WhatsappLinkService {
 
 		botsEngaged.forEach(async (bot) => {
 			await Delay(bot.response_delay_seconds);
-			Logger.info(
-				'BOT TRIGGERED',
-				JSON.stringify({
-					recipient,
-					message_text: text,
-					bot_id: bot._id,
-				})
-			);
 
 			if (bot.respond_type === 'normal') {
 				let msg = bot.message;
@@ -869,19 +861,25 @@ export default class ChatBotService extends WhatsappLinkService {
 		botsEngaged.forEach(async (bot) => {
 			const nodes = bot.nodes;
 			const edges = bot.edges;
-			const startNode = nodes.find((node) => node.type === 'startNode');
-			if (!startNode) {
-				return;
-			}
-			const connectedEdge = edges.find((edge) => edge.source === startNode.id);
-			if (!connectedEdge) {
-				return;
-			}
-			const nextNode = nodes.find((node) => node.id === connectedEdge.target);
-			if (!nextNode) {
-				return;
-			}
-			this.sendFlowMessage(recipient, bot.bot_id, nextNode.id);
+			let startNode = nodes.find((node) => node.type === 'startNode');
+
+			do {
+				if (!startNode) {
+					break;
+				}
+				const connectedEdge = edges.find((edge) => edge.source === startNode?.id);
+				if (!connectedEdge) {
+					return;
+				}
+				const nextNode = nodes.find((node) => node.id === connectedEdge.target);
+				if (!nextNode) {
+					return;
+				}
+
+				this.sendFlowMessage(recipient, bot.bot_id, nextNode.id);
+
+				startNode = nextNode;
+			} while (true);
 		});
 	}
 
@@ -934,7 +932,6 @@ export default class ChatBotService extends WhatsappLinkService {
 			return;
 		}
 		let message_id;
-
 		if (
 			node.node_type === 'imageNode' ||
 			node.node_type === 'videoNode' ||
@@ -1023,6 +1020,39 @@ export default class ChatBotService extends WhatsappLinkService {
 				sendAt: DateUtils.getMomentNow().toDate(),
 				message_type: 'interactive',
 			});
+		} else if (node.node_type === 'flowNode') {
+			try {
+				const details = await this.getWhatsappFlowContents(node.data.flow_id);
+
+				const msgObj = {
+					messaging_product: 'whatsapp',
+					to: recipient,
+					type: 'interactive',
+					interactive: {
+						type: 'flow',
+						...generateListBody(node.data),
+						action: {
+							name: 'flow',
+							parameters: {
+								flow_message_version: '3',
+								flow_action: 'navigate',
+								flow_token: `wautopilot_${generateText(2)}`,
+								flow_id: node.data.flow_id,
+								flow_cta: node.data.button_text,
+								flow_action_payload: {
+									screen: details[0].id,
+								},
+							},
+						},
+					},
+				};
+				message_id = await schedulerService.schedule(recipient, msgObj, {
+					scheduler_id: bot_id,
+					scheduler_type: ChatBotFlowDB_name,
+					sendAt: DateUtils.getMomentNow().toDate(),
+					message_type: 'interactive',
+				});
+			} catch (err) {}
 		} else {
 			return;
 		}
@@ -1101,8 +1131,6 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			return id;
 		} catch (err) {
-			console.log((err as any).response.data);
-
 			return null;
 		}
 	}
@@ -1299,8 +1327,6 @@ export default class ChatBotService extends WhatsappLinkService {
 						},
 					};
 				} else {
-					console.log('Invalid field', child);
-
 					throw new CustomError(COMMON_ERRORS.INVALID_FIELDS);
 				}
 			});
@@ -1325,9 +1351,6 @@ export default class ChatBotService extends WhatsappLinkService {
 			});
 			FileUtils.deleteFile(filepath);
 			if (results.validation_errors.length > 0) {
-				Logger.error('Validation errors', new Error(JSON.stringify(results.validation_errors)), {
-					validations: results.validation_errors,
-				});
 				throw new CustomError(COMMON_ERRORS.INVALID_FIELDS);
 			}
 		} catch (err) {
@@ -1381,10 +1404,13 @@ export default class ChatBotService extends WhatsappLinkService {
 				});
 
 				return {
+					id: screen.id,
 					title,
 					children,
 				};
-			}) as UpdateWhatsappFlowValidationResult;
+			}) as (UpdateWhatsappFlowValidationResult['screens'][number] & {
+				id: string;
+			})[];
 
 			return screens;
 		} catch (err) {

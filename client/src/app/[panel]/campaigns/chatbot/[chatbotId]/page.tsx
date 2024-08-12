@@ -7,7 +7,7 @@ import { useTemplates } from '@/components/context/templates';
 import ContactSelectorDialog from '@/components/elements/dialogs/contact-selector';
 import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
 import TemplatePreview from '@/components/elements/template-preview';
-import ComboboxTemplates from '@/components/elements/templetes-selector';
+import TemplateSelector from '@/components/elements/templetes-selector';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -440,7 +440,7 @@ export default function ChatbotForm() {
 								render={({ field }) => (
 									<FormItem className='space-y-0 flex-1'>
 										<FormControl>
-											<ComboboxTemplates
+											<TemplateSelector
 												onChange={(value) => handleTemplateChange(value)}
 												value={field.value}
 												placeholder='Select template'
