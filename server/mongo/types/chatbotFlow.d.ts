@@ -1,5 +1,5 @@
 import { Document, Types } from 'mongoose';
-import { BOT_TRIGGER_OPTIONS, BOT_TRIGGER_TO } from '../../src/config/const';
+import { BOT_TRIGGER_OPTIONS } from '../../src/config/const';
 
 export default interface IChatBotFlow extends Document {
 	_id: Types.ObjectId;
@@ -9,7 +9,6 @@ export default interface IChatBotFlow extends Document {
 	name: string;
 
 	trigger: string;
-	respond_to: BOT_TRIGGER_TO;
 	options: BOT_TRIGGER_OPTIONS;
 
 	nodes: {

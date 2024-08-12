@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { BOT_TRIGGER_OPTIONS, BOT_TRIGGER_TO } from '../../src/config/const';
+import { BOT_TRIGGER_OPTIONS } from '../../src/config/const';
 import IChatBotFlow from '../types/chatbotFlow';
 import { AccountDB_name } from './Account';
 import { WhatsappLinkDB_name } from './WhatsappLink';
@@ -17,11 +17,6 @@ const schema = new mongoose.Schema<IChatBotFlow>(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: WhatsappLinkDB_name,
 			required: true,
-		},
-		respond_to: {
-			type: String,
-			enum: Object.values(BOT_TRIGGER_TO),
-			default: BOT_TRIGGER_TO.ALL,
 		},
 		name: String,
 		trigger: String,

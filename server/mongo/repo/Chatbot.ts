@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { BOT_TRIGGER_OPTIONS, BOT_TRIGGER_TO } from '../../src/config/const';
+import { BOT_TRIGGER_OPTIONS } from '../../src/config/const';
 import IChatBot from '../types/chatbot';
 import { AccountDB_name } from './Account';
 import { ContactDB_name } from './Contact';
@@ -19,11 +19,6 @@ const schema = new mongoose.Schema<IChatBot>(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: WhatsappLinkDB_name,
 			required: true,
-		},
-		respond_to: {
-			type: String,
-			enum: Object.values(BOT_TRIGGER_TO),
-			default: BOT_TRIGGER_TO.ALL,
 		},
 		trigger: String,
 		trigger_gap_seconds: Number,
@@ -120,10 +115,6 @@ const schema = new mongoose.Schema<IChatBot>(
 				],
 			},
 		],
-		group_respond: {
-			type: Boolean,
-			default: false,
-		},
 		active: {
 			type: Boolean,
 			default: true,

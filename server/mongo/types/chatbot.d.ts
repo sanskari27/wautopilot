@@ -1,12 +1,10 @@
 import { Document, Types } from 'mongoose';
-import { BOT_TRIGGER_OPTIONS, BOT_TRIGGER_TO } from '../../src/config/const';
+import { BOT_TRIGGER_OPTIONS } from '../../src/config/const';
 
 export default interface IChatBot extends Document {
 	_id: Types.ObjectId;
 	linked_to: Types.ObjectId;
 	device_id: Types.ObjectId;
-
-	respond_to: BOT_TRIGGER_TO;
 
 	trigger: string;
 	trigger_gap_seconds: number;
@@ -56,6 +54,5 @@ export default interface IChatBot extends Document {
 			fallback_value: string;
 		}[];
 	}[];
-	group_respond: boolean;
 	active: boolean;
 }

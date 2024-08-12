@@ -1,11 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
 import { z } from 'zod';
-import { BOT_TRIGGER_OPTIONS, BOT_TRIGGER_TO } from '../../config/const';
+import { BOT_TRIGGER_OPTIONS } from '../../config/const';
 import { CustomError } from '../../errors';
 
 export type CreateBotValidationResult = {
-	respond_to: BOT_TRIGGER_TO;
 	trigger: string;
 	trigger_gap_seconds: number;
 	response_delay_seconds: number;
@@ -32,7 +31,6 @@ export type CreateBotValidationResult = {
 		link?: string | undefined;
 		media_id?: string | undefined;
 	};
-	group_respond: boolean;
 	nurturing: {
 		after: number;
 		start_from: string;
@@ -56,7 +54,6 @@ export type CreateBotValidationResult = {
 export type CreateFlowValidationResult = {
 	name: string;
 	options: BOT_TRIGGER_OPTIONS;
-	respond_to: BOT_TRIGGER_TO;
 	trigger: string;
 	nodes: {
 		type:
@@ -160,11 +157,6 @@ export type UpdateWhatsappFlowValidationResult = {
 
 export async function CreateBotValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		respond_to: z.enum([
-			BOT_TRIGGER_TO.ALL,
-			BOT_TRIGGER_TO.SAVED_CONTACTS,
-			BOT_TRIGGER_TO.NON_SAVED_CONTACTS,
-		]),
 		trigger: z.string().default(''),
 		trigger_gap_seconds: z.number().positive().default(1),
 		response_delay_seconds: z.number().nonnegative().default(0),
@@ -230,7 +222,6 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 			)
 			.default([]),
 
-		group_respond: z.boolean().default(false),
 		nurturing: z
 			.object({
 				after: z.number(),
@@ -283,11 +274,6 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 
 export async function CreateFlowValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		respond_to: z.enum([
-			BOT_TRIGGER_TO.ALL,
-			BOT_TRIGGER_TO.SAVED_CONTACTS,
-			BOT_TRIGGER_TO.NON_SAVED_CONTACTS,
-		]),
 		trigger: z.string().default(''),
 		options: z.enum([
 			BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE,
@@ -363,9 +349,6 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 
 export async function UpdateFlowValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		respond_to: z
-			.enum([BOT_TRIGGER_TO.ALL, BOT_TRIGGER_TO.SAVED_CONTACTS, BOT_TRIGGER_TO.NON_SAVED_CONTACTS])
-			.optional(),
 		trigger: z.string().optional(),
 		options: z
 			.enum([

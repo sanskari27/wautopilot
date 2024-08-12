@@ -14,7 +14,7 @@ import IContact from '../../mongo/types/contact';
 import IMedia from '../../mongo/types/media';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
 import MetaAPI from '../config/MetaAPI';
-import { BOT_TRIGGER_OPTIONS, BOT_TRIGGER_TO, Path } from '../config/const';
+import { BOT_TRIGGER_OPTIONS, Path } from '../config/const';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
 import { UpdateWhatsappFlowValidationResult } from '../modules/chatbot/chatbot.validator';
@@ -36,7 +36,6 @@ import SchedulerService from './scheduler';
 import WhatsappLinkService from './whatsappLink';
 
 type CreateBotData = {
-	respond_to: BOT_TRIGGER_TO;
 	trigger: string;
 	trigger_gap_seconds: number;
 	response_delay_seconds: number;
@@ -86,7 +85,6 @@ type CreateBotData = {
 type CreateFlowData = {
 	name: string;
 	options: BOT_TRIGGER_OPTIONS;
-	respond_to: BOT_TRIGGER_TO;
 	trigger: string;
 	nodes: {
 		type:
@@ -126,7 +124,6 @@ function processDocs(docs: IChatBot[]) {
 	return docs.map((bot) => {
 		return {
 			bot_id: bot._id as Types.ObjectId,
-			respond_to: bot.respond_to,
 			trigger: bot.trigger,
 			trigger_gap_seconds: bot.trigger_gap_seconds,
 			response_delay_seconds: bot.response_delay_seconds,
@@ -154,7 +151,6 @@ function processDocs(docs: IChatBot[]) {
 				template_header: el.template_header,
 				template_body: el.template_body,
 			})),
-			group_respond: bot.group_respond,
 			isActive: bot.active,
 		};
 	});
@@ -165,7 +161,6 @@ function processFlowDocs(docs: IChatBotFlow[]) {
 		return {
 			bot_id: bot._id as Types.ObjectId,
 			name: bot.name,
-			respond_to: bot.respond_to,
 			trigger: bot.trigger,
 			options: bot.options,
 			nodes: bot.nodes.map((node) => ({
@@ -265,8 +260,6 @@ export default class ChatBotService extends WhatsappLinkService {
 		message_body: string;
 		recipient: string;
 	}) {
-		const phonebook = new PhoneBookService(this.account);
-		const contact = await phonebook.findRecordByPhone(recipient);
 		const bots = await this.activeBots();
 		const last_messages = await this.lastMessages(
 			bots.map((bot) => bot._id),
@@ -274,15 +267,6 @@ export default class ChatBotService extends WhatsappLinkService {
 		);
 
 		return bots.filter((bot) => {
-			const is_recipient =
-				bot.respond_to === BOT_TRIGGER_TO.ALL ||
-				(bot.respond_to === BOT_TRIGGER_TO.SAVED_CONTACTS && !!contact) ||
-				(bot.respond_to === BOT_TRIGGER_TO.NON_SAVED_CONTACTS && !contact);
-
-			if (!is_recipient) {
-				return false;
-			}
-
 			if (!DateUtils.isTimeBetween(bot.startAt, bot.endAt, DateUtils.getMomentNow())) {
 				return false;
 			}
@@ -334,13 +318,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		});
 	}
 
-	public async handleMessage(
-		recipient: string,
-		text: string,
-		opts: {
-			fromGroup?: boolean;
-		} = {}
-	) {
+	public async handleMessage(recipient: string, text: string) {
 		const botsEngaged = await this.botsEngaged({
 			message_body: text,
 			recipient,
@@ -350,10 +328,6 @@ export default class ChatBotService extends WhatsappLinkService {
 		const contact = await phonebook.findRecordByPhone(recipient);
 
 		botsEngaged.forEach(async (bot) => {
-			if (opts.fromGroup && !bot.group_respond) {
-				return;
-			}
-
 			await Delay(bot.response_delay_seconds);
 			Logger.info(
 				'BOT TRIGGERED',
@@ -842,28 +816,11 @@ export default class ChatBotService extends WhatsappLinkService {
 		await ChatBotFlowDB.deleteOne({ _id: bot_id });
 	}
 
-	private async flowsEngaged({
-		message_body,
-		recipient,
-	}: {
-		message_body: string;
-		recipient: string;
-	}) {
-		const phonebook = new PhoneBookService(this.account);
-		const contact = await phonebook.findRecordByPhone(recipient);
+	private async flowsEngaged({ message_body }: { message_body: string }) {
 		const bots = await this.allFlows();
 		const activeBots = bots.filter((bot) => bot.isActive);
 
 		return activeBots.filter((bot) => {
-			const is_recipient =
-				bot.respond_to === BOT_TRIGGER_TO.ALL ||
-				(bot.respond_to === BOT_TRIGGER_TO.SAVED_CONTACTS && !!contact) ||
-				(bot.respond_to === BOT_TRIGGER_TO.NON_SAVED_CONTACTS && !contact);
-
-			if (!is_recipient) {
-				return false;
-			}
-
 			if (bot.trigger === '') {
 				return true;
 			}
@@ -908,7 +865,6 @@ export default class ChatBotService extends WhatsappLinkService {
 	public async checkForFlowKeyword(recipient: string, text: string) {
 		const botsEngaged = await this.flowsEngaged({
 			message_body: text,
-			recipient,
 		});
 		botsEngaged.forEach(async (bot) => {
 			const nodes = bot.nodes;
