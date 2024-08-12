@@ -69,45 +69,100 @@ export const nurturingSchema = z.array(
 	})
 );
 
-export const chatbotSchema = z.object({
-	id: z.string(),
-	trigger: z.string(),
-	options: z.union([
-		z.literal('INCLUDES_IGNORE_CASE'),
-		z.literal('INCLUDES_MATCH_CASE'),
-		z.literal('EXACT_IGNORE_CASE'),
-		z.literal('EXACT_MATCH_CASE'),
-	]),
-	trigger_gap_time: z.string().refine((value) => {
-		if (isNaN(Number(value))) return false;
-		return Number(value) > 0;
-	}, 'Trigger gap time must be greater than 0'),
-	trigger_gap_type: z.enum(['SEC', 'MINUTE', 'HOUR']),
-	response_delay_time: z.string().refine((value) => {
-		if (isNaN(Number(value))) return false;
-		return Number(value) > 0;
-	}, 'Response delay time must be greater than 0'),
-	response_delay_type: z.enum(['SEC', 'MINUTE', 'HOUR']),
-	startAt: z.string(),
-	endAt: z.string(),
-	respond_type: z.union([z.literal('template'), z.literal('normal')]),
-	message: z.string(),
-	images: z.array(z.string()),
-	videos: z.array(z.string()),
-	audios: z.array(z.string()),
-	documents: z.array(z.string()),
-	contacts: z.array(z.string()),
-	template_id: z.string(),
-	template_name: z.string(),
-	template_body: templateBodySchema,
-	template_header: templateHeaderSchema,
-	nurturing: nurturingSchema,
-	forward: z.object({
-		number: z.string(),
+export const chatbotSchema = z
+	.object({
+		id: z.string(),
+		trigger: z.string(),
+		options: z.union([
+			z.literal('INCLUDES_IGNORE_CASE'),
+			z.literal('INCLUDES_MATCH_CASE'),
+			z.literal('EXACT_IGNORE_CASE'),
+			z.literal('EXACT_MATCH_CASE'),
+		]),
+		trigger_gap_time: z.string().refine((value) => {
+			if (isNaN(Number(value))) return false;
+			return Number(value) > 0;
+		}, 'Trigger gap time must be greater than 0'),
+		trigger_gap_type: z.enum(['SEC', 'MINUTE', 'HOUR']),
+		response_delay_time: z.string().refine((value) => {
+			if (isNaN(Number(value))) return false;
+			return Number(value) > 0;
+		}, 'Response delay time must be greater than 0'),
+		response_delay_type: z.enum(['SEC', 'MINUTE', 'HOUR']),
+		startAt: z.string(),
+		endAt: z.string(),
+		respond_type: z.union([z.literal('template'), z.literal('normal')]),
 		message: z.string(),
-	}),
-
-	isActive: z.boolean(),
-});
+		images: z.array(z.string()),
+		videos: z.array(z.string()),
+		audios: z.array(z.string()),
+		documents: z.array(z.string()),
+		contacts: z.array(z.string()),
+		template_id: z.string(),
+		template_name: z.string(),
+		template_body: templateBodySchema,
+		template_header: templateHeaderSchema,
+		nurturing: nurturingSchema,
+		forward: z.object({
+			number: z.string(),
+			message: z.string(),
+		}),
+		isActive: z.boolean(),
+	})
+	.refine((value) => {
+		if (value.startAt.length === 0) {
+			return false;
+		}
+		if (value.endAt.length === 0) {
+			return false;
+		}
+		if (value.respond_type === 'normal') {
+			if (
+				value.message.length === 0 &&
+				value.images.length === 0 &&
+				value.videos.length === 0 &&
+				value.audios.length === 0 &&
+				value.documents.length === 0 &&
+				value.contacts.length === 0
+			) {
+				return false;
+			}
+		}
+		if (value.respond_type === 'template') {
+			if (value.template_id.length === 0) {
+				console.log('template required');
+				return false;
+			}
+			if (value.template_name.length === 0) {
+				console.log('template name required');
+				return false;
+			}
+			if (
+				value.template_header.type === 'VIDEO' ||
+				value.template_header.type === 'DOCUMENT' ||
+				value.template_header.type === 'IMAGE'
+			) {
+				if (value.template_header.media_id.length === 0) {
+					console.log('template header media required');
+					return false;
+				}
+			}
+			if (value.template_body.length > 0) {
+				value.template_body.forEach((body) => {
+					if (body.variable_from === 'custom_text' && body.custom_text.length === 0) {
+						console.log('template body custom text required');
+						return false;
+					}
+					if (body.variable_from === 'phonebook_data') {
+						if (body.phonebook_data.length === 0 && body.fallback_value.length === 0) {
+							console.log('template body phonebook and fallback required');
+							return false;
+						}
+					}
+				});
+			}
+		}
+		return true;
+	});
 
 export type ChatBot = z.infer<typeof chatbotSchema>;

@@ -8,6 +8,7 @@ import ContactSelectorDialog from '@/components/elements/dialogs/contact-selecto
 import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
 import TemplatePreview from '@/components/elements/template-preview';
 import TemplateSelector from '@/components/elements/templetes-selector';
+import AbsoluteCenter from '@/components/ui/absolute-center';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -32,12 +33,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { countOccurrences, parseToObject } from '@/lib/utils';
 import { ChatBot, chatbotSchema } from '@/schema/chatbot';
 import { ContactWithID } from '@/schema/phonebook';
+import ChatBotService from '@/services/chatbot.service';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ResetIcon } from '@radix-ui/react-icons';
 import { Separator } from '@radix-ui/react-separator';
 import { ChevronLeftIcon } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { z } from 'zod';
 import LeadNurturingDialog from '../_component/lead-nurturing-dialog';
 
@@ -91,7 +95,9 @@ export default function ChatbotForm() {
 	const messageRef = useRef(0);
 
 	const router = useRouter();
+	const params = useParams();
 	const raw = parseToObject(useSearchParams().get('data'));
+	const isEditingBot = !!raw;
 
 	const templates = useTemplates();
 
@@ -110,6 +116,9 @@ export default function ChatbotForm() {
 	const template_id = form.watch('template_id');
 	const template_body = form.watch('template_body');
 	const header = form.watch('template_header');
+	const respond_type = form.watch('respond_type');
+
+	const isChatbotValid = form.formState.isValid;
 
 	const template = templates.find((t) => t.id === template_id);
 
@@ -151,12 +160,74 @@ export default function ChatbotForm() {
 		});
 	};
 
+	const handleSubmit = (data: ChatBot) => {
+		const promise = data.id
+			? ChatBotService.editChatBot({
+					botId: data.id,
+					details: {
+						...data,
+						nurturing: data.nurturing.map((item) => {
+							return {
+								...item,
+								after:
+									Number(item.after.value) *
+									(item.after.type === 'minutes' ? 60 : item.after.type === 'hours' ? 3600 : 86400),
+							};
+						}),
+						trigger_gap_seconds:
+							Number(data.trigger_gap_time) *
+							(data.trigger_gap_type === 'SEC'
+								? 1
+								: data.trigger_gap_type === 'MINUTE'
+								? 60
+								: 3600),
+						response_delay_seconds:
+							Number(data.response_delay_time) *
+							(data.response_delay_type === 'SEC'
+								? 1
+								: data.response_delay_type === 'MINUTE'
+								? 60
+								: 3600),
+					},
+			  })
+			: ChatBotService.createBot({
+					...data,
+					nurturing: data.nurturing.map((item) => {
+						return {
+							...item,
+							after:
+								Number(item.after.value) *
+								(item.after.type === 'minutes' ? 60 : item.after.type === 'hours' ? 3600 : 86400),
+						};
+					}),
+					trigger_gap_seconds:
+						Number(data.trigger_gap_time) *
+						(data.trigger_gap_type === 'SEC' ? 1 : data.trigger_gap_type === 'MINUTE' ? 60 : 3600),
+					response_delay_seconds:
+						Number(data.response_delay_time) *
+						(data.response_delay_type === 'SEC'
+							? 1
+							: data.response_delay_type === 'MINUTE'
+							? 60
+							: 3600),
+			  });
+
+		toast.promise(promise, {
+			loading: 'Saving Chatbot...',
+			success: () => {
+				router.replace(`/${params.panel}/campaigns/chatbot`);
+				return 'Successfully saved chatbot.';
+			},
+			error: 'Error saving chatbot. Please try agin.',
+		});
+	};
+
 	return (
 		<div className='custom-scrollbar flex flex-col gap-2 justify-center p-4'>
 			{/*--------------------------------- TRIGGER SECTION--------------------------- */}
 			<Form {...form}>
 				<form
-					onSubmit={form.handleSubmit((data) => console.log(data))}
+					onSubmit={form.handleSubmit(handleSubmit)}
 					className='flex flex-col rounded-xl mb-4 gap-8'
 				>
 					<div className='flex flex-col gap-2'>
@@ -339,12 +410,18 @@ export default function ChatbotForm() {
 					</div>
 
 					{/*--------------------------------- MESSAGE SECTION--------------------------- */}
-					<Tabs defaultValue='message'>
+					<Tabs
+						defaultValue='normal'
+						onValueChange={(value) =>
+							form.setValue('respond_type', value as ChatBot['respond_type'])
+						}
+						value={respond_type}
+					>
 						<TabsList>
-							<TabsTrigger value='message'>Normal Message</TabsTrigger>
+							<TabsTrigger value='normal'>Normal Message</TabsTrigger>
 							<TabsTrigger value='template'>Template Message</TabsTrigger>
 						</TabsList>
-						<TabsContent value='message'>
+						<TabsContent value='normal'>
 							<p>Medias</p>
 
 							<div className='flex flex-wrap justify-stretch gap-4 my-4 w-full'>
@@ -579,18 +656,6 @@ export default function ChatbotForm() {
 									<Show.ShowIf condition={!!template}>
 										<TemplatePreview components={template?.components ?? []} />
 									</Show.ShowIf>
-
-									{/* <Button
-										type='submit'
-										className='w-[80%] mx-auto'
-										disabled={
-											!form.formState.isValid ||
-											(fields.recipients_from === 'numbers' && fields.to.length === 0) ||
-											(fields.recipients_from === 'tags' && fields.labels.length === 0)
-										}
-									>
-										Schedule
-									</Button> */}
 								</div>
 							</div>
 						</TabsContent>
@@ -601,74 +666,76 @@ export default function ChatbotForm() {
 								Leads Nurturing ({form.getValues('nurturing').length})
 							</Button>
 						</LeadNurturingDialog>
-						{/* <LeadsNurturing ref={leadsNurtureRef} /> */}
 					</div>
 					{/* -------------------------------- FORWARD SECTION -------------------------- */}
-					{/* <Flex direction={'column'} gap={2} mt={'1rem'}>
-						<Box position='relative'>
-							<Divider height='2px' />
-							<AbsoluteCenter bg='white' px='4' color='gray.500'>
-								Forward Leads
-							</AbsoluteCenter>
-						</Box>
-						<Box flex={1} mt={'0.5rem'}>
-							<Text className='text-gray-700 dark:text-gray-400'>Forward To (without +)</Text>
-							<TextInput
-								placeholder='ex 9175XXXXXX68'
-								value={forward.number ?? ''}
-								onChangeText={(text) => dispatch(setForwardNumber(text))}
-							/>
-						</Box>
 
-						<Box flex={1}>
-							<Text className='text-gray-700 dark:text-gray-400'>Forward Message</Text>
-							<TextAreaElement
-								value={forward.message ?? ''}
-								onChange={(e) => dispatch(setForwardMessage(e.target.value))}
-								isInvalid={false}
-								placeholder={'ex. Forwarded Lead'}
+					<div className='flex flex-col gap-2 mt-4'>
+						<div className='relative'>
+							<Separator />
+							<AbsoluteCenter className='px-4'>Forward Leads</AbsoluteCenter>
+						</div>
+						<div className='flex-1 mt-2'>
+							<FormField
+								name='forward.number'
+								control={form.control}
+								render={({ field }) => (
+									<FormItem className='space-y-0 flex-1'>
+										<FormLabel>Forward To (without +)</FormLabel>
+										<FormControl>
+											<Input placeholder='ex 9175XXXXXX68' {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
 							/>
-						</Box>
-					</Flex> */}
+						</div>
 
-					{/* <Divider my={'1rem'} /> */}
+						<div className='flex-1'>
+							<FormField
+								name='forward.message'
+								control={form.control}
+								render={({ field }) => (
+									<FormItem className='space-y-0 flex-1'>
+										<FormLabel>Message</FormLabel>
+										<FormControl>
+											<Textarea placeholder='ex. Forwarded Lead' {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+					</div>
+
+					<Separator className='my-2' />
 
 					{/*--------------------------------- BUTTONS SECTION--------------------------- */}
 
-					{/* <HStack justifyContent={'space-between'} alignItems={'center'} py={8}>
+					<div className='flex gap-4 justify-between items-center py-8'>
 						{isEditingBot && (
 							<Button
-								bgColor={'red.300'}
-								width={'100%'}
+								className='w-full'
+								variant={'outline'}
 								onClick={() => {
-									dispatch(reset());
-									navigate(`${NAVIGATION.APP}/${NAVIGATION.CHATBOT}`);
+									router.back();
 								}}
-								isLoading={isAddingBot}
 							>
-								<Text color={'white'}>Cancel</Text>
+								Cancel
 							</Button>
 						)}
-						<Button
-							isLoading={isAddingBot}
-							bgColor={'green.300'}
-							_hover={{
-								bgColor: 'green.400',
-							}}
-							width={'100%'}
-							onClick={handleSave}
-						>
-							<Text color={'white'}>Save</Text>
+						<Button className='w-full' type='submit' disabled={!isChatbotValid}>
+							Save
 						</Button>
-						<IconButton
-							aria-label='reest'
-							icon={<BiRefresh />}
-							onClick={() => {
-								dispatch(reset());
-								navigate(`${NAVIGATION.APP}/${NAVIGATION.CHATBOT}/new`);
-							}}
-						/>
-					</HStack> */}
+						<Button
+							type='button'
+							onClick={() => form.reset()}
+							className='py-4'
+							size={'icon'}
+							variant={'secondary'}
+						>
+							<ResetIcon className='w-6 h-4' />
+						</Button>
+					</div>
 				</form>
 			</Form>
 		</div>

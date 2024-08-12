@@ -59,10 +59,10 @@ export default function LeadsTemplateMessageDialog({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
-			<DialogContent className='sm:max-w-[425px] md:max-w-lg lg:max-w-3xl h-full overflow-y-auto'>
+			<DialogContent className='sm:max-w-[425px] md:max-w-3xl lg:max-w-6xl h-full overflow-y-auto'>
 				<DialogHeader>Leads Template Message</DialogHeader>
-				<div className='flex flex-col w-full justify-between gap-3'>
-					<div className='flex flex-col w-full space-y-2'>
+				<div className='flex flex-col lg:flex-row w-full justify-between gap-3'>
+					<div className='flex flex-col lg:w-[70%] w-full space-y-2'>
 						<p
 							className='text-lg font-medium'
 							hidden={
@@ -202,11 +202,12 @@ export default function LeadsTemplateMessageDialog({
 							/>
 						</Show.ShowIf>
 					</div>
-					<div className='w-full flex flex-col justify-start items-start gap-3'>
+					<div className='w-full flex flex-col lg:w-[30%] justify-start items-start gap-3'>
 						<Show.ShowIf condition={!!template}>
 							<TemplatePreview components={template?.components ?? []} />
 						</Show.ShowIf>
 					</div>
+				</div>
 					<DialogFooter>
 						<Button
 							type='button'
@@ -221,7 +222,6 @@ export default function LeadsTemplateMessageDialog({
 							Save
 						</Button>
 					</DialogFooter>
-				</div>
 			</DialogContent>
 		</Dialog>
 	);

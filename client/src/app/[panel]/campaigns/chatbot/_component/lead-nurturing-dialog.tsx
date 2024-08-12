@@ -31,8 +31,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import useBoolean from '@/hooks/useBoolean';
 import { countOccurrences } from '@/lib/utils';
-import { chatbotSchema, nurturingSchema } from '@/schema/chatbot';
-import { ChatBot } from '@/schema/chatbot';
+import { ChatBot, chatbotSchema, nurturingSchema } from '@/schema/chatbot';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { Trash } from 'lucide-react';
 import React from 'react';

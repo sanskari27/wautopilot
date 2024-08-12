@@ -108,7 +108,6 @@ export default class ChatBotService {
 	}
 
 	static async createBot(details: {
-		respond_to: string;
 		trigger: string;
 		trigger_gap_seconds: number;
 		response_delay_seconds: number;
@@ -135,7 +134,6 @@ export default class ChatBotService {
 			link?: string;
 			media_id?: string;
 		};
-		group_respond: boolean;
 		nurturing: {
 			after: number;
 			start_from: string;
@@ -224,7 +222,6 @@ export default class ChatBotService {
 	}: {
 		botId: string;
 		details: {
-			respond_to: string;
 			trigger: string;
 			trigger_gap_seconds: number;
 			response_delay_seconds: number;
@@ -251,7 +248,6 @@ export default class ChatBotService {
 				link?: string;
 				media_id?: string;
 			};
-			group_respond: boolean;
 			nurturing: {
 				after: number;
 				start_from: string;
