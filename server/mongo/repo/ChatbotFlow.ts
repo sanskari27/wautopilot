@@ -49,8 +49,10 @@ const schema = new mongoose.Schema<IChatBotFlow>(
 					x: Number,
 					y: Number,
 				},
-				height: Number,
-				width: Number,
+				measured: {
+					height: Number,
+					width: Number,
+				},
 				data: {},
 			},
 		],

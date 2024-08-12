@@ -103,8 +103,10 @@ type CreateFlowData = {
 			x: number;
 			y: number;
 		};
-		height: number;
-		width: number;
+		measured: {
+			height: number;
+			width: number;
+		};
 		data?: any;
 	}[];
 	edges: {
@@ -170,8 +172,10 @@ function processFlowDocs(docs: IChatBotFlow[]) {
 				type: node.node_type,
 				id: node.id,
 				position: node.position,
-				height: node.height,
-				width: node.width,
+				measured: node.measured ?? {
+					width: 400,
+					height: 400,
+				},
 				data: node.data,
 			})),
 			edges: bot.edges,
@@ -784,8 +788,7 @@ export default class ChatBotService extends WhatsappLinkService {
 				node_type: node.type,
 				id: node.id,
 				position: node.position,
-				height: node.height,
-				width: node.width,
+				measured: node.measured,
 				data: node.data,
 			})),
 		});
@@ -803,8 +806,7 @@ export default class ChatBotService extends WhatsappLinkService {
 						node_type: node.type,
 						id: node.id,
 						position: node.position,
-						height: node.height,
-						width: node.width,
+						measured: node.measured,
 						data: node.data,
 					})),
 				}),
@@ -942,21 +944,22 @@ export default class ChatBotService extends WhatsappLinkService {
 			return;
 		}
 
-		const node_id = flowMessage.node_id;
+		let node_id = flowMessage.node_id;
+		do {
+			const possibleEdge = bot.edges.find(
+				(edge) => edge.source === node_id && edge.sourceHandle === button_id
+			);
+			if (!possibleEdge) {
+				break;
+			}
+			const targetNode = bot.nodes.find((node) => node.id === possibleEdge.target);
+			if (!targetNode) {
+				return;
+			}
 
-		const possibleEdge = bot.edges.find(
-			(edge) => edge.source === node_id && edge.sourceHandle === button_id
-		);
-		if (!possibleEdge) {
-			return;
-		}
-
-		const targetNode = bot.nodes.find((node) => node.id === possibleEdge.target);
-		if (!targetNode) {
-			return;
-		}
-
-		this.sendFlowMessage(recipient, bot._id, targetNode.id);
+			this.sendFlowMessage(recipient, bot._id, targetNode.id);
+			node_id = targetNode.id;
+		} while (true);
 	}
 
 	public async sendFlowMessage(recipient: string, bot_id: Types.ObjectId, node_id: string) {

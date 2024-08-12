@@ -386,9 +386,11 @@ export default function ContentsForm({
 								</div>
 							</div>
 							<div className='flex-1 min-w-[500px]'>
-								<Show.ShowIf condition={screens.length > 0}>
-									<ContentEditor screenIndex={currentScreen} form={form} />
-								</Show.ShowIf>
+								<div className='w-[500px] border-dashed border border-gray-400 p-4 rounded-2xl'>
+									<Show.ShowIf condition={screens.length > 0}>
+										<ContentEditor screenIndex={currentScreen} form={form} />
+									</Show.ShowIf>
+								</div>
 							</div>
 						</div>
 						<div className='max-w-md w-full'>

@@ -37,26 +37,22 @@ const Categories = [
 	| 'OTHER'
 )[];
 
-export default function WhatsappFlowDialog() {
+export function WhatsappFlowDialog() {
 	const searchParams = useSearchParams();
 	const whatsapp_flow = searchParams.get('flow');
 	const whatsapp_flow_id = searchParams.get('id');
-	const whatsapp_flow_name = searchParams.get('name');
-	const whatsapp_flow_categories = searchParams.get('categories');
+	const whatsapp_flow_name = searchParams.get('name') ?? '';
+	const whatsapp_flow_categories = searchParams.get('categories') ?? '';
 	if (whatsapp_flow === 'create') {
-		return <CreateFlow />;
+		return <WhatsappFlowDetails />;
 	} else if (whatsapp_flow === 'edit') {
 		return (
-			<CreateFlow
+			<WhatsappFlowDetails
 				id={whatsapp_flow_id ?? ''}
-				details={
-					whatsapp_flow_name && whatsapp_flow_categories
-						? {
-								name: whatsapp_flow_name,
-								categories: whatsapp_flow_categories.split(',') as typeof Categories,
-						  }
-						: undefined
-				}
+				details={{
+					name: whatsapp_flow_name,
+					categories: whatsapp_flow_categories.split(',') as typeof Categories,
+				}}
 			/>
 		);
 	} else {
@@ -64,23 +60,14 @@ export default function WhatsappFlowDialog() {
 	}
 }
 
-function CreateFlow({
+function WhatsappFlowDetails({
 	details,
 	id,
 }: {
 	id?: string;
 	details?: {
 		name: string;
-		categories: (
-			| 'SIGN_UP'
-			| 'SIGN_IN'
-			| 'APPOINTMENT_BOOKING'
-			| 'LEAD_GENERATION'
-			| 'CONTACT_US'
-			| 'CUSTOMER_SUPPORT'
-			| 'SURVEY'
-			| 'OTHER'
-		)[];
+		categories: typeof Categories;
 	};
 }) {
 	const router = useRouter();
@@ -89,12 +76,8 @@ function CreateFlow({
 	const [categories, setCategories] = useState<typeof Categories>([]);
 
 	useEffect(() => {
-		if (details?.name && details?.categories) {
-			setName(details.name);
-			setCategories(details.categories);
-		} else {
-			toast.error('Error fetching whatsapp flow details. Please try again.');
-		}
+		setName(details?.name ?? '');
+		setCategories(details?.categories ?? []);
 	}, [details]);
 
 	async function handleSave() {

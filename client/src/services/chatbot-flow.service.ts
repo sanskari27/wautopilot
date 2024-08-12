@@ -46,17 +46,15 @@ export default class ChatbotFlowService {
 		return validateChatBot(data.flow);
 	}
 	static async updateNodesAndEdges(botId: string, details: { nodes: any[]; edges: any[] }) {
-		const { data } = await api.patch(`/chatbot/flows/${botId}`, details);
-		return validateChatBot(data.flow);
+		try {
+			await api.patch(`/chatbot/flows/${botId}`, details);
+		} catch (err) {
+			console.log((err as any).response.data);
+			throw err;
+		}
 	}
 	static async deleteChatbotFlow(botId: string) {
-		try {
-			const { data } = await api.delete(`/chatbot/flows/${botId}`);
-
-			return validateChatBot(data.flow);
-		} catch (err) {
-			return [];
-		}
+		await api.delete(`/chatbot/flows/${botId}`);
 	}
 
 	static async toggleChatbotFlow(botId: string) {
@@ -89,10 +87,16 @@ export default class ChatbotFlowService {
 	}
 
 	static async getNodesAndEdges(botId: string) {
-		const { data } = await api.get(`/chatbot/flows/${botId}`);
-		return {
-			nodes: data.flow.nodes,
-			edges: data.flow.edges,
-		};
+		try {
+			const { data } = await api.get(`/chatbot/flows/${botId}`);
+			return {
+				nodes: data.flow.nodes,
+				edges: data.flow.edges,
+			};
+		} catch (err) {
+			console.log((err as any).response.data);
+
+			return null;
+		}
 	}
 }

@@ -27,8 +27,10 @@ export default interface IChatBotFlow extends Document {
 			x: number;
 			y: number;
 		};
-		height: number;
-		width: number;
+		measured: {
+			height: number;
+			width: number;
+		};
 		data?: any;
 	}[];
 	edges: {

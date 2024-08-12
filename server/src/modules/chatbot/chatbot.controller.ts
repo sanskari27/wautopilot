@@ -233,9 +233,10 @@ async function chatBotFlowDetails(req: Request, res: Response, next: NextFunctio
 	const {
 		serviceAccount: account,
 		device: { device },
+		id,
 	} = req.locals;
 	try {
-		const details = await new ChatBotService(account, device).chatBotFlowDetails(req.locals.id);
+		const details = await new ChatBotService(account, device).chatBotFlowDetails(id);
 
 		return Respond({
 			res,

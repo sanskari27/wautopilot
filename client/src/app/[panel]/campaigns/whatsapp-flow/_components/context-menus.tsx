@@ -66,7 +66,7 @@ export default function WhatsappFlowContextMenu({
 			<DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
 			<DropdownMenuContent className='w-56'>
 				<DeleteDialog
-					actionButton='Publish'
+					actionButtonText='Publish'
 					message='Are you sure you want to publish this flow? Ones published, it cannot be edited.'
 					onDelete={handlePublish}
 				>

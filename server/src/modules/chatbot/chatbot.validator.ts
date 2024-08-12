@@ -73,8 +73,10 @@ export type CreateFlowValidationResult = {
 			x: number;
 			y: number;
 		};
-		height: number;
-		width: number;
+		measured: {
+			height: number;
+			width: number;
+		};
 		data?: any;
 	}[];
 	edges: {
@@ -384,8 +386,10 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 						x: z.number(),
 						y: z.number(),
 					}),
-					height: z.number(),
-					width: z.number(),
+					measured: z.object({
+						height: z.number(),
+						width: z.number(),
+					}),
 					type: z.enum([
 						'startNode',
 						'textNode',

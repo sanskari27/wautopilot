@@ -7,6 +7,7 @@ export default function useBoolean(defaultValue = false) {
 	const on = () => setValue(true);
 	const off = () => setValue(false);
 	const toggle = () => setValue((prev) => !prev);
+	const setValueTo = (newValue: boolean) => setValue(newValue);
 
-	return { value, on, off, toggle };
+	return { value, on, off, toggle, set: setValueTo };
 }

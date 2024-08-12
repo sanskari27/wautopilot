@@ -13,12 +13,12 @@ import {
 export default function DeleteDialog({
 	children,
 	message = 'This action cannot be undone. This will permanently delete the resource and remove all the data from our servers.',
-	actionButton = 'Delete',
+	actionButtonText = 'Delete',
 	onDelete,
 }: {
 	children: React.ReactNode;
 	message?: string;
-	actionButton?: string;
+	actionButtonText?: string;
 	onDelete: () => void;
 }) {
 	return (
@@ -35,7 +35,7 @@ export default function DeleteDialog({
 						className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
 						onClick={onDelete}
 					>
-						{actionButton}
+						{actionButtonText}
 					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>
