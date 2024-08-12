@@ -25,7 +25,7 @@ export default async function ChatbotFlow({ params }: { params: { panel: string 
 			<div className='justify-between flex'>
 				<h2 className='text-2xl font-bold'>Chatbot Flow</h2>
 				<div className='flex gap-x-2 gap-y-1 flex-wrap '>
-					<Link href={`/${params.panel}/campaigns/whatsapp-flow?flow=create`}>
+					<Link href={`/${params.panel}/campaigns/chatbot-flow/new`}>
 						<Button size={'sm'}>Create New</Button>
 					</Link>
 				</div>

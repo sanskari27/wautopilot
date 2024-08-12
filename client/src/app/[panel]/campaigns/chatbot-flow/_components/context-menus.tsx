@@ -44,7 +44,11 @@ export function MainContextMenu({
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
 			<DropdownMenuContent className='w-56'>
-				<Link href={`/${params.panel}/campaigns/chatbot-flow/${details.id}/details`}>
+				<Link
+					href={`/${params.panel}/campaigns/chatbot-flow/${details.id}?data=${JSON.stringify(
+						details
+					)}`}
+				>
 					<DropdownMenuItem>
 						<Edit className='mr-2 h-4 w-4' />
 						<span>Edit Details</span>
