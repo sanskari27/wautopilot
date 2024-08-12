@@ -3,10 +3,10 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { cn, getInitials } from '@/lib/utils';
 import AgentService from '@/services/agent.service';
+import { Agent } from '@/types/agent';
 import Link from 'next/link';
 
-export async function FilterAgent({ selectedAgent }: { selectedAgent: string }) {
-	const agents = (await AgentService.getAgents())!;
+export async function FilterAgent({ selectedAgent,agents }: { selectedAgent: string; agents:Agent[] }) {
 
 	const startDate = new Date(new Date().setFullYear(new Date().getFullYear() - 1));
 	const endDate = new Date();

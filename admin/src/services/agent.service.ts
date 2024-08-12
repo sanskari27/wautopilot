@@ -242,16 +242,6 @@ export default class AgentService {
 	}
 
 	static async assignTask(message: string, due_date: string, assign_to?: string) {
-		try {
-			const { data } = await APIInstance.post('/users/tasks', { message, assign_to, due_date });
-			return data.task as {
-				id: string;
-				hidden: boolean;
-				due_date: string;
-				message: string;
-			}[];
-		} catch (err) {
-			return [];
-		}
+		await APIInstance.post('/users/tasks', { message, assign_to, due_date });
 	}
 }

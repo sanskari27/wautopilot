@@ -1,4 +1,7 @@
+import { Button } from '@/components/ui/button';
 import AgentService from '@/services/agent.service';
+import { Plus } from 'lucide-react';
+import AssignTaskDialog from './_components/assign-task-dialog';
 import { FilterAgent } from './_components/filter-agent';
 import { FilterDate } from './_components/filter-date';
 import List from './_components/list';
@@ -15,6 +18,7 @@ export default async function Tasks({
 }) {
 	const showHidden = searchParams.hidden === 'true';
 	const agent = searchParams.agent ?? 'me';
+	const agents = await AgentService.getAgents()!;
 
 	const startDate = searchParams.start
 		? new Date(searchParams.start)
@@ -31,11 +35,17 @@ export default async function Tasks({
 
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
-			<div className='justify-between'>
+			<div className='flex justify-between'>
 				<h2 className='text-2xl font-bold'>Tasks</h2>
+				<AssignTaskDialog agents={agents}>
+					<Button variant={'outline'}>
+						<Plus className='h-4 w-4' />
+						<span>Assign task</span>
+					</Button>
+				</AssignTaskDialog>
 			</div>
 
-			<FilterAgent selectedAgent={agent} />
+			<FilterAgent agents={agents} selectedAgent={agent} />
 
 			<FilterDate />
 
