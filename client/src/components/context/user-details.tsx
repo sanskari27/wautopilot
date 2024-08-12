@@ -94,3 +94,4 @@ export function UserDetailsProvider({
 }
 
 export const useUserDetails = () => React.useContext(UserDetailsContext);
+export const usePermissions = () => React.useContext(UserDetailsContext).permissions;
