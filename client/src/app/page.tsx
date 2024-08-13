@@ -37,7 +37,7 @@ export default async function Home() {
 									<span className='text-primary'>Transform</span> Your Business
 								</p>
 								<p className='font-medium text-[2rem] md:text-[2.5rem]'>
-									with <span className='text-primary'>Wautopilot's </span>
+									with <span className='text-primary'>Wautopilot&apos;s </span>
 									Official <span className='text-primary'>WhatsApp </span>
 									API
 								</p>
