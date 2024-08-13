@@ -16,6 +16,7 @@ import ButtonResponseService from '../../services/buttonResponse';
 import ChatBotService from '../../services/chatbot';
 import ConversationService from '../../services/conversation';
 import DateUtils from '../../utils/DateUtils';
+import { objectToMessageBody } from '../../utils/MessageHelper';
 
 async function whatsappVerification(req: Request, res: Response, next: NextFunction) {
 	const mode = req.query['hub.mode'];
@@ -265,6 +266,18 @@ function processIncomingMessage(details: {
 		};
 
 		const data = JSON.parse(nfm_reply.response_json);
+
+		conversationService.addMessageToConversation(conversation_id, {
+			message_id: meta_message_id,
+			recipient,
+			body: {
+				body_type: 'TEXT',
+				text: objectToMessageBody(data),
+			},
+			received_at: timestamp,
+			status: MESSAGE_STATUS.DELIVERED,
+			context: message.context,
+		});
 
 		WhatsappFlowResponseDB.create({
 			linked_to: user._id,

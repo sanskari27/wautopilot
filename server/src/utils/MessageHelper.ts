@@ -82,6 +82,13 @@ export function extractInteractiveHeader(components: Record<string, any>) {
 		return null;
 	}
 	const type = header.type.toUpperCase();
+	if(type === 'TEXT'){
+		return {
+			header_type: type,
+			header_content_source: 'TEXT',
+			header_content: header.text,
+		};
+	}
 	return {
 		header_type: type,
 		header_content_source: 'ID',
@@ -207,4 +214,10 @@ export function generateListBody(data: { [key: string]: string }) {
 
 export function convertToId(text: string, delimiter: string = '-') {
 	return text.replace(/[0-9]/g, '').replace(/\s/g, delimiter).toLowerCase();
+}
+
+export function objectToMessageBody(object: { [key: string]: string }, separator: string = '\n') {
+	return Object.entries(object)
+		.map(([key, value]) => `${key}: ${value}`)
+		.join(separator);
 }
