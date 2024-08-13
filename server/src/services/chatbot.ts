@@ -879,6 +879,7 @@ export default class ChatBotService extends WhatsappLinkService {
 				this.sendFlowMessage(recipient, bot.bot_id, nextNode.id);
 
 				startNode = nextNode;
+				await Delay(2500);
 			} while (true);
 		});
 	}
@@ -913,6 +914,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			this.sendFlowMessage(recipient, bot._id, targetNode.id);
 			node_id = targetNode.id;
+			await Delay(2500);
 		} while (true);
 	}
 
