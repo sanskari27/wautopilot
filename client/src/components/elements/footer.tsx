@@ -19,7 +19,7 @@ export default function Footer() {
 							</div>
 						</div>
 					</div>
-					<div className='w-full md:w-1/3 flex flex-col items-center md:items-end text-right'>
+					<div className='w-full md:w-1/3 flex flex-col text-center items-center md:items-end md:text-right'>
 						<p className='underline underline-offset-8 font-medium'>Support</p>
 						<div className='mt-2'>
 							<Link className='hover:text-slate-200' href='/terms'>

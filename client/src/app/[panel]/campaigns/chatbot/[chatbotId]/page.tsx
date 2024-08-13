@@ -271,7 +271,7 @@ export default function ChatbotForm() {
 
 					{/*--------------------------------- RECIPIENTS SECTION--------------------------- */}
 
-					<div className='grid grid-cols-2 gap-4'>
+					<div>
 						<FormField
 							control={form.control}
 							name='options'
@@ -301,13 +301,13 @@ export default function ChatbotForm() {
 					<div className='flex flex-col md:flex-row gap-4'>
 						<div className='flex flex-col md:flex-row gap-4 flex-1'>
 							<div className='flex flex-col gap-2'>
-								<p>Gap Delay</p>
-								<div className='grid grid-cols-2 gap-2'>
+								<div className='grid grid-cols-2 gap-2 items-end'>
 									<FormField
 										control={form.control}
 										name='trigger_gap_time'
 										render={({ field }) => (
 											<FormItem className='space-y-0 flex-1 max-w-md'>
+												<FormLabel>Gap Delay</FormLabel>
 												<FormControl>
 													<Input type='number' placeholder='eg. 10' {...field} />
 												</FormControl>
@@ -340,13 +340,13 @@ export default function ChatbotForm() {
 								</div>
 							</div>
 							<div className='flex flex-col gap-2'>
-								<p>Message Delay</p>
-								<div className='grid grid-cols-2 gap-2'>
+								<div className='grid grid-cols-2 items-end gap-2'>
 									<FormField
 										control={form.control}
 										name='response_delay_time'
 										render={({ field }) => (
 											<FormItem className='space-y-0 flex-1 max-w-md'>
+												<FormLabel>Message Delay</FormLabel>
 												<FormControl>
 													<Input type='number' placeholder='eg. 10' {...field} />
 												</FormControl>
@@ -714,6 +714,7 @@ export default function ChatbotForm() {
 					<div className='flex gap-4 justify-between items-center py-8'>
 						{isEditingBot && (
 							<Button
+								type='button'
 								className='w-full'
 								variant={'outline'}
 								onClick={() => {

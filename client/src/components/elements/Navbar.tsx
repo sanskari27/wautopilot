@@ -91,10 +91,6 @@ export default function Navbar() {
 					</MenubarItem>
 					<MenubarSeparator />
 					<MenubarItem>
-						<ThemeToggle />
-					</MenubarItem>
-					<MenubarSeparator />
-					<MenubarItem>
 						<LogoutButton />
 					</MenubarItem>
 				</MenubarContent>
