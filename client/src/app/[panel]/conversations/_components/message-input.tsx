@@ -27,7 +27,7 @@ import {
 	Contact as ContactIcon,
 	FileText,
 	HardDriveUpload,
-	Image,
+	Image as ImageIcon,
 	Loader2,
 	MessageSquareQuote,
 	Music,
@@ -185,7 +185,7 @@ export default function MessageBox() {
 							type='image'
 						>
 							<Button variant={'ghost'} size={'sm'} className='w-full justify-start'>
-								<Image className='w-4 h-4 mr-2' />
+								<ImageIcon className='w-4 h-4 mr-2' />
 								Photos
 							</Button>
 						</MediaSelectorDialog>

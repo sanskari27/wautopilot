@@ -1,21 +1,4 @@
 import api from '@/lib/api';
-import { PhonebookRecord } from '@/types/phonebook';
-
-const formatPhonebookRecord = (record: any) => {
-	return {
-		id: record.id ?? '',
-		salutation: record.salutation ?? '',
-		first_name: record.first_name ?? '',
-		last_name: record.last_name ?? '',
-		middle_name: record.middle_name ?? '',
-		phone_number: record.phone_number ?? '',
-		email: record.email ?? '',
-		birthday: record.birthday ?? '',
-		anniversary: record.anniversary ?? '',
-		others: record.others ?? {},
-		labels: record.labels ?? [],
-	};
-};
 
 export default class PhoneBookService {
 	static async allLabels() {

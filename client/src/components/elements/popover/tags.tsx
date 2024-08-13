@@ -12,7 +12,7 @@ export default function TagsSelector({
 	selected = [],
 	onChange = () => {},
 	onClose = () => {},
-	labels = useTags(),
+	labels: _labels,
 }: {
 	children: React.ReactNode;
 	selected?: string[];
@@ -20,6 +20,8 @@ export default function TagsSelector({
 	onClose?: (selected: string[]) => void;
 	labels?: string[];
 }) {
+	const allLabels =  useTags();
+	const labels = _labels || allLabels;
 	const [selectedTags, setSelectedTags] = useState<string[]>(selected);
 
 	return (

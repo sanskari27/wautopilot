@@ -51,7 +51,7 @@ import {
 	Heading2,
 	Heading3,
 	Heading4,
-	Image,
+	Image as ImageIcon,
 	Images,
 	RocketIcon,
 	SquareCheck,
@@ -283,7 +283,7 @@ export default function ContentsForm({
 														<DropdownMenuPortal>
 															<DropdownMenuSubContent>
 																<DropdownMenuItem onClick={() => addField(currentScreen, 'image')}>
-																	<Image className='w-4 h-4 mr-2' />
+																	<ImageIcon className='w-4 h-4 mr-2' />
 																	Image
 																</DropdownMenuItem>
 															</DropdownMenuSubContent>

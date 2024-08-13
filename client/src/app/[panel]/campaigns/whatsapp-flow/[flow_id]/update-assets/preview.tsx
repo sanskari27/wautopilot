@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { PRASHANT_VARMA } from '@/lib/consts';
 import { cn } from '@/lib/utils';
 import { TWhatsappFlow } from '@/schema/whatsapp-flow';
+import Image from 'next/image';
 
 export default function PreviewFlowContents({
 	screen,
@@ -67,7 +68,7 @@ export default function PreviewFlowContents({
 											} else if (content.type === 'Image') {
 												return (
 													<div className='mt-2 flex justify-center items-center'>
-														<img
+														<Image
 															src={content.src}
 															alt='Image'
 															style={{

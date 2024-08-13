@@ -1,6 +1,6 @@
 'use client';
 
-import { ChatBot } from '@/types/chatbot';
+import { ChatBot } from '@/schema/chatbot';
 import * as React from 'react';
 
 const ChatbotContext = React.createContext<ChatBot[]>([]);

@@ -8,10 +8,11 @@ import { MediaProvider } from '@/components/context/media';
 import { FieldsContextProvider, TagsProvider } from '@/components/context/tags';
 import { TemplatesProvider } from '@/components/context/templates';
 import { UserDetailsProvider, UserDetailsType } from '@/components/context/user-details';
-import { Contact } from '@/schema/phonebook';
+import { ChatBot } from '@/schema/chatbot';
+import { Contact, ContactWithID } from '@/schema/phonebook';
 import { TemplateWithID } from '@/schema/template';
 import { Agent } from '@/types/agent';
-import { ChatBot, ChatbotFlow } from '@/types/chatbot';
+import {  ChatbotFlow } from '@/types/chatbot';
 import { Media } from '@/types/media';
 
 export function Providers({
@@ -38,7 +39,7 @@ export function Providers({
 		value: string;
 	}[];
 	media: Media[];
-	contacts: Contact[];
+	contacts: ContactWithID[];
 }) {
 	return (
 		<UserDetailsProvider data={userDetails}>
