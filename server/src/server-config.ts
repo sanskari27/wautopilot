@@ -12,21 +12,7 @@ import { CustomError } from './errors';
 import BroadcastService from './services/broadcast';
 import SchedulerService from './services/scheduler';
 
-const allowlist = [
-	'http://localhost:3001',
-	'http://localhost:5173',
-	'http://localhost:5273',
-	'http://localhost:5274',
-	'http://localhost:5275',
-	'http://localhost:5276',
-	'http://localhost:5277',
-	'https://wautopilot.com',
-	'https://agent.wautopilot.com',
-	'https://agent.wautopilot.com',
-	'https://admin.wautopilot.com',
-	'https://master.wautopilot.com',
-	'https://auth.wautopilot.com',
-];
+const allowlist = ['http://localhost:3001', 'https://wautopilot.com'];
 
 const corsOptionsDelegate = (req: any, callback: any) => {
 	let corsOptions;
@@ -35,7 +21,7 @@ const corsOptionsDelegate = (req: any, callback: any) => {
 	if (isDomainAllowed) {
 		// Enable CORS for this request
 		corsOptions = {
-			origin: true,
+			origin: req.header('Origin'),
 			credentials: true,
 			exposedHeaders: ['Content-Disposition'],
 			methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

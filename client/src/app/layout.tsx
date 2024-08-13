@@ -5,6 +5,8 @@ import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import './globals.css';
+import { Suspense } from 'react';
+import Loading from '@/components/elements/loading';
 
 const poppins = Poppins({ weight: ['400', '500', '600', '700', '800', '900'], subsets: ['latin'] });
 
@@ -26,7 +28,9 @@ export default async function RootLayout({
 			<link rel='icon' type='image/png' sizes='16x16' href='/icons/favicon-16x16.png' />
 			<body className={cn('h-screen w-screen overflow-x-hidden', poppins.className)}>
 				<PageLayout>
+					<Suspense fallback={<Loading />}>
 					{children}
+					</Suspense>
 					<BackgroundBeams />
 				</PageLayout>
 				<Toaster position='top-center' />
