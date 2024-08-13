@@ -12,7 +12,31 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import BroadcastService from '@/services/broadcast.service';
+import Chart from 'react-google-charts';
 import toast from 'react-hot-toast';
+
+const COLORS = [
+	'#FF6633',
+	'#FF33FF',
+	'#FFFF99',
+	'#00B3E6',
+	'#FFB399',
+	'#3366E6',
+	'#E6B333',
+	'#999966',
+	'#99FF99',
+	'#B34D4D',
+	'#809900',
+	'#E6B3B3',
+	'#80B300',
+	'#6680B3',
+	'#66991A',
+	'#FF99E6',
+	'#CCFF1A',
+	'#FF1A66',
+	'#33FFCC',
+	'#E6331A',
+];
 
 export default function ResponseDataTable({
 	list,
@@ -31,7 +55,7 @@ export default function ResponseDataTable({
 		if (!id) return;
 		toast.promise(
 			BroadcastService.buttonResponseReport({
-				campaignId:id,
+				campaignId: id,
 				exportCSV: true,
 			}),
 			{
@@ -42,6 +66,24 @@ export default function ResponseDataTable({
 		);
 	};
 
+	const mappedData = list.reduce((acc, item) => {
+		if (acc.has(item.button_text)) {
+			acc.set(item.button_text, acc.get(item.button_text)! + 1);
+		} else {
+			acc.set(item.button_text, 1);
+		}
+		return acc;
+	}, new Map<string, number>());
+
+	function getData() {
+		const barGraphData = Array.from(mappedData.keys()).reduce((acc, key, index) => {
+			acc.push([key, mappedData.get(key)!, COLORS[index % COLORS.length]]);
+			return acc;
+		}, [] as [string, number, string][]);
+
+		return [['Text', 'Count', { role: 'style' }], ...barGraphData];
+	}
+
 	return (
 		<div>
 			<div className='justify-between flex'>
@@ -51,6 +93,25 @@ export default function ResponseDataTable({
 						Export
 					</Button>
 				</div>
+			</div>
+			<div hidden={list.length === 0}>
+				<div className=' flex flex-col md:flex-row'>
+					<div className='flex-1'>
+						<Chart chartType='ColumnChart' width='100%' height='400px' data={getData()} />
+					</div>
+					<div className='flex-1'>
+						<Chart
+							chartType='PieChart'
+							width='100%'
+							height='400px'
+							data={getData()}
+							options={{ is3D: true }}
+						/>
+					</div>
+				</div>
+				<p className='text-center font-medium'>
+					Visual comparison of the number of times each button was clicked by the recipients.
+				</p>
 			</div>
 			<Table>
 				<TableHeader>

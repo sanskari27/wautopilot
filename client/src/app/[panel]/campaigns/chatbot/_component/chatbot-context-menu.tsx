@@ -86,9 +86,11 @@ export default function ChatbotContextMenu({
 					<Download className='mr-2 h-4 w-4' />
 					<span>Download Report</span>
 				</DropdownMenuItem>
-				<DropdownMenuItem onClick={() => {}}>
-					<MdReport className='mr-2 h-4 w-4' />
-					<span>Button Click Report</span>
+				<DropdownMenuItem>
+					<Link className='flex items-center' href={`/${panel}/campaigns/button-report/${chatbot.id}`}>
+						<MdReport className='mr-2 h-4 w-4' />
+						<span>Button Click Report</span>
+					</Link>
 				</DropdownMenuItem>
 				<DeleteDialog onDelete={deleteBot}>
 					<Button size={'sm'} className='w-full bg-destructive hover:bg-destructive/50'>

@@ -1,25 +1,32 @@
 import BroadcastService from '@/services/broadcast.service';
 import { notFound } from 'next/navigation';
+import Chart from 'react-google-charts';
 import ResponseDataTable from './data-table';
 
-export default async function Report({
+
+
+export default async function ChatbotButtonReport({
 	params,
 }: {
 	params: {
-		campaign_id: string;
+		campaignId: string;
 	};
 }) {
 	if (!params) return notFound();
-	if (!params.campaign_id) return <div>Invalid campaign id</div>;
+	if (!params.campaignId) return <div>Invalid campaign id</div>;
 
 	const list = await BroadcastService.buttonResponseReport({
-		campaignId: params.campaign_id,
+		campaignId: params.campaignId,
 		exportCSV: false,
 	});
 
+	if (!list) return notFound();
+
+	
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
-			<ResponseDataTable id={params.campaign_id} list={list ?? []} />
+			
+			<ResponseDataTable id={params.campaignId} list={list ?? []} />
 		</div>
 	);
 }

@@ -124,7 +124,7 @@ export default function ReportDataTable({
 					<Each
 						items={list}
 						render={(recurring) => {
-							const link = `/${panel}/campaigns/report/button-report/${recurring.broadcast_id}`;
+							const link = `/${panel}/campaigns/button-report/${recurring.broadcast_id}`;
 							return (
 								<TableRow>
 									<TableCell className='font-medium'>

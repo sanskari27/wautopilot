@@ -78,7 +78,13 @@ function generateColumns(keys: string[]): ColumnDef<PhonebookRecordWithID>[] {
 				/>
 			),
 			cell: ({ row }) => (
-				<div className='inline-flex items-center px-2'>
+				<div
+					className='inline-flex items-center px-2'
+					onClick={(e) => {
+						e.preventDefault();
+						e.stopPropagation();
+					}}
+				>
 					<Checkbox
 						checked={row.getIsSelected()}
 						onCheckedChange={(value) => row.toggleSelected(!!value)}
