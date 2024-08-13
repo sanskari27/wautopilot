@@ -9,6 +9,5 @@ export const socket = io(SERVER_URL + 'conversation');
 socket.on('connect', () => {
 	AuthService.generateConversationMessageKey().then((key) => {
 		socket.emit('listen_new_messages', key);
-		console.log('listening to new messages');
 	});
 });
