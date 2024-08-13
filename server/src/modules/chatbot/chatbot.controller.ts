@@ -13,6 +13,7 @@ import {
 	UpdateWhatsappFlowValidationResult,
 	WhatsappFlowValidationResult,
 } from './chatbot.validator';
+import DateUtils from '../../utils/DateUtils';
 
 async function createBot(req: Request, res: Response, next: NextFunction) {
 	const {
@@ -301,11 +302,15 @@ async function deleteFlow(req: Request, res: Response, next: NextFunction) {
 
 async function exportWhatsappFlow(req: Request, res: Response, next: NextFunction) {
 	const { serviceAccount: account } = req.locals;
+	const { id } = req.params;
 
+	// flow token should starts with wautopilot_${id}
 	const docs = await WhatsappFlowResponseDB.find({
 		linked_to: account._id,
+		'data.flow_token': {
+			$regex: new RegExp(`^wautopilot_${id}`),
+		},
 	}).sort({
-		'data.flow_token': 1,
 		received_at: -1,
 	});
 
@@ -314,7 +319,7 @@ async function exportWhatsappFlow(req: Request, res: Response, next: NextFunctio
 		return {
 			recipient: data.recipient,
 			recipient_name: data.recipient_name,
-			received_at: data.received_at,
+			received_at: DateUtils.format(data.received_at, 'MMM Do, YYYY hh:mm A') as string,
 			...data.data,
 		};
 	});

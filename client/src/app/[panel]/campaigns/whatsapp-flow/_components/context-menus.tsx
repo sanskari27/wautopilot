@@ -8,7 +8,8 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Cog, Delete, Edit } from 'lucide-react';
+import ChatBotService from '@/services/chatbot.service';
+import { Cog, Delete, Edit, MessageSquareQuote } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -45,6 +46,14 @@ export default function WhatsappFlowContextMenu({
 		});
 	};
 
+	const downloadFlowReport = () => {
+		toast.promise(ChatBotService.exportWhatsappFlowData(id), {
+			loading: 'Downloading...',
+			success: 'Downloaded successfully',
+			error: 'Failed to download',
+		});
+	};
+
 	if (status === 'PUBLISHED') {
 		return (
 			<DropdownMenu>
@@ -56,6 +65,10 @@ export default function WhatsappFlowContextMenu({
 							<span>View Flow Structure</span>
 						</DropdownMenuItem>
 					</Link>
+					<DropdownMenuItem onClick={downloadFlowReport}>
+						<MessageSquareQuote className='mr-2 h-4 w-4' />
+						<span>Download Responses</span>
+					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 		);

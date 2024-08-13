@@ -272,7 +272,7 @@ export default class CSVHelper {
 		records: {
 			recipient: string;
 			recipient_name: string;
-			received_at: Date;
+			received_at: string;
 			[key: string]: any;
 		}[]
 	): string {

@@ -284,8 +284,8 @@ export default class ChatBotService {
 		return validateChatBot(data.bot);
 	}
 
-	static async exportWhatsappFlowData() {
-		const response = await api.get(`/chatbot/whatsapp-flows/export`, {
+	static async exportWhatsappFlowData(id: string) {
+		const response = await api.get(`/chatbot/whatsapp-flows/${id}/export`, {
 			responseType: 'blob',
 		});
 		const blob = new Blob([response.data]);

@@ -13,7 +13,7 @@ import {
 
 const router = express.Router();
 
-router.route('/whatsapp-flows/export').get(Controller.exportWhatsappFlow);
+router.route('/whatsapp-flows/:id/export').get(Controller.exportWhatsappFlow);
 
 router
 	.route('/whatsapp-flows/:id/publish')
