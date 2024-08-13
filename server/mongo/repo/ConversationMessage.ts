@@ -37,11 +37,7 @@ const schema = new mongoose.Schema<IConversationMessage>(
 			enum: Object.keys(MESSAGE_STATUS),
 			default: MESSAGE_STATUS.PENDING,
 		},
-		message_id: {
-			type: String,
-			sparse: true,
-			unique: true,
-		},
+		message_id: String,
 		delivered_at: Date,
 		read_at: Date,
 		sent_at: Date,

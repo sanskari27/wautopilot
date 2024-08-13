@@ -8,7 +8,6 @@ import IWhatsappLink from '../../mongo/types/whatsappLink';
 import MetaAPI from '../config/MetaAPI';
 import { IS_PRODUCTION, MESSAGE_STATUS } from '../config/const';
 import DateUtils from '../utils/DateUtils';
-import { generateRandomID } from '../utils/ExpressUtils';
 import {
 	extractInteractiveBody,
 	extractInteractiveButtons,
@@ -113,7 +112,6 @@ export default class SchedulerService extends WhatsappLinkService {
 			let message_id: string | undefined = undefined;
 
 			if (userService.walletBalance < userService.markupPrice) {
-				message_id = generateRandomID();
 				failed_at = DateUtils.getMomentNow().toDate();
 				failed_reason = 'Insufficient balance';
 				status = MESSAGE_STATUS.FAILED;
@@ -143,7 +141,6 @@ export default class SchedulerService extends WhatsappLinkService {
 					} else {
 						failed_reason = (err as any).message as string;
 					}
-					message_id = generateRandomID();
 					failed_at = DateUtils.getMomentNow().toDate();
 					status = MESSAGE_STATUS.FAILED;
 				}
@@ -213,7 +210,6 @@ export default class SchedulerService extends WhatsappLinkService {
 			let message_id: string | undefined = undefined;
 
 			if (userService.walletBalance < userService.markupPrice) {
-				message_id = generateRandomID();
 				failed_at = DateUtils.getMomentNow().toDate();
 				failed_reason = 'Insufficient balance';
 				status = MESSAGE_STATUS.FAILED;
@@ -236,7 +232,6 @@ export default class SchedulerService extends WhatsappLinkService {
 					} else {
 						failed_reason = (err as any).message as string;
 					}
-					message_id = generateRandomID();
 					failed_at = DateUtils.getMomentNow().toDate();
 					status = MESSAGE_STATUS.FAILED;
 				}
@@ -342,7 +337,6 @@ export default class SchedulerService extends WhatsappLinkService {
 					} else {
 						failed_reason = (err as any).message as string;
 					}
-					message_id = generateRandomID();
 					failed_at = DateUtils.getMomentNow().toDate();
 					status = MESSAGE_STATUS.FAILED;
 				}
