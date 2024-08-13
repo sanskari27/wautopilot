@@ -291,6 +291,7 @@ export function ConversationNoteDialog({
 	};
 
 	useEffect(() => {
+		if (!isOpen) return;
 		MessagesService.getNote(id)
 			.then((res) => {
 				setNotes(res ?? '');
@@ -298,7 +299,7 @@ export function ConversationNoteDialog({
 			.catch(() => {
 				toast.error('Failed to get note');
 			});
-	}, [id]);
+	}, [id, isOpen]);
 
 	return (
 		<Dialog

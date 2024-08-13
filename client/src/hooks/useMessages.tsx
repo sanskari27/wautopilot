@@ -62,7 +62,7 @@ export default function useMessages(id: string) {
 	useEffect(() => {
 		if (id && pagination.current.current_id !== id) {
 			pagination.current.current_id = id;
-			markRead(id);
+			MessagesService.markConversationRead(id);
 		}
 	}, [id, markRead]);
 

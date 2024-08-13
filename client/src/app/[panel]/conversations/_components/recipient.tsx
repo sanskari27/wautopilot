@@ -64,12 +64,17 @@ export default function Recipient({
 								<Pin className='absolute -right-3 mr-2 w-4 h-4 top-0 rotate-45' />
 							</Show.ShowIf>
 						</div>
-						<div>
+						<div className='flex-1'>
 							<p className='line-clamp-1 font-medium'>
 								{recipient.profile_name || recipient.recipient}
 							</p>
 							<p className='text-sm'>{recipient.recipient}</p>
 						</div>
+						<Show.ShowIf condition={recipient.unreadCount !== 0}>
+							<span className='self-end text-xs bg-primary inline-flex justify-center items-center p-1.5 h-[1.2rem] min-w-[1.2rem] rounded-full text-white'>
+								{recipient.unreadCount}
+							</span>
+						</Show.ShowIf>
 					</div>
 				</div>
 
