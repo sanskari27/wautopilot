@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ChatbotFlowSchema = z.object({
-    id: z.string(),
+	id: z.string(),
 	name: z.string().min(1, 'Name is required'),
 	trigger: z.string(),
 	options: z.union([
@@ -10,5 +10,7 @@ export const ChatbotFlowSchema = z.object({
 		z.literal('EXACT_IGNORE_CASE'),
 		z.literal('EXACT_MATCH_CASE'),
 	]),
-    isActive: z.boolean().default(false),
+	isActive: z.boolean().default(false),
 });
+
+export type ChatbotFlow = z.infer<typeof ChatbotFlowSchema>;

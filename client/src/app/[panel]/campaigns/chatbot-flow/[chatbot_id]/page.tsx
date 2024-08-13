@@ -22,13 +22,13 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { parseToObject } from '@/lib/utils';
 import { ChatbotFlowSchema } from '@/schema/chatbot-flow';
-import ChatbotFlowService from '@/services/chatbot-flow.service';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronLeftIcon } from 'lucide-react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { notFound, useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
+import { createChatbotFlow, editChatbotFlow } from '../action';
 
 const DEFAULT_VALUE = {
 	id: '',
@@ -40,7 +40,7 @@ const DEFAULT_VALUE = {
 
 export default function CreateChatbotFlow() {
 	const router = useRouter();
-    const params = useParams();
+	const params = useParams();
 
 	const raw = parseToObject(useSearchParams().get('data'));
 	const isEditing = !!raw;
@@ -52,17 +52,20 @@ export default function CreateChatbotFlow() {
 	});
 
 	const handleSubmit = (data: z.infer<typeof ChatbotFlowSchema>) => {
-		const promise = isEditing
-			? ChatbotFlowService.editChatbotFlow({ botId: data.id, details: data })
-			: ChatbotFlowService.createChatbotFlow(data);
+		const promise = isEditing ? editChatbotFlow(data.id, data) : createChatbotFlow(data);
 		toast.promise(promise, {
 			loading: 'Saving...',
-			success: ()=>{
-                router.replace(`/${params.panel}/campaigns/chatbot-flow/${data.id}/customize`);
-                return 'Saved'},
+			success: (res) => {
+				router.replace(`/${params.panel}/campaigns/chatbot-flow/${res}/customize`);
+				return 'Saved';
+			},
 			error: 'Failed to save',
 		});
 	};
+
+	if (params.chatbot_id !== 'new' && !isEditing) {
+		return notFound();
+	}
 
 	return (
 		<div className='custom-scrollbar flex flex-col gap-2 justify-center p-4'>
@@ -73,7 +76,12 @@ export default function CreateChatbotFlow() {
 					className='flex flex-col rounded-xl mb-4 gap-8'
 				>
 					<div className='flex flex-col gap-2'>
-						<Button className='self-start' variant={'link'} onClick={() => router.back()}>
+						<Button
+							type='button'
+							className='self-start'
+							variant={'link'}
+							onClick={() => router.back()}
+						>
 							<ChevronLeftIcon className='w-6 h-6' />
 						</Button>
 						<FormField
@@ -109,7 +117,7 @@ export default function CreateChatbotFlow() {
 								/>
 							</div>
 						</div>
-                        
+
 						<FormField
 							control={form.control}
 							name='trigger'
