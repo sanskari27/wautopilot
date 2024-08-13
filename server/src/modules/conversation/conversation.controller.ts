@@ -54,36 +54,6 @@ async function fetchConversationMessages(req: Request, res: Response, next: Next
 	});
 }
 
-async function markRead(req: Request, res: Response, next: NextFunction) {
-	const {
-		serviceAccount: account,
-		device: { device },
-	} = req.locals;
-	const message_id = req.params.message_id;
-
-	try {
-		await MetaAPI(device.accessToken).put(`/${device.phoneNumberId}/messages`, {
-			messaging_product: 'whatsapp',
-			status: 'read',
-			message_id: message_id,
-		});
-	} catch (err) {
-		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
-	}
-
-	try {
-		const conversationService = new ConversationService(account, device);
-		await conversationService.markMessageRead(message_id);
-
-		return Respond({
-			res,
-			status: 200,
-		});
-	} catch (err) {
-		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
-	}
-}
-
 async function assignLabelToMessage(req: Request, res: Response, next: NextFunction) {
 	const {
 		serviceAccount: account,
@@ -386,6 +356,75 @@ async function getNote(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function toggleConversationPin(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount: account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	try {
+		const conversationService = new ConversationService(account, device);
+		await conversationService.toggleConversationPin(id);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		if (err instanceof CustomError) {
+			return next(err);
+		}
+		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+	}
+}
+
+async function toggleConversationArchive(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount: account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	try {
+		const conversationService = new ConversationService(account, device);
+		await conversationService.toggleConversationArchive(id);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		if (err instanceof CustomError) {
+			return next(err);
+		}
+		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+	}
+}
+
+async function markConversationRead(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount: account,
+		device: { device },
+		id,
+	} = req.locals;
+
+	try {
+		const conversationService = new ConversationService(account, device);
+		await conversationService.markConversationRead(id);
+
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (err) {
+		if (err instanceof CustomError) {
+			return next(err);
+		}
+		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+	}
+}
+
 const Controller = {
 	fetchConversations,
 	fetchConversationMessages,
@@ -393,12 +432,14 @@ const Controller = {
 	bulkAssignConversationToAgent,
 	transferAgentConversation,
 	removeConversationFromAgent,
-	markRead,
 	assignLabelToMessage,
 	sendMessageToConversation,
 	exportConversationsFromPhonebook,
 	addNote,
 	getNote,
+	toggleConversationPin,
+	toggleConversationArchive,
+	markConversationRead,
 };
 
 export default Controller;

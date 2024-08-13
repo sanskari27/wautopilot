@@ -1,5 +1,7 @@
 'use client';
 
+import useBoolean from '@/hooks/useBoolean';
+import { socket } from '@/socket';
 import { Recipient } from '@/types/recipient';
 import * as React from 'react';
 
@@ -9,23 +11,21 @@ const RecipientsContext = React.createContext<{
 	unpinnedConversations: Recipient[];
 	selectedConversations: string[];
 	selected_recipient: Recipient | null;
-	setRecipientTags: (id: string, tags: string[]) => void;
-	togglePin: (id: string) => void;
-	markUnread: (id: string) => void;
+	showArchived: boolean;
 	markRead: (id: string) => void;
 	toggleSelected: (id: string) => void;
 	setLabelFilter: (labels: string[]) => void;
 	setSearchText: (text: string) => void;
 	setSelectedRecipient: (recipient: Recipient) => void;
+	toggleShowArchived: () => void;
 }>({
 	list: [],
 	pinnedConversations: [],
 	unpinnedConversations: [],
 	selectedConversations: [],
 	selected_recipient: null,
-	setRecipientTags: () => {},
-	togglePin: () => {},
-	markUnread: () => {},
+	showArchived: false,
+	toggleShowArchived: () => {},
 	markRead: () => {},
 	toggleSelected: () => {},
 	setLabelFilter: () => {},
@@ -42,69 +42,96 @@ export function RecipientProvider({
 }) {
 	const [searchText, setSearchText] = React.useState('');
 	const [label_filter, setLabelFilter] = React.useState<string[]>([]);
-	const [value, setValue] = React.useState<Recipient[]>(data);
-	const [pinnedIds, setPinnedIds] = React.useState<string[]>([]);
-	const [unReadConversations, setUnReadConversations] = React.useState<string[]>([]);
+	const [list, setList] = React.useState<Recipient[]>(data);
 	const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
 	const [selected_recipient, setSelectedRecipient] = React.useState<Recipient | null>(null);
+	const { value: showArchived, toggle: toggleShowArchived } = useBoolean(false);
 
 	const filtered = React.useMemo(() => {
-		return value.filter((item) => {
-			return (
-				(item.profile_name.toLowerCase().includes(searchText.toLowerCase()) ||
-					item.recipient.includes(searchText)) &&
-				label_filter.every((label) => item.labels.includes(label))
-			);
+		return list.filter((item) => {
+			const cond1 =
+				item.profile_name.toLowerCase().includes(searchText.toLowerCase()) ||
+				item.recipient.includes(searchText);
+			const cond2 = (showArchived && item.archived) || (!showArchived && !item.archived);
+			const cond3 = label_filter.every((label) => item.labels.includes(label));
+			return cond1 && cond2 && cond3;
 		});
-	}, [value, label_filter, searchText]);
+	}, [list, label_filter, searchText, showArchived]);
 
-	const pinnedConversations = React.useMemo(
-		() => filtered.filter((item) => pinnedIds.includes(item._id)),
-		[filtered, pinnedIds]
+	const { pinnedConversations, unpinnedConversations } = React.useMemo(
+		() =>
+			filtered.reduce(
+				(acc, item) => {
+					if (item.pinned) {
+						acc.pinnedConversations.push(item);
+					} else {
+						acc.unpinnedConversations.push(item);
+					}
+					return acc;
+				},
+				{
+					pinnedConversations: [] as Recipient[],
+					unpinnedConversations: [] as Recipient[],
+				}
+			),
+		[filtered]
 	);
 
-	const unpinnedConversations = React.useMemo(
-		() => filtered.filter((item) => !pinnedIds.includes(item._id)),
-		[filtered, pinnedIds]
-	);
-
-	React.useEffect(() => {
-		try {
-			const pinned = JSON.parse(localStorage.getItem('pinned') ?? '[]');
-			setPinnedIds(pinned || []);
-		} catch (err) {}
+	const setTags = React.useCallback((phone_number: string, tags: string[]) => {
+		setList((list) =>
+			list.map((item) => {
+				if (item.recipient === phone_number) {
+					return { ...item, labels: tags };
+				}
+				return item;
+			})
+		);
 	}, []);
 
-	function setRecipientTags(id: string, tags: string[]) {
-		const newValue = value.map((item) => {
-			if (item._id === id) {
-				return { ...item, tags };
+	const togglePin = React.useCallback((id: string, pinned: boolean) => {
+		setList((prev) =>
+			prev.map((item) => {
+				if (item.id === id) {
+					return { ...item, pinned };
+				}
+				return item;
+			})
+		);
+	}, []);
+
+	const toggleArchived = React.useCallback((id: string, archived: boolean) => {
+		setList((prev) =>
+			prev.map((item) => {
+				if (item.id === id) {
+					return { ...item, archived };
+				}
+				return item;
+			})
+		);
+	}, []);
+
+	const markUnread = React.useCallback(
+		(id: string) => {
+			const unModified = list.filter((item) => item.id !== id);
+			const modified = list.find((item) => item.id === id);
+			if (modified) {
+				modified.unreadCount++;
+				setList([modified, ...unModified]);
 			}
-			return item;
-		});
-		setValue(newValue);
-	}
+		},
+		[list]
+	);
 
-	function togglePin(id: string) {
-		const newPinnedIds = pinnedIds.includes(id)
-			? pinnedIds.filter((item) => item !== id)
-			: [id, ...pinnedIds];
-
-		localStorage.setItem('pinned', JSON.stringify(newPinnedIds));
-		setPinnedIds(newPinnedIds);
-	}
-
-	function markUnread(id: string) {
-		if (!unReadConversations.includes(id)) {
-			setUnReadConversations([id, ...unReadConversations]);
-		} else {
-			setUnReadConversations([id, ...unReadConversations.filter((item) => item !== id)]);
-		}
-	}
-
-	function markRead(id: string) {
-		setUnReadConversations(unReadConversations.filter((item) => item !== id));
-	}
+	const markRead = React.useCallback((id: string) => {
+		setList((prev) =>
+			prev.map((item) => {
+				if (item.id === id) {
+					return { ...item, unreadCount: 0 };
+				}
+				return item;
+			})
+		);
+	}, []);
 
 	function toggleSelected(id: string) {
 		if (selectedIds.includes(id)) {
@@ -114,17 +141,73 @@ export function RecipientProvider({
 		}
 	}
 
+	React.useEffect(() => {
+		socket.on('new_message_notification', (conversation_id) => {
+			markUnread(conversation_id);
+		});
+
+		socket.on('conversation_read', (conversation_id) => {
+			markRead(conversation_id);
+		});
+
+		socket.on('conversation_pinned', (details) => {
+			togglePin(details.conversation_id, details.pinned);
+		});
+
+		socket.on('conversation_archived', (details) => {
+			toggleArchived(details.conversation_id, details.archived);
+		});
+
+		socket.on('labels_updated', (details) => {
+			console.log('labels updated', details);
+			setTags(details.phone_number, details.labels);
+		});
+	}, [markRead, markUnread, setTags, toggleArchived, togglePin]);
+
+	// React.useEffect(() => {
+	// 	socket.on('connect', () => {
+	// 		socket.emit('join_conversation', selected_recipient._id);
+	// 		AuthService.generateConversationMessageKey().then((key) => {
+	// 			socket.emit('listen_new_messages', key);
+	// 		});
+	// 	});
+
+	// 	socket.on('disconnect', () => {});
+
+	// 	socket.on('message_new', (msg) => {
+	// 		dispatch(addMessage(msg));
+	// 		// if (msg.received_at) {
+	// 		// 	MessagesService.markRead(selected_device_id, msg.message_id);
+	// 		// }
+	// 	});
+
+	// 	socket.on('message_updated', (msg) => {
+	// 		dispatch(updateMessage({ messageId: msg._id, message: msg }));
+	// 	});
+
+	// 	socket.on('new_message_notification', (conversation_id) => {
+	// 		dispatch(addUnreadConversation(conversation_id));
+	// 	});
+
+	// 	socket.on('message_updated', (msg) => {
+	// 		dispatch(updateMessage({ messageId: msg._id, message: msg }));
+	// 	});
+
+	// 	return () => {
+	// 		socket.disconnect();
+	// 	};
+	// }, []);
+
 	return (
 		<RecipientsContext.Provider
 			value={{
-				list: value,
+				list: list,
 				pinnedConversations,
 				unpinnedConversations,
 				selectedConversations: selectedIds,
 				selected_recipient,
-				setRecipientTags,
-				togglePin,
-				markUnread,
+				showArchived,
+				toggleShowArchived,
 				markRead,
 				toggleSelected,
 				setLabelFilter,

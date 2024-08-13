@@ -57,7 +57,7 @@ export default function MessageBox() {
 	const sendTextMessage = () => {
 		if (!textMessage.trim()) return;
 		setSending();
-		MessagesService.sendConversationMessage(selected_recipient!._id, {
+		MessagesService.sendConversationMessage(selected_recipient!.id, {
 			type: 'text',
 			text: textMessage,
 		}).then((data) => {
@@ -80,7 +80,7 @@ export default function MessageBox() {
 		const _type = type === 'PHOTOS' ? 'image' : type.toLowerCase();
 
 		for (let i = 0; i < attachments.length; i++) {
-			MessagesService.sendConversationMessage(selected_recipient!._id, {
+			MessagesService.sendConversationMessage(selected_recipient!.id, {
 				type: _type as 'image' | 'video' | 'document' | 'audio',
 				media_id: attachments[i],
 			});
@@ -88,7 +88,7 @@ export default function MessageBox() {
 	};
 
 	const sendContactMessage = (contact: Contact[]) => {
-		MessagesService.sendConversationMessage(selected_recipient!._id, {
+		MessagesService.sendConversationMessage(selected_recipient!.id, {
 			type: 'contacts',
 			contacts: contact,
 		}).then((data) => {

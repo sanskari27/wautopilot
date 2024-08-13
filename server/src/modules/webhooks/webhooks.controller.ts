@@ -60,19 +60,8 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 		const status = data.statuses[0];
 		const msgID = status.id;
 		const error: string = status.errors?.[0]?.error_data?.details || '';
-		// const conversationID = status.conversation.id;
-		// const conversationExpiry = status.conversation.expiration_timestamp;
-		// const origin = status.conversation.origin.type;
 		BroadcastService.updateStatus(msgID, status.status, status.timestamp, error);
 		ConversationService.updateStatus(msgID, status.status, status.timestamp, error);
-
-		if (status.conversation) {
-			ConversationService.updateConversationDetails(msgID, {
-				meta_conversation_id: status.conversation.id,
-				conversationExpiry: status.conversation.expiration_timestamp,
-				origin: status.conversation.origin.type,
-			});
-		}
 	} else {
 		const message = data.messages[0];
 		const meta_message_id = message.id;

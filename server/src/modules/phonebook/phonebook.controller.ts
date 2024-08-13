@@ -5,6 +5,7 @@ import { UserLevel } from '../../config/const';
 import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import PhoneBookService from '../../services/phonebook';
+import SocketServer from '../../socket';
 import CSVHelper from '../../utils/CSVHelper';
 import { Respond, RespondCSV, intersection } from '../../utils/ExpressUtils';
 import FileUtils from '../../utils/FileUtils';
@@ -284,6 +285,10 @@ async function setLabelsByPhone(req: Request, res: Response, next: NextFunction)
 		}
 
 		await phoneBookService.setLabels([doc.id], labels);
+		SocketServer.getInstance().labelsUpdated(user.userId.toString(), {
+			phone_number,
+			labels,
+		});
 
 		return Respond({
 			res,

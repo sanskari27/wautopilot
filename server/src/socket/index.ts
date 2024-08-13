@@ -61,6 +61,28 @@ export default class SocketServer {
 		this.io.of('/conversation').to(user_id).emit('new_message_notification', conversation_id);
 	}
 
+	public markRead(user_id: string, conversation_id: string) {
+		this.io.of('/conversation').to(user_id).emit('conversation_read', conversation_id);
+	}
+
+	public sendConversationPinned(
+		user_id: string,
+		details: { conversation_id: string; pinned: boolean }
+	) {
+		this.io.of('/conversation').to(user_id).emit('conversation_pinned', details);
+	}
+
+	public labelsUpdated(user_id: string, details: { phone_number: string; labels: string[] }) {
+		this.io.of('/conversation').to(user_id).emit('labels_updated', details);
+	}
+
+	public sendConversationArchived(
+		user_id: string,
+		details: { conversation_id: string; archived: boolean }
+	) {
+		this.io.of('/conversation').to(user_id).emit('conversation_archived', details);
+	}
+
 	public addConversationKey(key: string, user_id: string) {
 		this.conversationKeys.set(key, user_id);
 	}

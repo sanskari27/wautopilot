@@ -1,5 +1,4 @@
 'use client';
-import { useRecipient } from '@/components/context/recipients';
 import { Button } from '@/components/ui/button';
 import {
 	ContextMenu,
@@ -7,28 +6,41 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from '@/components/ui/context-menu';
+import MessagesService from '@/services/messages.service';
 import { Recipient } from '@/types/recipient';
 import AssignLabelDialog from './dialogs';
 
 export function RecipientContextMenu({
 	recipient,
-	isPinned,
 	children,
 }: {
 	recipient: Recipient;
-	isPinned?: boolean;
 	children: React.ReactNode;
 }) {
-	const { togglePin } = useRecipient();
+	const isPinned = recipient.pinned;
+	const isArchived = recipient.archived;
+	
+	function togglePin() {
+		MessagesService.togglePin(recipient.id);
+	}
+
+	function toggleArchive() {
+		MessagesService.toggleArchive(recipient.id);
+	}
 
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 			<ContextMenuContent className='w-64'>
 				{isPinned ? (
-					<ContextMenuItem onClick={() => togglePin(recipient._id)}>Unpin</ContextMenuItem>
+					<ContextMenuItem onClick={togglePin}>Unpin</ContextMenuItem>
 				) : (
-					<ContextMenuItem onClick={() => togglePin(recipient._id)}>Pin</ContextMenuItem>
+					<ContextMenuItem onClick={togglePin}>Pin</ContextMenuItem>
+				)}
+				{isArchived ? (
+					<ContextMenuItem onClick={toggleArchive}>Unarchive</ContextMenuItem>
+				) : (
+					<ContextMenuItem onClick={toggleArchive}>Archive</ContextMenuItem>
 				)}
 				<AssignLabelDialog recipient={recipient}>
 					<Button size={'sm'} variant={'ghost'} className='w-full p-2 font-normal'>

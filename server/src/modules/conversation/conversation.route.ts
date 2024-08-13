@@ -10,7 +10,6 @@ router
 	.route('/message/:id/assign-labels')
 	.all(IDValidator, LabelValidator)
 	.post(Controller.assignLabelToMessage);
-router.route('/mark-read/:message_id').post(Controller.markRead);
 
 router
 	.route('/assign-agent/:agent_id')
@@ -30,6 +29,12 @@ router
 router.route('/:id/messages').all(IDValidator).get(Controller.fetchConversationMessages);
 
 router.route('/:id/note').all(IDValidator).post(Controller.addNote).get(Controller.getNote);
+
+router.route('/:id/toggle-archived').all(IDValidator).post(Controller.toggleConversationArchive);
+
+router.route('/:id/toggle-pin').all(IDValidator).post(Controller.toggleConversationPin);
+
+router.route('/:id/mark-read').all(IDValidator).post(Controller.markConversationRead);
 
 router
 	.route('/:id/send-message')

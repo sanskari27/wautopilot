@@ -8,7 +8,6 @@ import {
 	Dialog,
 	DialogClose,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -96,39 +95,34 @@ export default function AssignLabelDialog({
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Assign Labels</DialogTitle>
-					<DialogDescription className='w-full'>
-						<div className='flex flex-wrap justify-start mt-2 gap-1'>
-							<Each
-								items={selectedLabels}
-								render={(label) => (
-									<Badge className='min-w-max bg-gray-200 text-gray-700 font-normal'>
-										{label}
-										<IoClose
-											onClick={() => removeLabel(label)}
-											className='w-4 h-4 cursor-pointer'
-											strokeWidth={3}
-										/>
-									</Badge>
-								)}
-							/>
-						</div>
-						<div className='flex w-full mt-4 items-center'>
-							<div className='flex-1'>
-								<Input
-									placeholder='Add new labels'
-									value={newLabel}
-									onChange={handleNewLabelInput}
-								/>
-							</div>
-							<TagsSelector onChange={handleLabelChange}>
-								<Button variant='secondary' size={'icon'}>
-									<ListFilter className='w-4 h-4' strokeWidth={3} />
-								</Button>
-							</TagsSelector>
-						</div>
-					</DialogDescription>
+					<DialogTitle>Assign Labels</DialogTitle>{' '}
 				</DialogHeader>
+
+				<div className='flex flex-wrap justify-start mt-2 gap-1'>
+					<Each
+						items={selectedLabels}
+						render={(label) => (
+							<Badge className='min-w-max bg-gray-200 text-gray-700 font-normal hover:text-white'>
+								{label}
+								<IoClose
+									onClick={() => removeLabel(label)}
+									className='w-4 h-4 cursor-pointer'
+									strokeWidth={3}
+								/>
+							</Badge>
+						)}
+					/>
+				</div>
+				<div className='flex w-full mt-4 items-center'>
+					<div className='flex-1'>
+						<Input placeholder='Add new labels' value={newLabel} onChange={handleNewLabelInput} />
+					</div>
+					<TagsSelector onChange={handleLabelChange}>
+						<Button variant='secondary' size={'icon'}>
+							<ListFilter className='w-4 h-4' strokeWidth={3} />
+						</Button>
+					</TagsSelector>
+				</div>
 				<DialogFooter>
 					<DialogClose asChild>
 						<Button type='submit' onClick={handleSave}>
@@ -317,11 +311,7 @@ export function ConversationNoteDialog({
 		>
 			<DialogContent className='max-w-sm md:max-w-lg lg:max-w-2xl'>
 				<DialogHeader>Conversation Note</DialogHeader>
-				<Textarea
-					className='h-[300px]'
-					value={notes}
-					onChange={(e) => setNotes(e.target.value)}
-				/>
+				<Textarea className='h-[300px]' value={notes} onChange={(e) => setNotes(e.target.value)} />
 				<DialogFooter>
 					<Button onClick={handleSave}>Save</Button>
 				</DialogFooter>

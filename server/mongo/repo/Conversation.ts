@@ -24,7 +24,6 @@ const schema = new mongoose.Schema<IConversation>(
 			type: String,
 			required: true,
 		},
-		meta_conversation_id: String,
 		messages: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
@@ -32,9 +31,23 @@ const schema = new mongoose.Schema<IConversation>(
 			},
 		],
 		assigned_to: mongoose.Schema.Types.ObjectId,
-		origin: String,
 		last_message_at: Date,
-		note: String,
+		note: {
+			type: String,
+			default: '',
+		},
+		pinned: {
+			type: Boolean,
+			default: false,
+		},
+		archived: {
+			type: Boolean,
+			default: false,
+		},
+		unreadCount: {
+			type: Number,
+			default: 0,
+		},
 	},
 	{
 		timestamps: { createdAt: true },

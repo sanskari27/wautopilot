@@ -1,13 +1,13 @@
 export type Recipient = {
-	_id: string;
+	id: string;
 	recipient: string;
 	profile_name: string;
-	origin: string;
 	labels: string[];
-	expiry?: number | 'EXPIRED';
+	unreadCount: number;
+	pinned: boolean;
+	archived: boolean;
+	last_message_at: string;
 };
-
-
 
 export type Message = {
 	_id: string;

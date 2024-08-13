@@ -13,19 +13,18 @@ import { RecipientContextMenu } from './contextMenu';
 export default function Recipient({
 	recipient,
 	isActive = false,
-	isPinned = false,
 	isSelected = false,
 	onClick,
 }: {
 	recipient: TRecipient;
 	isActive?: boolean;
-	isPinned?: boolean;
 	isSelected?: boolean;
 	onClick?: (item: TRecipient) => void;
 }) {
+	const isPinned = recipient.pinned;
 	const { toggleSelected } = useRecipient();
 	return (
-		<RecipientContextMenu recipient={recipient} isPinned={isPinned}>
+		<RecipientContextMenu recipient={recipient}>
 			<div
 				className={cn(
 					'rounded-lg p-2 border-b cursor-pointer',
@@ -42,7 +41,7 @@ export default function Recipient({
 									className='h-12 w-12 bg-primary rounded-full flex items-center justify-center cursor-pointer'
 									onClick={(e) => {
 										e.stopPropagation();
-										toggleSelected(recipient._id);
+										toggleSelected(recipient.id);
 									}}
 								>
 									<Check className='text-white mx-auto h-6 w-6' />
@@ -53,7 +52,7 @@ export default function Recipient({
 									className='h-12 w-12 cursor-pointer'
 									onClick={(e) => {
 										e.stopPropagation();
-										toggleSelected(recipient._id);
+										toggleSelected(recipient.id);
 									}}
 								>
 									<AvatarFallback className='capitalize'>

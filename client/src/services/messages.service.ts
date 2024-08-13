@@ -11,12 +11,13 @@ export default class MessagesService {
 			});
 			return (data.conversations ?? []).map((conversation: any) => {
 				return {
-					_id: conversation._id ?? '',
+					id: conversation.id ?? '',
 					recipient: conversation.recipient ?? '',
 					profile_name: conversation.profile_name ?? '',
-					origin: conversation.origin ?? '',
-					expiration_timestamp: conversation.expiration_timestamp ?? '',
 					labels: conversation.labels ?? [],
+					archived: conversation.archived ?? false,
+					pinned: conversation.pinned ?? false,
+					unreadCount: conversation.unreadCount ?? 0,
 				};
 			});
 		} catch (err) {
@@ -260,6 +261,18 @@ export default class MessagesService {
 
 	static async deleteQuickReply(id: string) {
 		await api.delete(`/users/quick-replies/${id}`);
+	}
+
+	static async togglePin(id: string) {
+		await api.post(`/conversation/${id}/toggle-pin`).catch(() => {});
+	}
+
+	static async toggleArchive(id: string) {
+		await api.post(`/conversation/${id}/toggle-archived`).catch(() => {});
+	}
+
+	static async markConversationRead(id: string) {
+		await api.post(`/conversation/${id}/mark-read`).catch(() => {});
 	}
 
 	static async exportConversations(phonebook_ids: string[]) {

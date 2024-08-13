@@ -43,11 +43,11 @@ export default function AssignMessageLabelDialog({
 	}, [selected]);
 
 	useEffect(() => {
-		if (!recipient?._id) {
+		if (!recipient?.id) {
 			return;
 		}
 		setLoading(true);
-		MessagesService.fetchConversationMessages(recipient?._id, {
+		MessagesService.fetchConversationMessages(recipient?.id, {
 			page: 1,
 			limit: 1,
 		})
@@ -57,7 +57,7 @@ export default function AssignMessageLabelDialog({
 			.finally(() => {
 				setLoading(false);
 			});
-	}, [recipient?._id]);
+	}, [recipient?.id]);
 
 	const handleAddTags = (tags: string[]) => {
 		const _tags = tags.filter((tag) => {

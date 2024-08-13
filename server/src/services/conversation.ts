@@ -20,11 +20,14 @@ function processConversationDocs(
 	})[]
 ) {
 	return docs.map((doc) => ({
-		_id: doc._id,
+		id: doc._id,
 		recipient: doc.recipient,
 		profile_name: doc.profile_name ?? '',
-		origin: doc.origin ?? '',
 		labels: doc.labels ?? [],
+		last_message_at: doc.last_message_at,
+		pinned: doc.pinned,
+		archived: doc.archived,
+		unreadCount: doc.unreadCount,
 	}));
 }
 
@@ -61,17 +64,21 @@ export default class ConversationService extends WhatsappLinkService {
 
 	public async createConversation(recipient: string, name?: string) {
 		try {
-			const agents = (await (await UserService.findById(this.userId)).getAgents()).filter(
-				(val) => val.permissions.auto_assign_chats
-			);
+			let assigned_to;
+			try {
+				const agents = (await (await UserService.findById(this.userId)).getAgents()).filter(
+					(val) => val.permissions.auto_assign_chats
+				);
 
-			const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+				const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+				assigned_to = randomAgent.id;
+			} catch (err) {}
 
 			const doc = await ConversationDB.create({
 				linked_to: this.userId,
 				device_id: this.deviceId,
 				recipient,
-				assigned_to: randomAgent.id,
+				assigned_to: assigned_to,
 			});
 
 			const phoneBookService = new PhoneBookService(this.account);
@@ -105,26 +112,6 @@ export default class ConversationService extends WhatsappLinkService {
 		});
 		if (!doc) return null;
 		return doc;
-	}
-
-	public async updateConversation(
-		recipient: string,
-		details: {
-			profile_name: string;
-			meta_conversation_id: string;
-			expiration_timestamp: Date;
-			origin: string;
-		}
-	) {
-		await ConversationDB.updateMany(
-			{
-				linked_to: this.userId,
-				recipient,
-			},
-			{
-				$set: details,
-			}
-		);
 	}
 
 	public async findRecipientByConversation(id: Types.ObjectId) {
@@ -165,13 +152,14 @@ export default class ConversationService extends WhatsappLinkService {
 			};
 		}
 	) {
+		details = filterUndefinedKeys(details);
 		try {
 			const doc = await ConversationMessageDB.create({
 				linked_to: this.userId,
 				device_id: this.deviceId,
 				conversation_id,
 				status: details.status ?? MESSAGE_STATUS.PROCESSING,
-				...filterUndefinedKeys(details),
+				...details,
 			});
 
 			await ConversationDB.updateOne(
@@ -183,8 +171,15 @@ export default class ConversationService extends WhatsappLinkService {
 						messages: doc._id,
 					},
 					$set: {
-						last_message_at: DateUtils.getMomentNow().toDate(),
+						last_message_at: details.received_at || DateUtils.getMomentNow().toDate(),
 					},
+					...(!details.scheduled_by && !details.sender
+						? {
+								$inc: {
+									unreadCount: 1,
+								},
+						  }
+						: {}),
 				}
 			);
 
@@ -238,24 +233,6 @@ export default class ConversationService extends WhatsappLinkService {
 		SocketServer.getInstance().sendMessageUpdated(doc.conversation_id.toString(), data);
 	}
 
-	public static async updateConversationDetails(
-		recipient: string,
-		details: Partial<{
-			meta_conversation_id: string;
-			conversationExpiry: number;
-			origin: string;
-		}>
-	) {
-		await ConversationDB.updateOne(
-			{
-				recipient: recipient,
-			},
-			{
-				$set: filterUndefinedKeys(details),
-			}
-		);
-	}
-
 	public async updateConversationDetails(
 		recipient: string,
 		details: Partial<{
@@ -274,20 +251,48 @@ export default class ConversationService extends WhatsappLinkService {
 		);
 	}
 
-	public async markMessageRead(message_id: string) {
-		await ConversationMessageDB.updateOne(
+	public async markConversationRead(conversation_id: Types.ObjectId) {
+		await ConversationDB.updateOne(
 			{
-				linked_to: this.userId,
-				device_id: this.deviceId,
-				message_id,
+				_id: conversation_id,
 			},
 			{
 				$set: {
-					read_at: new Date(),
-					status: MESSAGE_STATUS.READ,
+					unreadCount: 0,
 				},
 			}
 		);
+
+		SocketServer.getInstance().markRead(
+			this.userId.toString(),
+			conversation_id.toString()
+		);
+	}
+
+	public async toggleConversationPin(conversation_id: Types.ObjectId) {
+		const doc = await ConversationDB.findOne(conversation_id);
+		if (!doc) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+		doc.pinned = !doc.pinned;
+		await doc.save();
+		SocketServer.getInstance().sendConversationPinned(this.userId.toString(), {
+			conversation_id: conversation_id.toString(),
+			pinned: doc.pinned,
+		});
+	}
+
+	public async toggleConversationArchive(conversation_id: Types.ObjectId) {
+		const doc = await ConversationDB.findOne(conversation_id);
+		if (!doc) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+		doc.archived = !doc.archived;
+		await doc.save();
+		SocketServer.getInstance().sendConversationArchived(this.userId.toString(), {
+			conversation_id: conversation_id.toString(),
+			archived: doc.archived,
+		});
 	}
 
 	public async fetchConversations(
@@ -385,6 +390,9 @@ export default class ConversationService extends WhatsappLinkService {
 					saved_name: { $first: '$saved_name' },
 					labels: { $first: '$labels' },
 					last_message_at: { $first: '$last_message_at' },
+					pinned: { $first: '$pinned' },
+					archived: { $first: '$archived' },
+					unreadCount: { $first: '$unreadCount' },
 				},
 			},
 			{

@@ -13,7 +13,9 @@ import {
 import useBoolean from '@/hooks/useBoolean';
 import useMessages from '@/hooks/useMessages';
 import { getInitials } from '@/lib/utils';
+import MessagesService from '@/services/messages.service';
 import { ChevronLeft, EllipsisVertical } from 'lucide-react';
+import { useEffect } from 'react';
 import { ConversationNoteDialog } from './dialogs';
 import MessageBox from './message-input';
 import MessageTagsView from './message-tag-view';
@@ -32,7 +34,13 @@ export default function ConversationScreen() {
 		off: closeConversationNoteDialog,
 	} = useBoolean(false);
 	const { expand } = useChatListExpanded();
-	const { loading, expiry, messages, loadMore } = useMessages(recipient?._id ?? '');
+	const { loading, expiry, messages, loadMore } = useMessages(recipient?.id ?? '');
+
+	useEffect(() => {
+		if (recipient?.id) {
+			MessagesService.markConversationRead(recipient.id);
+		}
+	}, [recipient?.id]);
 
 	if (!recipient) return null;
 
@@ -93,12 +101,12 @@ export default function ConversationScreen() {
 			<MessageTagsView
 				isOpen={isOpenMessageTagDialog}
 				onClose={closeMessageTagDialog}
-				id={recipient._id}
+				id={recipient.id}
 			/>
 			<ConversationNoteDialog
 				isOpen={isOpenConversationNoteDialog}
 				onClose={closeConversationNoteDialog}
-				id={recipient._id}
+				id={recipient.id}
 			/>
 		</div>
 	);

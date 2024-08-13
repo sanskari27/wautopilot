@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import AgentService from '@/services/agent.service';
 import { Recipient as TRecipient } from '@/types/recipient';
-import { Headset, ListFilter } from 'lucide-react';
+import { ArchiveRestore, Headset, ListFilter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Recipient from './recipient';
 
@@ -22,6 +22,8 @@ export default function RecipientsList() {
 		setLabelFilter,
 		selectedConversations,
 		setSelectedRecipient,
+		showArchived,
+		toggleShowArchived,
 	} = useRecipient();
 
 	const handleRecipientClick = (item: TRecipient) => {
@@ -67,7 +69,12 @@ export default function RecipientsList() {
 				isExpanded ? '!w-full' : '!hidden md:!flex'
 			)}
 		>
-			<h3 className='font-semibold text-2xl mx-4'>Chats</h3>
+			<h3 className='font-semibold text-2xl mx-4'>
+				Chats
+				<span className='text-sm font-normal text-neutral-500'>
+					{showArchived ? ' (Archived)' : ''}
+				</span>
+			</h3>
 			<div className='pr-2 mb-2 mr-1 md:!px-0 flex gap-x-1'>
 				<div className='flex-1'>
 					<Input
@@ -89,30 +96,37 @@ export default function RecipientsList() {
 						</Button>
 					</AgentSelector>
 				)}
+				<Button
+					variant={showArchived ? 'default' : 'secondary'}
+					size={'icon'}
+					onClick={toggleShowArchived}
+				>
+					<ArchiveRestore className='w-4 h-4' />
+				</Button>
 			</div>
 			<div className='flex flex-col overflow-y-scroll overflow-x-hidden h-[calc(100vh-160px)]'>
 				{
 					<>
 						<Each
 							items={pinnedConversations}
+							id={(t) => t.id}
 							render={(item) => (
 								<Recipient
 									onClick={handleRecipientClick}
 									recipient={item}
-									isPinned
 									isActive={false}
-									isSelected={selectedConversations.includes(item._id)}
+									isSelected={selectedConversations.includes(item.id)}
 								/>
 							)}
 						/>
 						<Each
 							items={unpinnedConversations}
-							render={(item, index) => (
+							id={(t) => t.id}
+							render={(item) => (
 								<Recipient
 									onClick={handleRecipientClick}
 									recipient={item}
-									isActive={false}
-									isSelected={selectedConversations.includes(item._id)}
+									isSelected={selectedConversations.includes(item.id)}
 								/>
 							)}
 						/>

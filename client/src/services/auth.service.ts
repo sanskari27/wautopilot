@@ -187,4 +187,15 @@ export default class AuthService {
 			return false;
 		}
 	}
+
+	static async generateConversationMessageKey() {
+		try {
+			const {
+				data: { key },
+			} = await api.post(`/conversation-message-key`);
+			return key as string;
+		} catch (err) {
+			return '';
+		}
+	}
 }
