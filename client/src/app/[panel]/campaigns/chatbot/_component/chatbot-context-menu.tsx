@@ -11,12 +11,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ChatBot } from '@/schema/chatbot';
 import ChatBotService from '@/services/chatbot.service';
-import { Delete, Download, Edit, Play } from 'lucide-react';
+import { Delete, Download, Edit, LucidePieChart, ToggleLeft, ToggleRight } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { FaStop } from 'react-icons/fa';
-import { MdReport } from 'react-icons/md';
 import { deleteChatbot, toggleChatbot } from '../action';
+import { FaChartPie } from 'react-icons/fa';
 
 export default function ChatbotContextMenu({
 	children,
@@ -72,11 +71,11 @@ export default function ChatbotContextMenu({
 					<Button size={'sm'} variant={'ghost'} className='w-full p-2'>
 						<Show>
 							<Show.When condition={chatbot.isActive}>
-								<FaStop className='mr-2 h-4 w-4' />
+								<ToggleLeft className='mr-2 h-4 w-4' />
 								<span className='mr-auto'>Stop</span>
 							</Show.When>
 							<Show.Else>
-								<Play className='mr-2 h-4 w-4' />
+								<ToggleRight className='mr-2 h-4 w-4' />
 								<span className='mr-auto'>Play</span>
 							</Show.Else>
 						</Show>
@@ -87,8 +86,11 @@ export default function ChatbotContextMenu({
 					<span>Download Report</span>
 				</DropdownMenuItem>
 				<DropdownMenuItem>
-					<Link className='flex items-center' href={`/${panel}/campaigns/button-report/${chatbot.id}`}>
-						<MdReport className='mr-2 h-4 w-4' />
+					<Link
+						className='flex items-center'
+						href={`/${panel}/campaigns/button-report/${chatbot.id}`}
+					>
+						<LucidePieChart className='mr-2 h-4 w-4' />
 						<span>Button Click Report</span>
 					</Link>
 				</DropdownMenuItem>

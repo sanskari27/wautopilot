@@ -21,13 +21,19 @@ export default function WhatsappFlowSelector({
 	placeholder,
 	value,
 	onChange,
+	publishedOnly = true,
 }: {
 	placeholder: string;
 	value: string;
 	onChange: (details: { id: string; name: string }) => void;
+	publishedOnly?: boolean;
 }) {
 	const [open, setOpen] = React.useState(false);
-	const items = useWhatsappFlows();
+	let items = useWhatsappFlows();
+
+	if (publishedOnly) {
+		items = items.filter((item) => item.status === 'PUBLISHED');
+	}
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>

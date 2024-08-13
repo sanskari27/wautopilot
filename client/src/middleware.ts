@@ -19,14 +19,6 @@ export async function middleware(request: NextRequest) {
 		}
 	}
 
-	if (pathname === '/') {
-		if (!isAuthenticated) {
-			return Response.redirect(new URL(`/auth/login?callback=${pathname}`, request.url));
-		} else {
-			return Response.redirect(new URL(`${subpath}/dashboard`, request.url));
-		}
-	}
-
 	if (pathname.startsWith('/admin')) {
 		if (!isAuthenticated) {
 			return Response.redirect(new URL(`/auth/login?callback=${pathname}`, request.url));
@@ -48,8 +40,6 @@ export async function middleware(request: NextRequest) {
 		if (!agent) {
 			return Response.redirect(new URL(`${subpath}/dashboard`, request.url));
 		}
-	} else {
-		return Response.redirect(new URL(`/`, request.url));
 	}
 }
 

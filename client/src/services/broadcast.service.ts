@@ -288,43 +288,18 @@ export default class BroadcastService {
 		exportCSV?: boolean;
 	}) {
 		if (!exportCSV) {
-			const { data } = await api.get(`/broadcast/${campaignId}/button-responses`);
-			return data.responses as {
-				button_text: string;
-				recipient: string;
-				responseAt: string;
-				name: string;
-				email: string;
-			}[];
-			// return [
-			// 	{
-			// 		button_text: 'button_text',
-			// 		recipient: 'recipient',
-			// 		responseAt: 'responseAt',
-			// 		name: 'name',
-			// 		email: 'email',
-			// 	},
-			// 	{
-			// 		button_text: 'button_text',
-			// 		recipient: 'recipient',
-			// 		responseAt: 'responseAt',
-			// 		name: 'name',
-			// 		email: 'email',
-			// 	},
-			// 	{
-			// 		button_text: 'button_text',
-			// 		recipient: 'recipient',
-			// 		responseAt: 'responseAt',
-			// 		name: 'name',
-			// 		email: 'email',
-			// 	},
-			// ] as {
-			// 	button_text: string;
-			// 	recipient: string;
-			// 	responseAt: string;
-			// 	name: string;
-			// 	email: string;
-			// }[];
+			try {
+				const { data } = await api.get(`/broadcast/${campaignId}/button-responses`);
+				return data.responses as {
+					button_text: string;
+					recipient: string;
+					responseAt: string;
+					name: string;
+					email: string;
+				}[];
+			} catch (err) {
+				return null;
+			}
 		} else {
 			const response = await api.get(`/broadcast/${campaignId}/button-responses?export_csv=true`, {
 				responseType: 'blob',

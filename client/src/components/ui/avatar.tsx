@@ -35,7 +35,7 @@ const AvatarFallback = React.forwardRef<
 	React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
 >(({ className, ...props }, ref) => {
 	const colorCode =
-		COLORS[(props.children?.toString().charAt(0).toUpperCase() ?? 'N') as keyof typeof COLORS].hex;
+		COLORS[(props.children?.toString().charAt(0).toUpperCase() || 'N') as keyof typeof COLORS].hex;
 	return (
 		<AvatarPrimitive.Fallback
 			ref={ref}

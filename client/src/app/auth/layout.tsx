@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Auth @ Wautopilot',
+	title: 'Auth • Wautopilot',
 };
 
 export default function Layout({
