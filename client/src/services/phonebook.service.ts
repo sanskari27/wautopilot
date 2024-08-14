@@ -57,6 +57,13 @@ export default class PhoneBookService {
 		});
 	}
 
+	static async assignTagsToNumbers(numbers: string[], tags: string[]) {
+		await api.post(`/phonebook/set-labels`, {
+			numbers,
+			tags,
+		});
+	}
+
 	static bulkUpload(file: File, labels: string[] = []) {
 		const formData = new FormData();
 		formData.append('file', file);
