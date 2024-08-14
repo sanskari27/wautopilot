@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Panel } from '@xyflow/react';
 import { ChevronsLeft } from 'lucide-react';
 import { FaGooglePlay, FaImage, FaListAlt, FaVideo } from 'react-icons/fa';
+import { FaPause } from 'react-icons/fa6';
 import { IoMdRadioButtonOn, IoMdText } from 'react-icons/io';
 import { IoDocumentText } from 'react-icons/io5';
 import { MdAudiotrack } from 'react-icons/md';
@@ -23,6 +24,7 @@ import {
 import {
 	ButtonNodeDetails,
 	DocumentNodeDetails,
+	EndNodeDetails,
 	FlowNodeDetails,
 	ListNodeDetails,
 	StartNodeDetails,
@@ -38,6 +40,7 @@ type Props = {
 			| ButtonNodeDetails
 			| ListNodeDetails
 			| FlowNodeDetails
+			| EndNodeDetails
 	) => void;
 };
 
@@ -208,6 +211,16 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 								className={'bg-indigo-500'}
 							/>
 						</WhatsappFlowMessage>
+						<MessageType
+							body={'End Flow'}
+							icon={<FaPause size={'1.25rem'} />}
+							className={'bg-green-500'}
+							onClick={() =>
+								addNode({
+									type: 'END',
+								})
+							}
+						/>
 					</div>
 				</div>
 			</SheetContent>

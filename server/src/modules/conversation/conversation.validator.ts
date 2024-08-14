@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
 import { z } from 'zod';
 import { CustomError } from '../../errors';
+import { idsArray } from '../../utils/schema';
 
 export type SendMessageValidationResult = {
 	type: 'text' | 'image' | 'video' | 'document' | 'audio' | 'location' | 'contacts';
@@ -184,12 +185,7 @@ export async function NumbersValidator(req: Request, res: Response, next: NextFu
 	const reqValidator = z
 		.object({
 			numbers: z.string().array().default([]),
-			phonebook_ids: z
-				.string()
-				.array()
-				.default([])
-				.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
-				.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
+			phonebook_ids: idsArray.default([]),
 		})
 		.refine((data) => {
 			if (data.numbers.length === 0 && data.phonebook_ids.length === 0) {

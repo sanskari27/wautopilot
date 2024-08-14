@@ -1,6 +1,3 @@
-import axios from 'axios';
-import FormData from 'form-data';
-import fs from 'fs';
 import { Types } from 'mongoose';
 import { ConversationMessageDB } from '../../mongo';
 import ChatBotDB, { ChatBotDB_name } from '../../mongo/repo/Chatbot';
@@ -11,27 +8,30 @@ import IChatBot from '../../mongo/types/chatbot';
 import IChatBotFlow from '../../mongo/types/chatbotFlow';
 import IContact from '../../mongo/types/contact';
 import IMedia from '../../mongo/types/media';
+import IPhoneBook from '../../mongo/types/phonebook';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
-import MetaAPI from '../config/MetaAPI';
-import { BOT_TRIGGER_OPTIONS, Path } from '../config/const';
+import { BOT_TRIGGER_OPTIONS } from '../config/const';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
-import { UpdateWhatsappFlowValidationResult } from '../modules/chatbot/chatbot.validator';
 import DateUtils from '../utils/DateUtils';
 import { Delay, filterUndefinedKeys, generateText } from '../utils/ExpressUtils';
-import FileUtils from '../utils/FileUtils';
 import {
-	convertToId,
 	generateBodyText,
 	generateButtons,
+	generateContactMessageObject,
 	generateHeader,
 	generateListBody,
+	generateMediaMessageObject,
 	generateSections,
+	generateTemplateMessageObject,
+	generateTextMessageObject,
+	parseVariables,
 } from '../utils/MessageHelper';
 import TimeGenerator from '../utils/TimeGenerator';
 import MediaService from './media';
 import PhoneBookService from './phonebook';
 import SchedulerService from './scheduler';
+import WhatsappFlowService from './wa_flow';
 import WhatsappLinkService from './whatsappLink';
 
 type CreateBotData = {
@@ -95,7 +95,8 @@ type CreateFlowData = {
 			| 'documentNode'
 			| 'buttonNode'
 			| 'listNode'
-			| 'flowNode';
+			| 'flowNode'
+			| 'endNode';
 		id: string;
 		position: {
 			x: number;
@@ -117,6 +118,29 @@ type CreateFlowData = {
 		};
 		sourceHandle?: string;
 		targetHandle?: string;
+	}[];
+	nurturing: {
+		after: number;
+		respond_type: 'template' | 'normal';
+		message: string;
+		images: Types.ObjectId[];
+		videos: Types.ObjectId[];
+		audios: Types.ObjectId[];
+		documents: Types.ObjectId[];
+		contacts: Types.ObjectId[];
+		template_id: string;
+		template_name: string;
+		template_header?: {
+			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+			media_id?: string;
+			link?: string;
+		};
+		template_body: {
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
+		}[];
 	}[];
 };
 
@@ -142,15 +166,7 @@ function processDocs(docs: IChatBot[]) {
 			template_header: bot.template_header,
 			template_body: bot.template_body,
 
-			nurturing: (bot.nurturing ?? []).map((el) => ({
-				template_id: el.template_id,
-				template_name: el.template_name,
-				after: el.after,
-				start_from: el.start_from,
-				end_at: el.end_at,
-				template_header: el.template_header,
-				template_body: el.template_body,
-			})),
+			nurturing: bot.nurturing ?? [],
 			isActive: bot.active,
 		};
 	});
@@ -174,20 +190,37 @@ function processFlowDocs(docs: IChatBotFlow[]) {
 				data: node.data,
 			})),
 			edges: bot.edges,
+			nurturing: bot.nurturing || [],
 			isActive: bot.active,
 		};
 	});
 }
 
-const bodyParametersList = [
-	'first_name',
-	'last_name',
-	'middle_name',
-	'phone_number',
-	'email',
-	'birthday',
-	'anniversary',
-];
+type IChatBotFlowPopulated = Omit<IChatBotFlow, 'nurturing'> & {
+	nurturing: {
+		after: number;
+		respond_type: 'template' | 'normal';
+		message: string;
+		images: IMedia[];
+		videos: IMedia[];
+		audios: IMedia[];
+		documents: IMedia[];
+		contacts: IContact[];
+		template_id: string;
+		template_name: string;
+		template_header?: {
+			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+			media_id?: string;
+			link?: string;
+		};
+		template_body: {
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
+		}[];
+	}[];
+};
 
 export default class ChatBotService extends WhatsappLinkService {
 	public constructor(user: IAccount, device: IWhatsappLink) {
@@ -202,20 +235,6 @@ export default class ChatBotService extends WhatsappLinkService {
 		return processDocs(bots);
 	}
 
-	public async allBotsDetailed() {
-		const bots = await ChatBotDB.find({
-			linked_to: this.userId,
-			device_id: this.deviceId,
-		}).populate<{
-			images: IMedia[];
-			videos: IMedia[];
-			audios: IMedia[];
-			documents: IMedia[];
-			contacts: IContact[];
-		}>('images videos audios documents contacts');
-		return bots;
-	}
-
 	public async boyByID(id: Types.ObjectId) {
 		const bot = await ChatBotDB.findById(id);
 
@@ -224,443 +243,6 @@ export default class ChatBotService extends WhatsappLinkService {
 		}
 
 		return processDocs([bot])[0];
-	}
-
-	private async activeBots() {
-		const bots = await this.allBotsDetailed();
-		return bots.filter((bot) => bot.active);
-	}
-
-	private async lastMessages(ids: Types.ObjectId[], recipient: string) {
-		const responses = await ConversationMessageDB.find({
-			linked_to: this.userId,
-			device_id: this.deviceId,
-			recipient,
-			'scheduled_by.id': { $in: ids },
-		});
-
-		return responses.reduce(
-			(acc, item) => {
-				let diff = DateUtils.getMoment(item.sent_at).diff(DateUtils.getMomentNow(), 'seconds');
-				diff = Math.abs(diff);
-				const bot_id = item.scheduled_by?.id?.toString();
-				acc[bot_id] = acc[bot_id] ? Math.min(diff, acc[bot_id]) : diff;
-				return acc;
-			},
-			{} as {
-				[key: string]: number;
-			}
-		);
-	}
-
-	private async botsEngaged({
-		message_body,
-		recipient,
-	}: {
-		message_body: string;
-		recipient: string;
-	}) {
-		const bots = await this.activeBots();
-		const last_messages = await this.lastMessages(
-			bots.map((bot) => bot._id),
-			recipient
-		);
-
-		return bots.filter((bot) => {
-			if (!DateUtils.isTimeBetween(bot.startAt, bot.endAt, DateUtils.getMomentNow())) {
-				return false;
-			}
-
-			if (bot.trigger_gap_seconds > 0) {
-				const last_message_time = last_messages[bot._id.toString()];
-				if (!isNaN(last_message_time) && last_message_time <= bot.trigger_gap_seconds) {
-					return false;
-				}
-			}
-			if (bot.trigger.length === 0) {
-				return true;
-			}
-			let match = false;
-			for (const trigger of bot.trigger) {
-				if (match) {
-					break;
-				}
-				if (bot.options === BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE) {
-					if (message_body.toLowerCase() === trigger.toLowerCase()) {
-						match = true;
-					}
-				} else if (bot.options === BOT_TRIGGER_OPTIONS.EXACT_MATCH_CASE) {
-					if (message_body === trigger) {
-						match = true;
-					}
-				} else if (bot.options === BOT_TRIGGER_OPTIONS.INCLUDES_IGNORE_CASE) {
-					const lowerCaseSentence = trigger.toLowerCase();
-					const lowerCaseParagraph = message_body.toLowerCase();
-
-					// Split the paragraph into words
-					const words_paragraph = lowerCaseParagraph.split(/\s+/);
-					const sentence_paragraph = lowerCaseSentence.split(/\s+/);
-
-					const _match = words_paragraph.some(
-						(_, index, arr) =>
-							arr.slice(index, index + sentence_paragraph.length).join() ===
-							sentence_paragraph.join()
-					);
-					if (_match) {
-						match = true;
-					}
-				} else if (bot.options === BOT_TRIGGER_OPTIONS.INCLUDES_MATCH_CASE) {
-					const lowerCaseSentence = trigger;
-					const lowerCaseParagraph = message_body;
-
-					// Split the paragraph into words
-					const words_paragraph = lowerCaseParagraph.split(/\s+/);
-					const sentence_paragraph = lowerCaseSentence.split(/\s+/);
-
-					const _match = words_paragraph.some(
-						(_, index, arr) =>
-							arr.slice(index, index + sentence_paragraph.length).join() ===
-							sentence_paragraph.join()
-					);
-					if (_match) {
-						match = true;
-					}
-				}
-			}
-
-			return match;
-		});
-	}
-
-	public async handleMessage(recipient: string, text: string) {
-		const botsEngaged = await this.botsEngaged({
-			message_body: text,
-			recipient,
-		});
-		const schedulerService = new SchedulerService(this.account, this.device);
-		const phonebook = new PhoneBookService(this.account);
-		const contact = await phonebook.findRecordByPhone(recipient);
-
-		botsEngaged.forEach(async (bot) => {
-			await Delay(bot.response_delay_seconds);
-
-			if (bot.respond_type === 'normal') {
-				let msg = bot.message;
-				if (msg) {
-					if (msg.includes('{{first_name}}')) {
-						msg = msg.replace('{{first_name}}', contact?.first_name ?? '');
-					}
-					if (msg.includes('{{middle_name}}')) {
-						msg = msg.replace('{{middle_name}}', contact?.middle_name ?? '');
-					}
-					if (msg.includes('{{last_name}}')) {
-						msg = msg.replace('{{last_name}}', contact?.last_name ?? '');
-					}
-					if (msg.includes('{{phone_number}}')) {
-						msg = msg.replace('{{phone_number}}', contact?.phone_number ?? '');
-					}
-					if (msg.includes('{{email}}')) {
-						msg = msg.replace('{{email}}', contact?.email ?? '');
-					}
-					if (msg.includes('{{birthday}}')) {
-						msg = msg.replace('{{birthday}}', contact?.birthday ?? '');
-					}
-					if (msg.includes('{{anniversary}}')) {
-						msg = msg.replace('{{anniversary}}', contact?.anniversary ?? '');
-					}
-
-					const msgObj = {
-						messaging_product: 'whatsapp',
-						to: recipient,
-						type: 'text',
-						text: {
-							body: msg,
-						},
-					};
-
-					await schedulerService.schedule(recipient, msgObj, {
-						scheduler_id: bot._id,
-						scheduler_type: ChatBotDB_name,
-						sendAt: DateUtils.getMomentNow().toDate(),
-						message_type: 'normal',
-					});
-				}
-
-				for (const mediaObject of bot.images) {
-					const msgObj = {
-						messaging_product: 'whatsapp',
-						to: recipient,
-						type: 'image',
-						image: {
-							id: mediaObject.media_id,
-						},
-					};
-
-					await schedulerService.schedule(recipient, msgObj, {
-						scheduler_id: bot._id,
-						scheduler_type: ChatBotDB_name,
-						sendAt: DateUtils.getMomentNow().toDate(),
-						message_type: 'normal',
-					});
-				}
-
-				for (const mediaObject of bot.videos) {
-					const msgObj = {
-						messaging_product: 'whatsapp',
-						to: recipient,
-						type: 'video',
-						video: {
-							id: mediaObject.media_id,
-						},
-					};
-
-					await schedulerService.schedule(recipient, msgObj, {
-						scheduler_id: bot._id,
-						scheduler_type: ChatBotDB_name,
-						sendAt: DateUtils.getMomentNow().toDate(),
-						message_type: 'normal',
-					});
-				}
-
-				for (const mediaObject of bot.audios) {
-					const msgObj = {
-						messaging_product: 'whatsapp',
-						to: recipient,
-						type: 'audio',
-						audio: {
-							id: mediaObject.media_id,
-						},
-					};
-
-					await schedulerService.schedule(recipient, msgObj, {
-						scheduler_id: bot._id,
-						scheduler_type: ChatBotDB_name,
-						sendAt: DateUtils.getMomentNow().toDate(),
-						message_type: 'normal',
-					});
-				}
-
-				for (const mediaObject of bot.documents) {
-					const msgObj = {
-						messaging_product: 'whatsapp',
-						to: recipient,
-						type: 'document',
-						document: {
-							id: mediaObject.media_id,
-						},
-					};
-
-					await schedulerService.schedule(recipient, msgObj, {
-						scheduler_id: bot._id,
-						scheduler_type: ChatBotDB_name,
-						sendAt: DateUtils.getMomentNow().toDate(),
-						message_type: 'normal',
-					});
-				}
-
-				(bot.contacts ?? []).forEach(async (card) => {
-					const msgObj = {
-						messaging_product: 'whatsapp',
-						to: recipient,
-						type: 'contacts',
-						contacts: [
-							{
-								addresses: card.addresses,
-								birthday: card.birthday,
-								emails: card.emails.map((email) => ({
-									type: 'HOME',
-									email: email.email,
-								})),
-								name: card.name,
-								org: card.org,
-								phones: card.phones.map((phone) => ({
-									type: 'HOME',
-									phone: phone.phone,
-									wa_id: phone.wa_id,
-								})),
-								urls: card.urls.map((url) => ({
-									type: 'HOME',
-									url: url.url,
-								})),
-							},
-						],
-					};
-
-					await schedulerService.schedule(recipient, msgObj, {
-						scheduler_id: bot._id,
-						scheduler_type: ChatBotDB_name,
-						sendAt: DateUtils.getMomentNow().toDate(),
-						message_type: 'normal',
-					});
-				});
-			} else if (bot.respond_type === 'template') {
-				if (bot.template_id) {
-					let headers = [] as Record<string, unknown>[];
-
-					if (bot.template_header && bot.template_header.type) {
-						const object = {
-							...(bot.template_header.media_id
-								? { id: bot.template_header.media_id }
-								: bot.template_header.link
-								? { link: bot.template_header.link }
-								: {}),
-						};
-
-						headers = [
-							{
-								type: 'HEADER',
-								parameters:
-									bot.template_header.type !== 'TEXT'
-										? [
-												{
-													type: bot.template_header.type,
-													[bot.template_header.type.toLowerCase()]: object,
-												},
-										  ]
-										: [],
-							},
-						];
-					}
-
-					const messageObject = {
-						template_name: bot.template_name,
-						to: recipient,
-						components: [
-							{
-								type: 'BODY',
-								parameters: bot.template_body.map((b) => {
-									if (b.variable_from === 'custom_text') {
-										return {
-											type: 'text',
-											text: b.custom_text,
-										};
-									} else {
-										if (!contact) {
-											return {
-												type: 'text',
-												text: b.fallback_value,
-											};
-										}
-
-										const fieldVal = (
-											bodyParametersList.includes(b.phonebook_data)
-												? contact[b.phonebook_data as keyof typeof contact]
-												: contact.others[b.phonebook_data]
-										) as string;
-
-										if (typeof fieldVal === 'string') {
-											return {
-												type: 'text',
-												text: fieldVal || b.fallback_value,
-											};
-										}
-										// const field = fields[]
-										return {
-											type: 'text',
-											text: b.fallback_value,
-										};
-									}
-								}),
-							},
-							...headers,
-						],
-					};
-
-					await schedulerService.schedule(recipient, messageObject, {
-						scheduler_id: bot._id,
-						scheduler_type: ChatBotDB_name,
-						sendAt: DateUtils.getMomentNow().toDate(),
-						message_type: 'template',
-					});
-				}
-			}
-
-			if (bot.nurturing.length > 0) {
-				const dateGenerator = new TimeGenerator();
-
-				bot.nurturing.map(async (el) => {
-					const fields = await phonebook.findRecordByPhone(recipient);
-
-					let headers = [] as Record<string, unknown>[];
-
-					if (el.template_header && el.template_header.type) {
-						const object = {
-							...(el.template_header.media_id
-								? { id: el.template_header.media_id }
-								: el.template_header.link
-								? { link: el.template_header.link }
-								: {}),
-						};
-
-						headers = [
-							{
-								type: 'HEADER',
-								parameters:
-									el.template_header.type !== 'TEXT'
-										? [
-												{
-													type: el.template_header.type,
-													[el.template_header.type.toLowerCase()]: object,
-												},
-										  ]
-										: [],
-							},
-						];
-					}
-
-					const messageObject = {
-						template_name: el.template_name,
-						to: recipient,
-						components: [
-							{
-								type: 'BODY',
-								parameters: el.template_body.map((b) => {
-									if (b.variable_from === 'custom_text') {
-										return {
-											type: 'text',
-											text: b.custom_text,
-										};
-									} else {
-										if (!fields) {
-											return {
-												type: 'text',
-												text: b.fallback_value,
-											};
-										}
-
-										const fieldVal = (
-											bodyParametersList.includes(b.phonebook_data)
-												? fields[b.phonebook_data as keyof typeof fields]
-												: fields.others[b.phonebook_data]
-										) as string;
-
-										if (typeof fieldVal === 'string') {
-											return {
-												type: 'text',
-												text: fieldVal || b.fallback_value,
-											};
-										}
-										// const field = fields[]
-										return {
-											type: 'text',
-											text: b.fallback_value,
-										};
-									}
-								}),
-							},
-							...headers,
-						],
-					};
-
-					await schedulerService.schedule(recipient, messageObject, {
-						scheduler_id: bot._id,
-						scheduler_type: 'Lead Nurturing',
-						sendAt: dateGenerator.next(el.after).value,
-						message_type: 'template',
-					});
-				});
-			}
-		});
 	}
 
 	public async createBot(data: CreateBotData) {
@@ -693,12 +275,25 @@ export default class ChatBotService extends WhatsappLinkService {
 			linked_to: this.userId,
 			device_id: this.deviceId,
 		});
-		if (!bot) {
+		if (bot) {
+			bot.active = !bot.active;
+			bot.save();
+			return;
+		}
+
+		const flow = await ChatBotFlowDB.findOne({
+			_id: id,
+			linked_to: this.userId,
+			device_id: this.deviceId,
+		});
+		if (flow) {
+			flow.active = !flow.active;
+			flow.save();
+		}
+
+		if (!bot && !flow) {
 			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
 		}
-		bot.active = !bot.active;
-		bot.save();
-		return processDocs([bot])[0];
 	}
 
 	public async pauseAll() {
@@ -713,7 +308,8 @@ export default class ChatBotService extends WhatsappLinkService {
 	}
 
 	public async deleteBot(bot_id: Types.ObjectId) {
-		await ChatBotDB.deleteOne({ _id: bot_id });
+		await ChatBotDB.deleteMany({ _id: bot_id, linked_to: this.userId });
+		await ChatBotFlowDB.deleteMany({ bot_id, linked_to: this.userId });
 	}
 
 	public async botResponses(bot_id: Types.ObjectId) {
@@ -803,29 +399,104 @@ export default class ChatBotService extends WhatsappLinkService {
 		return processFlowDocs([bot])[0];
 	}
 
-	public async toggleActiveFlow(id: Types.ObjectId) {
-		const bot = await ChatBotFlowDB.findOne({
-			_id: id,
+	public static async updateMessageId(
+		chatbot_id: Types.ObjectId,
+		{
+			prev_id,
+			new_id,
+			meta_message_id,
+		}: {
+			prev_id: Types.ObjectId;
+			new_id: Types.ObjectId;
+			meta_message_id?: string;
+		}
+	) {
+		await FlowMessageDB.updateOne(
+			{
+				bot_id: chatbot_id,
+				message_id: prev_id,
+			},
+			{
+				message_id: new_id,
+				meta_message_id,
+			}
+		);
+	}
+
+	private async lastMessages(
+		ids: Types.ObjectId[],
+		recipient: string
+	): Promise<{ [key: string]: number }> {
+		const responses = await ConversationMessageDB.find({
 			linked_to: this.userId,
 			device_id: this.deviceId,
-		});
-		if (!bot) {
-			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+			recipient,
+			'scheduled_by.id': { $in: ids },
+		})
+			.sort({ sent_at: -1 })
+			.distinct('scheduled_by.id');
+
+		return responses.reduce(
+			(acc, item) => {
+				let diff = DateUtils.getMoment(item.sent_at).diff(DateUtils.getMomentNow(), 'seconds');
+				diff = Math.abs(diff);
+				const bot_id = item.scheduled_by?.id?.toString();
+				acc[bot_id] = acc[bot_id] ? Math.min(diff, acc[bot_id]) : diff;
+				return acc;
+			},
+			{} as {
+				[key: string]: number;
+			}
+		);
+	}
+
+	private async botsEngaged<
+		T extends
+			| IChatBotFlowPopulated
+			| (Omit<
+					IChatBot &
+						Required<{
+							_id: Types.ObjectId;
+						}>,
+					'images' | 'videos' | 'audios' | 'documents' | 'contacts'
+			  > & {
+					images: IMedia[];
+					videos: IMedia[];
+					audios: IMedia[];
+					documents: IMedia[];
+					contacts: IContact[];
+			  })
+	>({
+		bots,
+		message_body,
+		recipient,
+	}: {
+		bots: T[];
+		message_body: string;
+		recipient: string;
+	}): Promise<T[]> {
+		if (bots.length === 0) {
+			return [];
 		}
-		bot.active = !bot.active;
-		bot.save();
-		return processFlowDocs([bot])[0];
-	}
+		let last_messages: { [key: string]: number } = {};
+		if (instanceOfChatbot(bots[0])) {
+			last_messages = await this.lastMessages(
+				bots.map((bot) => bot._id),
+				recipient
+			);
+		}
 
-	public async deleteFlow(bot_id: Types.ObjectId) {
-		await ChatBotFlowDB.deleteOne({ _id: bot_id });
-	}
-
-	private async flowsEngaged({ message_body }: { message_body: string }) {
-		const bots = await this.allFlows();
-		const activeBots = bots.filter((bot) => bot.isActive);
-
-		return activeBots.filter((bot) => {
+		return bots.filter((bot) => {
+			if (instanceOfChatbot(bot)) {
+				if (!DateUtils.isTimeBetween(bot.startAt, bot.endAt, DateUtils.getMomentNow())) {
+					return false;
+				} else if (bot.trigger_gap_seconds > 0) {
+					const last_message_time = last_messages[bot._id.toString()];
+					if (!isNaN(last_message_time) && last_message_time <= bot.trigger_gap_seconds) {
+						return false;
+					}
+				}
+			}
 			if (bot.trigger.length === 0) {
 				return true;
 			}
@@ -881,33 +552,144 @@ export default class ChatBotService extends WhatsappLinkService {
 		});
 	}
 
-	public async checkForFlowKeyword(recipient: string, text: string) {
-		const botsEngaged = await this.flowsEngaged({
+	public async handleMessage(recipient: string, text: string) {
+		const schedulerService = new SchedulerService(this.account, this.device);
+		const phonebook = new PhoneBookService(this.account);
+		const contact = await phonebook.findRecordByPhone(recipient);
+
+		const chatBots = await ChatBotDB.find({
+			linked_to: this.userId,
+			device_id: this.deviceId,
+			active: true,
+		}).populate<{
+			images: IMedia[];
+			videos: IMedia[];
+			audios: IMedia[];
+			documents: IMedia[];
+			contacts: IContact[];
+		}>('images videos audios documents contacts');
+
+		// pupulate nurturing for chatbotflows
+
+		const flows: IChatBotFlowPopulated[] = await ChatBotFlowDB.find({
+			linked_to: this.userId,
+			device_id: this.deviceId,
+			active: true,
+		}).populate([
+			{ path: 'nurturing.images' }, // MediaDB_name
+			{ path: 'nurturing.videos' }, // MediaDB_name
+			{ path: 'nurturing.audios' }, // MediaDB_name
+			{ path: 'nurturing.documents' }, // MediaDB_name
+			{ path: 'nurturing.contacts' }, // ContactDB_name
+		]);
+
+		const chatbotEngaged = await this.botsEngaged({
+			bots: chatBots,
+			message_body: text,
+			recipient,
+		});
+
+		const flowsEngaged = await this.botsEngaged({
+			recipient,
+			bots: flows,
 			message_body: text,
 		});
-		botsEngaged.forEach(async (bot) => {
-			const nodes = bot.nodes;
-			const edges = bot.edges;
-			let startNode = nodes.find((node) => node.type === 'startNode');
 
-			do {
-				if (!startNode) {
-					break;
-				}
-				const connectedEdge = edges.find((edge) => edge.source === startNode?.id);
-				if (!connectedEdge) {
-					return;
-				}
-				const nextNode = nodes.find((node) => node.id === connectedEdge.target);
-				if (!nextNode) {
-					return;
+		chatbotEngaged.forEach(async (bot) => {
+			await Delay(bot.response_delay_seconds);
+
+			const schedulerOptions = {
+				scheduler_id: bot._id,
+				scheduler_type: ChatBotDB_name,
+				sendAt: DateUtils.getMomentNow().toDate(),
+				message_type: bot.respond_type as 'template' | 'normal' | 'interactive',
+			};
+
+			if (bot.respond_type === 'normal') {
+				let msg = bot.message;
+				if (msg) {
+					msg = parseVariables(msg, contact as unknown as Record<string, string>);
+
+					const msgObj = generateTextMessageObject(recipient, msg);
+					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 				}
 
-				this.sendFlowMessage(recipient, bot.bot_id, nextNode.id);
+				for (const mediaObject of bot.images) {
+					const msgObj = generateMediaMessageObject(recipient, {
+						media_id: mediaObject.media_id,
+						type: 'image',
+					});
+					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+				}
 
-				startNode = nextNode;
-				await Delay(2);
-			} while (true);
+				for (const mediaObject of bot.videos) {
+					const msgObj = generateMediaMessageObject(recipient, {
+						media_id: mediaObject.media_id,
+						type: 'video',
+					});
+					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+				}
+
+				for (const mediaObject of bot.audios) {
+					const msgObj = generateMediaMessageObject(recipient, {
+						media_id: mediaObject.media_id,
+						type: 'audio',
+					});
+					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+				}
+
+				for (const mediaObject of bot.documents) {
+					const msgObj = generateMediaMessageObject(recipient, {
+						media_id: mediaObject.media_id,
+						type: 'document',
+					});
+					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+				}
+
+				(bot.contacts ?? []).forEach(async (card) => {
+					const msgObj = generateContactMessageObject(recipient, card);
+					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+				});
+			} else if (bot.respond_type === 'template' && bot.template_id) {
+				const msgObj = generateTemplateMessageObject(recipient, {
+					template_name: bot.template_name,
+					header: bot.template_header,
+					body: bot.template_body,
+					contact: contact as unknown as IPhoneBook,
+				});
+				await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+			}
+
+			if (bot.nurturing.length > 0) {
+				const dateGenerator = new TimeGenerator();
+
+				bot.nurturing.map(async (el) => {
+					const msgObj = generateTemplateMessageObject(recipient, {
+						template_name: bot.template_name,
+						header: bot.template_header,
+						body: bot.template_body,
+						contact: contact as unknown as IPhoneBook,
+					});
+
+					await schedulerService.schedule(recipient, msgObj, {
+						scheduler_id: bot._id,
+						scheduler_type: 'Lead Nurturing',
+						sendAt: dateGenerator.next(el.after).value,
+						message_type: 'template',
+					});
+				});
+			}
+		});
+
+		flowsEngaged.forEach(async (bot) => {
+			let startNode = bot.nodes.find((node) => node.node_type === 'startNode');
+			if (!startNode) {
+				return;
+			}
+			this.processFlowNode(recipient, {
+				bot,
+				start_node_id: startNode?.id,
+			});
 		});
 	}
 
@@ -917,36 +699,140 @@ export default class ChatBotService extends WhatsappLinkService {
 			return;
 		}
 
-		const bot = await ChatBotFlowDB.findOne({
+		const bot: IChatBotFlowPopulated | null = await ChatBotFlowDB.findOne({
 			_id: flowMessage.bot_id,
 			linked_to: this.userId,
 			device_id: this.deviceId,
-		});
-		if (!bot || !bot.active) {
+			active: true,
+		}).populate([
+			{ path: 'nurturing.images' }, // MediaDB_name
+			{ path: 'nurturing.videos' }, // MediaDB_name
+			{ path: 'nurturing.audios' }, // MediaDB_name
+			{ path: 'nurturing.documents' }, // MediaDB_name
+			{ path: 'nurturing.contacts' }, // ContactDB_name
+		]);
+		if (!bot) {
 			return;
 		}
 
-		let node_id = flowMessage.node_id;
+		this.processFlowNode(recipient, {
+			bot,
+			start_node_id: flowMessage.node_id,
+		});
+	}
+
+	private async processFlowNode(
+		recipient: string,
+		details: {
+			bot: IChatBotFlowPopulated;
+			start_node_id: string;
+		}
+	) {
+		const phonebook = new PhoneBookService(this.account);
+		const schedulerService = new SchedulerService(this.account, this.device);
+		const contact = await phonebook.findRecordByPhone(recipient);
+		const nodes = details.bot.nodes;
+		const edges = details.bot.edges;
+		let startNode = details.bot.nodes.find((node) => node.id === details.start_node_id);
+		let isEnd = false;
 		do {
-			const possibleEdge = bot.edges.find(
-				(edge) => edge.source === node_id && edge.sourceHandle === button_id
-			);
-			if (!possibleEdge) {
+			if (!startNode) {
 				break;
 			}
-			const targetNode = bot.nodes.find((node) => node.id === possibleEdge.target);
-			if (!targetNode) {
-				return;
+			const connectedEdge = edges.find((edge) => edge.source === startNode?.id);
+			if (!connectedEdge) {
+				break;
+			}
+			const nextNode = nodes.find((node) => node.id === connectedEdge.target);
+			if (!nextNode) {
+				break;
 			}
 
-			this.sendFlowMessage(recipient, bot._id, targetNode.id);
-			node_id = targetNode.id;
+			this.sendFlowMessage(recipient, details.bot._id, nextNode.id);
+			startNode = nextNode;
+			if (nextNode.node_type === 'endNode') {
+				isEnd = true;
+			}
 			await Delay(2);
 		} while (true);
+
+		schedulerService.deleteNurturingByFlow(details.bot._id);
+
+		if (isEnd) {
+			return;
+		}
+
+		if (details.bot.nurturing.length > 0) {
+			const dateGenerator = new TimeGenerator();
+
+			details.bot.nurturing.map(async (el) => {
+				const schedulerOptions = {
+					scheduler_id: details.bot._id,
+					scheduler_type: 'ChatbotFlow Nurturing',
+					sendAt: dateGenerator.next(el.after).value,
+					message_type: el.respond_type as 'template' | 'normal' | 'interactive',
+				};
+				if (el.respond_type === 'normal') {
+					let msg = el.message;
+					if (msg) {
+						msg = parseVariables(msg, contact as unknown as Record<string, string>);
+
+						const msgObj = generateTextMessageObject(recipient, msg);
+						await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+					}
+
+					for (const mediaObject of el.images) {
+						const msgObj = generateMediaMessageObject(recipient, {
+							media_id: mediaObject.media_id,
+							type: 'image',
+						});
+						await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+					}
+
+					for (const mediaObject of el.videos) {
+						const msgObj = generateMediaMessageObject(recipient, {
+							media_id: mediaObject.media_id,
+							type: 'video',
+						});
+						await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+					}
+
+					for (const mediaObject of el.audios) {
+						const msgObj = generateMediaMessageObject(recipient, {
+							media_id: mediaObject.media_id,
+							type: 'audio',
+						});
+						await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+					}
+
+					for (const mediaObject of el.documents) {
+						const msgObj = generateMediaMessageObject(recipient, {
+							media_id: mediaObject.media_id,
+							type: 'document',
+						});
+						await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+					}
+
+					(el.contacts ?? []).forEach(async (card) => {
+						const msgObj = generateContactMessageObject(recipient, card);
+						await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+					});
+				} else if (el.respond_type === 'template' && el.template_id) {
+					const msgObj = generateTemplateMessageObject(recipient, {
+						template_name: el.template_name,
+						header: el.template_header,
+						body: el.template_body,
+						contact: contact as unknown as IPhoneBook,
+					});
+					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+				}
+			});
+		}
 	}
 
 	public async sendFlowMessage(recipient: string, bot_id: Types.ObjectId, node_id: string) {
 		const schedulerService = new SchedulerService(this.account, this.device);
+		const whatsappFlow = new WhatsappFlowService(this.account, this.device);
 		const mediaService = new MediaService(this.account, this.device);
 		const bot = await ChatBotFlowDB.findOne({
 			_id: bot_id,
@@ -961,6 +847,12 @@ export default class ChatBotService extends WhatsappLinkService {
 			return;
 		}
 		let message_id;
+		const schedulerOptions = {
+			scheduler_id: bot_id,
+			scheduler_type: ChatBotFlowDB_name,
+			sendAt: DateUtils.getMomentNow().toDate(),
+			message_type: 'interactive' as 'interactive' | 'normal' | 'template',
+		};
 		if (
 			node.node_type === 'imageNode' ||
 			node.node_type === 'videoNode' ||
@@ -989,12 +881,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					},
 				},
 			};
-			message_id = await schedulerService.schedule(recipient, msgObj, {
-				scheduler_id: bot_id,
-				scheduler_type: ChatBotFlowDB_name,
-				sendAt: DateUtils.getMomentNow().toDate(),
-				message_type: 'interactive',
-			});
+			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 		} else if (node.node_type === 'buttonNode') {
 			const msgObj = {
 				messaging_product: 'whatsapp',
@@ -1008,12 +895,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					},
 				},
 			};
-			message_id = await schedulerService.schedule(recipient, msgObj, {
-				scheduler_id: bot_id,
-				scheduler_type: ChatBotFlowDB_name,
-				sendAt: DateUtils.getMomentNow().toDate(),
-				message_type: 'interactive',
-			});
+			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 		} else if (node.node_type === 'textNode') {
 			const msgObj = {
 				messaging_product: 'whatsapp',
@@ -1023,12 +905,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					body: node.data.label,
 				},
 			};
-			message_id = await schedulerService.schedule(recipient, msgObj, {
-				scheduler_id: bot_id,
-				scheduler_type: ChatBotFlowDB_name,
-				sendAt: DateUtils.getMomentNow().toDate(),
-				message_type: 'normal',
-			});
+			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 		} else if (node.node_type === 'listNode') {
 			const msgObj = {
 				messaging_product: 'whatsapp',
@@ -1043,15 +920,10 @@ export default class ChatBotService extends WhatsappLinkService {
 					},
 				},
 			};
-			message_id = await schedulerService.schedule(recipient, msgObj, {
-				scheduler_id: bot_id,
-				scheduler_type: ChatBotFlowDB_name,
-				sendAt: DateUtils.getMomentNow().toDate(),
-				message_type: 'interactive',
-			});
+			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 		} else if (node.node_type === 'flowNode') {
 			try {
-				const details = await this.getWhatsappFlowContents(node.data.flow_id);
+				const details = await whatsappFlow.getWhatsappFlowContents(node.data.flow_id);
 
 				const msgObj = {
 					messaging_product: 'whatsapp',
@@ -1075,12 +947,7 @@ export default class ChatBotService extends WhatsappLinkService {
 						},
 					},
 				};
-				message_id = await schedulerService.schedule(recipient, msgObj, {
-					scheduler_id: bot_id,
-					scheduler_type: ChatBotFlowDB_name,
-					sendAt: DateUtils.getMomentNow().toDate(),
-					message_type: 'interactive',
-				});
+				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 			} catch (err) {}
 		} else {
 			return;
@@ -1096,354 +963,8 @@ export default class ChatBotService extends WhatsappLinkService {
 		});
 		// recipient, bot_id, node_id, message_id
 	}
+}
 
-	public static async updateMessageId(
-		chatbot_id: Types.ObjectId,
-		{
-			prev_id,
-			new_id,
-			meta_message_id,
-		}: {
-			prev_id: Types.ObjectId;
-			new_id: Types.ObjectId;
-			meta_message_id?: string;
-		}
-	) {
-		await FlowMessageDB.updateOne(
-			{
-				bot_id: chatbot_id,
-				message_id: prev_id,
-			},
-			{
-				message_id: new_id,
-				meta_message_id,
-			}
-		);
-	}
-
-	public async listWhatsappFlows() {
-		try {
-			const {
-				data: { data },
-			} = await MetaAPI(this.accessToken).get(`/${this.waid}/flows`);
-
-			return data.map((item: any) => ({
-				id: item.id,
-				name: item.name,
-				status: item.status as 'PUBLISHED' | 'DRAFT',
-				categories: item.categories as string[],
-			})) as {
-				id: string;
-				name: string;
-				status: 'PUBLISHED' | 'DRAFT';
-				categories: string[];
-			}[];
-		} catch (err) {
-			return [];
-		}
-	}
-
-	public async createWhatsappFlow(data: { name: string; categories: string[] }) {
-		try {
-			const formData = new FormData();
-			formData.append('name', data.name);
-			for (let i = 0; i < data.categories.length; i++) {
-				formData.append('categories', data.categories[i]);
-			}
-			const {
-				data: { id },
-			} = await MetaAPI(this.accessToken).post(`/${this.waid}/flows`, formData, {
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			});
-
-			return id;
-		} catch (err) {
-			return null;
-		}
-	}
-
-	public async updateWhatsappFlow(flow_id: string, data: { name: string; categories: string[] }) {
-		try {
-			const formData = new FormData();
-			formData.append('name', data.name);
-			for (let i = 0; i < data.categories.length; i++) {
-				formData.append('categories', data.categories[i]);
-			}
-			await MetaAPI(this.accessToken).post(`/${flow_id}`, formData, {
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			});
-
-			return true;
-		} catch (err) {
-			return false;
-		}
-	}
-
-	public async deleteWhatsappFlow(flow_id: string) {
-		try {
-			await MetaAPI(this.accessToken).delete(`/${flow_id}`);
-			return true;
-		} catch (err) {
-			return false;
-		}
-	}
-
-	public async publishWhatsappFlow(flow_id: string) {
-		try {
-			await MetaAPI(this.accessToken).post(`/${flow_id}/publish`);
-			return true;
-		} catch (err) {
-			return false;
-		}
-	}
-
-	public async updateWhatsappFlowContents(id: string, data: UpdateWhatsappFlowValidationResult) {
-		const object = {
-			version: '3.1',
-			screens: [] as {
-				id: string;
-				title: string;
-				layout: {
-					type: string;
-					children: {
-						type: string;
-						name: string;
-						children: any[];
-					}[];
-				};
-			}[],
-		};
-
-		for (let i = 0; i < data.screens.length; i++) {
-			const screen = data.screens[i];
-			const screenObject: {
-				id: string;
-				title: string;
-				terminal?: boolean;
-				success?: boolean;
-				data: Record<
-					string,
-					{
-						type: string;
-						__example__: string | boolean;
-					}
-				>;
-				layout: {
-					type: string;
-					children: {
-						type: string;
-						name: string;
-						children: any[];
-					}[];
-				};
-			} = {
-				id: convertToId(screen.title, '_'),
-				title: screen.title,
-				data: {},
-				layout: {
-					type: 'SingleColumnLayout',
-					children: [
-						{
-							type: 'Form',
-							name: 'flow_path',
-							children: [],
-						},
-					],
-				},
-			};
-
-			let extra_data = {} as Record<
-				string,
-				{
-					type: string;
-					__example__: string | boolean;
-				}
-			>;
-			if (i !== 0) {
-				object.screens[i - 1].layout.children[0].children.forEach((item) => {
-					if (
-						item.type === 'TextInput' ||
-						item.type === 'TextArea' ||
-						item.type === 'DatePicker' ||
-						item.type === 'RadioButtonsGroup' ||
-						item.type === 'CheckboxGroup' ||
-						item.type === 'Dropdown'
-					) {
-						extra_data[item.name] = {
-							type: 'string',
-							__example__: 'value',
-						};
-					} else if (item.type === 'OptIn') {
-						extra_data[item.name] = {
-							type: 'boolean',
-							__example__: true,
-						};
-					}
-				});
-
-				screenObject.data = extra_data;
-			}
-			if (i === data.screens.length - 1) {
-				screenObject.terminal = true;
-				screenObject.success = true;
-			}
-
-			const children = screen.children.map((child) => {
-				if (
-					[
-						'TextBody',
-						'TextCaption',
-						'TextSubheading',
-						'TextHeading',
-						'Image',
-						'TextInput',
-						'TextArea',
-						'DatePicker',
-						'OptIn',
-					].includes(child.type)
-				) {
-					return child;
-				} else if (['RadioButtonsGroup', 'CheckboxGroup', 'Dropdown'].includes(child.type)) {
-					return {
-						...child,
-						'data-source': ((child as any)['data-source'] as string[]).map((item) => ({
-							id: convertToId(item, '_'),
-							title: item,
-						})),
-					};
-				} else if (child.type === 'Footer') {
-					const keys = screen.children.reduce((acc, item) => {
-						if (
-							item.type === 'TextInput' ||
-							item.type === 'TextArea' ||
-							item.type === 'DatePicker' ||
-							item.type === 'RadioButtonsGroup' ||
-							item.type === 'CheckboxGroup' ||
-							item.type === 'Dropdown'
-						) {
-							acc[item.name] = '${form.' + item.name + '}';
-						} else if (item.type === 'OptIn') {
-							acc[item.name] = '${form.' + item.name + '}';
-						}
-						return acc;
-					}, {} as Record<string, string>);
-
-					const _data = Object.keys(extra_data).reduce((acc, key) => {
-						acc[key] = '${data.' + key + '}';
-						return acc;
-					}, {} as Record<string, string>);
-
-					return {
-						...child,
-						'on-click-action': {
-							name: i === data.screens.length - 1 ? 'complete' : 'navigate',
-							payload: {
-								...keys,
-								..._data,
-							},
-							...(i !== data.screens.length - 1
-								? {
-										next: {
-											type: 'screen',
-											name: convertToId(data.screens[i + 1].title, '_'),
-										},
-								  }
-								: {}),
-						},
-					};
-				} else {
-					throw new CustomError(COMMON_ERRORS.INVALID_FIELDS);
-				}
-			});
-
-			screenObject.layout.children[0].children = children;
-			object.screens.push(screenObject);
-		}
-
-		const filepath = `${__basedir}${Path.Misc}${id}.json`;
-
-		await FileUtils.generateJSONFile(filepath, object);
-
-		try {
-			const form = new FormData();
-			form.append('file', fs.createReadStream(filepath));
-			form.append('name', 'flow.json');
-			form.append('asset_type', 'FLOW_JSON');
-			const { data: results } = await MetaAPI(this.accessToken).post(`/${id}/assets`, form, {
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			});
-			FileUtils.deleteFile(filepath);
-			if (results.validation_errors.length > 0) {
-				throw new CustomError(COMMON_ERRORS.INVALID_FIELDS);
-			}
-		} catch (err) {
-			FileUtils.deleteFile(filepath);
-			if (err instanceof CustomError) {
-				throw err;
-			}
-			throw new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	public async getWhatsappFlowContents(id: string) {
-		let url = '';
-		try {
-			const {
-				data: { data },
-			} = await MetaAPI(this.accessToken).get(`/${id}/assets`);
-			url = data[0].download_url;
-		} catch (err) {
-			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
-		}
-		try {
-			const { data } = await axios.get(url);
-			const screens = data.screens.map((screen: any) => {
-				const title = screen.title;
-				const children = screen.layout.children[0].children.map((child: any) => {
-					if (
-						[
-							'TextBody',
-							'TextCaption',
-							'TextSubheading',
-							'TextHeading',
-							'Image',
-							'TextInput',
-							'TextArea',
-							'DatePicker',
-							'OptIn',
-						].includes(child.type)
-					) {
-						return child;
-					} else if (['RadioButtonsGroup', 'CheckboxGroup', 'Dropdown'].includes(child.type)) {
-						return {
-							...child,
-							'data-source': ((child as any)['data-source'] as any[]).map((item) => item.title),
-						};
-					} else if (child.type === 'Footer') {
-						return child;
-					} else {
-						throw new CustomError(COMMON_ERRORS.INVALID_FIELDS);
-					}
-				});
-
-				return {
-					id: screen.id,
-					title,
-					children,
-				};
-			}) as (UpdateWhatsappFlowValidationResult['screens'][number] & {
-				id: string;
-			})[];
-
-			return screens;
-		} catch (err) {
-			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
-		}
-	}
+function instanceOfChatbot(object: any): object is IChatBot {
+	return 'startAt' in object || 'endAt' in object || 'trigger_gap_seconds' in object;
 }

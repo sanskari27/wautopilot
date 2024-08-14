@@ -1,3 +1,6 @@
+import IContact from '../../mongo/types/contact';
+import IPhoneBook from '../../mongo/types/phonebook';
+
 export function extractTemplateHeader(
 	components: Record<string, any>[],
 	componentsMsg: Record<string, any>[]
@@ -82,7 +85,7 @@ export function extractInteractiveHeader(components: Record<string, any>) {
 		return null;
 	}
 	const type = header.type.toUpperCase();
-	if(type === 'TEXT'){
+	if (type === 'TEXT') {
 		return {
 			header_type: type,
 			header_content_source: 'TEXT',
@@ -220,4 +223,159 @@ export function objectToMessageBody(object: { [key: string]: string }, separator
 	return Object.entries(object)
 		.map(([key, value]) => `${key}: ${value}`)
 		.join(separator);
+}
+
+export function parseVariables(text: string, variables: { [key: string]: string }) {
+	return text.replace(/{{(.*?)}}/g, (match, variable) => {
+		return variables[variable] ?? '';
+	});
+}
+
+export function generateTextMessageObject(recipient: string, msg: string) {
+	return {
+		messaging_product: 'whatsapp',
+		to: recipient,
+		type: 'text',
+		text: {
+			body: msg,
+		},
+	};
+}
+
+export function generateMediaMessageObject(
+	recipient: string,
+	details: { type: string; media_id: string }
+) {
+	return {
+		messaging_product: 'whatsapp',
+		to: recipient,
+		type: details.type,
+		[details.type]: {
+			id: details.media_id,
+		},
+	};
+}
+
+export function generateContactMessageObject(recipient: string, card: IContact) {
+	return {
+		messaging_product: 'whatsapp',
+		to: recipient,
+		type: 'contacts',
+		contacts: [
+			{
+				addresses: card.addresses,
+				birthday: card.birthday,
+				emails: card.emails.map((email) => ({
+					type: 'HOME',
+					email: email.email,
+				})),
+				name: card.name,
+				org: card.org,
+				phones: card.phones.map((phone) => ({
+					type: 'HOME',
+					phone: phone.phone,
+					wa_id: phone.wa_id,
+				})),
+				urls: card.urls.map((url) => ({
+					type: 'HOME',
+					url: url.url,
+				})),
+			},
+		],
+	};
+}
+
+export function generateTemplateMessageObject(
+	recipient: string,
+	details: {
+		template_name: string;
+		header?: {
+			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+			media_id?: string;
+		};
+		body: {
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
+		}[];
+		contact?: IPhoneBook;
+	}
+) {
+	const bodyParametersList = [
+		'first_name',
+		'last_name',
+		'middle_name',
+		'phone_number',
+		'email',
+		'birthday',
+		'anniversary',
+	];
+
+	let headers = [] as Record<string, unknown>[];
+
+	if (details.header && ['IMAGE', 'VIDEO', 'DOCUMENT'].includes(details.header.type ?? '')) {
+		const object = {
+			...(details.header.media_id ? { id: details.header.media_id } : {}),
+		};
+		const header_type = details.header.type;
+
+		headers = [
+			{
+				type: 'HEADER',
+				parameters:
+					header_type !== 'TEXT'
+						? [
+								{
+									type: header_type,
+									[header_type.toLowerCase()]: object,
+								},
+						  ]
+						: [],
+			},
+		];
+	}
+	const body = {
+		type: 'BODY',
+		parameters: details.body.map((b) => {
+			if (b.variable_from === 'custom_text') {
+				return {
+					type: 'text',
+					text: b.custom_text,
+				};
+			} else {
+				if (!details.contact) {
+					return {
+						type: 'text',
+						text: b.fallback_value,
+					};
+				}
+
+				const fieldVal = (
+					bodyParametersList.includes(b.phonebook_data)
+						? details.contact[b.phonebook_data as keyof typeof details.contact]
+						: details.contact.others[b.phonebook_data]
+				) as string;
+
+				if (typeof fieldVal === 'string') {
+					return {
+						type: 'text',
+						text: fieldVal || b.fallback_value,
+					};
+				}
+				// const field = fields[]
+				return {
+					type: 'text',
+					text: b.fallback_value,
+				};
+			}
+		}),
+	};
+	return {
+		template_name: details.template_name,
+		to: recipient,
+		template: {
+			components: [...headers, [body]],
+		},
+	};
 }

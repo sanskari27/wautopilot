@@ -21,7 +21,8 @@ export default interface IChatBotFlow extends Document {
 			| 'documentNode'
 			| 'buttonNode'
 			| 'listNode'
-			| 'flowNode';
+			| 'flowNode'
+			| 'endNode';
 		id: string;
 		position: {
 			x: number;
@@ -45,4 +46,28 @@ export default interface IChatBotFlow extends Document {
 		targetHandle?: string;
 	}[];
 	active: boolean;
+
+	nurturing: {
+		after: number;
+		respond_type: 'template' | 'normal';
+		message: string;
+		images: Types.ObjectId[];
+		videos: Types.ObjectId[];
+		audios: Types.ObjectId[];
+		documents: Types.ObjectId[];
+		contacts: Types.ObjectId[];
+		template_id: string;
+		template_name: string;
+		template_header?: {
+			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+			media_id?: string;
+			link?: string;
+		};
+		template_body: {
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
+		}[];
+	}[];
 }

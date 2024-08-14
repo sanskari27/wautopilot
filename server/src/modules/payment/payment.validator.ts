@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { Types } from 'mongoose';
 import { z } from 'zod';
 import { CustomError } from '../../errors';
+import { idsArray } from '../../utils/schema';
 
 export async function AddAmountValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
@@ -31,12 +31,7 @@ export async function AddAmountValidator(req: Request, res: Response, next: Next
 
 export async function LabelValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		ids: z
-			.string()
-			.array()
-			.default([])
-			.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
-			.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
+		ids: idsArray.default([]),
 		labels: z.string().array().default([]),
 	});
 
@@ -63,12 +58,7 @@ export async function LabelValidator(req: Request, res: Response, next: NextFunc
 
 export async function MultiDeleteValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		ids: z
-			.string()
-			.array()
-			.default([])
-			.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
-			.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
+		ids: idsArray.default([]),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

@@ -384,4 +384,13 @@ export default class SchedulerService extends WhatsappLinkService {
 			status: MESSAGE_STATUS.PENDING,
 		});
 	}
+
+	public async deleteNurturingByFlow(bot_id: Types.ObjectId) {
+		return ScheduledMessageDB.deleteMany({
+			linked_to: this.account._id,
+			device_id: this.deviceId,
+			scheduler_id: bot_id,
+			scheduler_type: 'ChatbotFlow Nurturing',
+		});
+	}
 }

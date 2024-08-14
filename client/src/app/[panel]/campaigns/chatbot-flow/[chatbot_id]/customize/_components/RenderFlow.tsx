@@ -25,6 +25,7 @@ import {
 	AudioNode,
 	ButtonNode,
 	DocumentNode,
+	EndNode,
 	ImageNode,
 	ListNode,
 	StartNode,
@@ -36,6 +37,9 @@ import CreateNodeDrawer from './CreateNodeDrawer';
 
 export type StartNodeDetails = {
 	type: 'START';
+};
+export type EndNodeDetails = {
+	type: 'END';
 };
 export type TextNodeDetails = {
 	type: 'TEXT';
@@ -98,6 +102,7 @@ const nodeTypes = {
 	buttonNode: ButtonNode,
 	listNode: ListNode,
 	flowNode: WaFlowNode,
+	endNode: EndNode,
 };
 
 export default function RenderFlow({
@@ -122,6 +127,7 @@ export default function RenderFlow({
 			| ButtonNodeDetails
 			| ListNodeDetails
 			| FlowNodeDetails
+			| EndNodeDetails
 	) => {
 		const node: Node = {
 			id: randomString(),
@@ -166,6 +172,12 @@ export default function RenderFlow({
 		} else if (details.type === 'WHATSAPP_FLOW') {
 			node.type = 'flowNode';
 			node.data = details.data;
+		} else if (details.type === 'END') {
+			node.type = 'endNode';
+			const endNodeExists = nodes.some((n) => n.type === 'endNode');
+			if (endNodeExists) {
+				return toast.error('End node already exists');
+			}
 		}
 		setNodes((prev) => {
 			return [...prev, node];

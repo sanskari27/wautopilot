@@ -7,7 +7,7 @@ import COMMON_ERRORS from '../errors/common-errors';
 import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import UserService from './user';
 
-type Record = {
+type IPhonebookRecord = {
 	salutation: string;
 	first_name: string;
 	last_name: string;
@@ -28,7 +28,7 @@ function processPhonebookDocs(
 	docs: (Partial<IPhoneBook> & {
 		_id: Types.ObjectId;
 	})[]
-): (Record & {
+): (IPhonebookRecord & {
 	id: Types.ObjectId;
 })[] {
 	return docs.map((doc) => ({
@@ -41,7 +41,7 @@ function processPhonebookDocs(
 		email: doc.email ?? '',
 		birthday: doc.birthday ?? '',
 		anniversary: doc.anniversary ?? '',
-		others: (filterUndefinedKeys(doc.others as object) ?? {}) as Record['others'],
+		others: (filterUndefinedKeys(doc.others as object) ?? {}) as IPhonebookRecord['others'],
 		labels: doc.labels ?? [],
 	}));
 }
@@ -51,7 +51,7 @@ export default class PhoneBookService extends UserService {
 		super(account);
 	}
 
-	public async addRecords(details: Partial<Record>[]) {
+	public async addRecords(details: Partial<IPhonebookRecord>[]) {
 		const phoneNumbers = details.map((record) => record.phone_number);
 		const existingRecords = await PhoneBookDB.find({
 			phone_number: { $in: phoneNumbers },
@@ -219,7 +219,7 @@ export default class PhoneBookService extends UserService {
 		};
 	}
 
-	public async updateRecord(recordId: Types.ObjectId, details: Partial<Record>) {
+	public async updateRecord(recordId: Types.ObjectId, details: Partial<IPhonebookRecord>) {
 		const record = await PhoneBookDB.findOne({ _id: recordId, linked_to: this.userId });
 
 		if (!record) {

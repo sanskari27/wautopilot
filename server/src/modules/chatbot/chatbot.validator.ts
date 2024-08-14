@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import { z } from 'zod';
 import { BOT_TRIGGER_OPTIONS } from '../../config/const';
 import { CustomError } from '../../errors';
+import { idsArray } from '../../utils/schema';
 
 export type CreateBotValidationResult = {
 	trigger: string[];
@@ -65,7 +66,8 @@ export type CreateFlowValidationResult = {
 			| 'documentNode'
 			| 'buttonNode'
 			| 'listNode'
-			| 'flowNode';
+			| 'flowNode'
+			| 'endNode';
 		id: string;
 		position: {
 			x: number;
@@ -87,6 +89,29 @@ export type CreateFlowValidationResult = {
 		};
 		sourceHandle?: string;
 		targetHandle?: string;
+	}[];
+	nurturing: {
+		after: number;
+		respond_type: 'template' | 'normal';
+		message: string;
+		images: Types.ObjectId[];
+		videos: Types.ObjectId[];
+		audios: Types.ObjectId[];
+		documents: Types.ObjectId[];
+		contacts: Types.ObjectId[];
+		template_id: string;
+		template_name: string;
+		template_header?: {
+			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+			media_id?: string;
+			link?: string;
+		};
+		template_body: {
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
+		}[];
 	}[];
 };
 
@@ -172,36 +197,11 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 
 		respond_type: z.enum(['template', 'normal']),
 		message: z.string().trim().default(''),
-		images: z
-			.string()
-			.array()
-			.default([])
-			.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
-			.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
-		videos: z
-			.string()
-			.array()
-			.default([])
-			.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
-			.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
-		audios: z
-			.string()
-			.array()
-			.default([])
-			.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
-			.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
-		documents: z
-			.string()
-			.array()
-			.default([])
-			.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
-			.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
-		contacts: z
-			.string()
-			.array()
-			.default([])
-			.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
-			.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
+		images: idsArray.default([]),
+		videos: idsArray.default([]),
+		audios: idsArray.default([]),
+		documents: idsArray.default([]),
+		contacts: idsArray.default([]),
 
 		template_id: z.string().default(''),
 		template_name: z.string().default(''),
@@ -307,6 +307,7 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 						'buttonNode',
 						'listNode',
 						'flowNode',
+						'endNode',
 					]),
 				})
 			)
@@ -325,6 +326,39 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 						.optional(),
 					sourceHandle: z.string().or(z.null()).optional(),
 					targetHandle: z.string().or(z.null()).optional(),
+				})
+			)
+			.default([]),
+
+		nurturing: z
+			.array(
+				z.object({
+					after: z.number().min(1),
+					respond_type: z.enum(['template', 'normal']).default('normal'),
+					message: z.string().default(''),
+					images: idsArray.default([]),
+					videos: idsArray.default([]),
+					audios: idsArray.default([]),
+					documents: idsArray.default([]),
+					contacts: idsArray.default([]),
+					template_id: z.string().default(''),
+					template_name: z.string().default(''),
+					template_header: z
+						.object({
+							type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
+							media_id: z.string().optional(),
+						})
+						.optional(),
+					template_body: z
+						.array(
+							z.object({
+								custom_text: z.string(),
+								phonebook_data: z.string(),
+								variable_from: z.enum(['custom_text', 'phonebook_data']),
+								fallback_value: z.string(),
+							})
+						)
+						.default([]),
 				})
 			)
 			.default([]),
@@ -387,6 +421,7 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 						'buttonNode',
 						'listNode',
 						'flowNode',
+						'endNode',
 					]),
 				})
 			)

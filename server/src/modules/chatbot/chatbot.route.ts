@@ -50,8 +50,8 @@ router
 	.route('/flows/:id')
 	.all(IDValidator)
 	.get(Controller.chatBotFlowDetails)
-	.delete(VerifyPermissions(Permissions.chatbot_flow.delete), Controller.deleteFlow)
-	.put(VerifyPermissions(Permissions.chatbot_flow.update), Controller.toggleActiveFlow)
+	.delete(VerifyPermissions(Permissions.chatbot_flow.delete), Controller.deleteBot)
+	.put(VerifyPermissions(Permissions.chatbot_flow.update), Controller.toggleActive)
 	.patch(
 		VerifyPermissions(Permissions.chatbot_flow.update),
 		UpdateFlowValidator,

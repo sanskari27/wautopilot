@@ -154,7 +154,6 @@ function processIncomingMessage(details: {
 			context: message.context,
 		});
 		chatBotService.handleMessage(recipient, message.text.body);
-		chatBotService.checkForFlowKeyword(recipient, message.text.body);
 	} else if (
 		message.type === 'image' ||
 		message.type === 'video' ||
@@ -229,7 +228,6 @@ function processIncomingMessage(details: {
 			context: message.context,
 		});
 		chatBotService.handleMessage(recipient, message.interactive?.list_reply?.title ?? '');
-		chatBotService.checkForFlowKeyword(recipient, message.interactive?.list_reply?.title ?? '');
 		chatBotService.continueFlow(
 			recipient,
 			message.context.id,
@@ -249,7 +247,6 @@ function processIncomingMessage(details: {
 			context: message.context,
 		});
 		chatBotService.handleMessage(recipient, button_reply?.title ?? '');
-		chatBotService.checkForFlowKeyword(recipient, button_reply?.title ?? '');
 		chatBotService.continueFlow(recipient, message.context.id, button_reply.id ?? '');
 		buttonResponseService.createResponse({
 			button_id: button_reply.id,

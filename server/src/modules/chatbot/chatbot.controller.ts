@@ -4,7 +4,9 @@ import IWhatsappFlowResponse from '../../../mongo/types/whatsappFlowResponse';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import ChatBotService from '../../services/chatbot';
+import WhatsappFlowService from '../../services/wa_flow';
 import CSVHelper from '../../utils/CSVHelper';
+import DateUtils from '../../utils/DateUtils';
 import { Respond, RespondCSV } from '../../utils/ExpressUtils';
 import {
 	CreateBotValidationResult,
@@ -13,7 +15,6 @@ import {
 	UpdateWhatsappFlowValidationResult,
 	WhatsappFlowValidationResult,
 } from './chatbot.validator';
-import DateUtils from '../../utils/DateUtils';
 
 async function createBot(req: Request, res: Response, next: NextFunction) {
 	const {
@@ -82,31 +83,6 @@ async function listBots(req: Request, res: Response, next: NextFunction) {
 		status: 200,
 		data: {
 			bots: list,
-		},
-	});
-}
-
-async function toggleActive(req: Request, res: Response, next: NextFunction) {
-	const {
-		serviceAccount: account,
-		device: { device },
-		id,
-		agentLogService,
-	} = req.locals;
-
-	const bot = await new ChatBotService(account, device).toggleActive(id);
-	agentLogService?.addLog({
-		text: `Create bot with trigger ${bot.trigger}`,
-		data: {
-			id: bot.bot_id,
-		},
-	});
-
-	return Respond({
-		res,
-		status: 200,
-		data: {
-			bot: bot,
 		},
 	});
 }
@@ -251,53 +227,33 @@ async function chatBotFlowDetails(req: Request, res: Response, next: NextFunctio
 	}
 }
 
-async function toggleActiveFlow(req: Request, res: Response, next: NextFunction) {
+async function toggleActive(req: Request, res: Response, next: NextFunction) {
 	const {
 		serviceAccount: account,
 		device: { device },
 		id,
 		agentLogService,
 	} = req.locals;
+	try {
+		await new ChatBotService(account, device).toggleActive(id);
 
-	const flow = await new ChatBotService(account, device).toggleActiveFlow(id);
+		agentLogService?.addLog({
+			text: `Toggle active flow with id ${id}`,
+			data: {
+				id,
+			},
+		});
 
-	agentLogService?.addLog({
-		text: `Create flow with id ${flow.bot_id}`,
-		data: {
-			id: flow.bot_id,
-		},
-	});
-
-	return Respond({
-		res,
-		status: 200,
-		data: {
-			flow: flow,
-		},
-	});
-}
-
-async function deleteFlow(req: Request, res: Response, next: NextFunction) {
-	const {
-		serviceAccount: account,
-		device: { device },
-		id,
-		agentLogService,
-	} = req.locals;
-
-	await new ChatBotService(account, device).deleteFlow(id);
-
-	agentLogService?.addLog({
-		text: `Delete flow with id ${id}`,
-		data: {
-			id,
-		},
-	});
-
-	return Respond({
-		res,
-		status: 200,
-	});
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (e) {
+		if (e instanceof CustomError) {
+			return next(e);
+		}
+		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+	}
 }
 
 async function exportWhatsappFlow(req: Request, res: Response, next: NextFunction) {
@@ -337,7 +293,7 @@ async function listWhatsappFlows(req: Request, res: Response, next: NextFunction
 		device: { device },
 	} = req.locals;
 
-	const flows = await new ChatBotService(account, device).listWhatsappFlows();
+	const flows = await new WhatsappFlowService(account, device).listFlows();
 
 	return Respond({
 		res,
@@ -356,7 +312,7 @@ async function createWhatsappFlow(req: Request, res: Response, next: NextFunctio
 	} = req.locals;
 	const data = req.locals.data as WhatsappFlowValidationResult;
 
-	const id = await new ChatBotService(account, device).createWhatsappFlow(data);
+	const id = await new WhatsappFlowService(account, device).createFlow(data);
 
 	if (!id) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
@@ -391,7 +347,7 @@ async function updateWhatsappFlow(req: Request, res: Response, next: NextFunctio
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 
-	const success = await new ChatBotService(account, device).updateWhatsappFlow(id, data);
+	const success = await new WhatsappFlowService(account, device).updateFlow(id, data);
 
 	if (!success) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
@@ -425,7 +381,7 @@ async function publishWhatsappFlow(req: Request, res: Response, next: NextFuncti
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 
-	const success = await new ChatBotService(account, device).publishWhatsappFlow(id);
+	const success = await new WhatsappFlowService(account, device).publishFlow(id);
 
 	if (!success) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
@@ -458,7 +414,7 @@ async function getWhatsappFlowAssets(req: Request, res: Response, next: NextFunc
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 	try {
-		const screens = await new ChatBotService(account, device).getWhatsappFlowContents(id);
+		const screens = await new WhatsappFlowService(account, device).getWhatsappFlowContents(id);
 		return Respond({
 			res,
 			status: 200,
@@ -487,7 +443,7 @@ async function deleteWhatsappFlow(req: Request, res: Response, next: NextFunctio
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 
-	const success = await new ChatBotService(account, device).deleteWhatsappFlow(id);
+	const success = await new WhatsappFlowService(account, device).deleteFlow(id);
 
 	if (!success) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
@@ -523,7 +479,7 @@ async function updateWhatsappFlowContents(req: Request, res: Response, next: Nex
 	}
 
 	try {
-		await new ChatBotService(account, device).updateWhatsappFlowContents(id, data);
+		await new WhatsappFlowService(account, device).updateFlowContents(id, data);
 	} catch (e) {
 		return next(e);
 	}
@@ -552,8 +508,6 @@ const Controller = {
 	deleteBot,
 	createFlow,
 	updateFlow,
-	toggleActiveFlow,
-	deleteFlow,
 	listFlows,
 	downloadResponses,
 	chatBotFlowDetails,

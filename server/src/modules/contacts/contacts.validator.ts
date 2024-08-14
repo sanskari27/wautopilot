@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
 import { z } from 'zod';
 import { CustomError } from '../../errors';
+import { idsArray } from '../../utils/schema';
 
 export type CreateContactValidationResult = {
 	addresses: {
@@ -122,12 +123,7 @@ export function CreateContactValidator(req: Request, res: Response, next: NextFu
 
 export async function MultiDeleteValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		ids: z
-			.string()
-			.array()
-			.default([])
-			.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
-			.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
+		ids: idsArray.default([]),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
