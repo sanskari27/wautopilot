@@ -26,12 +26,18 @@ export default function useMessages(id: string) {
 	useEffect(() => {
 		socket.emit('join_conversation', id);
 		socket.on('message_new', (msg) => {
-			setMessages((prev) => [...prev, msg]);
+			setMessages((prev) => [msg, ...prev]);
 		});
 
 		socket.on('message_updated', (msg) => {
 			setMessages((prev) => prev.map((m) => (m._id === msg._id ? msg : m)));
 		});
+
+		return () => {
+			socket.emit('leave_conversation', id);
+			socket.off('message_new');
+			socket.off('message_updated');
+		};
 	}, [id]);
 
 	useEffect(() => {

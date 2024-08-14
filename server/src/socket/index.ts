@@ -36,6 +36,10 @@ export default class SocketServer {
 				socket.join(conversation_id);
 			});
 
+			socket.on('leave_conversation', (conversation_id) => {
+				socket.leave(conversation_id);
+			});
+
 			socket.on('listen_new_messages', (key) => {
 				const user_id = this.conversationKeys.get(key);
 				if (user_id) {
@@ -50,6 +54,8 @@ export default class SocketServer {
 	}
 
 	public sendMessage(conversation_id: string, message: any) {
+		console.log('sending message', conversation_id, message);
+
 		this.io.of('/conversation').to(conversation_id).emit('message_new', message);
 	}
 
