@@ -299,7 +299,8 @@ export function DataTable({
 	};
 
 	const phonebookData = phonebookSchema.safeParse(parseToObject(searchParams.get('data')));
-	const isOpenPhonebookDialog = searchParams.get('add-phonebook');
+	const isOpenPhonebookDialog =
+		searchParams.get('add-phonebook') === 'true' || phonebookData.success;
 
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
@@ -478,7 +479,7 @@ export function DataTable({
 					</Table>
 				</div>
 			</div>
-			<Show.ShowIf condition={!!isOpenPhonebookDialog || phonebookData.success}>
+			<Show.ShowIf condition={isOpenPhonebookDialog}>
 				<PhonebookDialog defaultValues={phonebookData.data!} onSave={handlePhonebookInput} />
 			</Show.ShowIf>
 		</div>
