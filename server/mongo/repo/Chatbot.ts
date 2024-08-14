@@ -20,7 +20,7 @@ const schema = new mongoose.Schema<IChatBot>(
 			ref: WhatsappLinkDB_name,
 			required: true,
 		},
-		trigger: String,
+		trigger: [String],
 		trigger_gap_seconds: Number,
 		response_delay_seconds: Number,
 		startAt: String,

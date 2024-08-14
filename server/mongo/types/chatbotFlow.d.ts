@@ -8,7 +8,7 @@ export default interface IChatBotFlow extends Document {
 
 	name: string;
 
-	trigger: string;
+	trigger: string[];
 	options: BOT_TRIGGER_OPTIONS;
 
 	nodes: {

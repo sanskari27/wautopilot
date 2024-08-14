@@ -6,7 +6,7 @@ export default interface IChatBot extends Document {
 	linked_to: Types.ObjectId;
 	device_id: Types.ObjectId;
 
-	trigger: string;
+	trigger: string[];
 	trigger_gap_seconds: number;
 	response_delay_seconds: number;
 

@@ -5,7 +5,7 @@ import { BOT_TRIGGER_OPTIONS } from '../../config/const';
 import { CustomError } from '../../errors';
 
 export type CreateBotValidationResult = {
-	trigger: string;
+	trigger: string[];
 	trigger_gap_seconds: number;
 	response_delay_seconds: number;
 	options: BOT_TRIGGER_OPTIONS;
@@ -54,7 +54,7 @@ export type CreateBotValidationResult = {
 export type CreateFlowValidationResult = {
 	name: string;
 	options: BOT_TRIGGER_OPTIONS;
-	trigger: string;
+	trigger: string[];
 	nodes: {
 		type:
 			| 'startNode'
@@ -158,7 +158,7 @@ export type UpdateWhatsappFlowValidationResult = {
 
 export async function CreateBotValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		trigger: z.string().default(''),
+		trigger: z.array(z.string().min(1)).default([]),
 		trigger_gap_seconds: z.number().positive().default(1),
 		response_delay_seconds: z.number().nonnegative().default(0),
 		options: z.enum([
@@ -275,7 +275,7 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 
 export async function CreateFlowValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		trigger: z.string().default(''),
+		trigger: z.array(z.string().min(1)).default([]),
 		options: z.enum([
 			BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE,
 			BOT_TRIGGER_OPTIONS.EXACT_MATCH_CASE,

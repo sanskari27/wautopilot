@@ -35,7 +35,7 @@ import SchedulerService from './scheduler';
 import WhatsappLinkService from './whatsappLink';
 
 type CreateBotData = {
-	trigger: string;
+	trigger: string[];
 	trigger_gap_seconds: number;
 	response_delay_seconds: number;
 	options: BOT_TRIGGER_OPTIONS;
@@ -84,7 +84,7 @@ type CreateBotData = {
 type CreateFlowData = {
 	name: string;
 	options: BOT_TRIGGER_OPTIONS;
-	trigger: string;
+	trigger: string[];
 	nodes: {
 		type:
 			| 'startNode'
@@ -277,44 +277,58 @@ export default class ChatBotService extends WhatsappLinkService {
 					return false;
 				}
 			}
-			if (bot.trigger === '') {
+			if (bot.trigger.length === 0) {
 				return true;
 			}
-			if (bot.options === BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE) {
-				return message_body.toLowerCase() === bot.trigger.toLowerCase();
+			let match = false;
+			for (const trigger of bot.trigger) {
+				if (match) {
+					break;
+				}
+				if (bot.options === BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE) {
+					if (message_body.toLowerCase() === trigger.toLowerCase()) {
+						match = true;
+					}
+				} else if (bot.options === BOT_TRIGGER_OPTIONS.EXACT_MATCH_CASE) {
+					if (message_body === trigger) {
+						match = true;
+					}
+				} else if (bot.options === BOT_TRIGGER_OPTIONS.INCLUDES_IGNORE_CASE) {
+					const lowerCaseSentence = trigger.toLowerCase();
+					const lowerCaseParagraph = message_body.toLowerCase();
+
+					// Split the paragraph into words
+					const words_paragraph = lowerCaseParagraph.split(/\s+/);
+					const sentence_paragraph = lowerCaseSentence.split(/\s+/);
+
+					const _match = words_paragraph.some(
+						(_, index, arr) =>
+							arr.slice(index, index + sentence_paragraph.length).join() ===
+							sentence_paragraph.join()
+					);
+					if (_match) {
+						match = true;
+					}
+				} else if (bot.options === BOT_TRIGGER_OPTIONS.INCLUDES_MATCH_CASE) {
+					const lowerCaseSentence = trigger;
+					const lowerCaseParagraph = message_body;
+
+					// Split the paragraph into words
+					const words_paragraph = lowerCaseParagraph.split(/\s+/);
+					const sentence_paragraph = lowerCaseSentence.split(/\s+/);
+
+					const _match = words_paragraph.some(
+						(_, index, arr) =>
+							arr.slice(index, index + sentence_paragraph.length).join() ===
+							sentence_paragraph.join()
+					);
+					if (_match) {
+						match = true;
+					}
+				}
 			}
-			if (bot.options === BOT_TRIGGER_OPTIONS.EXACT_MATCH_CASE) {
-				return message_body === bot.trigger;
-			}
 
-			if (bot.options === BOT_TRIGGER_OPTIONS.INCLUDES_IGNORE_CASE) {
-				const lowerCaseSentence = bot.trigger.toLowerCase();
-				const lowerCaseParagraph = message_body.toLowerCase();
-
-				// Split the paragraph into words
-				const words_paragraph = lowerCaseParagraph.split(/\s+/);
-				const sentence_paragraph = lowerCaseSentence.split(/\s+/);
-
-				return words_paragraph.some(
-					(_, index, arr) =>
-						arr.slice(index, index + sentence_paragraph.length).join() === sentence_paragraph.join()
-				);
-			}
-			if (bot.options === BOT_TRIGGER_OPTIONS.INCLUDES_MATCH_CASE) {
-				const lowerCaseSentence = bot.trigger;
-				const lowerCaseParagraph = message_body;
-
-				// Split the paragraph into words
-				const words_paragraph = lowerCaseParagraph.split(/\s+/);
-				const sentence_paragraph = lowerCaseSentence.split(/\s+/);
-
-				return words_paragraph.some(
-					(_, index, arr) =>
-						arr.slice(index, index + sentence_paragraph.length).join() === sentence_paragraph.join()
-				);
-			}
-
-			return false;
+			return match;
 		});
 	}
 
@@ -717,7 +731,6 @@ export default class ChatBotService extends WhatsappLinkService {
 		}
 
 		return responses.map((chat) => ({
-			trigger: bot.trigger,
 			recipient: chat.recipient,
 			triggered_at: DateUtils.getMoment(chat.sent_at).format('DD-MM-YYYY HH:mm:ss'),
 			message_type: chat.body.body_type,
@@ -813,44 +826,58 @@ export default class ChatBotService extends WhatsappLinkService {
 		const activeBots = bots.filter((bot) => bot.isActive);
 
 		return activeBots.filter((bot) => {
-			if (bot.trigger === '') {
+			if (bot.trigger.length === 0) {
 				return true;
 			}
-			if (bot.options === BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE) {
-				return message_body.toLowerCase() === bot.trigger.toLowerCase();
+			let match = false;
+			for (const trigger of bot.trigger) {
+				if (match) {
+					break;
+				}
+				if (bot.options === BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE) {
+					if (message_body.toLowerCase() === trigger.toLowerCase()) {
+						match = true;
+					}
+				} else if (bot.options === BOT_TRIGGER_OPTIONS.EXACT_MATCH_CASE) {
+					if (message_body === trigger) {
+						match = true;
+					}
+				} else if (bot.options === BOT_TRIGGER_OPTIONS.INCLUDES_IGNORE_CASE) {
+					const lowerCaseSentence = trigger.toLowerCase();
+					const lowerCaseParagraph = message_body.toLowerCase();
+
+					// Split the paragraph into words
+					const words_paragraph = lowerCaseParagraph.split(/\s+/);
+					const sentence_paragraph = lowerCaseSentence.split(/\s+/);
+
+					const _match = words_paragraph.some(
+						(_, index, arr) =>
+							arr.slice(index, index + sentence_paragraph.length).join() ===
+							sentence_paragraph.join()
+					);
+					if (_match) {
+						match = true;
+					}
+				} else if (bot.options === BOT_TRIGGER_OPTIONS.INCLUDES_MATCH_CASE) {
+					const lowerCaseSentence = trigger;
+					const lowerCaseParagraph = message_body;
+
+					// Split the paragraph into words
+					const words_paragraph = lowerCaseParagraph.split(/\s+/);
+					const sentence_paragraph = lowerCaseSentence.split(/\s+/);
+
+					const _match = words_paragraph.some(
+						(_, index, arr) =>
+							arr.slice(index, index + sentence_paragraph.length).join() ===
+							sentence_paragraph.join()
+					);
+					if (_match) {
+						match = true;
+					}
+				}
 			}
-			if (bot.options === BOT_TRIGGER_OPTIONS.EXACT_MATCH_CASE) {
-				return message_body === bot.trigger;
-			}
 
-			if (bot.options === BOT_TRIGGER_OPTIONS.INCLUDES_IGNORE_CASE) {
-				const lowerCaseSentence = bot.trigger.toLowerCase();
-				const lowerCaseParagraph = message_body.toLowerCase();
-
-				// Split the paragraph into words
-				const words_paragraph = lowerCaseParagraph.split(/\s+/);
-				const sentence_paragraph = lowerCaseSentence.split(/\s+/);
-
-				return words_paragraph.some(
-					(_, index, arr) =>
-						arr.slice(index, index + sentence_paragraph.length).join() === sentence_paragraph.join()
-				);
-			}
-			if (bot.options === BOT_TRIGGER_OPTIONS.INCLUDES_MATCH_CASE) {
-				const lowerCaseSentence = bot.trigger;
-				const lowerCaseParagraph = message_body;
-
-				// Split the paragraph into words
-				const words_paragraph = lowerCaseParagraph.split(/\s+/);
-				const sentence_paragraph = lowerCaseSentence.split(/\s+/);
-
-				return words_paragraph.some(
-					(_, index, arr) =>
-						arr.slice(index, index + sentence_paragraph.length).join() === sentence_paragraph.join()
-				);
-			}
-
-			return false;
+			return match;
 		});
 	}
 

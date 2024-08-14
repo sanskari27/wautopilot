@@ -93,7 +93,6 @@ export default class CSVHelper {
 
 	static exportChatbotReport(
 		records: {
-			trigger: string;
 			recipient: string;
 			triggered_at: string;
 			message_type: 'TEXT' | 'MEDIA' | 'CONTACT' | 'LOCATION' | 'UNKNOWN';
@@ -104,10 +103,6 @@ export default class CSVHelper {
 			{
 				value: 'recipient',
 				label: 'Recipient',
-			},
-			{
-				value: 'trigger',
-				label: 'Trigger',
 			},
 			{
 				value: 'message_type',

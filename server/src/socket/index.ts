@@ -54,8 +54,6 @@ export default class SocketServer {
 	}
 
 	public sendMessage(conversation_id: string, message: any) {
-		console.log('sending message', conversation_id, message);
-
 		this.io.of('/conversation').to(conversation_id).emit('message_new', message);
 	}
 
