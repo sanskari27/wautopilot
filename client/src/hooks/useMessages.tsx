@@ -27,10 +27,16 @@ export default function useMessages(id: string) {
 		socket.emit('join_conversation', id);
 		socket.on('message_new', (msg) => {
 			setMessages((prev) => [msg, ...prev]);
+			setTimeout(() => {
+				markRead(id);
+			}, 1000);
 		});
 
 		socket.on('message_updated', (msg) => {
 			setMessages((prev) => prev.map((m) => (m._id === msg._id ? msg : m)));
+			setTimeout(() => {
+				markRead(id);
+			}, 1000);
 		});
 
 		return () => {
@@ -38,7 +44,7 @@ export default function useMessages(id: string) {
 			socket.off('message_new');
 			socket.off('message_updated');
 		};
-	}, [id]);
+	}, [id, markRead]);
 
 	useEffect(() => {
 		const _pagination = pagination.current;
