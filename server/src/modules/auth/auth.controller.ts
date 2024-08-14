@@ -7,7 +7,7 @@ import COMMON_ERRORS from '../../errors/common-errors';
 import { sendPasswordResetEmail } from '../../provider/email';
 import { UserService } from '../../services';
 import WhatsappLinkService from '../../services/whatsappLink';
-import { Respond, setCookie } from '../../utils/ExpressUtils';
+import { clearCookie, Respond, setCookie } from '../../utils/ExpressUtils';
 import {
 	LoginValidationResult,
 	RegisterValidationResult,
@@ -53,6 +53,11 @@ async function login(req: Request, res: Response, next: NextFunction) {
 		return Respond({
 			res,
 			status: 200,
+			data: {
+				isAdmin: userService.userLevel === UserLevel.Admin,
+				isAgent: userService.userLevel === UserLevel.Agent,
+				isMaster: userService.userLevel === UserLevel.Master,
+			},
 		});
 	} catch (err) {
 		return next(new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR));
@@ -149,7 +154,7 @@ async function register(req: Request, res: Response, next: NextFunction) {
 			level: UserLevel.Admin,
 		});
 
-		const { authToken, refreshToken } = await UserService.login(email, password, {
+		const { authToken, refreshToken, userService } = await UserService.login(email, password, {
 			platform: req.useragent?.platform || '',
 			browser: req.useragent?.browser || '',
 		});
@@ -169,6 +174,11 @@ async function register(req: Request, res: Response, next: NextFunction) {
 		return Respond({
 			res,
 			status: 200,
+			data: {
+				isAdmin: userService.userLevel === UserLevel.Admin,
+				isAgent: userService.userLevel === UserLevel.Agent,
+				isMaster: userService.userLevel === UserLevel.Master,
+			},
 		});
 	} catch (err) {
 		return next(new CustomError(AUTH_ERRORS.USER_ALREADY_EXISTS));
@@ -273,8 +283,8 @@ async function logout(req: Request, res: Response, next: NextFunction) {
 	} catch (err) {
 		//ignored
 	}
-	res.clearCookie(Cookie.Auth);
-	res.clearCookie(Cookie.Refresh);
+	clearCookie(res, Cookie.Auth);
+	clearCookie(res, Cookie.Refresh);
 	return Respond({
 		res,
 		status: 200,

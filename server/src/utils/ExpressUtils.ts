@@ -67,6 +67,16 @@ export const setCookie = (
 	});
 };
 
+export const clearCookie = (res: Response, key: string) => {
+	res.clearCookie(key, {
+		sameSite: 'none',
+		expires: new Date(),
+		httpOnly: IS_PRODUCTION,
+		secure: true,
+		domain: IS_PRODUCTION ? '.wautopilot.com' : 'localhost',
+	});
+};
+
 export const getRequestIP = (req: Request) => {
 	return (req.headers['x-real-ip'] ?? req.socket.remoteAddress)?.toString();
 };

@@ -4,7 +4,7 @@ import { Cookie, UserLevel } from '../../config/const';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import WhatsappLinkService from '../../services/whatsappLink';
-import { Respond, setCookie } from '../../utils/ExpressUtils';
+import { clearCookie, Respond, setCookie } from '../../utils/ExpressUtils';
 import { SESSION_EXPIRE_TIME } from '../auth/auth.controller';
 import { WhatsappLinkCreateValidationResult } from './whatsappLink.validator';
 
@@ -105,7 +105,7 @@ async function removeDevice(req: Request, res: Response, next: NextFunction) {
 					expires: SESSION_EXPIRE_TIME,
 				});
 			} else {
-				res.clearCookie(Cookie.Device);
+				clearCookie(res, Cookie.Device);
 			}
 		}
 		return Respond({

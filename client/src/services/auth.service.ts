@@ -32,15 +32,23 @@ export default class AuthService {
 
 	static async login(email: string, password: string) {
 		try {
-			await api.post(`/sessions/login`, {
+			const { data } = await api.post(`/sessions/login`, {
 				email,
 				password,
 			});
-			return true;
+			return {
+				authenticated: true,
+				admin: data.isAdmin,
+				agent: data.isAgent,
+				master: data.isMaster,
+			};
 		} catch (err) {
-			console.log(err);
-
-			return false;
+			return {
+				authenticated: false,
+				admin: false,
+				agent: false,
+				master: false,
+			};
 		}
 	}
 
@@ -55,15 +63,25 @@ export default class AuthService {
 
 	static async register(details: z.infer<typeof signupSchema>) {
 		try {
-			const data = await api.post(`/sessions/register`, {
+			const { data } = await api.post(`/sessions/register`, {
 				name: `${details.firstName} ${details.lastName}`.trim(),
 				phone: details.phone,
 				email: details.email,
 				password: details.password,
 			});
-			return data;
+			return {
+				authenticated: true,
+				admin: data.isAdmin,
+				agent: data.isAgent,
+				master: data.isMaster,
+			};
 		} catch (err) {
-			//ignore
+			return {
+				authenticated: false,
+				admin: false,
+				agent: false,
+				master: false,
+			};
 		}
 	}
 

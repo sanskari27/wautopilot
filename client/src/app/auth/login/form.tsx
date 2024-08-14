@@ -40,8 +40,16 @@ export default function LoginForm() {
 	async function formSubmit(values: z.infer<typeof loginSchema>) {
 		setLoading(true);
 		const success = await AuthService.login(values.email, values.password);
-		if (success) {
-			router.push(searchParams.get('callback') ?? '/');
+		if (success.authenticated) {
+			if (searchParams.get('callback')) {
+				router.push(searchParams.get('callback') ?? '/');
+			} else if (success.master) {
+				router.push('/master/home/dashboard');
+			} else if (success.admin) {
+				router.push('/admin/home/dashboard');
+			} else if (success.agent) {
+				router.push('/agent/home/dashboard');
+			}
 		} else {
 			setLoading(false);
 			setError('password', { message: 'Invalid Credentials' });
