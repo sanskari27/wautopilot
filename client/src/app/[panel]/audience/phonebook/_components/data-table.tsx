@@ -282,6 +282,7 @@ export function DataTable({
 
 	const handlePhonebookInput = (phonebook: PhonebookRecord) => {
 		const id = searchParams.get('add-phonebook');
+		console.log(id);
 		const promise =
 			id && id !== 'true'
 				? PhoneBookService.updateRecord(id, phonebook)
@@ -298,6 +299,7 @@ export function DataTable({
 	};
 
 	const phonebookData = phonebookSchema.safeParse(parseToObject(searchParams.get('data')));
+	const isOpenPhonebookDialog = searchParams.get('add-phonebook');
 
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
@@ -476,7 +478,7 @@ export function DataTable({
 					</Table>
 				</div>
 			</div>
-			<Show.ShowIf condition={phonebookData.success}>
+			<Show.ShowIf condition={!!isOpenPhonebookDialog || phonebookData.success}>
 				<PhonebookDialog defaultValues={phonebookData.data!} onSave={handlePhonebookInput} />
 			</Show.ShowIf>
 		</div>
