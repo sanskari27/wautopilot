@@ -304,7 +304,7 @@ async function setLabelsByPhone(req: Request, res: Response, next: NextFunction)
 
 async function setLabels(req: Request, res: Response, next: NextFunction) {
 	const { user, serviceAccount } = req.locals;
-	const { ids } = req.locals.data as SetLabelValidationResult;
+	const { ids, numbers } = req.locals.data as SetLabelValidationResult;
 	let { labels } = req.locals.data as SetLabelValidationResult;
 	if (user.userLevel === UserLevel.Agent) {
 		const permissions = await user.getPermissions();
@@ -314,7 +314,11 @@ async function setLabels(req: Request, res: Response, next: NextFunction) {
 
 	try {
 		const phoneBookService = new PhoneBookService(serviceAccount);
-		await phoneBookService.setLabels(ids, labels);
+		if (ids.length === 0) {
+			await phoneBookService.setLabelsByPhone(numbers, labels);
+		} else {
+			await phoneBookService.setLabels(ids, labels);
+		}
 
 		return Respond({
 			res,

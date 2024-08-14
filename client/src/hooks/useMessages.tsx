@@ -1,6 +1,7 @@
 'use client';
 import { useRecipient } from '@/components/context/recipients';
 import MessagesService from '@/services/messages.service';
+import { socket } from '@/socket';
 import { Message } from '@/types/recipient';
 import { useEffect, useRef, useState } from 'react';
 
@@ -21,6 +22,19 @@ export default function useMessages(id: string) {
 		},
 		current_id: '',
 	});
+
+	useEffect(() => {
+		socket.on('message_new', (msg) => {
+			dispatch(addMessage(msg));
+			// if (msg.received_at) {
+			// 	MessagesService.markRead(selected_device_id, msg.message_id);
+			// }
+		});
+
+		socket.on('message_updated', (msg) => {
+			dispatch(updateMessage({ messageId: msg._id, message: msg }));
+		});
+	}, []);
 
 	useEffect(() => {
 		const _pagination = pagination.current;

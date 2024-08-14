@@ -22,6 +22,7 @@ export type SingleRecordValidationResult = {
 export type SetLabelValidationResult = {
 	labels: string[];
 	ids: Types.ObjectId[];
+	numbers: string[];
 };
 
 export type MultiDeleteValidationResult = {
@@ -91,15 +92,21 @@ export async function RecordUpdateValidator(req: Request, res: Response, next: N
 }
 
 export async function LabelValidator(req: Request, res: Response, next: NextFunction) {
-	const reqValidator = z.object({
-		ids: z
-			.string()
-			.array()
-			.default([])
-			.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
-			.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
-		labels: z.string().array().default([]),
-	});
+	const reqValidator = z
+		.object({
+			ids: z
+				.string()
+				.array()
+				.default([])
+				.refine((ids) => !ids.some((value) => !Types.ObjectId.isValid(value)))
+				.transform((ids) => ids.map((value) => new Types.ObjectId(value))),
+			numbers: z.string().array().default([]),
+			labels: z.string().array().default([]),
+		})
+		.refine(
+			(data) => data.ids.length || data.numbers.length,
+			'At least one of ids or numbers is required'
+		);
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
 

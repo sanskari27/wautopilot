@@ -239,6 +239,10 @@ export default class PhoneBookService extends UserService {
 		await PhoneBookDB.updateMany({ _id: { $in: recordId } }, { labels: tags });
 	}
 
+	public async setLabelsByPhone(numbers: string[], tags: string[]) {
+		await PhoneBookDB.updateMany({ phone_number: { $in: numbers } }, { labels: tags });
+	}
+
 	public async addLabels(recordId: Types.ObjectId[], tags: string[]) {
 		await PhoneBookDB.updateMany(
 			{ _id: { $in: recordId } },
