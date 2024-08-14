@@ -25,14 +25,11 @@ export default function useMessages(id: string) {
 
 	useEffect(() => {
 		socket.on('message_new', (msg) => {
-			dispatch(addMessage(msg));
-			// if (msg.received_at) {
-			// 	MessagesService.markRead(selected_device_id, msg.message_id);
-			// }
+			setMessages((prev) => [...prev, msg]);
 		});
 
 		socket.on('message_updated', (msg) => {
-			dispatch(updateMessage({ messageId: msg._id, message: msg }));
+			setMessages((prev) => prev.map((m) => (m._id === msg._id ? msg : m)));
 		});
 	}, []);
 

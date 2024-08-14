@@ -164,40 +164,6 @@ export function RecipientProvider({
 		});
 	}, [markRead, markUnread, setTags, toggleArchived, togglePin]);
 
-	// React.useEffect(() => {
-	// 	socket.on('connect', () => {
-	// 		socket.emit('join_conversation', selected_recipient._id);
-	// 		AuthService.generateConversationMessageKey().then((key) => {
-	// 			socket.emit('listen_new_messages', key);
-	// 		});
-	// 	});
-
-	// 	socket.on('disconnect', () => {});
-
-	// 	socket.on('message_new', (msg) => {
-	// 		dispatch(addMessage(msg));
-	// 		// if (msg.received_at) {
-	// 		// 	MessagesService.markRead(selected_device_id, msg.message_id);
-	// 		// }
-	// 	});
-
-	// 	socket.on('message_updated', (msg) => {
-	// 		dispatch(updateMessage({ messageId: msg._id, message: msg }));
-	// 	});
-
-	// 	socket.on('new_message_notification', (conversation_id) => {
-	// 		dispatch(addUnreadConversation(conversation_id));
-	// 	});
-
-	// 	socket.on('message_updated', (msg) => {
-	// 		dispatch(updateMessage({ messageId: msg._id, message: msg }));
-	// 	});
-
-	// 	return () => {
-	// 		socket.disconnect();
-	// 	};
-	// }, []);
-
 	return (
 		<RecipientsContext.Provider
 			value={{
