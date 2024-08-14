@@ -12,6 +12,7 @@ import {
 	LoginValidationResult,
 	RegisterValidationResult,
 	ResetPasswordValidationResult,
+	UpdateAccountValidationResult,
 	UpdatePasswordValidationResult,
 } from './auth.validator';
 export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
@@ -275,6 +276,17 @@ async function details(req: Request, res: Response, next: NextFunction) {
 	});
 }
 
+async function updateDetails(req: Request, res: Response, next: NextFunction) {
+	const { user, data } = req.locals;
+
+	await user.updateDetails(data as UpdateAccountValidationResult);
+
+	return Respond({
+		res,
+		status: 200,
+	});
+}
+
 async function logout(req: Request, res: Response, next: NextFunction) {
 	try {
 		const _refresh_id = req.cookies[Cookie.Refresh];
@@ -300,6 +312,7 @@ const Controller = {
 	register,
 	logout,
 	details,
+	updateDetails,
 };
 
 export default Controller;

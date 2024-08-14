@@ -25,6 +25,12 @@ export type UpdatePasswordValidationResult = {
 	password: string;
 };
 
+export type UpdateAccountValidationResult = {
+	name?: string;
+	phone?: string;
+	email?: string;
+};
+
 export type GoogleLoginValidationResult = {
 	token: string;
 };
@@ -91,6 +97,34 @@ export async function ResetPasswordValidator(req: Request, res: Response, next: 
 	const reqValidator = z.object({
 		email: z.string().email(),
 		callbackURL: z.string().url(),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+	const message = reqValidatorResult.error.issues
+		.map((err) => err.path)
+		.flat()
+		.filter((item, pos, arr) => arr.indexOf(item) == pos)
+		.join(', ');
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: message,
+		})
+	);
+}
+
+export async function UpdateAccountValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z.object({
+		name: z.string().optional(),
+		phone: z.string().optional(),
+		email: z.string().email().optional(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
