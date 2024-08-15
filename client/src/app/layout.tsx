@@ -28,7 +28,6 @@ export default async function RootLayout({
 			<link rel='icon' type='image/png' sizes='32x32' href='/icons/favicon-32x32.png' />
 			<link rel='icon' type='image/png' sizes='16x16' href='/icons/favicon-16x16.png' />
 			<body className={cn('h-screen w-screen overflow-x-hidden', poppins.className)}>
-				<Script id='razorpay-checkout-js' src='https://checkout.razorpay.com/v1/checkout.js' />
 				<PageLayout>
 					<Suspense fallback={<Loading />}>{children}</Suspense>
 					<BackgroundBeams />

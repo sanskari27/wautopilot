@@ -142,46 +142,50 @@ export default class AuthService {
 	}
 
 	static async addMoney(amount: number) {
-		const { data } = await api.post(`/payment/add-money`, {
-			amount,
-		});
-		return {
-			transaction_id: data.transaction_id ?? '',
-			razorpay_options: {
-				description: data.razorpay_options.description ?? '',
-				currency: data.razorpay_options.currency ?? '',
-				amount: data.razorpay_options.amount ?? 0,
-				name: data.razorpay_options.name ?? '',
-				order_id: data.razorpay_options.order_id ?? '',
-				prefill: {
-					name: data.razorpay_options.prefill.name ?? '',
-					email: data.razorpay_options.prefill.email ?? '',
-					contact: data.razorpay_options.prefill.contact ?? '',
+		try {
+			const { data } = await api.post(`/payment/add-money`, {
+				amount,
+			});
+			return {
+				transaction_id: data.transaction_id ?? '',
+				razorpay_options: {
+					description: data.razorpay_options.description ?? '',
+					currency: data.razorpay_options.currency ?? '',
+					amount: data.razorpay_options.amount ?? 0,
+					name: data.razorpay_options.name ?? '',
+					order_id: data.razorpay_options.order_id ?? '',
+					prefill: {
+						name: data.razorpay_options.prefill.name ?? '',
+						email: data.razorpay_options.prefill.email ?? '',
+						contact: data.razorpay_options.prefill.contact ?? '',
+					},
+					key: data.razorpay_options.key ?? '',
+					theme: {
+						color: data.razorpay_options.theme.color ?? '',
+					},
 				},
-				key: data.razorpay_options.key ?? '',
-				theme: {
-					color: data.razorpay_options.theme.color ?? '',
-				},
-			},
-		} as {
-			transaction_id: string;
-			razorpay_options: {
-				description: string;
-				currency: string;
-				amount: number;
-				name: string;
-				order_id: string;
-				prefill: {
+			} as {
+				transaction_id: string;
+				razorpay_options: {
+					description: string;
+					currency: string;
+					amount: number;
 					name: string;
-					email: string;
-					contact: string;
-				};
-				key: string;
-				theme: {
-					color: string;
+					order_id: string;
+					prefill: {
+						name: string;
+						email: string;
+						contact: string;
+					};
+					key: string;
+					theme: {
+						color: string;
+					};
 				};
 			};
-		};
+		} catch (err) {
+			return null;
+		}
 	}
 
 	static async confirmPayment(transaction_id: string) {
