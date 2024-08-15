@@ -1,12 +1,13 @@
 import PageLayout from '@/components/containers/page-layout';
+import Loading from '@/components/elements/loading';
 import { BackgroundBeams } from '@/components/ui/background-beams';
 import { cn } from '@/lib/utils';
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
+import Script from 'next/script';
+import { Suspense } from 'react';
 import { Toaster } from 'react-hot-toast';
 import './globals.css';
-import { Suspense } from 'react';
-import Loading from '@/components/elements/loading';
 
 const poppins = Poppins({ weight: ['400', '500', '600', '700', '800', '900'], subsets: ['latin'] });
 
@@ -27,10 +28,9 @@ export default async function RootLayout({
 			<link rel='icon' type='image/png' sizes='32x32' href='/icons/favicon-32x32.png' />
 			<link rel='icon' type='image/png' sizes='16x16' href='/icons/favicon-16x16.png' />
 			<body className={cn('h-screen w-screen overflow-x-hidden', poppins.className)}>
+				<Script id='razorpay-checkout-js' src='https://checkout.razorpay.com/v1/checkout.js' />
 				<PageLayout>
-					<Suspense fallback={<Loading />}>
-					{children}
-					</Suspense>
+					<Suspense fallback={<Loading />}>{children}</Suspense>
 					<BackgroundBeams />
 				</PageLayout>
 				<Toaster position='top-center' />

@@ -17,7 +17,13 @@ export type UserDetailsType = {
 	isAgent: boolean;
 };
 
-const UserDetailsContext = React.createContext<UserDetailsType>({
+export type UserDetailsProfile = {
+	name: string;
+	email: string;
+	phone: string;
+};
+
+const DEFAULT_VALUES = {
 	name: '',
 	email: '',
 	phone: '',
@@ -81,6 +87,14 @@ const UserDetailsContext = React.createContext<UserDetailsType>({
 	isMaster: false,
 	isAdmin: false,
 	isAgent: false,
+};
+
+const UserDetailsContext = React.createContext<{
+	profile: UserDetailsType;
+	setProfile: (details: Partial<UserDetailsType>) => void;
+}>({
+	profile: DEFAULT_VALUES,
+	setProfile: () => {},
 });
 
 export function UserDetailsProvider({
@@ -90,8 +104,33 @@ export function UserDetailsProvider({
 	children: React.ReactNode;
 	data: UserDetailsType;
 }) {
-	return <UserDetailsContext.Provider value={data}>{children}</UserDetailsContext.Provider>;
+	const [userDetails, setUserDetails] = React.useState<UserDetailsType>(DEFAULT_VALUES);
+
+	const setProfile = (details: Partial<UserDetailsType>) => {
+		setUserDetails((prev) => {
+			return {
+				...prev,
+				...details,
+			};
+		});
+	};
+
+	React.useEffect(() => {
+		setUserDetails(data);
+	}, [data]);
+
+	return (
+		<UserDetailsContext.Provider
+			value={{
+				profile: userDetails,
+				setProfile,
+			}}
+		>
+			{children}
+		</UserDetailsContext.Provider>
+	);
 }
 
-export const useUserDetails = () => React.useContext(UserDetailsContext);
-export const usePermissions = () => React.useContext(UserDetailsContext).permissions;
+export const useUserDetailsSetter = () => React.useContext(UserDetailsContext).setProfile;
+export const useUserDetails = () => React.useContext(UserDetailsContext).profile;
+export const usePermissions = () => React.useContext(UserDetailsContext).profile.permissions;
