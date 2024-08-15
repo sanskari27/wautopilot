@@ -29,3 +29,4 @@ export async function editChatbotFlow(id: string, details: ChatbotFlow) {
 	revalidatePath('[panel]/campaigns/chatbot-flow', 'page');
 	return data.id;
 }
+

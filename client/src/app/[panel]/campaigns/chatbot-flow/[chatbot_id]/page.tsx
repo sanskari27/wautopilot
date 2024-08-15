@@ -86,8 +86,17 @@ export default function CreateChatbotFlow() {
 
 	const trigger = form.watch('trigger');
 	const nurturing = form.watch('nurturing');
-
+	
 	const handleSubmit = (data: z.infer<typeof ChatbotFlowSchema>) => {
+		console.log({
+			...data,
+			nurturing: data.nurturing.map((nurturing) => ({
+				...nurturing,
+				after:
+					Number(nurturing.after.value) *
+					(nurturing.after.type === 'min' ? 60 : nurturing.after.type === 'hours' ? 3600 : 86400),
+			})),
+		});
 		for (let i = 0; i < data.nurturing.length; i++) {
 			if (data.nurturing[i].respond_type === 'normal') {
 				if (
