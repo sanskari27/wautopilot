@@ -1,4 +1,5 @@
 'use client';
+import { usePermissions } from '@/components/context/user-details';
 import DeleteDialog from '@/components/elements/dialogs/delete';
 import AgentSelector from '@/components/elements/popover/agents';
 import TagsSelector from '@/components/elements/popover/tags';
@@ -8,9 +9,23 @@ import MessagesService from '@/services/messages.service';
 import PhoneBookService from '@/services/phonebook.service';
 import { Database, FolderDown, Headset, ListFilter, Trash } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+
+export function CreateButton() {
+	const { panel } = useParams();
+	const { create: createPermission } = usePermissions().recurring;
+
+	if (!createPermission) return null;
+	return (
+		<Link href={`/${panel}/campaigns/recurring/create`}>
+			<Button variant={'outline'} size={'sm'}>
+				Create New
+			</Button>
+		</Link>
+	);
+}
 
 export function ExportButton({ labels }: { labels: string[] }) {
 	function handleExport() {

@@ -1,6 +1,7 @@
 'use client';
 
 import Show from '@/components/containers/show';
+import { usePermissions, useUserDetails } from '@/components/context/user-details';
 import PhonebookDialog from '@/components/elements/dialogs/phonebook';
 import FieldSearch from '@/components/elements/filters/fieldSearch';
 import { Button } from '@/components/ui/button';
@@ -215,6 +216,13 @@ export function DataTable({
 	maxRecord: number;
 }) {
 	const pathname = usePathname();
+	const { isAgent } = useUserDetails();
+	const {
+		create: createPermission,
+		delete: deletePermission,
+		export: exportPermission,
+		update: updatePermission,
+	} = usePermissions().phonebook;
 	const fields = records.reduce<Set<string>>((acc, record) => {
 		Object.keys(record.others).forEach((field) => acc.add(field));
 		return acc;
@@ -281,11 +289,24 @@ export function DataTable({
 	}
 
 	const handlePhonebookInput = (phonebook: PhonebookRecord) => {
-		const id = searchParams.get('add-phonebook');
-		const promise =
-			id && id !== 'true'
-				? PhoneBookService.updateRecord(id, phonebook)
-				: PhoneBookService.addRecord(phonebook);
+		let id = searchParams.get('add-phonebook');
+		id = id === 'true' ? '' : id;
+
+		let promise;
+		if (id) {
+			if (updatePermission) {
+				toast.error('You do not have permission to update phonebook');
+				return;
+			}
+			promise = PhoneBookService.updateRecord(id, phonebook);
+		} else {
+			if (!createPermission) {
+				toast.error('You do not have permission to create phonebook');
+				return;
+			}
+			promise = PhoneBookService.addRecord(phonebook);
+		}
+
 		toast.promise(promise, {
 			loading: 'Saving Phonebook...',
 			success: () => {
@@ -307,13 +328,21 @@ export function DataTable({
 				<h2 className='text-2xl font-bold'>Phonebook</h2>
 				<div className='flex gap-x-2 gap-y-1 flex-wrap '>
 					<Show.ShowIf condition={Object.keys(rowSelection).length === 0}>
-						<AddFields />
-						<ExportButton labels={searchParams.getAll('tags') ?? []} />
-						<UploadCSV />
-						<AddRecord />
+						<Show.ShowIf condition={!isAgent}>
+							<AddFields />
+						</Show.ShowIf>
+						<Show.ShowIf condition={exportPermission}>
+							<ExportButton labels={searchParams.getAll('tags') ?? []} />
+						</Show.ShowIf>
+						<Show.ShowIf condition={createPermission}>
+							<UploadCSV />
+							<AddRecord />
+						</Show.ShowIf>
 					</Show.ShowIf>
 					<Show.ShowIf condition={Object.keys(rowSelection).length !== 0}>
-						<DeleteButton ids={Object.keys(rowSelection)} />
+						<Show.ShowIf condition={deletePermission}>
+							<DeleteButton ids={Object.keys(rowSelection)} />
+						</Show.ShowIf>
 						<ExportChatButton ids={Object.keys(rowSelection)} />
 						<AssignTags ids={Object.keys(rowSelection)} />
 						<AssignAgent ids={Object.keys(rowSelection)} />

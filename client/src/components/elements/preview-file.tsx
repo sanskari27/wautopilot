@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
-import { Progress } from '../ui/progress';
 import Image from 'next/image';
+import { Progress } from '../ui/progress';
 
 export default function PreviewFile({
 	data,
@@ -22,7 +22,15 @@ export default function PreviewFile({
 	}
 
 	if (data.type === 'image') {
-		return <Image src={data.url} className='aspect-square rounded-lg' alt={''} />;
+		return (
+			<Image
+				src={data.url}
+				className='aspect-square rounded-lg'
+				alt={''}
+				width={400}
+				height={400}
+			/>
+		);
 	} else if (data.type === 'video') {
 		return (
 			<div>

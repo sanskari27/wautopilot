@@ -1,6 +1,7 @@
 'use client';
 
 import Show from '@/components/containers/show';
+import { usePermissions } from '@/components/context/user-details';
 import DeleteDialog from '@/components/elements/dialogs/delete';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,11 +12,17 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ChatBot } from '@/schema/chatbot';
 import ChatBotService from '@/services/chatbot.service';
-import { Delete, Download, Edit, LucidePieChart, ToggleLeft, ToggleRight } from 'lucide-react';
+import {
+	Delete as DeleteIcon,
+	Download,
+	Edit,
+	LucidePieChart,
+	ToggleLeft,
+	ToggleRight,
+} from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { deleteChatbot, toggleChatbot } from '../action';
-import { FaChartPie } from 'react-icons/fa';
 
 export default function ChatbotContextMenu({
 	children,
@@ -26,6 +33,9 @@ export default function ChatbotContextMenu({
 	children: React.ReactNode;
 	chatbot: ChatBot;
 }) {
+	const permissions = usePermissions().chatbot;
+	const buttonPermissions = usePermissions().buttons.read;
+
 	const toggleBot = () => {
 		toast.promise(toggleChatbot(chatbot.id), {
 			loading: 'Toggling chatbot...',
@@ -54,15 +64,17 @@ export default function ChatbotContextMenu({
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
 			<DropdownMenuContent className='w-56'>
-				<DropdownMenuItem>
-					<Link
-						className='w-full flex items-center'
-						href={`/${panel}/campaigns/chatbot/${chatbot.id}?data=${JSON.stringify(chatbot)}`}
-					>
-						<Edit className='mr-2 h-4 w-4' />
-						<span>Edit</span>
-					</Link>
-				</DropdownMenuItem>
+				<Show.ShowIf condition={permissions.update}>
+					<DropdownMenuItem>
+						<Link
+							className='w-full flex items-center'
+							href={`/${panel}/campaigns/chatbot/${chatbot.id}?data=${JSON.stringify(chatbot)}`}
+						>
+							<Edit className='mr-2 h-4 w-4' />
+							<span>Edit</span>
+						</Link>
+					</DropdownMenuItem>
+				</Show.ShowIf>
 				<DeleteDialog
 					actionButtonText={chatbot.isActive ? 'Stop' : 'Play'}
 					onDelete={toggleBot}
@@ -81,25 +93,31 @@ export default function ChatbotContextMenu({
 						</Show>
 					</Button>
 				</DeleteDialog>
-				<DropdownMenuItem onClick={downloadChatBot}>
-					<Download className='mr-2 h-4 w-4' />
-					<span>Download Report</span>
-				</DropdownMenuItem>
-				<DropdownMenuItem>
-					<Link
-						className='flex items-center'
-						href={`/${panel}/campaigns/button-report/${chatbot.id}`}
-					>
-						<LucidePieChart className='mr-2 h-4 w-4' />
-						<span>Button Click Report</span>
-					</Link>
-				</DropdownMenuItem>
-				<DeleteDialog onDelete={deleteBot}>
-					<Button size={'sm'} className='w-full bg-destructive hover:bg-destructive/50'>
-						<Delete className='mr-2 h-4 w-4' />
-						<span className='mr-auto'>Delete</span>
-					</Button>
-				</DeleteDialog>
+				<Show.ShowIf condition={permissions.export}>
+					<DropdownMenuItem onClick={downloadChatBot}>
+						<Download className='mr-2 h-4 w-4' />
+						<span>Download Report</span>
+					</DropdownMenuItem>
+				</Show.ShowIf>
+				<Show.ShowIf condition={buttonPermissions}>
+					<DropdownMenuItem>
+						<Link
+							className='flex items-center'
+							href={`/${panel}/campaigns/button-report/${chatbot.id}`}
+						>
+							<LucidePieChart className='mr-2 h-4 w-4' />
+							<span>Button Click Report</span>
+						</Link>
+					</DropdownMenuItem>
+				</Show.ShowIf>
+				<Show.ShowIf condition={permissions.delete}>
+					<DeleteDialog onDelete={deleteBot}>
+						<Button size={'sm'} className='w-full bg-destructive hover:bg-destructive/50'>
+							<DeleteIcon className='mr-2 h-4 w-4' />
+							<span className='mr-auto'>Delete</span>
+						</Button>
+					</DeleteDialog>
+				</Show.ShowIf>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

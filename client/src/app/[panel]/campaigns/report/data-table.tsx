@@ -1,6 +1,8 @@
 'use client';
 
 import Each from '@/components/containers/each';
+import Show from '@/components/containers/show';
+import { usePermissions } from '@/components/context/user-details';
 import DeleteDialog from '@/components/elements/dialogs/delete';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -34,6 +36,7 @@ export default function ReportDataTable({
 		createdAt: string;
 	}[];
 }) {
+	const permissions = usePermissions().broadcast;
 	const router = useRouter();
 	const params = useParams();
 	const panel = params.panel as string;
@@ -80,14 +83,18 @@ export default function ReportDataTable({
 			<div className='justify-between flex'>
 				<h2 className='text-2xl font-bold'>Campaign Report</h2>
 				<div className='flex gap-x-2 gap-y-1 flex-wrap '>
-					<Button onClick={handleExport} size={'sm'}>
-						Export
-					</Button>
-					<DeleteDialog onDelete={deleteCampaign}>
-						<Button variant={'destructive'} size={'sm'}>
-							Delete
+					<Show.ShowIf condition={permissions.export}>
+						<Button onClick={handleExport} size={'sm'}>
+							Export
 						</Button>
-					</DeleteDialog>
+					</Show.ShowIf>
+					<Show.ShowIf condition={permissions.update}>
+						<DeleteDialog onDelete={deleteCampaign}>
+							<Button variant={'destructive'} size={'sm'}>
+								Delete
+							</Button>
+						</DeleteDialog>
+					</Show.ShowIf>
 				</div>
 			</div>
 			<Table>
@@ -156,46 +163,59 @@ export default function ReportDataTable({
 										{recurring.pending}
 									</TableCellLink>
 									<TableCell className='text-center'>
-										{recurring.isPaused ? (
-											<Button
-												size={'sm'}
-												onClick={() => {
-													BroadcastService.resumeBroadcast(recurring.broadcast_id).then(() => {
-														router.refresh();
-													});
-												}}
-											>
-												Resume
-											</Button>
-										) : recurring.pending !== 0 ? (
-											<Button
-												size={'sm'}
-												variant={'destructive'}
-												onClick={() => {
-													BroadcastService.pauseBroadcast(recurring.broadcast_id).then(() => {
-														router.refresh();
-													});
-												}}
-											>
-												Pause
-											</Button>
-										) : recurring.failed > 0 ? (
-											<Button
-												size={'sm'}
-												variant={'outline'}
-												onClick={() => {
-													BroadcastService.resendFailedBroadcast(recurring.broadcast_id).then(
-														() => {
-															router.refresh();
-														}
-													);
-												}}
-											>
-												Resend Failed
-											</Button>
-										) : (
-											'Completed'
-										)}
+										<Show>
+											<Show.When condition={permissions.update}>
+												{recurring.isPaused ? (
+													<Button
+														size={'sm'}
+														onClick={() => {
+															BroadcastService.resumeBroadcast(recurring.broadcast_id).then(() => {
+																router.refresh();
+															});
+														}}
+													>
+														Resume
+													</Button>
+												) : recurring.pending !== 0 ? (
+													<Button
+														size={'sm'}
+														variant={'destructive'}
+														onClick={() => {
+															BroadcastService.pauseBroadcast(recurring.broadcast_id).then(() => {
+																router.refresh();
+															});
+														}}
+													>
+														Pause
+													</Button>
+												) : recurring.failed > 0 ? (
+													<Button
+														size={'sm'}
+														variant={'outline'}
+														onClick={() => {
+															BroadcastService.resendFailedBroadcast(recurring.broadcast_id).then(
+																() => {
+																	router.refresh();
+																}
+															);
+														}}
+													>
+														Resend Failed
+													</Button>
+												) : (
+													'Completed'
+												)}
+											</Show.When>
+											<Show.Else>
+												{recurring.isPaused
+													? 'Resume'
+													: recurring.pending !== 0
+													? 'Pause'
+													: recurring.failed > 0
+													? 'Resend Failed'
+													: 'Completed'}
+											</Show.Else>
+										</Show>
 									</TableCell>
 								</TableRow>
 							);

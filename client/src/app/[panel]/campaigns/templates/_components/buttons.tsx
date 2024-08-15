@@ -1,7 +1,7 @@
 'use client';
+import { usePermissions } from '@/components/context/user-details';
 import DeleteDialog from '@/components/elements/dialogs/delete';
 import { Button } from '@/components/ui/button';
-import { TableRow } from '@/components/ui/table';
 import MediaService from '@/services/media.service';
 import { LayoutPanelTop, Trash } from 'lucide-react';
 import Link from 'next/link';
@@ -22,6 +22,7 @@ export function AddTemplate() {
 
 export function DeleteButton({ id }: { id: string }) {
 	const router = useRouter();
+	const permission = usePermissions().template.delete;
 	function handleExport() {
 		toast.promise(MediaService.deleteMedia(id), {
 			success: () => {
@@ -32,6 +33,8 @@ export function DeleteButton({ id }: { id: string }) {
 			loading: 'Deleting...',
 		});
 	}
+
+	if (!permission) return null;
 
 	return (
 		<DeleteDialog onDelete={handleExport}>

@@ -41,7 +41,21 @@ async function login(req: Request, res: Response, next: NextFunction) {
 			expires: SESSION_EXPIRE_TIME,
 		});
 
-		const devices = await WhatsappLinkService.fetchRecords(userService.userId);
+		let devices: {
+			id: string;
+			phoneNumber: string;
+			verifiedName: string;
+			phoneNumberId: string;
+			waid: string;
+		}[] = [];
+		
+		if (userService.userLevel >= UserLevel.Admin) {
+			devices = await WhatsappLinkService.fetchRecords(userService.userId);
+		} else {
+			if (userService.account.parent) {
+				devices = await WhatsappLinkService.fetchRecords(userService.account.parent!);
+			}
+		}
 
 		if (devices.length > 0) {
 			setCookie(res, {

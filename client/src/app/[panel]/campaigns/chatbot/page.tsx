@@ -9,22 +9,17 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import ChatBotService from '@/services/chatbot.service';
-import Link from 'next/link';
+import { CreateButton } from './_component/buttons';
 import ChatbotContextMenu from './_component/chatbot-context-menu';
 
 export default async function ChatbotPage({ params: { panel } }: { params: { panel: string } }) {
 	const chatbotList = await ChatBotService.listChatBots();
-
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
 			<div className='justify-between flex'>
 				<h2 className='text-2xl font-bold'>Chatbot</h2>
 				<div className='flex gap-x-2 gap-y-1 flex-wrap '>
-					<Link href={`/${panel}/campaigns/chatbot/create`}>
-						<Button variant={'outline'} size={'sm'}>
-							Create New
-						</Button>
-					</Link>
+					<CreateButton />
 				</div>
 			</div>
 			<Table>

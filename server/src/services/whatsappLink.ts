@@ -16,7 +16,7 @@ type RecordWithAccessToken = Record & {
 	accessToken: string;
 };
 
-function processPhonebookDocs(
+function processDocs(
 	docs: (Record & {
 		_id: Types.ObjectId;
 		phoneNumber: string;
@@ -97,16 +97,18 @@ export default class WhatsappLinkService extends UserService {
 			linked_to: user,
 		});
 
-		return processPhonebookDocs([doc])[0];
+		return processDocs([doc])[0];
 	}
 
 	public static async fetchRecords(user: Types.ObjectId): Promise<
 		(Record & {
 			id: string;
+			phoneNumber: string;
+			verifiedName: string;
 		})[]
 	> {
 		const records = await WhatsappLinkDB.find({ linked_to: user });
-		return processPhonebookDocs(records);
+		return processDocs(records);
 	}
 
 	public static async deleteRecord(user: Types.ObjectId, recordId: Types.ObjectId) {

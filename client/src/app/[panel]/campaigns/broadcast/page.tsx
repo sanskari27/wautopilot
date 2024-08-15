@@ -3,6 +3,7 @@ import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
 import { useFields } from '@/components/context/tags';
 import { useTemplates } from '@/components/context/templates';
+import { usePermissions } from '@/components/context/user-details';
 import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
 import NumberInputDialog from '@/components/elements/dialogs/numberInput';
 import TagsSelector from '@/components/elements/popover/tags';
@@ -37,6 +38,8 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 export default function BroadcastPage() {
+	const permissions = usePermissions().broadcast;
+
 	const templates = useTemplates();
 	let phonebook_fields = useFields();
 	phonebook_fields = phonebook_fields.filter((field) => field.value !== 'all');
@@ -67,6 +70,7 @@ export default function BroadcastPage() {
 	const header = template?.components.find((component) => component.type === 'HEADER');
 
 	function handleSave(data: Broadcast) {
+		if (!permissions.create) return toast.error('You do not have permission to create a broadcast');
 		const promise = api.post(`/broadcast/send`, {
 			name: data.name,
 			description: data.description,
@@ -439,6 +443,7 @@ export default function BroadcastPage() {
 									type='submit'
 									className='w-[80%] mx-auto'
 									disabled={
+										!permissions.create ||
 										!form.formState.isValid ||
 										(fields.recipients_from === 'numbers' && fields.to.length === 0) ||
 										(fields.recipients_from === 'tags' && fields.labels.length === 0)

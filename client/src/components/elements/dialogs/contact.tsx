@@ -45,7 +45,7 @@ const _defaultValues = {
 export default function ContactDialog({
 	defaultValues = _defaultValues,
 	onSave = () => {},
-	onClose = () => {},
+	onClose,
 	canEdit = true,
 }: {
 	defaultValues?: z.infer<typeof contactSchema> | null;
@@ -68,14 +68,7 @@ export default function ContactDialog({
 
 	if (isMobile) {
 		return (
-			<Drawer
-				open
-				onOpenChange={(open) => {
-					if (!open) {
-						handleClose();
-					}
-				}}
-			>
+			<Drawer open onOpenChange={(open) => !open && handleClose()}>
 				<DrawerContent className='px-3'>
 					<DrawerHeader>
 						<DrawerTitle>Contact Card</DrawerTitle>
@@ -90,14 +83,7 @@ export default function ContactDialog({
 		);
 	} else {
 		return (
-			<Sheet
-				open
-				onOpenChange={(open) => {
-					if (!open) {
-						handleClose();
-					}
-				}}
-			>
+			<Sheet open onOpenChange={(open) => !open && handleClose()}>
 				<SheetContent className='w-screen sm:max-w-3xl overflow-scroll'>
 					<SheetHeader>
 						<SheetTitle className='text-center'>Contact Card</SheetTitle>

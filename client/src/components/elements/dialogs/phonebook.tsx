@@ -70,7 +70,7 @@ export default function PhonebookDialog({
 			>
 				<DrawerContent>
 					<DrawerHeader>
-						<DrawerTitle>Contact Card</DrawerTitle>
+						<DrawerTitle>Phonebook Record</DrawerTitle>
 					</DrawerHeader>
 					<PhonebookForm
 						defaultValues={_defaultValues ? _defaultValues : defaultValues}

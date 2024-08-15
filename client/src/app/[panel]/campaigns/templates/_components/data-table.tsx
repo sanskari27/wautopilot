@@ -1,3 +1,4 @@
+'use client';
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
 import {

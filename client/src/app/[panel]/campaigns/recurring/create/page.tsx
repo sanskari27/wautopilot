@@ -1,12 +1,14 @@
 'use client';
+import { usePermissions } from '@/components/context/user-details';
 import { Recurring } from '@/schema/broadcastSchema';
 import RecurringService from '@/services/recurring.service';
-import { useRouter } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import DataForm from '../_components/data-form';
 
 export default function CreateRecurring() {
 	const router = useRouter();
+	const { create: createPermission } = usePermissions().recurring;
 
 	function handleSave(data: Recurring) {
 		toast.promise(RecurringService.createRecurring(data), {
@@ -17,6 +19,10 @@ export default function CreateRecurring() {
 			},
 			error: 'Failed to create Recurring Broadcast',
 		});
+	}
+
+	if (!createPermission) {
+		return notFound();
 	}
 
 	return (

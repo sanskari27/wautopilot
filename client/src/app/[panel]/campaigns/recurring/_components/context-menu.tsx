@@ -1,6 +1,7 @@
 'use client';
 
 import Show from '@/components/containers/show';
+import { usePermissions } from '@/components/context/user-details';
 import DeleteDialog from '@/components/elements/dialogs/delete';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,6 +27,7 @@ export default function RecurringActionContextMenu({
 }) {
 	const router = useRouter();
 	const params = useParams();
+	const permission = usePermissions().recurring;
 
 	const rescheduleCampaign = () => {
 		const promise = RecurringService.rescheduleRecurring(campaignId);
@@ -77,32 +79,38 @@ export default function RecurringActionContextMenu({
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
 			<DropdownMenuContent className='w-56'>
-				<DropdownMenuItem onClick={toggleRecurringCampaign}>
-					<Show>
-						<Show.When condition={active === 'ACTIVE'}>
-							<ToggleLeftIcon className='mr-2 h-4 w-4' />
-							<span>Pause</span>
-						</Show.When>
-						<Show.Else>
-							<ToggleRightIcon className='mr-2 h-4 w-4' />
-							<span>Resume</span>
-						</Show.Else>
-					</Show>
-				</DropdownMenuItem>
-				<DropdownMenuItem onClick={rescheduleCampaign}>
-					<MdScheduleSend className='mr-2 h-4 w-4' />
-					<span>Reschedule</span>
-				</DropdownMenuItem>
-				<DropdownMenuItem onClick={downloadRecurringCampaign}>
-					<Download className='mr-2 h-4 w-4' />
-					<span>Download</span>
-				</DropdownMenuItem>
-				<DeleteDialog onDelete={deleteRecurringCampaign}>
-					<Button size={'sm'} className='w-full bg-destructive hover:bg-destructive/50'>
-						<Delete className='mr-2 h-4 w-4' />
-						<span className='mr-auto'>Delete</span>
-					</Button>
-				</DeleteDialog>
+				<Show.ShowIf condition={permission.update}>
+					<DropdownMenuItem onClick={toggleRecurringCampaign}>
+						<Show>
+							<Show.When condition={active === 'ACTIVE'}>
+								<ToggleLeftIcon className='mr-2 h-4 w-4' />
+								<span>Pause</span>
+							</Show.When>
+							<Show.Else>
+								<ToggleRightIcon className='mr-2 h-4 w-4' />
+								<span>Resume</span>
+							</Show.Else>
+						</Show>
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={rescheduleCampaign}>
+						<MdScheduleSend className='mr-2 h-4 w-4' />
+						<span>Reschedule</span>
+					</DropdownMenuItem>
+				</Show.ShowIf>
+				<Show.ShowIf condition={permission.export}>
+					<DropdownMenuItem onClick={downloadRecurringCampaign}>
+						<Download className='mr-2 h-4 w-4' />
+						<span>Download</span>
+					</DropdownMenuItem>
+				</Show.ShowIf>
+				<Show.ShowIf condition={permission.delete}>
+					<DeleteDialog onDelete={deleteRecurringCampaign}>
+						<Button size={'sm'} className='w-full bg-destructive hover:bg-destructive/50'>
+							<Delete className='mr-2 h-4 w-4' />
+							<span className='mr-auto'>Delete</span>
+						</Button>
+					</DeleteDialog>
+				</Show.ShowIf>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

@@ -2,7 +2,7 @@
 
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
-import { Button } from '@/components/ui/button';
+import { usePermissions } from '@/components/context/user-details';
 import {
 	Table,
 	TableBody,
@@ -14,6 +14,7 @@ import {
 import BroadcastService from '@/services/broadcast.service';
 import Chart from 'react-google-charts';
 import toast from 'react-hot-toast';
+import { ExportButton } from './_components/buttons';
 
 const COLORS = [
 	'#FF6633',
@@ -51,8 +52,10 @@ export default function ResponseDataTable({
 		email: string;
 	}[];
 }) {
+	const permission = usePermissions().buttons.export;
+
 	const handleExport = () => {
-		if (!id) return;
+		if (!id || !permission) return;
 		toast.promise(
 			BroadcastService.buttonResponseReport({
 				campaignId: id,
@@ -89,9 +92,7 @@ export default function ResponseDataTable({
 			<div className='justify-between flex'>
 				<h2 className='text-2xl font-bold'>Button Response</h2>
 				<div className='flex gap-x-2 gap-y-1 flex-wrap '>
-					<Button onClick={handleExport} size={'sm'}>
-						Export
-					</Button>
+					<ExportButton />
 				</div>
 			</div>
 			<div hidden={list.length === 0}>

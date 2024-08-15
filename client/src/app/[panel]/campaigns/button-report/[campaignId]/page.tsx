@@ -1,9 +1,6 @@
 import BroadcastService from '@/services/broadcast.service';
 import { notFound } from 'next/navigation';
-import Chart from 'react-google-charts';
 import ResponseDataTable from './data-table';
-
-
 
 export default async function ChatbotButtonReport({
 	params,
@@ -22,10 +19,8 @@ export default async function ChatbotButtonReport({
 
 	if (!list) return notFound();
 
-	
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
-			
 			<ResponseDataTable id={params.campaignId} list={list ?? []} />
 		</div>
 	);

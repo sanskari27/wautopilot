@@ -73,8 +73,8 @@ export default async function AgentPage({
 				</Table>
 			</div>
 			{edit && <DetailsDialog />}
-			{update_password === 'true' && <PasswordDialog />}
-			{permissions === 'true' && <PermissionDialog />}
+			{update_password && <PasswordDialog />}
+			{permissions && <PermissionDialog />}
 		</div>
 	);
 }
