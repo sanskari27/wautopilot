@@ -148,19 +148,16 @@ export const chatbotSchema = z
 				value.template_header.type === 'IMAGE'
 			) {
 				if (value.template_header.media_id.length === 0) {
-					console.log('template header media required');
 					return false;
 				}
 			}
 			if (value.template_body.length > 0) {
 				value.template_body.forEach((body) => {
 					if (body.variable_from === 'custom_text' && body.custom_text.length === 0) {
-						console.log('template body custom text required');
 						return false;
 					}
 					if (body.variable_from === 'phonebook_data') {
 						if (body.phonebook_data.length === 0 && body.fallback_value.length === 0) {
-							console.log('template body phonebook and fallback required');
 							return false;
 						}
 					}

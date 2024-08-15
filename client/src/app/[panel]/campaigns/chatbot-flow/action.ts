@@ -1,7 +1,7 @@
 'use server';
 
-import { ChatbotFlow } from '@/schema/chatbot-flow';
 import ChatbotFlowService from '@/services/chatbot-flow.service';
+import { ChatbotFlow } from '@/types/chatbot';
 import { revalidatePath } from 'next/cache';
 
 export async function toggleChatbotFlow(id: string) {

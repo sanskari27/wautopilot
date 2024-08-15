@@ -23,7 +23,7 @@ export default class ChatbotFlowService {
 	}
 	static async createChatbotFlow(details: {
 		name: string;
-		trigger: string;
+		trigger: string[];
 		options: string;
 	}) {
 		const { data } = await api.post(`/chatbot/flows`, details);
@@ -72,7 +72,7 @@ export default class ChatbotFlowService {
 	}: {
 		botId: string;
 		details: {
-			trigger: string;
+			trigger: string[];
 			options: string;
 			name: string;
 			isActive: boolean;
