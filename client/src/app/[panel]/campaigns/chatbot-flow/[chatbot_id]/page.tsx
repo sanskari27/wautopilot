@@ -86,7 +86,7 @@ export default function CreateChatbotFlow() {
 
 	const trigger = form.watch('trigger');
 	const nurturing = form.watch('nurturing');
-	
+
 	const handleSubmit = (data: z.infer<typeof ChatbotFlowSchema>) => {
 		console.log({
 			...data,
@@ -119,7 +119,7 @@ export default function CreateChatbotFlow() {
 					nurturing: data.nurturing.map((nurturing) => ({
 						...nurturing,
 						after:
-							Number(nurturing.after) *
+							Number(nurturing.after.value) *
 							(nurturing.after.type === 'min'
 								? 60
 								: nurturing.after.type === 'hours'
@@ -132,7 +132,7 @@ export default function CreateChatbotFlow() {
 					nurturing: data.nurturing.map((nurturing) => ({
 						...nurturing,
 						after:
-							Number(nurturing.after) *
+							Number(nurturing.after.value) *
 							(nurturing.after.type === 'min'
 								? 60
 								: nurturing.after.type === 'hours'
