@@ -443,6 +443,39 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 				})
 			)
 			.optional(),
+
+		nurturing: z
+			.array(
+				z.object({
+					after: z.number().min(1),
+					respond_type: z.enum(['template', 'normal']).default('normal'),
+					message: z.string().default(''),
+					images: idsArray.default([]),
+					videos: idsArray.default([]),
+					audios: idsArray.default([]),
+					documents: idsArray.default([]),
+					contacts: idsArray.default([]),
+					template_id: z.string().default(''),
+					template_name: z.string().default(''),
+					template_header: z
+						.object({
+							type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
+							media_id: z.string().optional(),
+						})
+						.optional(),
+					template_body: z
+						.array(
+							z.object({
+								custom_text: z.string(),
+								phonebook_data: z.string(),
+								variable_from: z.enum(['custom_text', 'phonebook_data']),
+								fallback_value: z.string(),
+							})
+						)
+						.default([]),
+				})
+			)
+			.default([]),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
