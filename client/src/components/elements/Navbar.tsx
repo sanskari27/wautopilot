@@ -3,7 +3,7 @@ import { LOGO_WHITE } from '@/lib/consts';
 import { CircleUserRound } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useUserDetails } from '../context/user-details';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -16,16 +16,32 @@ import {
 	MenubarSeparator,
 	MenubarTrigger,
 } from '../ui/menubar';
-import { ThemeToggle } from '../ui/theme-toggle';
 import { LogoutButton } from './logout-button';
 
 export default function Navbar() {
 	const userDetails = useUserDetails();
 	const pathname = usePathname();
+	const router = useRouter();
 	let panel_id = pathname.split('/')[1];
 
 	function getLink(link: string) {
 		return `/${panel_id}${link}`;
+	}
+
+	function openSettings() {
+		const url = new URL((window as any).location);
+		if (!url.searchParams.has(`settings`)) {
+			url.searchParams.set(`settings`, 'true');
+		}
+		router.replace(url.toString());
+	}
+
+	function openDevices() {
+		const url = new URL((window as any).location);
+		if (!url.searchParams.has(`devices`)) {
+			url.searchParams.set(`devices`, 'true');
+		}
+		router.replace(url.toString());
 	}
 
 	return (
@@ -38,7 +54,7 @@ export default function Navbar() {
 					<MenubarLink href={getLink('/home/tasks')}>Tasks</MenubarLink>
 					<MenubarSeparator />
 					<MenubarLink href={getLink('/home/agents')}>Agents</MenubarLink>
-					<MenubarLink href={`${pathname}?devices=true`}>Devices</MenubarLink>
+					<MenubarLink onClick={openDevices}>Devices</MenubarLink>
 					<MenubarLink href={getLink('/home/settings')}>Settings</MenubarLink>
 				</MenubarContent>
 			</MenubarMenu>
@@ -81,13 +97,9 @@ export default function Navbar() {
 					</Avatar>
 				</MenubarTrigger>
 				<MenubarContent>
-					<MenubarItem>
-						<Link href={`/profile/edit`}>
-							<div className='inline-flex justify-start items-center gap-2'>
-								<CircleUserRound size={'1.2rem'} />
-								Profile Details
-							</div>
-						</Link>
+					<MenubarItem onClick={openSettings}>
+						<CircleUserRound className='mr-2' size={'1.2rem'} />
+						Profile Details
 					</MenubarItem>
 					<MenubarSeparator />
 					<MenubarItem>

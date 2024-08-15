@@ -5,6 +5,7 @@ import { MediaProvider } from '@/components/context/media';
 import { FieldsContextProvider, TagsProvider } from '@/components/context/tags';
 import { UserDetailsProvider } from '@/components/context/user-details';
 import DevicesDialog from '@/components/elements/dialogs/devices';
+import SettingsDialog from '@/components/elements/dialogs/settings';
 import Loading from '@/components/elements/loading';
 import Navbar from '@/components/elements/Navbar';
 import AgentService from '@/services/agent.service';
@@ -41,6 +42,7 @@ export default async function Layout({
 								<ContactsProvider data={contacts}>
 									<FieldsContextProvider data={fields}>
 										<AgentProvider data={agents}>{children}</AgentProvider>
+										<SettingsDialog />
 									</FieldsContextProvider>
 								</ContactsProvider>
 							</MediaProvider>

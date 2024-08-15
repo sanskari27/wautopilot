@@ -83,12 +83,31 @@ function DevicesList() {
 			});
 	};
 
+	const closeDevices = () => {
+		const url = new URL((window as any).location);
+		if (url.searchParams.has('devices')) {
+			url.searchParams.delete('devices');
+		}
+		router.replace(url.toString());
+	};
+
+	const openAddDevices = () => {
+		const url = new URL((window as any).location);
+		if (!url.searchParams.has(`add-device`)) {
+			if (url.searchParams.has('devices')) {
+				url.searchParams.delete('devices');
+			}
+			url.searchParams.set(`add-device`, 'true');
+		}
+		router.replace(url.toString());
+	};
+
 	return (
 		<Dialog
 			defaultOpen={true}
 			onOpenChange={(value) => {
 				if (!value) {
-					router.replace(pathname);
+					closeDevices();
 				}
 			}}
 		>
@@ -145,9 +164,7 @@ function DevicesList() {
 					>
 						Close
 					</Button>
-					<Link href={`${pathname}?add-device=true`}>
-						<Button>Add Device</Button>
-					</Link>
+					<Button onClick={openAddDevices}>Add Device</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
@@ -169,9 +186,27 @@ function AddDeviceDialog() {
 		code: '',
 	});
 
+	const closeAddDevice = () => {
+		const url = new URL((window as any).location);
+		if (url.searchParams.has('add-device')) {
+			if (!url.searchParams.has('devices')) {
+				url.searchParams.set('devices', 'true');
+			}
+			url.searchParams.delete('add-device');
+		}
+		router.replace(url.toString());
+	};
+
 	const onDeviceAdded = useCallback(() => {
-		router.replace(pathname + '?devices=true');
-	}, [router, pathname]);
+		const url = new URL((window as any).location);
+		if (url.searchParams.has('add-device')) {
+			if (!url.searchParams.has('devices')) {
+				url.searchParams.set('devices', 'true');
+			}
+			url.searchParams.delete('add-device');
+		}
+		router.replace(url.toString());
+	}, [router]);
 
 	const handleSave = useCallback(async () => {
 		setLoading.on();
@@ -282,7 +317,7 @@ function AddDeviceDialog() {
 			defaultOpen={true}
 			onOpenChange={(value) => {
 				if (!value) {
-					router.replace(pathname);
+					closeAddDevice();
 				}
 			}}
 		>

@@ -282,7 +282,6 @@ export function DataTable({
 
 	const handlePhonebookInput = (phonebook: PhonebookRecord) => {
 		const id = searchParams.get('add-phonebook');
-		console.log(id);
 		const promise =
 			id && id !== 'true'
 				? PhoneBookService.updateRecord(id, phonebook)

@@ -216,4 +216,8 @@ export default class AuthService {
 			return '';
 		}
 	}
+
+	static async updateProfileDetails(details: { name: string; email: string; phone: string }) {
+		await api.post(`/sessions/details`, details);
+	}
 }
