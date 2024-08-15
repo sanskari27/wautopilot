@@ -72,7 +72,7 @@ export const nurturingSchema = z.array(
 export const chatbotSchema = z
 	.object({
 		id: z.string(),
-		trigger: z.string(),
+		trigger: z.array(z.string()),
 		options: z.union([
 			z.literal('INCLUDES_IGNORE_CASE'),
 			z.literal('INCLUDES_MATCH_CASE'),
@@ -110,6 +110,11 @@ export const chatbotSchema = z
 		isActive: z.boolean(),
 	})
 	.refine((value) => {
+		value.trigger.forEach((trigger) => {
+			if (trigger.length === 0) {
+				return false;
+			}
+		});
 		if (value.startAt.length === 0) {
 			return false;
 		}

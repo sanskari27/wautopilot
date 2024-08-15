@@ -108,7 +108,7 @@ export default class ChatBotService {
 	}
 
 	static async createBot(details: {
-		trigger: string;
+		trigger: string[];
 		trigger_gap_seconds: number;
 		response_delay_seconds: number;
 		options: string;
@@ -222,7 +222,7 @@ export default class ChatBotService {
 	}: {
 		botId: string;
 		details: {
-			trigger: string;
+			trigger: string[];
 			trigger_gap_seconds: number;
 			response_delay_seconds: number;
 			options: string;

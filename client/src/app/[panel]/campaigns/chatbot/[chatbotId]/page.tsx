@@ -37,7 +37,7 @@ import ChatBotService from '@/services/chatbot.service';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ResetIcon } from '@radix-ui/react-icons';
 import { Separator } from '@radix-ui/react-separator';
-import { ChevronLeftIcon } from 'lucide-react';
+import { ChevronLeftIcon, Plus } from 'lucide-react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
@@ -57,7 +57,7 @@ const tagsVariable = [
 
 const DEFAULT_DATA: ChatBot = {
 	id: '',
-	trigger: '',
+	trigger: [],
 	options: 'INCLUDES_IGNORE_CASE',
 	trigger_gap_time: '1',
 	trigger_gap_type: 'SEC',
@@ -106,7 +106,7 @@ export default function ChatbotForm() {
 		mode: 'onChange',
 		defaultValues: raw || DEFAULT_DATA,
 	});
-
+	const trigger = form.watch('trigger');
 	const images = form.watch('images');
 	const videos = form.watch('videos');
 	const audios = form.watch('audios');
@@ -222,6 +222,10 @@ export default function ChatbotForm() {
 		});
 	};
 
+	const addEmptyTrigger = () => {
+		form.setValue('trigger', [...trigger, '']);
+	};
+
 	return (
 		<div className='custom-scrollbar flex flex-col gap-2 justify-center p-4'>
 			{/*--------------------------------- TRIGGER SECTION--------------------------- */}
@@ -244,27 +248,35 @@ export default function ChatbotForm() {
 										<FormItem className='space-y-0 flex-1 inline-flex items-center gap-2'>
 											<FormControl>
 												<Checkbox
-													checked={field.value === ''}
-													onCheckedChange={(checked) => checked && field.onChange('')}
+													checked={field.value.length === 0}
+													onCheckedChange={(checked) => checked && field.onChange([])}
 												/>
 											</FormControl>
 											<div className='text-sm'>Default Message</div>
 										</FormItem>
 									)}
 								/>
+								<Button type='button' size={'sm'} onClick={addEmptyTrigger}>
+									<Plus className='w-4 h-4' />
+									<span>Add Trigger</span>
+								</Button>
 							</div>
 						</div>
-
-						<FormField
-							control={form.control}
-							name='trigger'
-							render={({ field }) => (
-								<FormItem className='space-y-0 flex-1'>
-									<FormControl>
-										<Textarea placeholder='eg. Fanfest' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
+						<Each
+							items={trigger}
+							render={(trigger, index) => (
+								<FormField
+									control={form.control}
+									name={`trigger.${index}`}
+									render={({ field }) => (
+										<FormItem className='space-y-0 flex-1'>
+											<FormControl>
+												<Textarea placeholder='eg. Fanfest' {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 							)}
 						/>
 					</div>
