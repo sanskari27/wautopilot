@@ -5,44 +5,41 @@ const validateChatBot = (bot: any) => {
 	return {
 		id: bot.bot_id ?? '',
 		name: bot.name ?? '',
-		isActive: bot.isActive ?? false,
+		trigger: bot.trigger ?? [],
 		options: bot.options ?? '',
-		respond_to: bot.respond_to ?? '',
-		trigger: bot.trigger ?? '',
-		nurturing: (bot.nurturing ?? []).map((item: any) => {
-			return {
-				after: {
-					type: item.after % 86400 === 0 ? 'days' : item.after % 3600 === 0 ? 'hours' : 'min',
-					value:
-						item.after % 86400 === 0
-							? item.after / 86400
-							: item.after % 3600 === 0
-							? item.after / 3600
-							: item.after / 60,
-				},
-				respond_type: (item.respond_type as string) ?? '',
-				message: (item.message as string) ?? '',
-				images: item.images ?? [],
-				videos: item.videos ?? [],
-				audios: item.audios ?? [],
-				documents: item.documents ?? [],
-				contacts: item.contacts ?? [],
-				template_id: (item.template_id as string) ?? '',
-				template_name: (item.template_name as string) ?? '',
-				template_body: item.template_body.map((body: any) => {
-					return {
-						custom_text: body.custom_text ?? '',
-						phonebook_data: body.phonebook_data ?? '',
-						variable_from: body.variable_from ?? '',
-						fallback_value: body.fallback_value ?? '',
-					};
-				}),
-				template_header: {
-					type: item.template_header.type ?? '',
-					media_id: item.template_header.media_id ?? '',
-				},
-			};
-		}),
+		isActive: bot.isActive ?? false,
+		nurturing: (bot.nurturing ?? []).map((nurturing: any) => ({
+			message: nurturing.message ?? '',
+			respond_type: nurturing.respond_type ?? 'normal',
+			images: nurturing.images ?? [],
+			videos: nurturing.videos ?? [],
+			audios: nurturing.audios ?? [],
+			documents: nurturing.documents ?? [],
+			contacts: nurturing.contacts ?? [],
+			template_id: nurturing.template_id ?? '',
+			template_name: nurturing.template_name ?? '',
+			template_body: (nurturing.template_body ?? []).map((body: any) => ({
+				custom_text: body.custom_text ?? '',
+				phonebook_data: body.phonebook_data ?? '',
+				variable_from: body.variable_from ?? 'custom_text',
+				fallback_value: body.fallback_value ?? '',
+			})),
+			template_header: {
+				type: nurturing.template_header?.type ?? '',
+				media_id: nurturing.template_header?.media_id ?? '',
+			},
+			//after will have the property as value and type will be calculated with days min or hours
+			after: {
+				type:
+					nurturing.after % 86400 === 0 ? 'days' : nurturing.after % 3600 === 0 ? 'hours' : 'min',
+				value: (nurturing.after % 86400 === 0
+					? nurturing.after / 86400
+					: nurturing.after % 3600 === 0
+					? nurturing.after / 3600
+					: nurturing.after / 60
+				).toString(),
+			},
+		})),
 	} as ChatbotFlow;
 };
 
@@ -50,7 +47,6 @@ export default class ChatbotFlowService {
 	static async listChatBots(): Promise<ChatbotFlow[]> {
 		try {
 			const { data } = await api.get(`/chatbot/flows`);
-			console.log(data.flows);
 			return data.flows.map(validateChatBot);
 		} catch (err) {
 			return [];
@@ -98,7 +94,6 @@ export default class ChatbotFlowService {
 				delete nurturing.template_header;
 			}
 		});
-		console.log(details);
 		const { data } = await api.post(`/chatbot/flows`, details);
 		return validateChatBot(data.flow);
 	}

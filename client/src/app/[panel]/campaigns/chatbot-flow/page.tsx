@@ -16,8 +16,6 @@ import { MainContextMenu } from './_components/context-menus';
 export default async function ChatbotFlow({ params }: { params: { panel: string } }) {
 	const list = await ChatbotFlowService.listChatBots();
 
-	console.log(list);
-
 	if (!list) {
 		return notFound();
 	}

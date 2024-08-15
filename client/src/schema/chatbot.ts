@@ -135,11 +135,9 @@ export const chatbotSchema = z
 		}
 		if (value.respond_type === 'template') {
 			if (value.template_id.length === 0) {
-				console.log('template required');
 				return false;
 			}
 			if (value.template_name.length === 0) {
-				console.log('template name required');
 				return false;
 			}
 			if (

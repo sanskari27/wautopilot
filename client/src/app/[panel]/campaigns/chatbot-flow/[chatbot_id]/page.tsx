@@ -221,10 +221,6 @@ export default function CreateChatbotFlow() {
 
 	const isValid = ChatbotFlowSchema.safeParse(form.getValues()).success;
 
-	if (!isValid) {
-		console.log(ChatbotFlowSchema.safeParse(form.getValues()));
-	}
-
 	return (
 		<div className='custom-scrollbar flex flex-col gap-2 justify-center p-4'>
 			{/*--------------------------------- TRIGGER SECTION--------------------------- */}
