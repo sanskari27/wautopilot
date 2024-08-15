@@ -387,7 +387,7 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 
 export async function UpdateFlowValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		trigger: z.string().optional(),
+		trigger: z.array(z.string().min(1)).default([]),
 		options: z
 			.enum([
 				BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE,
