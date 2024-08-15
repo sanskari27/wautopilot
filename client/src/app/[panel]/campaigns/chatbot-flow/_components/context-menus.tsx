@@ -9,7 +9,8 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ChatbotFlow } from '@/types/chatbot';
+
+import { ChatbotFlow } from '@/schema/chatbot-flow';
 import { Cog, Delete, Edit, Settings2, ToggleLeft, ToggleRight } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';

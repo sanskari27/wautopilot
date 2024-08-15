@@ -25,7 +25,7 @@ export async function createChatbotFlow(chatbotFlow: ChatbotFlow) {
 }
 
 export async function editChatbotFlow(id: string, details: ChatbotFlow) {
-	const data = await ChatbotFlowService.editChatbotFlow({ botId: id, details });
+	const data = await ChatbotFlowService.updateChatbotFlow({ bot_id: id, details });
 	revalidatePath('[panel]/campaigns/chatbot-flow', 'page');
 	return data.id;
 }

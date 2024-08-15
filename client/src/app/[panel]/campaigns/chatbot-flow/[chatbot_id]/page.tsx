@@ -88,15 +88,6 @@ export default function CreateChatbotFlow() {
 	const nurturing = form.watch('nurturing');
 
 	const handleSubmit = (data: z.infer<typeof ChatbotFlowSchema>) => {
-		console.log({
-			...data,
-			nurturing: data.nurturing.map((nurturing) => ({
-				...nurturing,
-				after:
-					Number(nurturing.after.value) *
-					(nurturing.after.type === 'min' ? 60 : nurturing.after.type === 'hours' ? 3600 : 86400),
-			})),
-		});
 		for (let i = 0; i < data.nurturing.length; i++) {
 			if (data.nurturing[i].respond_type === 'normal') {
 				if (
@@ -146,7 +137,10 @@ export default function CreateChatbotFlow() {
 				router.replace(`/${params.panel}/campaigns/chatbot-flow/${res}/customize`);
 				return 'Saved';
 			},
-			error: 'Failed to save',
+			error: (err) => {
+				console.log(err);
+				return 'Failed to save';
+			},
 		});
 	};
 
@@ -226,6 +220,10 @@ export default function CreateChatbotFlow() {
 	};
 
 	const isValid = ChatbotFlowSchema.safeParse(form.getValues()).success;
+
+	if (!isValid) {
+		console.log(ChatbotFlowSchema.safeParse(form.getValues()));
+	}
 
 	return (
 		<div className='custom-scrollbar flex flex-col gap-2 justify-center p-4'>
