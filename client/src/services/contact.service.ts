@@ -13,44 +13,36 @@ const formatContact = (contact: any) => {
 			suffix: contact.name.suffix ?? '',
 			prefix: contact.name.prefix ?? '',
 		},
-		phones:
-			contact.phones ??
-			[].map((phone: any) => {
-				return {
-					phone: phone.phone ?? '',
-					wa_id: phone.wa_id ?? '',
-					type: phone.type ?? '',
-				};
-			}),
-		emails:
-			contact.emails ??
-			[].map((email: any) => {
-				return {
-					email: email.email ?? '',
-					type: email.type ?? '',
-				};
-			}),
-		urls:
-			contact.urls ??
-			[].map((url: any) => {
-				return {
-					url: url.url ?? '',
-					type: url.type ?? '',
-				};
-			}),
-		addresses:
-			contact.addresses ??
-			[].map((address: any) => {
-				return {
-					type: address.type ?? '',
-					street: address.street ?? '',
-					city: address.city ?? '',
-					state: address.state ?? '',
-					zip: address.zip ?? '',
-					country: address.country ?? '',
-					country_code: address.country_code ?? '',
-				};
-			}),
+		phones: (contact.phones ?? []).map((phone: any) => {
+			return {
+				phone: phone.phone ?? '',
+				wa_id: phone.wa_id ?? '',
+				type: phone.type ?? '',
+			};
+		}),
+		emails: (contact.emails ?? []).map((email: any) => {
+			return {
+				email: email.email ?? '',
+				type: email.type ?? 'HOME',
+			};
+		}),
+		urls: (contact.urls ?? []).map((url: any) => {
+			return {
+				url: url.url ?? '',
+				type: url.type ?? '',
+			};
+		}),
+		addresses: (contact.addresses ?? []).map((address: any) => {
+			return {
+				type: address.type ?? '',
+				street: address.street ?? '',
+				city: address.city ?? '',
+				state: address.state ?? '',
+				zip: address.zip ?? '',
+				country: address.country ?? '',
+				country_code: address.country_code ?? '',
+			};
+		}),
 		org: {
 			company: contact.org.company ?? '',
 			department: contact.org.department ?? '',

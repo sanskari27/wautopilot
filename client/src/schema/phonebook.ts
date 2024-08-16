@@ -16,7 +16,7 @@ export const contactSchema = z.object({
 	emails: z.array(
 		z.object({
 			email: z.string().email('Invalid email address'),
-			type: z.string(),
+			type: z.string().default('HOME'),
 		})
 	),
 	name: z.object({
