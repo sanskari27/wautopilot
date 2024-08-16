@@ -32,7 +32,7 @@ export default function SettingsDialog() {
 }
 
 export function SettingsForm({ onClose }: { onClose: () => void }) {
-	const { name, email, phone, isSubscribed, walletBalance } = useUserDetails();
+	const { name, email, phone, isSubscribed, walletBalance, isAgent } = useUserDetails();
 	const setProfile = useUserDetailsSetter();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -97,7 +97,9 @@ export function SettingsForm({ onClose }: { onClose: () => void }) {
 				<Tabs defaultValue='profile' className='w-full'>
 					<TabsList className='grid w-full grid-cols-2'>
 						<TabsTrigger value='profile'>Profile</TabsTrigger>
-						<TabsTrigger value='settings'>Settings</TabsTrigger>
+						<TabsTrigger disabled={isAgent} value='settings'>
+							Settings
+						</TabsTrigger>
 					</TabsList>
 					<TabsContent value='profile'>
 						<p>Name</p>
