@@ -55,7 +55,6 @@ export default function Navbar() {
 					<MenubarSeparator />
 					<MenubarLink href={getLink('/home/agents')}>Agents</MenubarLink>
 					<MenubarLink onClick={openDevices}>Devices</MenubarLink>
-					<MenubarLink href={getLink('/home/settings')}>Settings</MenubarLink>
 				</MenubarContent>
 			</MenubarMenu>
 			<MenubarMenu>
@@ -99,7 +98,7 @@ export default function Navbar() {
 				<MenubarContent>
 					<MenubarItem onClick={openSettings}>
 						<CircleUserRound className='mr-2' size={'1.2rem'} />
-						Profile Details
+						Account Details
 					</MenubarItem>
 					<MenubarSeparator />
 					<MenubarItem>
