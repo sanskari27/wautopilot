@@ -16,6 +16,9 @@ const Paths = {
 	Phonebook: '/audience/phonebook',
 	Media: '/audience/media',
 	Contacts: '/audience/contacts',
+	Admin: '/home/admin',
+	Coupons: '/home/coupons',
+	Extras: '/home/extras',
 };
 
 export async function middleware(request: NextRequest) {
@@ -43,7 +46,7 @@ export async function middleware(request: NextRequest) {
 			return Response.redirect(new URL(`/auth/login?callback=${pathname}`, request.url));
 		}
 
-		const { permissions } = (await AuthService.userDetails())!;
+		const { permissions, isMaster } = (await AuthService.userDetails())!;
 
 		if (
 			pathname.startsWith(`${roleBasedPath}${Paths.Chatbot}/create`) &&
@@ -101,6 +104,15 @@ export async function middleware(request: NextRequest) {
 		}
 
 		if (pathname.startsWith(`${roleBasedPath}${Paths.ButtonReport}`) && !permissions.buttons.read) {
+			return Response.redirect(new URL(`/permission-denied`, request.url));
+		}
+		if (pathname.startsWith(`${roleBasedPath}${Paths.Admin}`) && !isMaster) {
+			return Response.redirect(new URL(`/permission-denied`, request.url));
+		}
+		if (pathname.startsWith(`${roleBasedPath}${Paths.Coupons}`) && !isMaster) {
+			return Response.redirect(new URL(`/permission-denied`, request.url));
+		}
+		if (pathname.startsWith(`${roleBasedPath}${Paths.Extras}`) && !isMaster) {
 			return Response.redirect(new URL(`/permission-denied`, request.url));
 		}
 	} else if (
