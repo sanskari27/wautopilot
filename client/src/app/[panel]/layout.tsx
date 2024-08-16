@@ -30,9 +30,9 @@ export default async function Layout({
 	return (
 		<Suspense fallback={<Loading />}>
 			<main className='w-full h-full '>
-				<Navbar />
-				<PageLayout className='overflow-scroll'>
-					<UserDetailsProvider data={userDetails!}>
+				<UserDetailsProvider data={userDetails!}>
+					<Navbar />
+					<PageLayout className='overflow-scroll'>
 						<TagsProvider data={labels}>
 							<FieldsContextProvider data={fields}>
 								<AgentProvider data={agents}>{children}</AgentProvider>
@@ -40,8 +40,8 @@ export default async function Layout({
 							</FieldsContextProvider>
 						</TagsProvider>
 						<DevicesDialog />
-					</UserDetailsProvider>
-				</PageLayout>
+					</PageLayout>
+				</UserDetailsProvider>
 			</main>
 		</Suspense>
 	);

@@ -4,6 +4,7 @@ import { CircleUserRound } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import Show from '../containers/show';
 import { useUserDetails } from '../context/user-details';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -19,6 +20,7 @@ import {
 import { LogoutButton } from './logout-button';
 
 export default function Navbar() {
+	const { isMaster } = useUserDetails();
 	const userDetails = useUserDetails();
 	const pathname = usePathname();
 	const router = useRouter();
@@ -55,6 +57,12 @@ export default function Navbar() {
 					<MenubarSeparator />
 					<MenubarLink href={getLink('/home/agents')}>Agents</MenubarLink>
 					<MenubarLink onClick={openDevices}>Devices</MenubarLink>
+					<Show.ShowIf condition={isMaster}>
+						<MenubarSeparator />
+						<MenubarLink href={getLink('/home/admin')}>Admin</MenubarLink>
+						<MenubarLink href={getLink('/home/coupons')}>Coupons</MenubarLink>
+						<MenubarLink href={getLink('/home/extras')}>Extras</MenubarLink>
+					</Show.ShowIf>
 				</MenubarContent>
 			</MenubarMenu>
 			<MenubarMenu>
