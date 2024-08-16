@@ -68,6 +68,7 @@ export default function (app: Express) {
 
 		if (req.method !== 'GET') {
 			Logger.http(url, {
+				label: req.method,
 				type: 'request',
 				headers,
 				body,
