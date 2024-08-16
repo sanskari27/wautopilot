@@ -1,5 +1,7 @@
 'use client';
 import Each from '@/components/containers/each';
+import Show from '@/components/containers/show';
+import { useUserDetails } from '@/components/context/user-details';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -51,6 +53,7 @@ export default function DevicesDialog() {
 }
 
 function DevicesList() {
+	const { isAgent } = useUserDetails();
 	const router = useRouter();
 	const pathname = usePathname();
 	const [devices, setDevices] = useState<Device[]>([]);
@@ -101,6 +104,8 @@ function DevicesList() {
 		}
 		router.replace(url.toString());
 	};
+
+	console.log(isAgent)
 
 	return (
 		<Dialog
@@ -164,7 +169,9 @@ function DevicesList() {
 					>
 						Close
 					</Button>
-					<Button onClick={openAddDevices}>Add Device</Button>
+					<Show.ShowIf condition={!isAgent}>
+						<Button onClick={openAddDevices}>Add Device</Button>
+					</Show.ShowIf>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
@@ -173,7 +180,6 @@ function DevicesList() {
 
 function AddDeviceDialog() {
 	const router = useRouter();
-	const pathname = usePathname();
 
 	const { value: isOpen, ...setIsOpen } = useBoolean(false);
 	const { value: loading, ...setLoading } = useBoolean();

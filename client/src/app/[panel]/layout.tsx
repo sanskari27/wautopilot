@@ -37,8 +37,8 @@ export default async function Layout({
 								<SettingsDialog />
 							</FieldsContextProvider>
 						</TagsProvider>
+						<DevicesDialog />
 					</UserDetailsProvider>
-					<DevicesDialog />
 				</PageLayout>
 			</main>
 		</Suspense>
