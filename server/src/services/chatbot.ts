@@ -322,8 +322,13 @@ export default class ChatBotService extends WhatsappLinkService {
 		await ChatBotFlowDB.deleteMany({ bot_id, linked_to: this.userId });
 	}
 
-	public async botResponses(bot_id: Types.ObjectId) {
-		const bot = await ChatBotDB.findById(bot_id);
+	public async botResponses(bot_id: Types.ObjectId, type: 'chatbot' | 'chatbotflow' = 'chatbot') {
+		let bot;
+		if (type === 'chatbot') {
+			bot = await ChatBotDB.findById(bot_id);
+		} else {
+			bot = await ChatBotFlowDB.findById(bot_id);
+		}
 		const responses = await ConversationMessageDB.find({
 			linked_to: this.userId,
 			device_id: this.deviceId,

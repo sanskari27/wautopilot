@@ -256,6 +256,30 @@ async function toggleActive(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function downloadFlowResponses(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount: account,
+		device: { device },
+		id,
+		agentLogService,
+	} = req.locals;
+
+	const responses = await new ChatBotService(account, device).botResponses(id, 'chatbotflow');
+
+	agentLogService?.addLog({
+		text: `Download flow responses with id ${id}`,
+		data: {
+			id,
+		},
+	});
+
+	return RespondCSV({
+		res,
+		filename: `responses-${id}.csv`,
+		data: CSVHelper.exportChatbotReport(responses),
+	});
+}
+
 async function exportWhatsappFlow(req: Request, res: Response, next: NextFunction) {
 	const { serviceAccount: account } = req.locals;
 	const { id } = req.params;
@@ -510,6 +534,7 @@ const Controller = {
 	updateFlow,
 	listFlows,
 	downloadResponses,
+	downloadFlowResponses,
 	chatBotFlowDetails,
 	exportWhatsappFlow,
 	listWhatsappFlows,

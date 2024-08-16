@@ -46,6 +46,12 @@ router
 		Controller.createWhatsappFlow
 	);
 
+
+router
+	.route('/flows/:id/download-response')
+	.all(VerifyPermissions(Permissions.chatbot_flow.export), IDValidator)
+	.get(Controller.downloadFlowResponses);
+
 router
 	.route('/flows/:id')
 	.all(IDValidator)
