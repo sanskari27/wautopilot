@@ -763,7 +763,10 @@ export default class ChatBotService extends WhatsappLinkService {
 		}
 
 		if (details.bot.nurturing.length > 0) {
-			const dateGenerator = new TimeGenerator();
+			const dateGenerator = new TimeGenerator({
+				startTime: '00:01',
+				endTime: '23:59',
+			});
 
 			details.bot.nurturing.map(async (el) => {
 				const schedulerOptions = {
@@ -776,10 +779,10 @@ export default class ChatBotService extends WhatsappLinkService {
 					let msg = el.message;
 					if (msg) {
 						msg = parseVariables(msg, contact as unknown as Record<string, string>);
-
 						const msgObj = generateTextMessageObject(recipient, msg);
 						await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 					}
+					schedulerOptions.message_type = 'interactive';
 
 					for (const mediaObject of el.images) {
 						const msgObj = generateMediaMessageObject(recipient, {
@@ -851,9 +854,19 @@ export default class ChatBotService extends WhatsappLinkService {
 			scheduler_id: bot_id,
 			scheduler_type: ChatBotFlowDB_name,
 			sendAt: DateUtils.getMomentNow().toDate(),
-			message_type: 'interactive' as 'interactive' | 'normal' | 'template',
+			message_type: 'normal' as 'interactive' | 'normal' | 'template',
 		};
-		if (
+		if (node.node_type === 'textNode') {
+			const msgObj = {
+				messaging_product: 'whatsapp',
+				to: recipient,
+				type: 'text',
+				text: {
+					body: node.data.label,
+				},
+			};
+			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+		} else if (
 			node.node_type === 'imageNode' ||
 			node.node_type === 'videoNode' ||
 			node.node_type === 'documentNode' ||
@@ -881,6 +894,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					},
 				},
 			};
+			schedulerOptions.message_type = 'interactive';
 			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 		} else if (node.node_type === 'buttonNode') {
 			const msgObj = {
@@ -893,16 +907,6 @@ export default class ChatBotService extends WhatsappLinkService {
 					action: {
 						buttons: generateButtons(node.data.buttons),
 					},
-				},
-			};
-			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
-		} else if (node.node_type === 'textNode') {
-			const msgObj = {
-				messaging_product: 'whatsapp',
-				to: recipient,
-				type: 'text',
-				text: {
-					body: node.data.label,
 				},
 			};
 			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
