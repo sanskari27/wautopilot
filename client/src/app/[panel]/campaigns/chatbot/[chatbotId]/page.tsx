@@ -226,7 +226,12 @@ export default function ChatbotForm() {
 					className='flex flex-col rounded-xl mb-4 gap-8'
 				>
 					<div className='flex flex-col gap-2'>
-						<Button className='self-start' variant={'link'} onClick={() => router.back()}>
+						<Button
+							type='button'
+							className='self-start'
+							variant={'link'}
+							onClick={() => router.back()}
+						>
 							<ChevronLeftIcon className='w-6 h-6' />
 						</Button>
 						<div className='flex justify-between items-center'>
