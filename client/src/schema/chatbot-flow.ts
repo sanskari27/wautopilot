@@ -91,6 +91,10 @@ export const ChatbotFlowSchema = z.object({
 				return true;
 			})
 	),
+	forward: z.object({
+		number: z.string(),
+		message: z.string(),
+	}),
 });
 
 export type ChatbotFlow = z.infer<typeof ChatbotFlowSchema>;

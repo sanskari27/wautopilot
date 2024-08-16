@@ -115,6 +115,10 @@ const schema = new mongoose.Schema<IChatBot>(
 				],
 			},
 		],
+		forward: {
+			number: String,
+			message: String,
+		},
 		active: {
 			type: Boolean,
 			default: true,

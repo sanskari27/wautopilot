@@ -54,5 +54,6 @@ export default interface IChatBot extends Document {
 			fallback_value: string;
 		}[];
 	}[];
+	forward: { number: string; message: string };
 	active: boolean;
 }

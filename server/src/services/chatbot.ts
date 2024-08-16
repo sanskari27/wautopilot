@@ -79,6 +79,7 @@ type CreateBotData = {
 			fallback_value: string;
 		}[];
 	}[];
+	forward: { number: string; message: string };
 };
 
 type CreateFlowData = {
@@ -142,6 +143,7 @@ type CreateFlowData = {
 			fallback_value: string;
 		}[];
 	}[];
+	forward: { number: string; message: string };
 };
 
 function processDocs(docs: IChatBot[]) {
@@ -167,6 +169,10 @@ function processDocs(docs: IChatBot[]) {
 			template_body: bot.template_body,
 
 			nurturing: bot.nurturing ?? [],
+			forward: bot.forward ?? {
+				number: '',
+				message: '',
+			},
 			isActive: bot.active,
 		};
 	});
@@ -191,6 +197,10 @@ function processFlowDocs(docs: IChatBotFlow[]) {
 			})),
 			edges: bot.edges,
 			nurturing: bot.nurturing || [],
+			forward: bot.forward ?? {
+				number: '',
+				message: '',
+			},
 			isActive: bot.active,
 		};
 	});
@@ -679,6 +689,20 @@ export default class ChatBotService extends WhatsappLinkService {
 					});
 				});
 			}
+
+			if (bot.forward && bot.forward.number) {
+				const custom_message = parseVariables(
+					bot.forward.message,
+					contact as unknown as Record<string, string>
+				);
+				const msgObj = generateTextMessageObject(bot.forward.number, custom_message);
+				await schedulerService.schedule(bot.forward.number, msgObj, {
+					scheduler_id: bot._id,
+					scheduler_type: ChatBotFlowDB_name,
+					sendAt: DateUtils.getMomentNow().toDate(),
+					message_type: 'normal',
+				});
+			}
 		});
 
 		flowsEngaged.forEach(async (bot) => {
@@ -690,6 +714,20 @@ export default class ChatBotService extends WhatsappLinkService {
 				bot,
 				start_node_id: startNode?.id,
 			});
+
+			if (bot.forward && bot.forward.number) {
+				const custom_message = parseVariables(
+					bot.forward.message,
+					contact as unknown as Record<string, string>
+				);
+				const msgObj = generateTextMessageObject(bot.forward.number, custom_message);
+				await schedulerService.schedule(bot.forward.number, msgObj, {
+					scheduler_id: bot._id,
+					scheduler_type: ChatBotFlowDB_name,
+					sendAt: DateUtils.getMomentNow().toDate(),
+					message_type: 'normal',
+				});
+			}
 		});
 	}
 

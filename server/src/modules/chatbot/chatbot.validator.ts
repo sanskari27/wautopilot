@@ -50,6 +50,7 @@ export type CreateBotValidationResult = {
 			media_id?: string | undefined;
 		};
 	}[];
+	forward: { number: string; message: string };
 };
 
 export type CreateFlowValidationResult = {
@@ -113,6 +114,7 @@ export type CreateFlowValidationResult = {
 			fallback_value: string;
 		}[];
 	}[];
+	forward: { number: string; message: string };
 };
 
 export type UpdateFlowValidationResult = Partial<CreateFlowValidationResult>;
@@ -250,6 +252,11 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 			})
 			.array()
 			.default([]),
+
+		forward: z.object({
+			number: z.string().default(''),
+			message: z.string().default(''),
+		}),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
@@ -362,6 +369,10 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 				})
 			)
 			.default([]),
+		forward: z.object({
+			number: z.string().default(''),
+			message: z.string().default(''),
+		}),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
@@ -476,6 +487,10 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 				})
 			)
 			.default([]),
+		forward: z.object({
+			number: z.string().default(''),
+			message: z.string().default(''),
+		}),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

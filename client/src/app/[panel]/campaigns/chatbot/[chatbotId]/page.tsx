@@ -93,6 +93,7 @@ export default function ChatbotForm() {
 	phonebook_fields = phonebook_fields.filter((field) => field.value !== 'all');
 
 	const messageRef = useRef(0);
+	const forwardMessageRef = useRef(0);
 
 	const router = useRouter();
 	const params = useParams();
@@ -133,6 +134,18 @@ export default function ChatbotForm() {
 		);
 	};
 
+	const insertVariablesToForward = (variable: string) => {
+		const message = form.getValues('forward.message');
+		form.setValue(
+			'forward.message',
+			message?.substring(0, forwardMessageRef.current) +
+				' ' +
+				variable +
+				' ' +
+				message?.substring(forwardMessageRef.current ?? 0, message?.length)
+		);
+	};
+
 	const handleTemplateChange = (details: { id: string; name: string } | null) => {
 		if (!details) return;
 		form.setValue('template_name', details.name);
@@ -161,61 +174,39 @@ export default function ChatbotForm() {
 	};
 
 	const handleSubmit = (data: ChatBot) => {
+		const details = {
+			...data,
+			nurturing: data.nurturing.map((item) => {
+				return {
+					...item,
+					after:
+						Number(item.after.value) *
+						(item.after.type === 'minutes' ? 60 : item.after.type === 'hours' ? 3600 : 86400),
+				};
+			}),
+			trigger_gap_seconds:
+				Number(data.trigger_gap_time) *
+				(data.trigger_gap_type === 'SEC' ? 1 : data.trigger_gap_type === 'MINUTE' ? 60 : 3600),
+			response_delay_seconds:
+				Number(data.response_delay_time) *
+				(data.response_delay_type === 'SEC'
+					? 1
+					: data.response_delay_type === 'MINUTE'
+					? 60
+					: 3600),
+		};
+
 		const promise = data.id
 			? ChatBotService.editChatBot({
 					botId: data.id,
-					details: {
-						...data,
-						nurturing: data.nurturing.map((item) => {
-							return {
-								...item,
-								after:
-									Number(item.after.value) *
-									(item.after.type === 'minutes' ? 60 : item.after.type === 'hours' ? 3600 : 86400),
-							};
-						}),
-						trigger_gap_seconds:
-							Number(data.trigger_gap_time) *
-							(data.trigger_gap_type === 'SEC'
-								? 1
-								: data.trigger_gap_type === 'MINUTE'
-								? 60
-								: 3600),
-						response_delay_seconds:
-							Number(data.response_delay_time) *
-							(data.response_delay_type === 'SEC'
-								? 1
-								: data.response_delay_type === 'MINUTE'
-								? 60
-								: 3600),
-					},
+					details: details,
 			  })
-			: ChatBotService.createBot({
-					...data,
-					nurturing: data.nurturing.map((item) => {
-						return {
-							...item,
-							after:
-								Number(item.after.value) *
-								(item.after.type === 'minutes' ? 60 : item.after.type === 'hours' ? 3600 : 86400),
-						};
-					}),
-					trigger_gap_seconds:
-						Number(data.trigger_gap_time) *
-						(data.trigger_gap_type === 'SEC' ? 1 : data.trigger_gap_type === 'MINUTE' ? 60 : 3600),
-					response_delay_seconds:
-						Number(data.response_delay_time) *
-						(data.response_delay_type === 'SEC'
-							? 1
-							: data.response_delay_type === 'MINUTE'
-							? 60
-							: 3600),
-			  });
+			: ChatBotService.createBot(details);
 
 		toast.promise(promise, {
 			loading: 'Saving Chatbot...',
 			success: () => {
-				router.replace(`/${params.panel}/campaigns/chatbot`);
+				router.push(`/${params.panel}/campaigns/chatbot`);
 				return 'Successfully saved chatbot.';
 			},
 			error: 'Error saving chatbot. Please try agin.',
@@ -710,8 +701,29 @@ export default function ChatbotForm() {
 									<FormItem className='space-y-0 flex-1'>
 										<FormLabel>Message</FormLabel>
 										<FormControl>
-											<Textarea placeholder='ex. Forwarded Lead' {...field} />
+											<Textarea
+												placeholder='ex. Forwarded Lead'
+												{...field}
+												onMouseUp={(e: React.MouseEvent<HTMLTextAreaElement, MouseEvent>) => {
+													if (e.target instanceof HTMLTextAreaElement) {
+														forwardMessageRef.current = e.target.selectionStart;
+													}
+												}}
+											/>
 										</FormControl>
+										<div className='flex flex-wrap gap-4 pt-2'>
+											<Each
+												items={tagsVariable}
+												render={(tag) => (
+													<Badge
+														className='cursor-pointer'
+														onClick={() => insertVariablesToForward(tag)}
+													>
+														{tag}
+													</Badge>
+												)}
+											/>
+										</div>
 										<FormMessage />
 									</FormItem>
 								)}

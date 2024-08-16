@@ -70,4 +70,5 @@ export default interface IChatBotFlow extends Document {
 			fallback_value: string;
 		}[];
 	}[];
+	forward: { number: string; message: string };
 }

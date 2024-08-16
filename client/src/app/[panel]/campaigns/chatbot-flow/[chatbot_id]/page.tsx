@@ -8,6 +8,7 @@ import ContactSelectorDialog from '@/components/elements/dialogs/contact-selecto
 import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
 import TemplatePreview from '@/components/elements/template-preview';
 import TemplateSelector from '@/components/elements/templetes-selector';
+import AbsoluteCenter from '@/components/ui/absolute-center';
 import {
 	Accordion,
 	AccordionContent,
@@ -55,6 +56,10 @@ const DEFAULT_VALUE = {
 	options: 'INCLUDES_IGNORE_CASE',
 	isActive: false,
 	nurturing: [],
+	forward: {
+		number: '',
+		message: '',
+	},
 };
 
 const tagsVariable = [
@@ -69,6 +74,7 @@ const tagsVariable = [
 
 export default function CreateChatbotFlow() {
 	const messageRef = useRef(0);
+	const forwardMessageRef = useRef(0);
 	const router = useRouter();
 	const params = useParams();
 	const templates = useTemplates();
@@ -104,33 +110,16 @@ export default function CreateChatbotFlow() {
 				}
 			}
 		}
-		const promise = isEditing
-			? editChatbotFlow(data.id, {
-					...data,
-					nurturing: data.nurturing.map((nurturing) => ({
-						...nurturing,
-						after:
-							Number(nurturing.after.value) *
-							(nurturing.after.type === 'min'
-								? 60
-								: nurturing.after.type === 'hours'
-								? 3600
-								: 86400),
-					})),
-			  })
-			: createChatbotFlow({
-					...data,
-					nurturing: data.nurturing.map((nurturing) => ({
-						...nurturing,
-						after:
-							Number(nurturing.after.value) *
-							(nurturing.after.type === 'min'
-								? 60
-								: nurturing.after.type === 'hours'
-								? 3600
-								: 86400),
-					})),
-			  });
+		const details = {
+			...data,
+			nurturing: data.nurturing.map((nurturing) => ({
+				...nurturing,
+				after:
+					Number(nurturing.after.value) *
+					(nurturing.after.type === 'min' ? 60 : nurturing.after.type === 'hours' ? 3600 : 86400),
+			})),
+		};
+		const promise = isEditing ? editChatbotFlow(data.id, details) : createChatbotFlow(details);
 		toast.promise(promise, {
 			loading: 'Saving...',
 			success: (res) => {
@@ -150,6 +139,18 @@ export default function CreateChatbotFlow() {
 			form.getValues().nurturing[index].message.slice(0, messageRef.current) +
 				variable +
 				form.getValues().nurturing[index].message.slice(messageRef.current)
+		);
+	};
+
+	const insertVariablesToForward = (variable: string) => {
+		const message = form.getValues('forward.message');
+		form.setValue(
+			'forward.message',
+			message?.substring(0, forwardMessageRef.current) +
+				' ' +
+				variable +
+				' ' +
+				message?.substring(forwardMessageRef.current ?? 0, message?.length)
 		);
 	};
 
@@ -320,6 +321,67 @@ export default function CreateChatbotFlow() {
 								</FormItem>
 							)}
 						/>
+					</div>
+
+					{/* -------------------------------- FORWARD SECTION -------------------------- */}
+
+					<div className='flex flex-col gap-2 mt-4'>
+						<div className='relative'>
+							<Separator />
+							<AbsoluteCenter className='px-4'>Forward Leads</AbsoluteCenter>
+						</div>
+						<div className='flex-1 mt-2'>
+							<FormField
+								name='forward.number'
+								control={form.control}
+								render={({ field }) => (
+									<FormItem className='space-y-0 flex-1'>
+										<FormLabel>Forward To (without +)</FormLabel>
+										<FormControl>
+											<Input placeholder='ex 9175XXXXXX68' {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+
+						<div className='flex-1'>
+							<FormField
+								name='forward.message'
+								control={form.control}
+								render={({ field }) => (
+									<FormItem className='space-y-0 flex-1'>
+										<FormLabel>Message</FormLabel>
+										<FormControl>
+											<Textarea
+												placeholder='ex. Forwarded Lead'
+												{...field}
+												onMouseUp={(e: React.MouseEvent<HTMLTextAreaElement, MouseEvent>) => {
+													if (e.target instanceof HTMLTextAreaElement) {
+														forwardMessageRef.current = e.target.selectionStart;
+													}
+												}}
+											/>
+										</FormControl>
+										<div className='flex flex-wrap gap-4 pt-2'>
+											<Each
+												items={tagsVariable}
+												render={(tag) => (
+													<Badge
+														className='cursor-pointer'
+														onClick={() => insertVariablesToForward(tag)}
+													>
+														{tag}
+													</Badge>
+												)}
+											/>
+										</div>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
 					</div>
 
 					{/*--------------------------------- NURTURING SECTION--------------------------- */}

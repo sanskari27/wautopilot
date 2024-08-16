@@ -40,6 +40,7 @@ const validateChatBot = (bot: any) => {
 				).toString(),
 			},
 		})),
+		forward: bot.forward ?? { number: '', message: '' },
 	} as ChatbotFlow;
 };
 

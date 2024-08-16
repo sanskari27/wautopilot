@@ -133,6 +133,10 @@ const schema = new mongoose.Schema<IChatBotFlow>(
 				],
 			},
 		],
+		forward: {
+			number: String,
+			message: String,
+		},
 	},
 	{
 		timestamps: { createdAt: true },
