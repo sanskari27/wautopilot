@@ -1,8 +1,7 @@
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableCellLink, TableHeader, TableRow } from '@/components/ui/table';
 import { ContactWithID } from '@/schema/phonebook';
-import Link from 'next/link';
 
 export function DataTable({ records }: { records: ContactWithID[] }) {
 	return (
@@ -30,14 +29,12 @@ export function DataTable({ records }: { records: ContactWithID[] }) {
 									render={(record, index) => (
 										<TableRow>
 											<TableCell>{index + 1}.</TableCell>
-											<Link
+											<TableCellLink
 												href={`?contact=${record.id}&data=${JSON.stringify(record)}`}
-												className='w-full h-full  inline-block'
+												className='w-full inline-block'
 											>
-												<TableCell className='w-full inline-block'>
-													{record.formatted_name}
-												</TableCell>
-											</Link>
+												{record.formatted_name}
+											</TableCellLink>
 										</TableRow>
 									)}
 								/>
