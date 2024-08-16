@@ -8,6 +8,8 @@ import {
 	ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import { Admin } from '@/types/admin';
+import toast from 'react-hot-toast';
+import { switchServiceAccount } from '../action';
 
 export function AdminContextMenu({
 	children,
@@ -20,19 +22,12 @@ export function AdminContextMenu({
 	disabled?: boolean;
 	admin: Admin;
 }) {
-	// const openServiceAccount = async () => {
-	// 	const status = await AuthService.serviceAccount(admin.id);
-	// 	if (status) {
-	// 		window.location.href = ADMIN_URL;
-	// 	} else {
-	// 		toast({
-	// 			title: 'Unable to switch account.',
-	// 			description: 'Please try again later.',
-	// 			status: 'error',
-	// 		});
-	// 	}
-	// };
-
+	const openServiceAccount = async () => {
+		toast.loading('Switching account...', {
+			duration: 5000,
+		});
+		await switchServiceAccount(id);
+	};
 	if (disabled) {
 		return <>{children}</>;
 	}
@@ -55,7 +50,7 @@ export function AdminContextMenu({
 				>
 					Set markup price
 				</ContextMenuLink>
-				<ContextMenuItem inset>Service account</ContextMenuItem>
+				<ContextMenuItem onClick={openServiceAccount} inset>Service account</ContextMenuItem>
 			</ContextMenuContent>
 		</ContextMenu>
 	);
