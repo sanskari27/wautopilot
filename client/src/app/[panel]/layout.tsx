@@ -21,16 +21,18 @@ export default async function Layout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const userDetails = (await AuthService.userDetails())!;
-	const agents = (await AgentService.getAgents())!;
-	const { labels, fields } = (await PhoneBookService.allLabels())!;
+	const [userDetails, agents, { labels, fields }] = await Promise.all([
+		AuthService.userDetails(),
+		AgentService.getAgents(),
+		PhoneBookService.allLabels(),
+	]);
 
 	return (
 		<Suspense fallback={<Loading />}>
 			<main className='w-full h-full '>
 				<Navbar />
 				<PageLayout className='overflow-scroll'>
-					<UserDetailsProvider data={userDetails}>
+					<UserDetailsProvider data={userDetails!}>
 						<TagsProvider data={labels}>
 							<FieldsContextProvider data={fields}>
 								<AgentProvider data={agents}>{children}</AgentProvider>

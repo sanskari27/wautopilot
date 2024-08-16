@@ -19,10 +19,12 @@ export default async function Layout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const conversations = await MessagesService.fetchAllConversation();
-	const quickReplies = await MessagesService.fetchQuickReplies();
-	const media = (await MediaService.getMedias())!;
-	const contacts = (await ContactService.listContacts())!;
+	const [conversations, quickReplies, media, contacts] = await Promise.all([
+		MessagesService.fetchAllConversation(),
+		MessagesService.fetchQuickReplies(),
+		MediaService.getMedias(),
+		ContactService.listContacts(),
+	]);
 
 	return (
 		<Suspense fallback={<Loading />}>
