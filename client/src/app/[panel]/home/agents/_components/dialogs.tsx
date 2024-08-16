@@ -561,7 +561,7 @@ export function PermissionDialog() {
 										defaultChecked={data.chatbot_flow?.create}
 										{...register('chatbot_flow.create')}
 										onCheckedChange={(e) => {
-											setValue('chatbot.create', Boolean(e));
+											setValue('chatbot_flow.create', Boolean(e));
 										}}
 									/>
 								</TableCell>
