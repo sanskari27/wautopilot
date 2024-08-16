@@ -46,8 +46,10 @@ export default async function ChatbotFlow({ params }: { params: { panel: string 
 						render={(item) => (
 							<TableRow>
 								<TableCell>{item.name}</TableCell>
-								<TableCell>{item.trigger}</TableCell>
-								<TableCell>{item.options}</TableCell>
+								<TableCell>{item.trigger.join(', ')}</TableCell>
+								<TableCell className='capitalize'>
+									{item.options.toLowerCase().replaceAll('_', ' ')}
+								</TableCell>
 								<TableCell>{item.isActive ? 'Active' : 'Inactive'}</TableCell>
 								<TableCell className='text-center'>
 									<MainContextMenu details={item}>
