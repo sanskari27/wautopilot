@@ -567,7 +567,7 @@ export function PermissionDialog() {
 								</TableCell>
 								<TableCell className='text-center'>
 									<Checkbox
-										defaultChecked={data.chatbot?.update}
+										defaultChecked={data.chatbot_flow?.update}
 										{...register('chatbot_flow.update')}
 										onCheckedChange={(e) => {
 											setValue('chatbot_flow.update', Boolean(e));
@@ -607,15 +607,7 @@ export function PermissionDialog() {
 										}}
 									/>
 								</TableCell>
-								<TableCell className='text-center'>
-									<Checkbox
-										defaultChecked={data.media?.update}
-										{...register('media.update')}
-										onCheckedChange={(e) => {
-											setValue('media.update', Boolean(e));
-										}}
-									/>
-								</TableCell>
+								<TableCell className='text-center'></TableCell>
 								<TableCell className='text-center'>
 									<Checkbox
 										defaultChecked={data.media?.delete}

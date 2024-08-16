@@ -56,13 +56,13 @@ export async function middleware(request: NextRequest) {
 		}
 		if (
 			pathname.startsWith(`${roleBasedPath}${Paths.ChatbotFlow}/new`) &&
-			!permissions.chatbot.create
+			!permissions.chatbot_flow.create
 		) {
 			return Response.redirect(new URL(`/permission-denied`, request.url));
 		}
 		if (
 			pathname.startsWith(`${roleBasedPath}${Paths.ChatbotFlow}/`) &&
-			!permissions.chatbot.update
+			!permissions.chatbot_flow.update
 		) {
 			return Response.redirect(new URL(`/permission-denied`, request.url));
 		}

@@ -12,7 +12,8 @@ import {
 
 import { usePermissions } from '@/components/context/user-details';
 import { ChatbotFlow } from '@/schema/chatbot-flow';
-import { Cog, Delete, Edit, Settings2, ToggleLeft, ToggleRight } from 'lucide-react';
+import ChatbotFlowService from '@/services/chatbot-flow.service';
+import { Cog, Delete, Download, Edit, Settings2, ToggleLeft, ToggleRight } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -44,6 +45,14 @@ export function MainContextMenu({
 			loading: 'Deleting...',
 			success: 'Deleted successfully',
 			error: 'Failed to delete',
+		});
+	};
+
+	const handleExportChatbotFlow = () => {
+		toast.promise(ChatbotFlowService.exportChatbotFlow(details.id), {
+			loading: 'Exporting...',
+			success: 'Exported successfully',
+			error: 'Failed to export',
 		});
 	};
 
@@ -93,6 +102,12 @@ export function MainContextMenu({
 							</Button>
 						</DeleteDialog>
 					</Show.ShowIf>
+				</Show.ShowIf>
+				<Show.ShowIf condition={permissions.export}>
+					<DropdownMenuItem onClick={handleExportChatbotFlow}>
+						<Download className='mr-2 h-4 w-4' />
+						<span>Export Chatbot</span>
+					</DropdownMenuItem>
 				</Show.ShowIf>
 				<Show.ShowIf condition={buttons_read}>
 					<Link href={`/${params.panel}/campaigns/button-report/${details.id}`}>
