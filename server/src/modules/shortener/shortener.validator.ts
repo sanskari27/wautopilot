@@ -32,17 +32,13 @@ export async function LinkValidator(req: Request, res: Response, next: NextFunct
 		req.locals.data = reqValidatorResult.data;
 		return next();
 	}
-	const message = reqValidatorResult.error.issues
-		.map((err) => err.path)
-		.flat()
-		.filter((item, pos, arr) => arr.indexOf(item) == pos)
-		.join(', ');
 
 	return next(
 		new CustomError({
 			STATUS: 400,
 			TITLE: 'INVALID_FIELDS',
-			MESSAGE: message,
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
 		})
 	);
 }

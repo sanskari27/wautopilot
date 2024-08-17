@@ -265,17 +265,13 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 		req.locals.data = reqValidatorResult.data;
 		return next();
 	}
-	const message = reqValidatorResult.error.issues
-		.map((err) => err.path)
-		.flat()
-		.filter((item, pos, arr) => arr.indexOf(item) == pos)
-		.join(', ');
 
 	return next(
 		new CustomError({
 			STATUS: 400,
 			TITLE: 'INVALID_FIELDS',
-			MESSAGE: message,
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
 		})
 	);
 }
@@ -381,17 +377,13 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 		req.locals.data = reqValidatorResult.data;
 		return next();
 	}
-	const message = reqValidatorResult.error.issues
-		.map((err) => err.path)
-		.flat()
-		.filter((item, pos, arr) => arr.indexOf(item) == pos)
-		.join(', ');
 
 	return next(
 		new CustomError({
 			STATUS: 400,
 			TITLE: 'INVALID_FIELDS',
-			MESSAGE: message,
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
 		})
 	);
 }
@@ -499,17 +491,13 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 		req.locals.data = reqValidatorResult.data;
 		return next();
 	}
-	const message = reqValidatorResult.error.issues
-		.map((err) => err.path)
-		.flat()
-		.filter((item, pos, arr) => arr.indexOf(item) == pos)
-		.join(', ');
 
 	return next(
 		new CustomError({
 			STATUS: 400,
 			TITLE: 'INVALID_FIELDS',
-			MESSAGE: message,
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
 		})
 	);
 }
@@ -537,17 +525,13 @@ export async function WhatsappFlowValidator(req: Request, res: Response, next: N
 		req.locals.data = reqValidatorResult.data;
 		return next();
 	}
-	const message = reqValidatorResult.error.issues
-		.map((err) => err.path)
-		.flat()
-		.filter((item, pos, arr) => arr.indexOf(item) == pos)
-		.join(', ');
 
 	return next(
 		new CustomError({
 			STATUS: 400,
 			TITLE: 'INVALID_FIELDS',
-			MESSAGE: message,
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
 		})
 	);
 }
@@ -629,17 +613,13 @@ export async function UpdateWhatsappFlowValidator(req: Request, res: Response, n
 		req.locals.data = reqValidatorResult.data;
 		return next();
 	}
-	const message = reqValidatorResult.error.issues
-		.map((err) => err.path)
-		.flat()
-		.filter((item, pos, arr) => arr.indexOf(item) == pos)
-		.join(', ');
 
 	return next(
 		new CustomError({
 			STATUS: 400,
 			TITLE: 'INVALID_FIELDS',
-			MESSAGE: message,
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
 		})
 	);
 }

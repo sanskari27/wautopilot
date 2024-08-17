@@ -1,4 +1,5 @@
 import express from 'express';
+import ApiKeysRoute from './api-keys/keys.route';
 import SessionRoute from './auth/auth.route';
 import BroadcastRoute from './broadcast/broadcast.route';
 import ChatBotRoute from './chatbot/chatbot.route';
@@ -14,6 +15,7 @@ import ShortenerRoute from './shortener/shortener.route';
 import TemplateRoute from './template/template.route';
 import UploadsRoute from './uploads/uploads.route';
 import UsersRoute from './users/users.route';
+import V1 from './v1';
 import WebhooksRoute from './webhooks/webhooks.route';
 import WhatsappLinkRoute from './whatsapp-link/whatsappLink.route';
 
@@ -22,6 +24,7 @@ import { CustomError, ERRORS } from '../errors';
 import { VerifyDevice, VerifySession } from '../middleware';
 import SocketServer from '../socket';
 import { Respond, generateRandomID } from '../utils/ExpressUtils';
+import VerifyAPIKey from '../middleware/VerifyAPIKey';
 
 const router = express.Router();
 
@@ -35,6 +38,7 @@ router.use('/whatsapp-link', VerifySession, WhatsappLinkRoute);
 router.use('/payment', VerifySession, PaymentRoute);
 router.use('/shortener', VerifySession, ShortenerRoute);
 
+router.use('/api-keys', VerifySession, ApiKeysRoute);
 router.use('/overview', VerifySession, OverviewRoute);
 router.use('/template', VerifySession, VerifyDevice, TemplateRoute);
 router.use('/broadcast', VerifySession, VerifyDevice, BroadcastRoute);
@@ -45,6 +49,8 @@ router.use('/uploads', VerifySession, VerifyDevice, UploadsRoute);
 router.use('/users', VerifySession, UsersRoute);
 router.use('/extras', ExtrasRoute);
 router.use('/webhooks', WebhooksRoute);
+
+router.use('/v1',VerifyAPIKey, V1);
 
 router
 	.route('/conversation-message-key')

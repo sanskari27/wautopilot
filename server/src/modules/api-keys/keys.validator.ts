@@ -1,20 +1,28 @@
 import { NextFunction, Request, Response } from 'express';
+import { Types } from 'mongoose';
 import { z } from 'zod';
 import { CustomError } from '../../errors';
+import { idSchema } from '../../utils/schema';
 
-export type WhatsappLinkCreateValidationResult = {
-	phoneNumberId: string;
-	waid: string;
-	accessToken?: string;
-	code?: string;
+export type TCreateAPIKey = {
+	name: string;
+	permissions: {
+		messages: {
+			create: boolean;
+		};
+	};
+	device: Types.ObjectId;
 };
 
-export async function WhatsappLinkCreateValidator(req: Request, res: Response, next: NextFunction) {
+export async function CreateAPIKeyValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		phoneNumberId: z.string(),
-		waid: z.string(),
-		accessToken: z.string().optional(),
-		code: z.string().optional(),
+		name: z.string().min(3, 'Name must be at least 3 characters long'),
+		device: idSchema,
+		permissions: z.object({
+			messages: z.object({
+				create: z.boolean().default(true),
+			}),
+		}),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

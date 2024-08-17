@@ -6,12 +6,14 @@ export default class CustomError extends ServerError {
 	message: string;
 	status: number;
 	error: any;
+	object?: Record<string, any>;
 	constructor(option: IServerError, err: any = null) {
 		super(option.MESSAGE);
 		Object.setPrototypeOf(this, CustomError.prototype);
 		this.title = option.TITLE;
 		this.message = option.MESSAGE;
 		this.status = option.STATUS;
+		this.object = option.OBJECT;
 		this.error = err;
 	}
 
@@ -24,6 +26,6 @@ export default class CustomError extends ServerError {
 	}
 
 	toString() {
-		return 'Error: ' + this.status + ' - ' + this.title + ' - ' + this.message + '\n';
+		return 'Error: ' + this.status + ' - ' + this.title + ' - ' + this.message.toString() + '\n';
 	}
 }

@@ -7,3 +7,8 @@ export const idsArray = z.array(
 		.refine((id) => idValidator(id)[0])
 		.transform((id) => idValidator(id)[1])
 );
+
+export const idSchema = z
+	.string()
+	.refine((id) => idValidator(id)[0])
+	.transform((id) => idValidator(id)[1]);

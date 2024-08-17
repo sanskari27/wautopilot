@@ -30,17 +30,13 @@ export async function FAQValidator(req: Request, res: Response, next: NextFuncti
 		req.locals.data = reqValidatorResult.data.list;
 		return next();
 	}
-	const message = reqValidatorResult.error.issues
-		.map((err) => err.path)
-		.flat()
-		.filter((item, pos, arr) => arr.indexOf(item) == pos)
-		.join(', ');
 
 	return next(
 		new CustomError({
 			STATUS: 400,
 			TITLE: 'INVALID_FIELDS',
-			MESSAGE: message,
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
 		})
 	);
 }
@@ -63,17 +59,13 @@ export async function TestimonialValidator(req: Request, res: Response, next: Ne
 		req.locals.data = reqValidatorResult.data.list;
 		return next();
 	}
-	const message = reqValidatorResult.error.issues
-		.map((err) => err.path)
-		.flat()
-		.filter((item, pos, arr) => arr.indexOf(item) == pos)
-		.join(', ');
 
 	return next(
 		new CustomError({
 			STATUS: 400,
 			TITLE: 'INVALID_FIELDS',
-			MESSAGE: message,
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
 		})
 	);
 }

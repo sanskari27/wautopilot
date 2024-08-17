@@ -96,6 +96,7 @@ export default function (app: Express) {
 				status: 'error',
 				title: err.title,
 				message: err.message,
+				error: err.object,
 			});
 		}
 

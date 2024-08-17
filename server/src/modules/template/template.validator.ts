@@ -19,17 +19,13 @@ export async function TemplateRemoveValidator(req: Request, res: Response, next:
 		req.locals.data = reqValidatorResult.data;
 		return next();
 	}
-	const message = reqValidatorResult.error.issues
-		.map((err) => err.path)
-		.flat()
-		.filter((item, pos, arr) => arr.indexOf(item) == pos)
-		.join(', ');
 
 	return next(
 		new CustomError({
 			STATUS: 400,
 			TITLE: 'INVALID_FIELDS',
-			MESSAGE: message,
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
 		})
 	);
 }
@@ -96,17 +92,12 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 		return next();
 	}
 
-	const message = reqValidatorResult.error.issues
-		.map((err) => err.path)
-		.flat()
-		.filter((item, pos, arr) => arr.indexOf(item) == pos)
-		.join(', ');
-
 	return next(
 		new CustomError({
 			STATUS: 400,
 			TITLE: 'INVALID_FIELDS',
-			MESSAGE: message,
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
 		})
 	);
 }
@@ -158,6 +149,11 @@ export async function TemplateEditValidator(req: Request, res: Response, next: N
 		buttonsSchema,
 	]);
 
+	const _res = componentSchema.safeParse(req.body);
+	if (_res.success) {
+		_res.data;
+	}
+
 	const reqValidator = z.object({
 		id: z.string(),
 		name: z.string(),
@@ -174,17 +170,12 @@ export async function TemplateEditValidator(req: Request, res: Response, next: N
 		return next();
 	}
 
-	const message = reqValidatorResult.error.issues
-		.map((err) => err.path)
-		.flat()
-		.filter((item, pos, arr) => arr.indexOf(item) == pos)
-		.join(', ');
-
 	return next(
 		new CustomError({
 			STATUS: 400,
 			TITLE: 'INVALID_FIELDS',
-			MESSAGE: message,
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
 		})
 	);
 }

@@ -27,17 +27,13 @@ export async function CreateCouponValidator(req: Request, res: Response, next: N
 		req.locals.data = reqValidatorResult.data;
 		return next();
 	}
-	const message = reqValidatorResult.error.issues
-		.map((err) => err.path)
-		.flat()
-		.filter((item, pos, arr) => arr.indexOf(item) == pos)
-		.join(', ');
 
 	return next(
 		new CustomError({
 			STATUS: 400,
 			TITLE: 'INVALID_FIELDS',
-			MESSAGE: message,
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
 		})
 	);
 }

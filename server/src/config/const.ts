@@ -7,6 +7,7 @@ export const PORT = process.env.PORT !== undefined ? process.env.PORT : undefine
 
 export const JWT_SECRET = process.env.JWT_SECRET ?? 'jwt-secret';
 export const JWT_EXPIRE = process.env.JWT_EXPIRE ?? '3m';
+export const API_SECRET = process.env.API_SECRET ?? 'api-secret';
 export const REFRESH_SECRET = process.env.REFRESH_SECRET ?? 'refresh-secret';
 export const REFRESH_EXPIRE = process.env.REFRESH_EXPIRE ?? '28d';
 export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60;
