@@ -134,7 +134,7 @@ export function TestimonialDialog({
 }) {
 	const pathName = usePathname();
 	const router = useRouter();
-	const id = useSearchParams().get('testimonials');
+	const id = useSearchParams().get('testimonial');
 	const raw = parseToObject(useSearchParams().get('data')) as {
 		title: string;
 		name: string;
@@ -152,6 +152,10 @@ export function TestimonialDialog({
 		photo_url: string;
 		description: string;
 	}) => {
+		if (details.description.length < 300 || details.description.length > 400) {
+			toast.error('Description should be between 300 and 400 characters');
+			return;
+		}
 		let newList: {
 			title: string;
 			name: string;
@@ -249,7 +253,7 @@ function TestimonialDetails({
 						})
 					}
 				/>
-				<p>Description</p>
+				<p>Description ({details.description.length} words)</p>
 				<Input
 					placeholder='eg. I love the product...'
 					value={details.description}

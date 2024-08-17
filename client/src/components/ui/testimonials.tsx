@@ -84,7 +84,7 @@ export const InfiniteMovingCards = ({
 					<li key={idx} className=''>
 						<div className='w-full relative max-w-md'>
 							<div className='absolute inset-0 h-full w-full bg-gradient-to-r from-green-500 to-green-200 transform scale-[0.80] bg-red-500 rounded-full blur-3xl' />
-							<div className='min-h-[350px] relative shadow-xl bg-primary-foreground border border-primary  px-4 py-8 h-full overflow-hidden rounded-2xl flex flex-col justify-start items-start'>
+							<div className='w-full min-h-[350px] relative shadow-xl bg-primary-foreground border border-primary  px-4 py-8 h-full overflow-hidden rounded-2xl flex flex-col justify-start items-start'>
 
 								<h1 className='font-bold text-xl text-primary mb-4 relative z-50'>
 									{item.title}

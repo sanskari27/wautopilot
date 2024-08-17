@@ -26,7 +26,7 @@ export default async function TestimonialsPage() {
 		<div className='flex flex-col'>
 			<div className='flex gap-2 justify-between'>
 				<h1 className='text-2xl font-semibold'>FAQ</h1>
-				<Link href='?testimonials=create'>
+				<Link href='?testimonial=create'>
 					<Button>
 						<Plus size={16} />
 						Create Testimonials
@@ -36,7 +36,7 @@ export default async function TestimonialsPage() {
 			<Table className='border-2 border-dashed mt-4 rounded-lg'>
 				<TableHeader>
 					<TableRow>
-						<TableHead className='w-[5%]'>Sl. no.</TableHead>
+						<TableHead className='w-[7%]'>Sl. no.</TableHead>
 						<TableHead>Title</TableHead>
 						<TableHead>Info</TableHead>
 						<TableHead>Description</TableHead>
@@ -48,14 +48,14 @@ export default async function TestimonialsPage() {
 						items={list}
 						render={(item, index) => (
 							<TableRow key={item.title}>
-								<TableCell>{index + 1}</TableCell>
-								<TableCell className='whitespace-pre-wrap'>{item.title}</TableCell>
-								<TableCell className='whitespace-pre-wrap'>{item.name}</TableCell>
-								<TableCell className='whitespace-pre-wrap'>{item.description}</TableCell>
-								<TableCell className='text-center'>
+								<TableCell className='px-4'>{index + 1}</TableCell>
+								<TableCell className='px-4 whitespace-pre-wrap'>{item.title}</TableCell>
+								<TableCell className='px-4 whitespace-pre-wrap'>{item.name}</TableCell>
+								<TableCell className='px-4 whitespace-pre-wrap'>{item.description}</TableCell>
+								<TableCell className='px-4 text-center'>
 									<TestimonialsContextMenu list={list} id={index} testimonial={item}>
 										<Button size='sm' variant={'outline'}>
-											Edit
+											Action
 										</Button>
 									</TestimonialsContextMenu>
 								</TableCell>
