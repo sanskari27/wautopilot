@@ -197,10 +197,11 @@ export default async function Home() {
 					</div>
 				</section>
 				<section hidden={(testimonialList ?? []).length === 0} id='testimonials'>
-					<div className='h-[40rem] rounded-md flex flex-col antialiased bg-white dark:bg-black dark:bg-grid-white/[0.05] items-center justify-center relative overflow-hidden'>
+					<div className='h-[40rem] rounded-md flex flex-col antialiased bg-transparent items-center justify-center relative overflow-hidden'>
 						<InfiniteMovingCards items={testimonialList ?? []} direction='right' speed='slow' />
 					</div>
 				</section>
+				<section></section>
 				<section
 					hidden={(faqList ?? []).length === 0}
 					id='faq'

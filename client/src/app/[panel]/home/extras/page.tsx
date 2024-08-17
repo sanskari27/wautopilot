@@ -1,5 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import FAQPage from './_components/FAQ';
+import TestimonialsPage from './_components/Testimonials';
 
 export default async function ExtrasPage() {
 	return (
@@ -12,7 +13,9 @@ export default async function ExtrasPage() {
 				<TabsContent value='faq'>
 					<FAQPage />
 				</TabsContent>
-				<TabsContent value='testimonials'>Change your password here.</TabsContent>
+				<TabsContent value='testimonials'>
+					<TestimonialsPage />
+				</TabsContent>
 			</Tabs>
 		</div>
 	);

@@ -12,11 +12,11 @@ import ExtraService from '@/services/extra.service';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { FAQContextMenu } from './ContextMenu';
-import { FAQDialog } from './dialogs';
+import { TestimonialsContextMenu } from './ContextMenu';
+import { TestimonialDialog } from './dialogs';
 
-export default async function FAQPage() {
-	const list = await ExtraService.getFAQs();
+export default async function TestimonialsPage() {
+	const list = await ExtraService.getTestimonials();
 
 	if (!list) {
 		return notFound();
@@ -26,10 +26,10 @@ export default async function FAQPage() {
 		<div className='flex flex-col'>
 			<div className='flex gap-2 justify-between'>
 				<h1 className='text-2xl font-semibold'>FAQ</h1>
-				<Link href='?faq=create'>
+				<Link href='?testimonials=create'>
 					<Button>
 						<Plus size={16} />
-						Create FAQ
+						Create Testimonials
 					</Button>
 				</Link>
 			</div>
@@ -39,6 +39,7 @@ export default async function FAQPage() {
 						<TableHead className='w-[5%]'>Sl. no.</TableHead>
 						<TableHead>Title</TableHead>
 						<TableHead>Info</TableHead>
+						<TableHead>Description</TableHead>
 						<TableHead className='text-center w-10%'>Action</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -49,20 +50,21 @@ export default async function FAQPage() {
 							<TableRow key={item.title}>
 								<TableCell>{index + 1}</TableCell>
 								<TableCell className='whitespace-pre-wrap'>{item.title}</TableCell>
-								<TableCell className='whitespace-pre-wrap'>{item.info}</TableCell>
+								<TableCell className='whitespace-pre-wrap'>{item.name}</TableCell>
+								<TableCell className='whitespace-pre-wrap'>{item.description}</TableCell>
 								<TableCell className='text-center'>
-									<FAQContextMenu list={list} id={index} FAQ={item}>
+									<TestimonialsContextMenu list={list} id={index} testimonial={item}>
 										<Button size='sm' variant={'outline'}>
 											Edit
 										</Button>
-									</FAQContextMenu>
+									</TestimonialsContextMenu>
 								</TableCell>
 							</TableRow>
 						)}
 					/>
 				</TableBody>
 			</Table>
-			<FAQDialog list={list} />
+			<TestimonialDialog list={list} />
 		</div>
 	);
 }

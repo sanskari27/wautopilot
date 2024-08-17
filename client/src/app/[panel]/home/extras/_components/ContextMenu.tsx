@@ -6,9 +6,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from '@/component
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { createFAQs } from '../action';
+import { createFAQs, createTestimonials } from '../action';
 
-export default function FAQContextMenu({
+export function FAQContextMenu({
 	children,
 	id,
 	FAQ,
@@ -40,6 +40,57 @@ export default function FAQContextMenu({
 					<DropdownMenuItem>Edit</DropdownMenuItem>
 				</Link>
 				<DeleteDialog onDelete={handleDeleteFAQ}>
+					<Button variant={'destructive'} size={'sm'} className='w-full'>
+						<span className='mr-auto'>Delete</span>
+					</Button>
+				</DeleteDialog>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+}
+
+export function TestimonialsContextMenu({
+	children,
+	id,
+	testimonial,
+	list,
+}: {
+	children: React.ReactNode;
+	id: number;
+	testimonial: {
+		description: string;
+		name: string;
+		title: string;
+		photo_url: string;
+	};
+	list: {
+		description: string;
+		name: string;
+		title: string;
+		photo_url: string;
+	}[];
+}) {
+	const handleDeleteTestimonial = () => {
+		const newList = list.filter((_, i) => i !== id);
+		toast.promise(createTestimonials(newList), {
+			loading: 'Deleting Testimonial',
+			success: () => {
+				return 'Testimonial Deleted';
+			},
+			error: () => {
+				return 'Error while deleting Testimonial';
+			},
+		});
+	};
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+			<DropdownMenuContent>
+				<Link href={`?testimonial=${id}&data=${JSON.stringify(testimonial)}`}>
+					<DropdownMenuItem>Edit</DropdownMenuItem>
+				</Link>
+				<DeleteDialog onDelete={handleDeleteTestimonial}>
 					<Button variant={'destructive'} size={'sm'} className='w-full'>
 						<span className='mr-auto'>Delete</span>
 					</Button>

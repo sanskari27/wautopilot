@@ -15,11 +15,12 @@ export default class ExtraService {
 			const { data } = await api.get('/extras/testimonials');
 			return (data.list ?? []).map((list: any) => {
 				return {
-					quote: list.description,
+					description: list.description,
 					name: list.name,
 					title: list.title,
+					photo_url: list.photo_url,
 				};
-			}) as { quote: string; name: string; title: string }[];
+			}) as { description: string; name: string; title: string; photo_url: string }[];
 		} catch (err) {
 			return null;
 		}
@@ -27,5 +28,11 @@ export default class ExtraService {
 
 	static async createFAQs(list: { title: string; info: string }[]) {
 		await api.post('/extras/faqs', { list });
+	}
+
+	static async createTestimonials(
+		list: { title: string; name: string; photo_url: string; description: string }[]
+	) {
+		await api.post('/extras/testimonials', { list });
 	}
 }

@@ -13,14 +13,21 @@ import { parseToObject } from '@/lib/utils';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { createFAQs } from '../action';
+import { createFAQs, createTestimonials } from '../action';
 
-const DEFAULT_VALUE = {
+const DEFAULT_VALUE_FAQ = {
 	title: '',
 	info: '',
 };
 
-export default function FAQDialog({ list }: { list: { title: string; info: string }[] }) {
+const DEFAULT_VALUE_TESTIMONIAL = {
+	title: '',
+	name: '',
+	photo_url: '',
+	description: '',
+};
+
+export function FAQDialog({ list }: { list: { title: string; info: string }[] }) {
 	const pathName = usePathname();
 	const router = useRouter();
 	const id = useSearchParams().get('faq');
@@ -31,17 +38,17 @@ export default function FAQDialog({ list }: { list: { title: string; info: strin
 	};
 
 	const onSave = (details: { title: string; info: string }) => {
-        let newList: { title: string; info: string }[] = [];
-        if (id === 'create') {
-            newList = [...list, details];
-        } else {
-            newList = list.map((item, i) => {
-                if (i === Number(id)) {
-                    return details;
-                }
-                return item;
-            });
-        }
+		let newList: { title: string; info: string }[] = [];
+		if (id === 'create') {
+			newList = [...list, details];
+		} else {
+			newList = list.map((item, i) => {
+				if (i === Number(id)) {
+					return details;
+				}
+				return item;
+			});
+		}
 		toast.promise(createFAQs(newList), {
 			loading: 'Creating FAQ',
 			success: () => {
@@ -58,7 +65,7 @@ export default function FAQDialog({ list }: { list: { title: string; info: strin
 		return null;
 	}
 
-	return <FAQDetails onSave={onSave} onClose={onClose} details={raw ?? DEFAULT_VALUE} />;
+	return <FAQDetails onSave={onSave} onClose={onClose} details={raw ?? DEFAULT_VALUE_FAQ} />;
 }
 
 function FAQDetails({
@@ -108,6 +115,161 @@ function FAQDetails({
 						<Button variant={'destructive'}>Delete</Button>
 					</DialogClose>
 					<Button onClick={() => onSave(details)} disabled={!details.title || !details.info}>
+						Save
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+}
+export function TestimonialDialog({
+	list,
+}: {
+	list: {
+		title: string;
+		name: string;
+		photo_url: string;
+		description: string;
+	}[];
+}) {
+	const pathName = usePathname();
+	const router = useRouter();
+	const id = useSearchParams().get('testimonials');
+	const raw = parseToObject(useSearchParams().get('data')) as {
+		title: string;
+		name: string;
+		photo_url: string;
+		description: string;
+	};
+
+	const onClose = () => {
+		router.replace(pathName);
+	};
+
+	const onSave = (details: {
+		title: string;
+		name: string;
+		photo_url: string;
+		description: string;
+	}) => {
+		let newList: {
+			title: string;
+			name: string;
+			photo_url: string;
+			description: string;
+		}[] = [];
+		if (id === 'create') {
+			newList = [...list, details];
+		} else {
+			newList = list.map((item, i) => {
+				if (i === Number(id)) {
+					return details;
+				}
+				return item;
+			});
+		}
+		toast.promise(createTestimonials(newList), {
+			loading: 'Creating Testimonial',
+			success: () => {
+				onClose();
+				return 'Testimonial Created';
+			},
+			error: () => {
+				return 'Error while creating Testimonial';
+			},
+		});
+	};
+
+	if (!id) {
+		return null;
+	}
+
+	return (
+		<TestimonialDetails
+			onSave={onSave}
+			onClose={onClose}
+			details={raw ?? DEFAULT_VALUE_TESTIMONIAL}
+		/>
+	);
+}
+
+function TestimonialDetails({
+	onClose,
+	details: _details,
+	onSave,
+}: {
+	onSave: (details: {
+		title: string;
+		name: string;
+		photo_url: string;
+		description: string;
+	}) => void;
+	onClose: () => void;
+	details: {
+		title: string;
+		name: string;
+		photo_url: string;
+		description: string;
+	};
+}) {
+	const [details, setDetails] = useState<{
+		title: string;
+		name: string;
+		photo_url: string;
+		description: string;
+	}>(_details);
+
+	return (
+		<Dialog open={true} onOpenChange={(value) => !value && onClose()}>
+			<DialogContent>
+				<DialogHeader>Testimonial Details</DialogHeader>
+				<div>Title</div>
+				<Input
+					placeholder='eg. Love it...'
+					value={details.title}
+					onChange={(e) =>
+						setDetails((prev) => {
+							return {
+								...prev,
+								title: e.target.value,
+							};
+						})
+					}
+				/>
+				<div>Name</div>
+				<Input
+					placeholder='eg. John Doe'
+					value={details.name}
+					onChange={(e) =>
+						setDetails((prev) => {
+							return {
+								...prev,
+								name: e.target.value,
+							};
+						})
+					}
+				/>
+				<p>Description</p>
+				<Input
+					placeholder='eg. I love the product...'
+					value={details.description}
+					onChange={(e) =>
+						setDetails((prev) => {
+							return {
+								...prev,
+								description: e.target.value,
+							};
+						})
+					}
+				/>
+				<DialogFooter>
+					<DialogClose asChild>
+						<Button variant={'destructive'}>Delete</Button>
+					</DialogClose>
+					<Button
+						onClick={() => onSave(details)}
+						disabled={!details.title || !details.description || !details.name}
+					>
 						Save
 					</Button>
 				</DialogFooter>

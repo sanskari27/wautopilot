@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import React, { useEffect, useState } from 'react';
+import { Meteors } from './meteors';
 
 export const InfiniteMovingCards = ({
 	items,
@@ -11,7 +12,7 @@ export const InfiniteMovingCards = ({
 	className,
 }: {
 	items: {
-		quote: string;
+		description: string;
 		name: string;
 		title: string;
 	}[];
@@ -67,43 +68,38 @@ export const InfiniteMovingCards = ({
 		<div
 			ref={containerRef}
 			className={cn(
-				'scroller relative z-20  w-full overflow-hidden  [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]',
+				'scroller flex items-center relative z-20 h-full w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]',
 				className
 			)}
 		>
 			<ul
 				ref={scrollerRef}
 				className={cn(
-					' flex min-w-full shrink-0 gap-4 py-4 w-max flex-nowrap',
+					' flex min-w-full shrink-0 gap-8 w-max flex-nowrap',
 					start && 'animate-scroll ',
 					pauseOnHover && 'hover:[animation-play-state:paused]'
 				)}
 			>
 				{items.map((item, idx) => (
-					<li
-						className='w-[350px] max-w-full relative rounded-2xl border border-b-0 flex-shrink-0 border-slate-700 px-8 py-6 md:w-[450px]'
-						style={{
-							background: 'linear-gradient(135deg, #008B72 0%, #00A090 100%)',
-						}}
-						key={item.name}
-					>
-						<blockquote>
-							<div
-								aria-hidden='true'
-								className='user-select-none -z-1 pointer-events-none absolute -left-0.5 -top-0.5 h-[calc(100%_+_4px)] w-[calc(100%_+_4px)]'
-							></div>
-							<div className=' text-xl leading-[1.6] text-white font-normal'>{item.title}</div>
-							<span className=' relative z-20 text-sm leading-[1.6] text-gray-100 font-normal'>
-								{item.quote}
-							</span>
-							<div className='relative z-20 mt-6 flex flex-row items-center'>
-								<span className='flex flex-col gap-1'>
-									<span className=' text-sm leading-[1.6] text-gray-300 font-normal'>
-										{item.name}
-									</span>
-								</span>
+					<li key={idx} className=''>
+						<div className='w-full relative max-w-md'>
+							<div className='absolute inset-0 h-full w-full bg-gradient-to-r from-green-500 to-green-200 transform scale-[0.80] bg-red-500 rounded-full blur-3xl' />
+							<div className='min-h-[350px] relative shadow-xl bg-primary-foreground border border-primary  px-4 py-8 h-full overflow-hidden rounded-2xl flex flex-col justify-start items-start'>
+
+								<h1 className='font-bold text-xl text-primary mb-4 relative z-50'>
+									{item.title}
+								</h1>
+
+								<p className='font-normal text-base text-primary mb-4 relative z-50'>
+									{item.description}
+								</p>
+
+								<p className='mt-auto font-normal text-base text-emerald-700 mb-4 relative z-50'>
+									{item.name}
+								</p>
+								<Meteors number={20} />
 							</div>
-						</blockquote>
+						</div>
 					</li>
 				))}
 			</ul>
