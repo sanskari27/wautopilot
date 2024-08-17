@@ -24,4 +24,8 @@ export default class ExtraService {
 			return null;
 		}
 	}
+
+	static async createFAQs(list: { title: string; info: string }[]) {
+		await api.post('/extras/faqs', { list });
+	}
 }
