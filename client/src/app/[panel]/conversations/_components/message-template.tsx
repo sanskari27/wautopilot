@@ -4,11 +4,12 @@ import PreviewFile from '@/components/elements/preview-file';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import useBoolean from '@/hooks/useBoolean';
+import api from '@/lib/api';
 import { SERVER_URL } from '@/lib/consts';
 import { getFileSize, getFileType, getInitials } from '@/lib/utils';
 import { Contact } from '@/schema/phonebook';
 import { Message as TMessage } from '@/types/recipient';
-import { ArrowDownToLine, ShieldX } from 'lucide-react';
+import { ArrowDownToLine, Loader2, ShieldX } from 'lucide-react';
 import Link from 'next/link';
 import { memo, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -61,13 +62,12 @@ const TextMessage = ({ message }: { message: TMessage }) => {
 		}
 		if (!inView) return;
 		MessagesService.getMedia(message.header_content).then((data) => {
-			setMedia({
-				showPreview: true,
+			setMedia((prev) => ({
+				...prev,
 				loaded: true,
 				mimeType: data.mime_type,
-				url: data.url,
 				size: data.size,
-			});
+			}));
 		});
 	}, [inView, message.header_content, message.header_type]);
 
@@ -78,23 +78,91 @@ const TextMessage = ({ message }: { message: TMessage }) => {
 		message.header_type === 'DOCUMENT';
 	const headerIsText = message.header_type === 'TEXT';
 
+	const handlePreview = () => {
+		setMedia((prev) => ({ ...prev, showPreview: true }));
+		const url =
+			message.header_content_source === 'ID'
+				? `${SERVER_URL}uploads/download-meta-media/${message.header_content}`
+				: message.header_content;
+		api
+			.get(url, {
+				responseType: 'blob',
+			})
+			.then(({ data: blob }) => {
+				setMedia((prev) => ({
+					...prev,
+					url: window.URL.createObjectURL(blob),
+				}));
+			})
+			.catch(() => {
+				toast.error('Failed to load preview');
+			});
+	};
+
 	return (
 		<ChatMessageWrapper message={message}>
 			{showHeader ? (
 				headerIsMedia ? (
-					<div className='flex items-center mx-auto w-[98%]' ref={inViewRef}>
-						<div className='w-[300px] mx-auto' hidden={!media.loaded}>
-							<PreviewFile
-								data={{
-									url:
-										message.header_content_source === 'ID'
-											? `${SERVER_URL}uploads/download-meta-media/${message.header_content}`
-											: message.header_content,
-									type: getFileType(media.mimeType),
-								}}
-							/>
+					// <div className='flex items-center mx-auto w-[98%]' ref={inViewRef}>
+					// 	<div className='w-[300px] mx-auto' hidden={!media.loaded}>
+					// 		<PreviewFile
+					// 			data={{
+					// 				url:
+					// 					message.header_content_source === 'ID'
+					// 						? `${SERVER_URL}uploads/download-meta-media/${message.header_content}`
+					// 						: message.header_content,
+					// 				type: getFileType(media.mimeType),
+					// 			}}
+					// 		/>
+					// 	</div>
+					// </div>
+					!media.loaded ? (
+						<div className='w-full' ref={inViewRef}>
+							<div className='flex justify-center items-center  w-[260px] aspect-video bg-gray-200 rounded-lg'>
+								<MdOutlinePermMedia size={'2.5rem'} color='white' />
+							</div>
 						</div>
-					</div>
+					) : !media.showPreview ? (
+						<div className='w-full relative'>
+							<div className='flex justify-center items-center w-[16.25rem] aspect-video bg-gray-200 rounded-lg'>
+								<MdOutlinePermMedia size={'2.5rem'} color='white' />
+							</div>
+							<div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-600 opacity-80 w-fit-content px-4 h-10 rounded-full'>
+								<div
+									className='flex gap-2 cursor-pointer items-center justify-center h-full'
+									onClick={handlePreview}
+								>
+									<ArrowDownToLine className='w-4 h-4 text-white' />
+									<p className='text-white text-sm'>{getFileSize(media.size)}</p>
+								</div>
+							</div>
+						</div>
+					) : !media.url ? (
+						<div className='w-full relative'>
+							<div className='flex justify-center items-center w-[16.25rem] aspect-video bg-gray-200 rounded-lg'>
+								<MdOutlinePermMedia size={'2.5rem'} color='white' />
+							</div>
+							<div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-600 opacity-80 w-fit-content px-3 h-10 rounded-full'>
+								<div
+									className='flex gap-2 cursor-pointer items-center justify-center h-full'
+									onClick={handlePreview}
+								>
+									<Loader2 className='w-4 h-4 text-white animate-spin' />
+								</div>
+							</div>
+						</div>
+					) : (
+						<div className='flex flex-col w-[400px] max-w-full aspect-square relative mx-auto'>
+							<div className=' mx-auto h-[94%] aspect-square'>
+								<PreviewFile
+									data={{
+										url: media.url,
+										type: getFileType(media.mimeType),
+									}}
+								/>
+							</div>
+						</div>
+					)
 				) : headerIsText ? (
 					<p className='font-bold'>{message.header_content}</p>
 				) : null
@@ -157,7 +225,7 @@ const MediaMessage = ({ message }: { message: TMessage }) => {
 				showPreview: false,
 				loaded: true,
 				mimeType: data.mime_type,
-				url: data.url,
+				url: '',
 				size: data.size,
 			});
 		});
@@ -176,6 +244,19 @@ const MediaMessage = ({ message }: { message: TMessage }) => {
 
 	const handlePreview = () => {
 		setMedia((prev) => ({ ...prev, showPreview: true }));
+		api
+			.get(`${SERVER_URL}uploads/download-meta-media/${message.body?.media_id}`, {
+				responseType: 'blob',
+			})
+			.then(({ data: blob }) => {
+				setMedia((prev) => ({
+					...prev,
+					url: window.URL.createObjectURL(blob),
+				}));
+			})
+			.catch(() => {
+				toast.error('Failed to load preview');
+			});
 	};
 
 	return (
@@ -203,12 +284,26 @@ const MediaMessage = ({ message }: { message: TMessage }) => {
 						</div>
 					</div>
 				</div>
+			) : !media.url ? (
+				<div className='w-full relative'>
+					<div className='flex justify-center items-center w-[16.25rem] aspect-video bg-gray-200 rounded-lg'>
+						<MdOutlinePermMedia size={'2.5rem'} color='white' />
+					</div>
+					<div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-600 opacity-80 w-fit-content px-3 h-10 rounded-full'>
+						<div
+							className='flex gap-2 cursor-pointer items-center justify-center h-full'
+							onClick={handlePreview}
+						>
+							<Loader2 className='w-4 h-4 text-white animate-spin' />
+						</div>
+					</div>
+				</div>
 			) : (
 				<div className='flex flex-col w-[400px] max-w-full aspect-square relative mx-auto'>
 					<div className=' mx-auto h-[94%] aspect-square'>
 						<PreviewFile
 							data={{
-								url: `${SERVER_URL}uploads/download-meta-media/${message.body?.media_id}`,
+								url: media.url,
 								type: getFileType(media.mimeType),
 							}}
 						/>

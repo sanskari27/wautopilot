@@ -10,6 +10,7 @@ import Logger from 'n23-logger';
 import { IS_PRODUCTION, IS_WINDOWS, Path } from './config/const';
 import { CustomError } from './errors';
 import BroadcastService from './services/broadcast';
+import MediaService from './services/media';
 import SchedulerService from './services/scheduler';
 
 const allowlist = ['http://localhost:3001', 'https://wautopilot.com'];
@@ -121,6 +122,7 @@ export default function (app: Express) {
 	//0 0 * * *
 	cron.schedule('30 0 * * *', function () {
 		BroadcastService.sendRecursiveBroadcastMessages();
+		MediaService.syncMedia();
 	});
 	createDir();
 }

@@ -83,6 +83,10 @@ export default function MessageBox() {
 			MessagesService.sendConversationMessage(selected_recipient!.id, {
 				type: _type as 'image' | 'video' | 'document' | 'audio',
 				media_id: attachments[i],
+			}).then((data) => {
+				if (!data) {
+					return toast.error('Failed to send message');
+				}
 			});
 		}
 	};

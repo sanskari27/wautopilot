@@ -31,6 +31,10 @@ const schema = new mongoose.Schema<IMedia>({
 	local_path: {
 		type: String,
 	},
+	last_synced: {
+		type: Date,
+		default: Date.now,
+	},
 });
 
 const MediaDB = mongoose.model<IMedia>(MediaDB_name, schema);

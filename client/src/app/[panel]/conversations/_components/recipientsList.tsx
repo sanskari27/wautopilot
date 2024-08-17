@@ -76,6 +76,13 @@ export default function RecipientsList() {
 				</span>
 			</h3>
 			<div className='pr-2 mb-2 mr-1 md:!px-0 flex gap-x-1'>
+				<Button
+					variant={showArchived ? 'default' : 'secondary'}
+					size={'icon'}
+					onClick={toggleShowArchived}
+				>
+					<ArchiveRestore className='w-4 h-4' />
+				</Button>
 				<div className='flex-1'>
 					<Input
 						type='text'
@@ -96,13 +103,6 @@ export default function RecipientsList() {
 						</Button>
 					</AgentSelector>
 				)}
-				<Button
-					variant={showArchived ? 'default' : 'secondary'}
-					size={'icon'}
-					onClick={toggleShowArchived}
-				>
-					<ArchiveRestore className='w-4 h-4' />
-				</Button>
 			</div>
 			<div className='flex flex-col overflow-y-scroll overflow-x-hidden h-[calc(100vh-160px)]'>
 				{

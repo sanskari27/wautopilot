@@ -159,7 +159,6 @@ export function RecipientProvider({
 		});
 
 		socket.on('labels_updated', (details) => {
-			console.log('labels updated', details);
 			setTags(details.phone_number, details.labels);
 		});
 	}, [markRead, markUnread, setTags, toggleArchived, togglePin]);

@@ -105,8 +105,6 @@ function DevicesList() {
 		router.replace(url.toString());
 	};
 
-	console.log(isAgent)
-
 	return (
 		<Dialog
 			defaultOpen={true}

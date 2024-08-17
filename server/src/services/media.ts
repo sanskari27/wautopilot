@@ -1,10 +1,17 @@
+import FormData from 'form-data';
+import fs from 'fs';
 import { Types } from 'mongoose';
-import { MediaDB } from '../../mongo';
+import { MediaDB, RecurringBroadcastDB } from '../../mongo';
+import ChatBotDB from '../../mongo/repo/Chatbot';
 import IAccount from '../../mongo/types/account';
 import IMedia from '../../mongo/types/media';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
+import { IS_PRODUCTION } from '../config/const';
+import MetaAPI from '../config/MetaAPI';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
+import DateUtils from '../utils/DateUtils';
+import FileUtils from '../utils/FileUtils';
 import WhatsappLinkService from './whatsappLink';
 
 function processMediaDocs(docs: IMedia[]) {
@@ -90,4 +97,84 @@ export default class MediaService extends WhatsappLinkService {
 		});
 		return medias.reduce((acc, media) => acc + media.file_length, 0);
 	}
+
+	static async syncMedia() {
+		if (!IS_PRODUCTION) return;
+		const medias = await MediaDB.find({
+			last_synced: { $lt: DateUtils.getMomentNow().add(-28, 'days').toDate() },
+		}).populate<{
+			device_id: IWhatsappLink;
+		}>('device_id');
+
+		medias.forEach(async (media) => {
+			const filepath = __basedir + media.local_path;
+			if (!FileUtils.exists(filepath)) {
+				await MediaDB.deleteOne({ _id: media._id });
+				return;
+			}
+
+			const form = new FormData();
+			form.append('messaging_product', 'whatsapp');
+			form.append('file', fs.createReadStream(filepath));
+
+			const {
+				data: { id: media_id },
+			} = await MetaAPI(media.device_id.accessToken).post(
+				`/${media.device_id.phoneNumberId}/media`,
+				form,
+				{
+					maxContentLength: Infinity,
+					maxBodyLength: Infinity,
+				}
+			);
+
+			const { data } = await MetaAPI(media.device_id.accessToken).get(`/${media_id}`);
+
+			await MediaDB.updateOne(
+				{ _id: media._id },
+				{
+					media_id: media_id,
+					media_url: data.url,
+					file_length: Number(data.file_size),
+					mime_type: data.mime_type,
+					last_synced: DateUtils.getMomentNow().toDate(),
+				}
+			);
+
+			await ChatBotDB.updateOne(
+				{ 'template_header.media_id': media.media_id },
+				{ 'template_header.media_id': media_id }
+			);
+
+			const bots = await ChatBotDB.find({ 'nurturing.template_header.media_id': media.media_id });
+			bots.forEach(async (doc) => {
+				const nurturing = doc.nurturing.map((item) => {
+					if (!item.template_header) return item;
+					if (item.template_header.media_id === media.media_id) {
+						item.template_header.media_id = media_id;
+					}
+					return item;
+				});
+				await ChatBotDB.updateOne({ _id: doc._id }, { nurturing });
+			});
+
+			const flows = await ChatBotDB.find({ 'nurturing.template_header.media_id': media.media_id });
+			flows.forEach(async (doc) => {
+				const nurturing = doc.nurturing.map((item) => {
+					if (!item.template_header) return item;
+					if (item.template_header.media_id === media.media_id) {
+						item.template_header.media_id = media_id;
+					}
+					return item;
+				});
+				await ChatBotDB.updateOne({ _id: doc._id }, { nurturing });
+			});
+
+			await RecurringBroadcastDB.updateMany(
+				{ 'template_header.media_id': media.media_id },
+				{ 'template_header.media_id': media_id }
+			);
+		});
+	}
 }
+MediaService.syncMedia();

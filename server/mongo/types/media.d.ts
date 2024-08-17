@@ -11,4 +11,6 @@ export default interface IMedia extends Document {
 	media_id: string;
 	media_url: string;
 	local_path: string;
+
+	last_synced: Date;
 }
