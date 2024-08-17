@@ -19,7 +19,6 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { PLANS } from '@/lib/consts';
-import { parseToObject } from '@/lib/utils';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -82,7 +81,7 @@ export function MarkupPriceDialog() {
 	const searchParams = useSearchParams();
 	const pathName = usePathname();
 	const id = searchParams.get('markup-price');
-	const price = parseToObject(searchParams.get('price'));
+	const price = searchParams.get('price');
 
 	const handlePriceInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (Number(e.target.value) < 0) {
@@ -93,7 +92,7 @@ export function MarkupPriceDialog() {
 
 	useEffect(() => {
 		if (price) {
-			setMarkupPrice(price.toString());
+			setMarkupPrice(price ?? '');
 		}
 	}, [price]);
 
