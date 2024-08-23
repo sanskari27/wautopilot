@@ -442,7 +442,7 @@ export default function ChatbotForm() {
 									}
 								>
 									<Button variant={'outline'} className='flex-1 min-w-[200px]'>
-										Contact Card ({contacts.length})
+										VCards ({contacts.length})
 									</Button>
 								</ContactSelectorDialog>
 								<MediaSelectorDialog

@@ -476,7 +476,7 @@ export default function CreateChatbotFlow() {
 															}
 														>
 															<Button variant={'outline'} className='flex-1 min-w-[200px]'>
-																Contact Card ({nurturing[index].contacts.length})
+																VCards ({nurturing[index].contacts.length})
 															</Button>
 														</ContactSelectorDialog>
 														<MediaSelectorDialog

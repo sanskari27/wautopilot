@@ -219,7 +219,7 @@ export default function MessageBox() {
 						<ContactSelectorDialog onConfirm={sendContactMessage} newEntryAllowed>
 							<Button variant={'ghost'} size={'sm'} className='w-full justify-start'>
 								<ContactIcon className='w-4 h-4 mr-2' />
-								Contact
+								VCards
 							</Button>
 						</ContactSelectorDialog>
 						<UploadMediaDialog onConfirm={(media) => sendAttachmentMessage('DOCUMENT', [media])}>

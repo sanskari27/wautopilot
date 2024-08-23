@@ -20,7 +20,7 @@ export function AddContact() {
 		<Link href={`?contact=new`}>
 			<Button size={'sm'} className='bg-teal-600 hover:bg-teal-700'>
 				<ContactRound className='w-4 h-4 mr-2' />
-				Add Contact
+				Add VCard
 			</Button>
 		</Link>
 	);

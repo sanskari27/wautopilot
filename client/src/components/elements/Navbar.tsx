@@ -71,7 +71,7 @@ export default function Navbar() {
 					<MenubarLink href={getLink('/audience/phonebook')}>Phonebook</MenubarLink>
 					<MenubarSeparator />
 					<MenubarLink href={getLink('/audience/media')}>Media</MenubarLink>
-					<MenubarLink href={getLink('/audience/contacts')}>Contacts</MenubarLink>
+					<MenubarLink href={getLink('/audience/contacts')}>VCards</MenubarLink>
 				</MenubarContent>
 			</MenubarMenu>
 			<MenubarMenu>
