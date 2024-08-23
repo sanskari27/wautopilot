@@ -43,8 +43,13 @@ export function DownloadButton({ id }: { id: string }) {
 	}
 
 	return (
-		<Button variant={'outline'} size={'icon'} className='border-primary' onClick={handleExport}>
-			<FolderDown className='w-5 h-5 text-primary' strokeWidth={2} />
+		<Button
+			variant={'outline'}
+			size={'icon'}
+			className='border-primary w-8 h-8'
+			onClick={handleExport}
+		>
+			<FolderDown className='w-4 h-4 text-primary' strokeWidth={2} />
 		</Button>
 	);
 }
@@ -64,8 +69,8 @@ export function DeleteButton({ id }: { id: string }) {
 
 	return (
 		<DeleteDialog onDelete={handleExport}>
-			<Button variant={'outline'} size={'icon'} className='border-red-600'>
-				<Trash className='w-5 h-5 text-red-600' strokeWidth={2} />
+			<Button variant={'outline'} size={'icon'} className='border-red-600 w-8 h-8'>
+				<Trash className='w-4 h-4 text-red-600' strokeWidth={2} />
 			</Button>
 		</DeleteDialog>
 	);

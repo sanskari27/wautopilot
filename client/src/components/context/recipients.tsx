@@ -12,12 +12,14 @@ const RecipientsContext = React.createContext<{
 	selectedConversations: string[];
 	selected_recipient: Recipient | null;
 	showArchived: boolean;
+	showUnread: boolean;
 	markRead: (id: string) => void;
 	toggleSelected: (id: string) => void;
 	setLabelFilter: (labels: string[]) => void;
 	setSearchText: (text: string) => void;
 	setSelectedRecipient: (recipient: Recipient) => void;
 	toggleShowArchived: () => void;
+	toggleShowUnread: () => void;
 }>({
 	list: [],
 	pinnedConversations: [],
@@ -25,7 +27,9 @@ const RecipientsContext = React.createContext<{
 	selectedConversations: [],
 	selected_recipient: null,
 	showArchived: false,
+	showUnread: false,
 	toggleShowArchived: () => {},
+	toggleShowUnread: () => {},
 	markRead: () => {},
 	toggleSelected: () => {},
 	setLabelFilter: () => {},
@@ -46,6 +50,7 @@ export function RecipientProvider({
 	const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
 	const [selected_recipient, setSelectedRecipient] = React.useState<Recipient | null>(null);
 	const { value: showArchived, toggle: toggleShowArchived } = useBoolean(false);
+	const { value: showUnread, toggle: toggleShowUnread } = useBoolean(false);
 
 	const filtered = React.useMemo(() => {
 		return list.filter((item) => {
@@ -54,9 +59,10 @@ export function RecipientProvider({
 				item.recipient.includes(searchText);
 			const cond2 = (showArchived && item.archived) || (!showArchived && !item.archived);
 			const cond3 = label_filter.every((label) => item.labels.includes(label));
-			return cond1 && cond2 && cond3;
+			const cond4 = showUnread ? item.unreadCount > 0 : true;
+			return cond1 && cond2 && cond3 && cond4;
 		});
-	}, [list, label_filter, searchText, showArchived]);
+	}, [list, searchText, showArchived, label_filter, showUnread]);
 
 	const { pinnedConversations, unpinnedConversations } = React.useMemo(
 		() =>
@@ -172,6 +178,8 @@ export function RecipientProvider({
 				selectedConversations: selectedIds,
 				selected_recipient,
 				showArchived,
+				showUnread,
+				toggleShowUnread,
 				toggleShowArchived,
 				markRead,
 				toggleSelected,

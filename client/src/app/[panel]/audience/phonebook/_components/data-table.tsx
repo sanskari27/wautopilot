@@ -294,7 +294,7 @@ export function DataTable({
 
 		let promise;
 		if (id) {
-			if (updatePermission) {
+			if (!updatePermission) {
 				toast.error('You do not have permission to update phonebook');
 				return;
 			}

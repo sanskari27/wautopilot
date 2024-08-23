@@ -105,18 +105,12 @@ async function deleteMedia(req: Request, res: Response, next: NextFunction) {
 		agentLogService,
 	} = req.locals;
 
+	const mediaService = new MediaService(account, device);
 	let media;
 	try {
-		media = await new MediaService(account, device).getMedia(id);
-		await MetaAPI(device.accessToken).delete(
-			`/${media.media_id}/?phone_number_id=${device.phoneNumberId}`
-		);
-	} catch (err: unknown) {
-		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
-	}
+		media = await mediaService.getMedia(id);
+		let path = await mediaService.delete(id);
 
-	try {
-		let path = await new MediaService(account, device).delete(id);
 		path = __basedir + path;
 		FileUtils.deleteFile(path);
 
@@ -126,6 +120,10 @@ async function deleteMedia(req: Request, res: Response, next: NextFunction) {
 				id: media.id,
 			},
 		});
+
+		MetaAPI(device.accessToken)
+			.delete(`/${media.media_id}/?phone_number_id=${device.phoneNumberId}`)
+			.catch(() => {});
 
 		return Respond({
 			res,

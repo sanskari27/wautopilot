@@ -84,8 +84,14 @@ function PreviewElement({ media }: { media: Media }) {
 				/>
 			</CardContent>
 			<Separator className='bg-gray-300' />
-			<CardFooter>
-				<div className='flex flex-col items-stretch w-full'>
+			<CardFooter className='p-3'>
+				<div className='flex flex-col items-stretch w-full text-xs'>
+					<div className='flex gap-2 items-center'>
+						<p className='line-clamp-1'>
+							Name:
+							<span className='font-medium ml-2'>{media.filename}</span>
+						</p>
+					</div>
 					<div className='flex gap-2 items-center'>
 						<p>File Type:</p>
 						<p className='font-medium'>{data?.type}</p>

@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import AgentService from '@/services/agent.service';
 import { Recipient as TRecipient } from '@/types/recipient';
-import { ArchiveRestore, Headset, ListFilter } from 'lucide-react';
+import { ArchiveRestore, BellDot, Headset, ListFilter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Recipient from './recipient';
 
@@ -23,7 +23,9 @@ export default function RecipientsList() {
 		selectedConversations,
 		setSelectedRecipient,
 		showArchived,
+		showUnread,
 		toggleShowArchived,
+		toggleShowUnread,
 	} = useRecipient();
 
 	const handleRecipientClick = (item: TRecipient) => {
@@ -74,6 +76,9 @@ export default function RecipientsList() {
 				<span className='text-sm font-normal text-neutral-500'>
 					{showArchived ? ' (Archived)' : ''}
 				</span>
+				<span className='text-sm font-normal text-neutral-500'>
+					{showUnread ? ' (Unread)' : ''}
+				</span>
 			</h3>
 			<div className='pr-2 mb-2 mr-1 md:!px-0 flex gap-x-1'>
 				<Button
@@ -82,6 +87,13 @@ export default function RecipientsList() {
 					onClick={toggleShowArchived}
 				>
 					<ArchiveRestore className='w-4 h-4' />
+				</Button>
+				<Button
+					variant={showUnread ? 'default' : 'secondary'}
+					size={'icon'}
+					onClick={toggleShowUnread}
+				>
+					<BellDot className='w-4 h-4' />
 				</Button>
 				<div className='flex-1'>
 					<Input
