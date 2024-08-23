@@ -53,7 +53,7 @@ export default async function FAQPage() {
 								<TableCell className='text-center'>
 									<FAQContextMenu list={list} id={index} FAQ={item}>
 										<Button size='sm' variant={'outline'}>
-											Edit
+											Action
 										</Button>
 									</FAQContextMenu>
 								</TableCell>
