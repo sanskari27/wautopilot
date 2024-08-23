@@ -71,7 +71,7 @@ export default function Recipient({
 							<p className='text-sm'>{recipient.recipient}</p>
 						</div>
 						<Show.ShowIf condition={recipient.unreadCount !== 0}>
-							<span className='self-end text-xs bg-primary inline-flex justify-center items-center p-1.5 h-[1.2rem] min-w-[1.2rem] rounded-full text-white'>
+							<span className='self-end text-xs bg-yellow-300 inline-flex justify-center items-center p-1.5 h-[1.2rem] min-w-[1.2rem] rounded-full text-white'>
 								{recipient.unreadCount}
 							</span>
 						</Show.ShowIf>
