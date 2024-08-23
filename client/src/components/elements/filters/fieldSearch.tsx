@@ -3,6 +3,7 @@
 import Each from '@/components/containers/each';
 import { useFields } from '@/components/context/tags';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Combobox from '@/components/ui/combobox';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -86,6 +87,14 @@ export default function FieldSearch() {
 		router.push(url.toString());
 	}
 
+	const handleSearch = () => {
+		if (search && fieldName) {
+			addToSearchParams(fieldName, search);
+			setFieldName('');
+			setSearch('');
+		}
+	};
+
 	return (
 		<div>
 			<div className='flex flex-col justify-center gap-2'>
@@ -99,19 +108,22 @@ export default function FieldSearch() {
 							buttonVariant='ghost'
 						/>
 					</div>
-					<div className='flex-1 w-3/4'>
-						<Input
-							placeholder='Search'
-							value={search}
-							onKeyDown={(e) => {
-								if (e.key === 'Enter' && search && fieldName) {
-									addToSearchParams(fieldName, search);
-									setFieldName('');
-									setSearch('');
-								}
-							}}
-							onChange={(e) => setSearch(e.target.value.replace('=', ''))}
-						/>
+					<div className='flex-1 w-3/4 flex gap-2 items-center'>
+						<div className='flex-1'>
+							<Input
+								placeholder='Search'
+								value={search}
+								onKeyDown={(e) => {
+									if (e.key === 'Enter' && search && fieldName) {
+										addToSearchParams(fieldName, search);
+										setFieldName('');
+										setSearch('');
+									}
+								}}
+								onChange={(e) => setSearch(e.target.value.replace('=', ''))}
+							/>
+						</div>
+						<Button onClick={handleSearch}>Search</Button>
 					</div>
 				</div>
 				<div
