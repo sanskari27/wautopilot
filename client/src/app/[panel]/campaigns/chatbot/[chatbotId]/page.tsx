@@ -37,7 +37,7 @@ import ChatBotService from '@/services/chatbot.service';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ResetIcon } from '@radix-ui/react-icons';
 import { Separator } from '@radix-ui/react-separator';
-import { ChevronLeftIcon, Plus } from 'lucide-react';
+import { ChevronLeftIcon, InfoIcon, Plus } from 'lucide-react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
@@ -733,6 +733,11 @@ export default function ChatbotForm() {
 									</FormItem>
 								)}
 							/>
+							<div className='flex items-center justify-center text-center text-sm mt-2 text-muted-foreground'>
+								<InfoIcon className='w-4 h-4 mr-1' />
+								Kindly send hi from the mentioned number to this whatsapp business api number twice
+								a day preferably at 11AM and 6PM to keep getting the lead notification
+							</div>
 						</div>
 					</div>
 

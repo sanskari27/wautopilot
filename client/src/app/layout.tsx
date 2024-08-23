@@ -1,10 +1,8 @@
 import PageLayout from '@/components/containers/page-layout';
 import Loading from '@/components/elements/loading';
-import { BackgroundBeams } from '@/components/ui/background-beams';
 import { cn } from '@/lib/utils';
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
-import Script from 'next/script';
 import { Suspense } from 'react';
 import { Toaster } from 'react-hot-toast';
 import './globals.css';
@@ -30,7 +28,6 @@ export default async function RootLayout({
 			<body className={cn('h-screen w-screen overflow-x-hidden', poppins.className)}>
 				<PageLayout>
 					<Suspense fallback={<Loading />}>{children}</Suspense>
-					<BackgroundBeams />
 				</PageLayout>
 				<Toaster position='top-center' />
 			</body>
