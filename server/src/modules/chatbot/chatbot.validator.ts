@@ -482,7 +482,7 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 		forward: z.object({
 			number: z.string().default(''),
 			message: z.string().default(''),
-		}),
+		}).optional(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
