@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import Combobox from '@/components/ui/combobox';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { CircleMinus } from 'lucide-react';
+import { CircleMinus, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -123,7 +123,9 @@ export default function FieldSearch() {
 								onChange={(e) => setSearch(e.target.value.replace('=', ''))}
 							/>
 						</div>
-						<Button onClick={handleSearch}>Search</Button>
+						<Button size={'icon'} variant={'outline'} onClick={handleSearch}>
+							<Search className='w-4 h-4' />
+						</Button>
 					</div>
 				</div>
 				<div

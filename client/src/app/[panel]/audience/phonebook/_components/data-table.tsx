@@ -360,7 +360,7 @@ export function DataTable({
 				<div className='flex-1'>
 					<FieldSearch />
 				</div>
-				<div>
+				<div className='mt-1'>
 					<TagsFilter />
 				</div>
 			</div>

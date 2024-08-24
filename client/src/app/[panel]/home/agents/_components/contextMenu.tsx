@@ -59,7 +59,7 @@ export function AgentContextMenu({
 		<ContextMenu>
 			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 			<ContextMenuContent className='w-64'>
-				<ContextMenuLink href={`master/${id}/logs`} inset>
+				<ContextMenuLink href={`agents/${id}/logs`} inset>
 					View Logs
 				</ContextMenuLink>
 				<NumberInputDialog onSubmit={handleAssignChats}>
