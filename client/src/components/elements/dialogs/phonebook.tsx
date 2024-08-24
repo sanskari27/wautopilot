@@ -1,6 +1,8 @@
 'use client';
 import Each from '@/components/containers/each';
+import Show from '@/components/containers/show';
 import { useFields } from '@/components/context/tags';
+import { useUserDetails } from '@/components/context/user-details';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -20,10 +22,10 @@ import { PhonebookRecord, phonebookSchema } from '@/schema/phonebook';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ListFilter } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { IoClose } from 'react-icons/io5';
 import TagsSelector from '../popover/tags';
-import { useState } from 'react';
 
 const defaultValues = {
 	id: '',
@@ -94,7 +96,7 @@ export default function PhonebookDialog({
 					}
 				}}
 			>
-				<SheetContent className='w-screen sm:max-w-3xl'>
+				<SheetContent className='w-screen sm:max-w-3xl overflow-y-auto'>
 					<SheetHeader>
 						<SheetTitle className='text-center'>Phonebook Record</SheetTitle>
 					</SheetHeader>
@@ -115,6 +117,8 @@ export function PhonebookForm({
 	defaultValues?: PhonebookRecord;
 	onSave: (data: PhonebookRecord) => void;
 }) {
+	const { isAgent } = useUserDetails();
+
 	const fields = useFields();
 
 	const [tags, setTags] = useState<string>('');
@@ -305,10 +309,10 @@ export function PhonebookForm({
 					control={form.control}
 					name='labels'
 					render={({ field }) => (
-						<FormItem>
+						<FormItem className='border-b pb-2'>
 							<FormLabel className='text-primary'>Tags</FormLabel>
 
-							<div className='border-b gap-2'>
+							<div className='gap-2 flex items-center'>
 								<div className='flex flex-wrap gap-2 border-dashed border-2 rounded-lg p-2 flex-1'>
 									<Each
 										items={field.value}
@@ -324,21 +328,17 @@ export function PhonebookForm({
 										)}
 									/>
 								</div>
-								<div className='flex gap-2 items-center mt-2'>
-									<div className='flex-1'>
-										<Input
-											value={tags}
-											onChange={handleNewTagsInput}
-											placeholder='Add new labels'
-										/>
-									</div>
-									<TagsSelector onChange={(tags) => handleTagsChange(tags)}>
-										<Button variant='secondary' size={'icon'}>
-											<ListFilter className='w-4 h-4' strokeWidth={3} />
-										</Button>
-									</TagsSelector>
-								</div>
+								<TagsSelector onChange={(tags) => handleTagsChange(tags)}>
+									<Button variant='secondary' size={'icon'}>
+										<ListFilter className='w-4 h-4' strokeWidth={3} />
+									</Button>
+								</TagsSelector>
 							</div>
+							<Show.ShowIf condition={!isAgent}>
+								<div className='flex-1'>
+									<Input value={tags} onChange={handleNewTagsInput} placeholder='Add new labels' />
+								</div>
+							</Show.ShowIf>
 						</FormItem>
 					)}
 				/>
