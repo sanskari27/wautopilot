@@ -490,7 +490,13 @@ export function DataTable({
 										<TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
 											{row.getVisibleCells().map((cell) => (
 												<TableCellLink href={link} key={cell.id} className='p-2'>
-													{flexRender(cell.column.columnDef.cell, cell.getContext())}
+													{isAgent
+														? cell.column.id === 'phone_number'
+															? cell.getValue()
+																? (cell.getValue() as string).slice(0, -5) + 'XXXXX'
+																: null
+															: flexRender(cell.column.columnDef.cell, cell.getContext())
+														: flexRender(cell.column.columnDef.cell, cell.getContext())}
 												</TableCellLink>
 											))}
 										</TableRow>
