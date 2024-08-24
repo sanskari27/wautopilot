@@ -22,15 +22,10 @@ const Paths = {
 };
 
 export async function middleware(request: NextRequest) {
-	const {
-		authenticated: isAuthenticated,
-		admin,
-		agent,
-		master,
-	} = await AuthService.isAuthenticated();
+	const { authenticated: isAuthenticated } = await AuthService.isAuthenticated();
 
 	const pathname = request.nextUrl.pathname;
-	const roleBasedPath = master ? '/master' : admin ? '/admin' : agent ? '/agent' : '';
+	const roleBasedPath = '/panel';
 
 	if (pathname.startsWith('/auth')) {
 		if (isAuthenticated) {
@@ -114,14 +109,6 @@ export async function middleware(request: NextRequest) {
 		}
 		if (pathname.startsWith(`${roleBasedPath}${Paths.Extras}`) && !isMaster) {
 			return Response.redirect(new URL(`/permission-denied`, request.url));
-		}
-	} else if (
-		pathname.startsWith('/admin') ||
-		pathname.startsWith('/master') ||
-		pathname.startsWith('/agent')
-	) {
-		if (isAuthenticated) {
-			return Response.redirect(new URL(`${roleBasedPath}/home/dashboard`, request.url));
 		}
 	}
 }
