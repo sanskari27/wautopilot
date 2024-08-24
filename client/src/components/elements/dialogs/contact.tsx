@@ -71,7 +71,7 @@ export default function ContactDialog({
 			<Drawer open onOpenChange={(open) => !open && handleClose()}>
 				<DrawerContent className='px-3'>
 					<DrawerHeader>
-						<DrawerTitle>Contact Card</DrawerTitle>
+						<DrawerTitle>VCard</DrawerTitle>
 					</DrawerHeader>
 					<ContactForm
 						onSave={onSave}
@@ -86,7 +86,7 @@ export default function ContactDialog({
 			<Sheet open onOpenChange={(open) => !open && handleClose()}>
 				<SheetContent className='w-screen sm:max-w-3xl overflow-scroll'>
 					<SheetHeader>
-						<SheetTitle className='text-center'>Contact Card</SheetTitle>
+						<SheetTitle className='text-center'>VCard</SheetTitle>
 					</SheetHeader>
 					<ContactForm
 						onSave={onSave}

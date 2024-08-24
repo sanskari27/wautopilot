@@ -28,7 +28,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { parseToObject } from '@/lib/utils';
+import { formatPhoneNumber, parseToObject } from '@/lib/utils';
 import { PhonebookRecord, PhonebookRecordWithID, phonebookSchema } from '@/schema/phonebook';
 import PhoneBookService from '@/services/phonebook.service';
 import {
@@ -64,7 +64,7 @@ import {
 } from './buttons';
 import { AddFields, AssignTags, UploadCSV } from './dialogs';
 
-function generateColumns(keys: string[]): ColumnDef<PhonebookRecordWithID>[] {
+function generateColumns(keys: string[], isAgent = false): ColumnDef<PhonebookRecordWithID>[] {
 	return [
 		{
 			id: 'select',
@@ -155,7 +155,14 @@ function generateColumns(keys: string[]): ColumnDef<PhonebookRecordWithID>[] {
 					</Button>
 				);
 			},
-			cell: ({ row }) => <div className='px-4'>+{row.getValue('phone_number')}</div>,
+			cell: ({ row }) => (
+				<div className='px-4'>
+					+
+					{isAgent
+						? formatPhoneNumber(row.getValue('phone_number') as string)
+						: row.getValue('phone_number')}
+				</div>
+			),
 		},
 		{
 			accessorKey: 'email',
@@ -257,7 +264,7 @@ export function DataTable({
 		}
 	}, [maxPage, router, searchParams]);
 
-	const columns = React.useMemo(() => generateColumns(keys), [keys]);
+	const columns = React.useMemo(() => generateColumns(keys, isAgent), [keys, isAgent]);
 
 	const table = useReactTable({
 		data: records,
@@ -490,13 +497,7 @@ export function DataTable({
 										<TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
 											{row.getVisibleCells().map((cell) => (
 												<TableCellLink href={link} key={cell.id} className='p-2'>
-													{isAgent
-														? cell.column.id === 'phone_number'
-															? cell.getValue()
-																? (cell.getValue() as string).slice(0, -5) + 'XXXXX'
-																: null
-															: flexRender(cell.column.columnDef.cell, cell.getContext())
-														: flexRender(cell.column.columnDef.cell, cell.getContext())}
+													{flexRender(cell.column.columnDef.cell, cell.getContext())}
 												</TableCellLink>
 											))}
 										</TableRow>
