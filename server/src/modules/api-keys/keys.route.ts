@@ -1,9 +1,15 @@
 import express from 'express';
 import { IDValidator } from '../../middleware';
 import Controller from './keys.controller';
-import { CreateAPIKeyValidator } from './keys.validator';
+import { CreateAPIKeyValidator, WebhookValidator } from './keys.validator';
 
 const router = express.Router();
+
+router.route('/webhooks/:id').all(IDValidator).delete(Controller.deleteWebhook);
+router
+	.route('/webhooks')
+	.get(Controller.listWebhooks)
+	.post(WebhookValidator, Controller.createWebhook);
 
 router.route('/:id/regenerate-token').all(IDValidator).post(Controller.regenerateToken);
 router.route('/:id').all(IDValidator).delete(Controller.deleteAPIKey);

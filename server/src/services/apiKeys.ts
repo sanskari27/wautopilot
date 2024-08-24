@@ -1,7 +1,9 @@
 import { Types } from 'mongoose';
+import { WebhookDB } from '../../mongo';
 import APIKeyDB from '../../mongo/repo/APIKey';
 import IAccount from '../../mongo/types/account';
 import IAPIKey from '../../mongo/types/apiKeys';
+import IWebhook from '../../mongo/types/webhook';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
 import { CustomError, ERRORS } from '../errors';
 import DateUtils from '../utils/DateUtils';
@@ -13,6 +15,16 @@ function processDocs(doc: Omit<IAPIKey, 'device_id'> & { device_id: IWhatsappLin
 		name: doc.name,
 		device: doc.device_id.verifiedName,
 		permissions: doc.permissions,
+		createdAt: DateUtils.getMoment(doc.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+	};
+}
+
+function processWebhookDocs(doc: Omit<IWebhook, 'device_id'> & { device_id: IWhatsappLink }) {
+	return {
+		id: doc._id,
+		name: doc.name,
+		device: doc.device_id.verifiedName,
+		url: doc.url,
 		createdAt: DateUtils.getMoment(doc.createdAt).format('YYYY-MM-DD HH:mm:ss'),
 	};
 }
@@ -76,5 +88,32 @@ export default class ApiKeyService extends UserService {
 		doc.token = doc.generateToken();
 		await doc.save();
 		return doc.token;
+	}
+
+	public async listWebhooks() {
+		const docs = await WebhookDB.find({ linked_to: this.account._id }).populate<{
+			device_id: IWhatsappLink;
+		}>('device_id');
+		return docs.map(processWebhookDocs);
+	}
+
+	public async createWebhook(details: { name: string; device: Types.ObjectId; url: string }) {
+		const doc = await WebhookDB.create({
+			linked_to: this.account._id,
+			device_id: details.device,
+			name: details.name,
+			url: details.url,
+		});
+		return {
+			id: doc._id,
+			name: doc.name,
+			device: doc.device_id,
+			url: doc.url,
+			createdAt: DateUtils.getMoment(doc.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+		};
+	}
+
+	public async deleteWebhook(id: Types.ObjectId) {
+		await WebhookDB.deleteOne({ _id: id });
 	}
 }

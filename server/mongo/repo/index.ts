@@ -1,5 +1,6 @@
 export { default as AccountDB } from './Account';
 export { default as AgentLogDB } from './AgentLog';
+export { default as APIKeyDB } from './APIKey';
 export { default as BroadcastDB } from './Broadcast';
 export { default as ButtonResponseDB } from './ButtonResponse';
 export { default as ChatbotDB } from './Chatbot';
@@ -21,5 +22,6 @@ export { default as ShortenLinkDB } from './ShortenLink';
 export { default as StorageDB } from './Storage';
 export { default as SubscriptionDetailsDB } from './SubscriptionDetails';
 export { default as WalletTransactionDB } from './WalletTransaction';
+export { default as WebhookDB } from './Webhook';
 export { default as WhatsappFlowResponseDB } from './WhatsappFlowResponse';
 export { default as WhatsappLinkDB } from './WhatsappLink';

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 export {
+	APIKeyDB,
 	AccountDB,
 	AgentLogDB,
 	BroadcastDB,
@@ -23,6 +24,8 @@ export {
 	StorageDB,
 	SubscriptionDetailsDB,
 	WalletTransactionDB,
+	WebhookDB,
+	WhatsappFlowResponseDB,
 	WhatsappLinkDB,
 } from './repo';
 

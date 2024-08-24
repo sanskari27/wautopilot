@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { CustomError, ERRORS } from '../../errors';
 import ApiKeyService from '../../services/apiKeys';
 import { Respond } from '../../utils/ExpressUtils';
-import { TCreateAPIKey } from './keys.validator';
+import { TCreateAPIKey, TWebhook } from './keys.validator';
 
 async function createAPIKey(req: Request, res: Response, next: NextFunction) {
 	const { data, serviceAccount } = req.locals;
@@ -74,11 +74,67 @@ async function regenerateToken(req: Request, res: Response, next: NextFunction) 
 	}
 }
 
+async function listWebhooks(req: Request, res: Response, next: NextFunction) {
+	const { serviceAccount } = req.locals;
+
+	const apiKeyService = new ApiKeyService(serviceAccount);
+
+	try {
+		const docs = await apiKeyService.listWebhooks();
+		return Respond({
+			res,
+			status: 201,
+			data: {
+				list: docs,
+			},
+		});
+	} catch (error) {
+		next(new CustomError(ERRORS.INTERNAL_SERVER_ERROR));
+	}
+}
+
+async function createWebhook(req: Request, res: Response, next: NextFunction) {
+	const { data, serviceAccount } = req.locals;
+	const { name, device, url } = data as TWebhook;
+
+	const apiKeyService = new ApiKeyService(serviceAccount);
+
+	try {
+		const doc = await apiKeyService.createWebhook({ name, device, url });
+		return Respond({
+			res,
+			status: 201,
+			data: doc,
+		});
+	} catch (error) {
+		next(new CustomError(ERRORS.INTERNAL_SERVER_ERROR));
+	}
+}
+
+async function deleteWebhook(req: Request, res: Response, next: NextFunction) {
+	const { serviceAccount, id } = req.locals;
+
+	const apiKeyService = new ApiKeyService(serviceAccount);
+
+	try {
+		await apiKeyService.deleteWebhook(id);
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (error) {
+		next(new CustomError(ERRORS.INTERNAL_SERVER_ERROR));
+	}
+}
+
 const Controller = {
 	createAPIKey,
 	listKeys,
 	deleteAPIKey,
 	regenerateToken,
+	listWebhooks,
+	createWebhook,
+	deleteWebhook,
 };
 
 export default Controller;
