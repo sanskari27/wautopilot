@@ -12,6 +12,7 @@ export default interface IAPIKey extends Document {
 			create: boolean;
 		};
 	};
+	createdAt: Date;
 
 	generateToken(): string;
 }

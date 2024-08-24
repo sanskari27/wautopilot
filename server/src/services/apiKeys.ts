@@ -2,15 +2,18 @@ import { Types } from 'mongoose';
 import APIKeyDB from '../../mongo/repo/APIKey';
 import IAccount from '../../mongo/types/account';
 import IAPIKey from '../../mongo/types/apiKeys';
+import IWhatsappLink from '../../mongo/types/whatsappLink';
 import { CustomError, ERRORS } from '../errors';
+import DateUtils from '../utils/DateUtils';
 import UserService from './user';
 
-function processDocs(doc: IAPIKey) {
+function processDocs(doc: Omit<IAPIKey, 'device_id'> & { device_id: IWhatsappLink }) {
 	return {
 		id: doc._id,
 		name: doc.name,
-		device: doc.device_id,
+		device: doc.device_id.verifiedName,
 		permissions: doc.permissions,
+		createdAt: DateUtils.getMoment(doc.createdAt).format('YYYY-MM-DD HH:mm:ss'),
 	};
 }
 
@@ -33,7 +36,9 @@ export default class ApiKeyService extends UserService {
 	}
 
 	public async listAPIKeys() {
-		const docs = await APIKeyDB.find({ linked_to: this.account._id });
+		const docs = await APIKeyDB.find({ linked_to: this.account._id }).populate<{
+			device_id: IWhatsappLink;
+		}>('device_id');
 		return docs.map(processDocs);
 	}
 
@@ -54,6 +59,7 @@ export default class ApiKeyService extends UserService {
 			device: doc.device_id,
 			permissions: doc.permissions,
 			token: doc.token,
+			createdAt: DateUtils.getMoment(doc.createdAt).format('YYYY-MM-DD HH:mm:ss'),
 		};
 	}
 
