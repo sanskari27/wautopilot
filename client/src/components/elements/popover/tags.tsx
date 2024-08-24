@@ -21,6 +21,7 @@ export default function TagsSelector({
 	labels?: string[];
 }) {
 	const allLabels = useTags();
+	console.log(allLabels);
 	const labels = _labels || allLabels;
 	const [selectedTags, setSelectedTags] = useState<string[]>(selected);
 

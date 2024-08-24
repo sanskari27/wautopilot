@@ -1,6 +1,7 @@
 'use client';
 import Each from '@/components/containers/each';
 import { useFields } from '@/components/context/tags';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
@@ -17,8 +18,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { getDateObject, getFormattedDate, mobileCheck } from '@/lib/utils';
 import { PhonebookRecord, phonebookSchema } from '@/schema/phonebook';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ListFilter } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { IoClose } from 'react-icons/io5';
+import TagsSelector from '../popover/tags';
 
 const defaultValues = {
 	id: '',
@@ -132,6 +136,11 @@ export function PhonebookForm({
 	function handleSave(data: PhonebookRecord) {
 		onSave(data);
 	}
+
+	const handleTagsChange = (tags: string[]) => {
+		const newTags = form.getValues('labels').filter((tag) => !tags.includes(tag));
+		form.setValue('labels', [...newTags, ...tags]);
+	};
 
 	return (
 		<Form {...form}>
@@ -269,7 +278,7 @@ export function PhonebookForm({
 								<FormItem className='space-y-0'>
 									<FormLabel className='text-primary'>{item.value}</FormLabel>
 									<FormControl>
-										<Input placeholder='eg. Delhi' {...field} />
+										<Input placeholder='Enter value' {...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -277,6 +286,38 @@ export function PhonebookForm({
 						/>
 					)}
 				/>
+				<FormField
+					control={form.control}
+					name='labels'
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel className='text-primary'>Tags</FormLabel>
+							<div className='flex items-center justify-between border-b gap-2'>
+								<div className='flex flex-wrap gap-2 border-dashed border-2 rounded-lg p-2 flex-1'>
+									<Each
+										items={field.value}
+										render={(label) => (
+											<Badge className=''>
+												{label}
+												<IoClose
+													onClick={() => field.onChange(field.value.filter((l) => l !== label))}
+													className='w-4 h-4 cursor-pointer'
+													strokeWidth={3}
+												/>
+											</Badge>
+										)}
+									/>
+								</div>
+								<TagsSelector onChange={(tags) => handleTagsChange(tags)}>
+									<Button variant='secondary' size={'icon'}>
+										<ListFilter className='w-4 h-4' strokeWidth={3} />
+									</Button>
+								</TagsSelector>
+							</div>
+						</FormItem>
+					)}
+				/>
+
 				<div className='flex justify-end'>
 					<Button type='submit'>Save</Button>
 				</div>
