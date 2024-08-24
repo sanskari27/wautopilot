@@ -14,15 +14,7 @@ import Link from 'next/link';
 import { DeleteAPIKey, RegenerateAPIKey } from './_components/button';
 import { CreateAPIKeyDialog } from './_components/dialogs';
 
-export default async function AgentPage({
-	searchParams: { edit, update_password, permissions },
-}: {
-	searchParams: {
-		edit: string;
-		update_password: string;
-		permissions: string;
-	};
-}) {
+export default async function APIWebhookPage() {
 	const list = await APIWebhookService.listKeys();
 
 	return (
