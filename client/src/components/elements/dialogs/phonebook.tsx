@@ -23,6 +23,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { IoClose } from 'react-icons/io5';
 import TagsSelector from '../popover/tags';
+import { useState } from 'react';
 
 const defaultValues = {
 	id: '',
@@ -116,6 +117,8 @@ export function PhonebookForm({
 }) {
 	const fields = useFields();
 
+	const [tags, setTags] = useState<string>('');
+
 	const form = useForm<PhonebookRecord>({
 		resolver: zodResolver(phonebookSchema),
 		defaultValues: _defaultValues,
@@ -140,6 +143,18 @@ export function PhonebookForm({
 	const handleTagsChange = (tags: string[]) => {
 		const newTags = form.getValues('labels').filter((tag) => !tags.includes(tag));
 		form.setValue('labels', [...newTags, ...tags]);
+	};
+
+	const handleNewTagsInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setTags(e.target.value);
+		const new_label = e.target.value;
+		if (new_label.includes(' ')) {
+			const label = new_label.split(' ')[0];
+			if (!form.getValues('labels').includes(label) && label.trim().length !== 0) {
+				form.setValue('labels', [...form.getValues('labels'), label]);
+			}
+			setTags('');
+		}
 	};
 
 	return (
@@ -292,7 +307,8 @@ export function PhonebookForm({
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel className='text-primary'>Tags</FormLabel>
-							<div className='flex items-center justify-between border-b gap-2'>
+
+							<div className='border-b gap-2'>
 								<div className='flex flex-wrap gap-2 border-dashed border-2 rounded-lg p-2 flex-1'>
 									<Each
 										items={field.value}
@@ -308,11 +324,20 @@ export function PhonebookForm({
 										)}
 									/>
 								</div>
-								<TagsSelector onChange={(tags) => handleTagsChange(tags)}>
-									<Button variant='secondary' size={'icon'}>
-										<ListFilter className='w-4 h-4' strokeWidth={3} />
-									</Button>
-								</TagsSelector>
+								<div className='flex gap-2 items-center mt-2'>
+									<div className='flex-1'>
+										<Input
+											value={tags}
+											onChange={handleNewTagsInput}
+											placeholder='Add new labels'
+										/>
+									</div>
+									<TagsSelector onChange={(tags) => handleTagsChange(tags)}>
+										<Button variant='secondary' size={'icon'}>
+											<ListFilter className='w-4 h-4' strokeWidth={3} />
+										</Button>
+									</TagsSelector>
+								</div>
 							</div>
 						</FormItem>
 					)}

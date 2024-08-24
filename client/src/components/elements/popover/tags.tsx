@@ -30,6 +30,7 @@ export default function TagsSelector({
 			onOpenChange={(open) => {
 				if (!open) {
 					onClose(selectedTags);
+					setSelectedTags([]);
 				}
 			}}
 		>
