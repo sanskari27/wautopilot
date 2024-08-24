@@ -6,7 +6,7 @@ export default function Testimonials({
 	testimonials,
 }: {
 	testimonials: {
-		quote: string;
+		description: string;
 		title: string;
 		name: string;
 	}[];
