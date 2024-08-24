@@ -175,7 +175,7 @@ export default class AgentService {
 				createdAt: string;
 			}[];
 		} catch (err) {
-			null;
+			return null
 		}
 	}
 
