@@ -1,12 +1,20 @@
 import Each from '@/components/containers/each';
+import Show from '@/components/containers/show';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { cn, getInitials } from '@/lib/utils';
-import AgentService from '@/services/agent.service';
+import AuthService from '@/services/auth.service';
 import { Agent } from '@/types/agent';
 import Link from 'next/link';
 
-export async function FilterAgent({ selectedAgent,agents }: { selectedAgent: string; agents:Agent[] }) {
+export async function FilterAgent({
+	selectedAgent,
+	agents,
+}: {
+	selectedAgent: string;
+	agents: Agent[];
+}) {
+	const { isAgent } = (await AuthService.userDetails())!;
 
 	const startDate = new Date(new Date().setFullYear(new Date().getFullYear() - 1));
 	const endDate = new Date();
@@ -30,24 +38,28 @@ export async function FilterAgent({ selectedAgent,agents }: { selectedAgent: str
 	return (
 		<div className='border border-dashed border-gray-700 p-2 rounded-full'>
 			<div className='gap-4 flex-wrap flex'>
-				<Link
-					href={{
-						query: { agent: 'me', start: startDate.toISOString(), end: endDate.toISOString() },
-					}}
-				>
-					<Badge
-						className={cn(
-							'rounded-full cursor-pointer',
-							selectedAgent === 'me' ? 'bg-green-500' : 'bg-gray-300',
-							selectedAgent === 'me' ? 'text-white' : 'text-black'
-						)}
-					>
-						<Avatar className='h-6 w-6 -ml-1 mr-2 font-medium'>
-							<AvatarFallback>Me</AvatarFallback>
-						</Avatar>
-						<span className='font-medium'>Me</span>
-					</Badge>
-				</Link>
+				<Show>
+					<Show.When condition={!isAgent}>
+						<Link
+							href={{
+								query: { agent: 'me', start: startDate.toISOString(), end: endDate.toISOString() },
+							}}
+						>
+							<Badge
+								className={cn(
+									'rounded-full cursor-pointer',
+									selectedAgent === 'me' ? 'bg-green-500' : 'bg-gray-300',
+									selectedAgent === 'me' ? 'text-white' : 'text-black'
+								)}
+							>
+								<Avatar className='h-6 w-6 -ml-1 mr-2 font-medium'>
+									<AvatarFallback>Me</AvatarFallback>
+								</Avatar>
+								<span className='font-medium'>Me</span>
+							</Badge>
+						</Link>
+					</Show.When>
+				</Show>
 				<Each
 					items={agents}
 					render={(item) => (

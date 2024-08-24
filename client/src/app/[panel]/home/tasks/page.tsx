@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import AgentService from '@/services/agent.service';
 import { Plus } from 'lucide-react';
+import { Suspense } from 'react';
 import AssignTaskDialog from './_components/assign-task-dialog';
 import { FilterAgent } from './_components/filter-agent';
 import { FilterDate } from './_components/filter-date';
@@ -44,9 +45,9 @@ export default async function Tasks({
 					</Button>
 				</AssignTaskDialog>
 			</div>
-
-			<FilterAgent agents={agents} selectedAgent={agent} />
-
+			<Suspense fallback={<div>Loading...</div>}>
+				<FilterAgent agents={agents} selectedAgent={agent} />
+			</Suspense>
 			<FilterDate />
 
 			<p className='text-center text-sm underline -mt-4'>
