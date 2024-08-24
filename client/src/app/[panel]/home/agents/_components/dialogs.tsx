@@ -1,4 +1,7 @@
 'use client';
+import Each from '@/components/containers/each';
+import TagsSelector from '@/components/elements/popover/tags';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -24,9 +27,11 @@ import { permissionsSchema } from '@/schema/access';
 import { profileSchema, resetSchema } from '@/schema/auth';
 import AgentService from '@/services/agent.service';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ListFilter } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
+import { IoClose } from 'react-icons/io5';
 import { z } from 'zod';
 
 export function DetailsDialog() {
@@ -336,12 +341,12 @@ export function PermissionDialog() {
 				assigned_labels: [],
 		  };
 
-	const { handleSubmit, register, setError, setValue } = useForm<z.infer<typeof permissionsSchema>>(
-		{
-			resolver: zodResolver(permissionsSchema),
-			defaultValues: data,
-		}
-	);
+	const { handleSubmit, register, getValues, watch, setError, setValue } = useForm<
+		z.infer<typeof permissionsSchema>
+	>({
+		resolver: zodResolver(permissionsSchema),
+		defaultValues: data,
+	});
 
 	async function formSubmit(values: z.infer<typeof permissionsSchema>) {
 		if (!id) {
@@ -360,6 +365,11 @@ export function PermissionDialog() {
 			},
 		});
 	}
+
+	const handleTagsChange = (tags: string[]) => {
+		const newTags: string[] = tags.filter((tag) => !watch('assigned_labels').includes(tag));
+		setValue('assigned_labels', [...watch('assigned_labels'), ...newTags]);
+	};
 
 	return (
 		<Dialog
@@ -713,24 +723,56 @@ export function PermissionDialog() {
 							</TableRow>
 						</TableBody>
 					</Table>
+					<div>
+						<p className='font-medium text-lg'>Extras</p>
 
-					<p className='font-medium text-lg'>Extras</p>
+						<div className='flex items-center justify-between py-2 px-4'>
+							<label
+								htmlFor='auto_assign_chats'
+								className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+							>
+								Auto assign chats
+							</label>
+							<Checkbox
+								id='auto_assign_chats'
+								defaultChecked={data.auto_assign_chats}
+								{...register('auto_assign_chats')}
+								onCheckedChange={(e) => {
+									setValue('auto_assign_chats', Boolean(e));
+								}}
+							/>
+						</div>
+					</div>
+					<div>
+						<p className='font-medium text-lg'>Tags</p>
 
-					<div className='flex items-center justify-between py-5 px-4 border-b '>
-						<label
-							htmlFor='auto_assign_chats'
-							className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-						>
-							Auto assign chats
-						</label>
-						<Checkbox
-							id='auto_assign_chats'
-							defaultChecked={data.auto_assign_chats}
-							{...register('auto_assign_chats')}
-							onCheckedChange={(e) => {
-								setValue('auto_assign_chats', Boolean(e));
-							}}
-						/>
+						<div className='flex items-center justify-between py-2 px-4 border-b gap-2'>
+							<div className='flex flex-wrap gap-2 border-dashed border-2 rounded-lg p-2 flex-1'>
+								<Each
+									items={watch('assigned_labels')}
+									render={(label) => (
+										<Badge className=''>
+											{label}
+											<IoClose
+												onClick={() =>
+													setValue(
+														'assigned_labels',
+														watch('assigned_labels').filter((l) => l !== label)
+													)
+												}
+												className='w-4 h-4 cursor-pointer'
+												strokeWidth={3}
+											/>
+										</Badge>
+									)}
+								/>
+							</div>
+							<TagsSelector onChange={(tags) => handleTagsChange(tags)}>
+								<Button variant='secondary' size={'icon'}>
+									<ListFilter className='w-4 h-4' strokeWidth={3} />
+								</Button>
+							</TagsSelector>
+						</div>
 					</div>
 
 					<DialogFooter className='mt-2'>

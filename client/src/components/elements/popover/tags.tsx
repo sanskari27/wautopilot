@@ -20,7 +20,7 @@ export default function TagsSelector({
 	onClose?: (selected: string[]) => void;
 	labels?: string[];
 }) {
-	const allLabels =  useTags();
+	const allLabels = useTags();
 	const labels = _labels || allLabels;
 	const [selectedTags, setSelectedTags] = useState<string[]>(selected);
 
