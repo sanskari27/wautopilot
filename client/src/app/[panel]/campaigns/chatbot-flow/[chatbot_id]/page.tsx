@@ -41,7 +41,7 @@ import { countOccurrences, parseToObject } from '@/lib/utils';
 import { ChatbotFlow, ChatbotFlowSchema } from '@/schema/chatbot-flow';
 import { ContactWithID } from '@/schema/phonebook';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChevronLeftIcon, Plus, TrashIcon } from 'lucide-react';
+import { ChevronLeftIcon, InfoIcon, Plus, TrashIcon } from 'lucide-react';
 import { notFound, useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
@@ -345,7 +345,11 @@ export default function CreateChatbotFlow() {
 								)}
 							/>
 						</div>
-
+						<div className='flex items-center justify-center text-center text-sm mt-2 text-muted-foreground'>
+							<InfoIcon className='w-4 h-4 mr-1' />
+							Kindly send hi from the mentioned number to this whatsapp business api number twice a
+							day preferably at 11AM and 6PM to keep getting the lead notification
+						</div>
 						<div className='flex-1'>
 							<FormField
 								name='forward.message'

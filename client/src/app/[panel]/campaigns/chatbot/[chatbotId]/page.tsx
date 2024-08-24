@@ -697,6 +697,11 @@ export default function ChatbotForm() {
 								)}
 							/>
 						</div>
+						<div className='flex items-center justify-center text-center text-sm mt-2 text-muted-foreground'>
+							<InfoIcon className='w-4 h-4 mr-1' />
+							Kindly send hi from the mentioned number to this whatsapp business api number twice a
+							day preferably at 11AM and 6PM to keep getting the lead notification
+						</div>
 
 						<div className='flex-1'>
 							<FormField
@@ -733,11 +738,6 @@ export default function ChatbotForm() {
 									</FormItem>
 								)}
 							/>
-							<div className='flex items-center justify-center text-center text-sm mt-2 text-muted-foreground'>
-								<InfoIcon className='w-4 h-4 mr-1' />
-								Kindly send hi from the mentioned number to this whatsapp business api number twice
-								a day preferably at 11AM and 6PM to keep getting the lead notification
-							</div>
 						</div>
 					</div>
 
