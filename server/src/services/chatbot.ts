@@ -298,8 +298,6 @@ export default class ChatBotService extends WhatsappLinkService {
 		});
 		if (flow) {
 			flow.active = !flow.active;
-			console.log(flow);
-
 			flow.save();
 			return;
 		}
