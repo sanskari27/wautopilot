@@ -11,6 +11,11 @@ const COMMON_ERRORS = {
 		TITLE: 'INVALID_FIELDS',
 		MESSAGE: 'The request contains invalid fields. Please try again later.',
 	},
+	INSUFFICIENT_BALANCE: {
+		STATUS: 400,
+		TITLE: 'INSUFFICIENT_BALANCE',
+		MESSAGE: 'You do not have enough balance to perform this operation.',
+	},
 	NOT_FOUND: {
 		STATUS: 404,
 		TITLE: 'NOT_FOUND',

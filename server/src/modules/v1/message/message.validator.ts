@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import Logger from 'n23-logger';
 import { z } from 'zod';
 import { CustomError } from '../../../errors';
 
@@ -72,6 +71,52 @@ export type SendMessageValidationResult = {
 					name: string;
 					address: string;
 				};
+		  }
+		| {
+				type: 'button';
+				text: string;
+				buttons: {
+					id: string;
+					text: string;
+				}[];
+		  }
+		| {
+				type: 'list';
+				header: string;
+				body: string;
+				footer: string;
+				button_text: string;
+				sections: {
+					title: string;
+					buttons: {
+						id: string;
+						text: string;
+					}[];
+				}[];
+		  }
+		| {
+				type: 'whatsapp_flow';
+				header: string;
+				body: string;
+				footer: string;
+				flow_id: string;
+				button_text: string;
+		  }
+		| {
+				type: 'template';
+				template_id: string;
+				template_name: string;
+				template_header?: {
+					type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+					media_id?: string;
+					link?: string;
+				};
+				template_body: {
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value: string;
+				}[];
 		  };
 	recipient: string;
 	context?: {
@@ -153,12 +198,93 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 			.array(),
 	});
 
-	// Example of creating a discriminated union
+	const buttonType = z.object({
+		type: z.literal('button'),
+		text: z.string().trim().min(1),
+		buttons: z.array(
+			z.object({
+				id: z
+					.string()
+					.trim()
+					.min(1)
+					.refine((val) => val.match(/^[a-z]+$/), {
+						message: 'Button ID must be lowercase alphabets only.',
+					}),
+				text: z.string().trim().min(1),
+			})
+		),
+	});
+
+	const listType = z.object({
+		type: z.literal('list'),
+		header: z.string().trim().optional(),
+		body: z.string().trim().min(1),
+		footer: z.string().trim().optional(),
+		button_text: z.string().trim().min(1),
+		sections: z.array(
+			z.object({
+				title: z.string().trim().min(1),
+				buttons: z.array(
+					z.object({
+						id: z
+							.string()
+							.trim()
+							.min(1)
+							.refine((val) => val.match(/^[a-z]+$/), {
+								message: 'Button ID must be lowercase alphabets only.',
+							}),
+						text: z.string().trim().min(1),
+					})
+				),
+			})
+		),
+	});
+
+	const flowType = z.object({
+		type: z.literal('whatsapp_flow'),
+		header: z.string().trim().optional(),
+		body: z.string().trim().min(1),
+		footer: z.string().trim().optional(),
+		flow_id: z.string().trim().min(1),
+		button_text: z.string().trim().min(1),
+	});
+
+	const templateType = z.object({
+		type: z.literal('template'),
+		template_id: z.string().trim().min(1),
+		template_name: z.string().trim().min(1),
+		template_header: z
+			.object({
+				type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']).optional(),
+				media_id: z.string().optional(),
+				link: z.string().optional(),
+			})
+			.optional(),
+		template_body: z
+			.array(
+				z.object({
+					custom_text: z.string(),
+					phonebook_data: z.string(),
+					variable_from: z.enum(['custom_text', 'phonebook_data']),
+					fallback_value: z.string(),
+				})
+			)
+			.default([]),
+	});
 
 	const reqValidator = z.object({
 		recipient: z.string().min(1, 'Please provide a valid phone number.'),
 		message: z
-			.discriminatedUnion('type', [textType, mediaType, locationType, contactsType])
+			.discriminatedUnion('type', [
+				textType,
+				mediaType,
+				locationType,
+				contactsType,
+				buttonType,
+				listType,
+				flowType,
+				templateType,
+			])
 			.superRefine((data, ctx) => {
 				if (
 					data.type === 'document' ||
@@ -186,8 +312,6 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 		req.locals.data = reqValidatorResult.data;
 		return next();
 	}
-
-	Logger.debug(reqValidatorResult.error.format());
 
 	return next(
 		new CustomError({
