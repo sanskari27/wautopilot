@@ -24,11 +24,13 @@ export async function CreateAPIKeyValidator(req: Request, res: Response, next: N
 	const reqValidator = z.object({
 		name: z.string().min(3, 'Name must be at least 3 characters long'),
 		device: idSchema,
-		permissions: z.object({
-			messages: z.object({
-				create: z.boolean().default(true),
-			}),
-		}),
+		permissions: z
+			.object({
+				messages: z.object({
+					create: z.boolean().default(true),
+				}),
+			})
+			.default({ messages: { create: true } }),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

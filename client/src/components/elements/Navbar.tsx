@@ -58,6 +58,9 @@ export default function Navbar() {
 					<MenubarLink href={getLink('/home/agents')}>Agents</MenubarLink>
 					<MenubarLink onClick={openDevices}>Devices</MenubarLink>
 					<Show.ShowIf condition={isMaster}>
+						<MenubarLink href={getLink('/home/api-webhook')}>API & Webhooks</MenubarLink>
+					</Show.ShowIf>
+					<Show.ShowIf condition={isMaster}>
 						<MenubarSeparator />
 						<MenubarLink href={getLink('/home/admin')}>Admin</MenubarLink>
 						<MenubarLink href={getLink('/home/coupons')}>Coupons</MenubarLink>
