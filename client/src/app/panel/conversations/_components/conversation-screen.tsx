@@ -33,7 +33,7 @@ export default function ConversationScreen() {
 		on: openConversationNoteDialog,
 		off: closeConversationNoteDialog,
 	} = useBoolean(false);
-	const { expand } = useChatListExpanded();
+	const { expand, isExpanded } = useChatListExpanded();
 	const { loading, expiry, messages, loadMore } = useMessages(recipient?.id ?? '');
 
 	useEffect(() => {
@@ -45,7 +45,7 @@ export default function ConversationScreen() {
 	if (!recipient) return null;
 
 	return (
-		<div className='w-full'>
+		<div className={`${!isExpanded ? '!w-full' : '!hidden md:!flex'}`}>
 			<div className='flex p-4 border-b-2 justify-between w-full'>
 				<div className='flex gap-3 items-center'>
 					<ChevronLeft className='block md:!hidden' onClick={expand} />
@@ -96,7 +96,7 @@ export default function ConversationScreen() {
 				<div className='flex flex-col-reverse w-full overflow-y-auto p-4 h-full'>
 					<MessagesList list={messages} onLastReached={loadMore} />
 				</div>
-				<MessageBox />
+				<MessageBox isExpired={expiry === 'EXPIRED' ? true : false} />
 			</div>
 			<MessageTagsView
 				isOpen={isOpenMessageTagDialog}

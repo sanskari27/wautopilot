@@ -41,7 +41,7 @@ import toast from 'react-hot-toast';
 import QuickReplyDialog from './add-quick-reply-dialog';
 import { UploadMediaDialog } from './dialogs';
 
-export default function MessageBox() {
+export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 	const { value: isMessageSending, on: setSending, off: setNotSending } = useBoolean(false);
 	const { value: quickReply, toggle: toggleQuickReply } = useBoolean(true);
 	const { selected_recipient } = useRecipient();
@@ -126,6 +126,7 @@ export default function MessageBox() {
 				} overflow-hidden flex w-full bg-white border-b border-b-gray-200 gap-x-2`}
 			>
 				<Select
+					disabled={isExpired}
 					value={selectedQuickReply}
 					onValueChange={(val) => {
 						setTextMessage(list.find((item) => item.id === val)?.message ?? '');
@@ -149,7 +150,7 @@ export default function MessageBox() {
 
 				{!selectedQuickReply ? (
 					<QuickReplyDialog>
-						<Button variant={'secondary'} size={'icon'}>
+						<Button disabled={isExpired} variant={'secondary'} size={'icon'}>
 							<Plus className='w-4 h-4' />
 						</Button>
 					</QuickReplyDialog>
@@ -158,7 +159,7 @@ export default function MessageBox() {
 						id={selectedQuickReply}
 						message={list.find((item) => item.id === selectedQuickReply)?.message ?? ''}
 					>
-						<Button variant={'secondary'} size={'icon'}>
+						<Button disabled={isExpired} variant={'secondary'} size={'icon'}>
 							<Pencil className='w-4 h-4' />
 						</Button>
 					</QuickReplyDialog>
@@ -167,7 +168,7 @@ export default function MessageBox() {
 			<div className='flex bg-white w-full p-2 items-end gap-1'>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button variant='ghost' size={'icon'}>
+						<Button disabled={isExpired} variant='ghost' size={'icon'}>
 							<Paperclip className='w-4 h-4' />
 						</Button>
 					</DropdownMenuTrigger>
@@ -230,10 +231,11 @@ export default function MessageBox() {
 						</UploadMediaDialog>
 					</DropdownMenuContent>
 				</DropdownMenu>
-				<Button variant={'ghost'} size={'icon'} onClick={toggleQuickReply}>
+				<Button disabled={isExpired} variant={'ghost'} size={'icon'} onClick={toggleQuickReply}>
 					<MessageSquareQuote className='w-4 h-4' />
 				</Button>
 				<Textarea
+					disabled={isExpired}
 					className='max-h-[150px] min-h-[40px] h-[40px] resize-none !ring-0'
 					onKeyDown={handleKeyDown}
 					onInput={handleMessageInput}
@@ -241,7 +243,7 @@ export default function MessageBox() {
 					onChange={handleTextMessageChange}
 					placeholder='Type a message'
 				/>
-				<Button className='px-4' onClick={sendTextMessage} disabled={isMessageSending}>
+				<Button className='px-4' onClick={sendTextMessage} disabled={isExpired || isMessageSending}>
 					{isMessageSending ? (
 						<Loader2 className='w-4 h-4 animate-spin mr-2' />
 					) : (
