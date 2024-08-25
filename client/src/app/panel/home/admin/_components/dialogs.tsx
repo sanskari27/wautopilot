@@ -108,7 +108,6 @@ export function MarkupPriceDialog() {
 				return 'Markup price saved successfully';
 			},
 			error: (err) => {
-				console.log(err);
 				return 'Failed to save markup price';
 			},
 		});

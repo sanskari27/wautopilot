@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { Types } from 'mongoose';
 import { WebhookDB } from '../../mongo';
 import APIKeyDB from '../../mongo/repo/APIKey';
@@ -115,5 +116,29 @@ export default class ApiKeyService extends UserService {
 
 	public async deleteWebhook(id: Types.ObjectId) {
 		await WebhookDB.deleteOne({ _id: id });
+	}
+
+	public async validateWebhook(id: Types.ObjectId) {
+		const doc = await WebhookDB.findOne({ _id: id, linked_to: this.account._id });
+
+		if (!doc) {
+			throw new CustomError(ERRORS.NOT_FOUND);
+		}
+
+		try {
+			await axios.post(doc.url);
+		} catch (error) {
+			throw new CustomError(ERRORS.NOT_FOUND);
+		}
+	}
+
+	public async sendWebhook(device: IWhatsappLink, body: any) {
+		const docs = await WebhookDB.find({ linked_to: this.account._id, device_id: device._id });
+
+		for (const doc of docs) {
+			try {
+				await axios.post(doc.url, body);
+			} catch (error) {}
+		}
 	}
 }

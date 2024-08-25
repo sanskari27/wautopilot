@@ -127,6 +127,25 @@ async function deleteWebhook(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function validateWebhook(req: Request, res: Response, next: NextFunction) {
+	const { serviceAccount, id } = req.locals;
+
+	const apiKeyService = new ApiKeyService(serviceAccount);
+
+	try {
+		await apiKeyService.validateWebhook(id);
+		return Respond({
+			res,
+			status: 200,
+		});
+	} catch (error) {
+		if (error instanceof CustomError) {
+			return next(error);
+		}
+		return next(new CustomError(ERRORS.INTERNAL_SERVER_ERROR));
+	}
+}
+
 const Controller = {
 	createAPIKey,
 	listKeys,
@@ -135,6 +154,7 @@ const Controller = {
 	listWebhooks,
 	createWebhook,
 	deleteWebhook,
+	validateWebhook,
 };
 
 export default Controller;

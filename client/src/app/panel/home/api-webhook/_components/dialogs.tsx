@@ -69,7 +69,6 @@ export function CreateAPIKeyDialog() {
 				return 'API Key created successfully';
 			},
 			error: (err) => {
-				console.log(err);
 				return 'Failed to create API Key';
 			},
 		});
@@ -174,7 +173,6 @@ export function CreateWebhookDialog() {
 				return 'Webhook created successfully';
 			},
 			error: (err) => {
-				console.log(err);
 				return 'Failed to create Webhook';
 			},
 		});

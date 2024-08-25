@@ -83,7 +83,6 @@ export function EditCouponDialog() {
 				return 'Coupon saved successfully';
 			},
 			error: (err) => {
-				console.log(err);
 				return 'Failed to save coupon';
 			},
 		});

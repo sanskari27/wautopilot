@@ -8,12 +8,13 @@ export default class APIWebhookService {
 				id: list.id ?? '',
 				name: list.name ?? '',
 				device: list.device ?? '',
-				created_at: list.created_at ?? '',
+				createdAt: list.createdAt ?? '',
 			};
 		}) as {
 			id: string;
 			name: string;
 			device: string;
+			createdAt: string;
 		}[];
 	}
 

@@ -127,7 +127,6 @@ export default function CreateChatbotFlow() {
 				return 'Saved';
 			},
 			error: (err) => {
-				console.log(err);
 				return 'Failed to save';
 			},
 		});

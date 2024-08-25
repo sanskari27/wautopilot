@@ -5,6 +5,7 @@ import { CreateAPIKeyValidator, WebhookValidator } from './keys.validator';
 
 const router = express.Router();
 
+router.route('/webhooks/:id/validate').all(IDValidator).post(Controller.validateWebhook);
 router.route('/webhooks/:id').all(IDValidator).delete(Controller.deleteWebhook);
 router
 	.route('/webhooks')

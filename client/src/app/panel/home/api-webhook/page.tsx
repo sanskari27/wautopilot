@@ -41,7 +41,8 @@ export default async function APIWebhookPage() {
 					<TableHeader>
 						<TableRow>
 							<TableHead className='w-[20%]'>Name</TableHead>
-							<TableHead className='w-[70%]'>Device</TableHead>
+							<TableHead className='w-[60%]'>Device</TableHead>
+							<TableHead className='text-right w-[10%]'>Created At</TableHead>
 							<TableHead className='w-[10%] text-center'>Action</TableHead>
 						</TableRow>
 					</TableHeader>
@@ -52,9 +53,10 @@ export default async function APIWebhookPage() {
 								<TableRow>
 									<TableCell className='font-medium'>{item.name}</TableCell>
 									<TableCell className='font-medium'>{item.device}</TableCell>
+									<TableCell className='font-medium'>{item.createdAt}</TableCell>
 									<TableCell className='font-medium flex gap-2 justify-center'>
-										<DeleteAPIKey id={item.id} />
 										<RegenerateAPIKey id={item.id} />
+										<DeleteAPIKey id={item.id} />
 									</TableCell>
 								</TableRow>
 							)}
@@ -75,11 +77,11 @@ export default async function APIWebhookPage() {
 				<Table>
 					<TableHeader>
 						<TableRow>
-							<TableHead>Name</TableHead>
-							<TableHead>Device</TableHead>
-							<TableHead>URL</TableHead>
+							<TableHead className='w-[20%]'>Name</TableHead>
+							<TableHead className='w-[20%]'>Device</TableHead>
+							<TableHead className='w-[40%]'>URL</TableHead>
 							<TableHead className='text-right'>Created At</TableHead>
-							<TableHead className='text-center'>Action</TableHead>
+							<TableHead className='text-center w-[10%]'>Action</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -92,8 +94,8 @@ export default async function APIWebhookPage() {
 									<TableCell className='font-medium whitespace-pre-wrap'>{item.url}</TableCell>
 									<TableCell className='font-medium text-right'>{item.created_at}</TableCell>
 									<TableCell className='font-medium justify-center flex gap-2'>
-										<DeleteWebhookButton id={item.id} />
 										<ValidateWebhook id={item.id} />
+										<DeleteWebhookButton id={item.id} />
 									</TableCell>
 								</TableRow>
 							)}

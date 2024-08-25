@@ -11,22 +11,11 @@ export default async function Layout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	// const templates = (await TemplateService.listTemplates())!;
-	// const chatBots = (await ChatBotService.listChatBots())!;
-	// const chatBotFlows = (await ChatbotFlowService.listChatBots())!;
-	// console.log('fetching templates, chatBots, chatBotFlows');
 
 	return (
 		<Suspense fallback={<Loading />}>
 			<section>
 				{children}
-				{/* <TemplatesProvider data={templates}>
-					<ChatbotProvider data={chatBots}>
-						<ChatbotFlowProvider data={chatBotFlows}>
-							</ChatbotFlowProvider>
-					</ChatbotProvider>
-					<DevicesDialog />
-				</TemplatesProvider> */}
 			</section>
 		</Suspense>
 	);

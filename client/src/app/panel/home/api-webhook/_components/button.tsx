@@ -22,7 +22,7 @@ export function DeleteAPIKey({ id }: { id: string }) {
 	return (
 		<DeleteDialog onDelete={deleteAPIKey}>
 			<Button variant={'destructive'} size={'icon'}>
-				<Trash />
+				<Trash className='w-4 h-4' />
 			</Button>
 		</DeleteDialog>
 	);
@@ -41,7 +41,7 @@ export function DeleteWebhookButton({ id }: { id: string }) {
 	return (
 		<DeleteDialog onDelete={handleWebhookDelete}>
 			<Button variant={'destructive'} size={'icon'}>
-				<Trash />
+				<Trash className='w-4 h-4' />
 			</Button>
 		</DeleteDialog>
 	);
@@ -60,7 +60,7 @@ export function ValidateWebhook({ id }: { id: string }) {
 
 	return (
 		<Button variant={'secondary'} size={'icon'} onClick={validateWebhook}>
-			<CheckCheck />
+			<CheckCheck className='w-4 h-4' />
 		</Button>
 	);
 }
@@ -84,7 +84,7 @@ export function RegenerateAPIKey({ id }: { id: string }) {
 
 	return (
 		<Button variant={'secondary'} size={'icon'} onClick={regenerateAPIKey}>
-			<RefreshCcw />
+			<RefreshCcw className='w-4 h-4' />
 		</Button>
 	);
 }

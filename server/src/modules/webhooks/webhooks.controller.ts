@@ -11,6 +11,7 @@ import {
 	META_VERIFY_USER_STRING,
 	RAZORPAY_WEBHOOK_SECRET,
 } from '../../config/const';
+import ApiKeyService from '../../services/apiKeys';
 import BroadcastService from '../../services/broadcast';
 import ButtonResponseService from '../../services/buttonResponse';
 import ChatBotService from '../../services/chatbot';
@@ -47,6 +48,9 @@ async function whatsappCallback(req: Request, res: Response, next: NextFunction)
 	if (!user) {
 		return res.status(400).send("Resource doesn't exist");
 	}
+	const webhookService = new ApiKeyService(user);
+	webhookService.sendWebhook(link, req.body);
+
 	const conversationService = new ConversationService(user, link);
 	const contact = data.contacts?.[0] ?? {
 		wa_id: '',
