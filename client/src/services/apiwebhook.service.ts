@@ -43,7 +43,6 @@ export default class APIWebhookService {
 	static async listWebhook() {
 		const { data } = await api.get('/api-keys/webhooks');
 		return (data.list ?? []).map((list: any) => {
-			console.log(list.createdAt);
 			return {
 				id: list.id ?? '',
 				name: list.name ?? '',

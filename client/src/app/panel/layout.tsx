@@ -12,6 +12,8 @@ import PhoneBookService from '@/services/phonebook.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
 	title: 'Dashboard • Wautopilot',
 };

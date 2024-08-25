@@ -27,8 +27,6 @@ export class DashboardService {
 				contacts: data.contacts ?? 0,
 			};
 		} catch (error) {
-			console.log(error);
-
 			return null;
 		}
 	}

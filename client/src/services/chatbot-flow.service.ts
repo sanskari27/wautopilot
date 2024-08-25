@@ -151,12 +151,7 @@ export default class ChatbotFlowService {
 		return validateChatBot(data.flow);
 	}
 	static async updateNodesAndEdges(botId: string, details: { nodes: any[]; edges: any[] }) {
-		try {
 			await api.patch(`/chatbot/flows/${botId}`, details);
-		} catch (err) {
-			console.log((err as any).response.data);
-			throw err;
-		}
 	}
 	static async deleteChatbotFlow(botId: string) {
 		await api.delete(`/chatbot/flows/${botId}`);
@@ -180,8 +175,6 @@ export default class ChatbotFlowService {
 				edges: data.flow.edges,
 			};
 		} catch (err) {
-			console.log((err as any).response.data);
-
 			return null;
 		}
 	}
