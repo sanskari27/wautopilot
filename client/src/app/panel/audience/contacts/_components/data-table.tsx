@@ -6,7 +6,7 @@ import { ContactWithID } from '@/schema/phonebook';
 export function DataTable({ records }: { records: ContactWithID[] }) {
 	return (
 		<div className='w-full'>
-			<div className='rounded-md border'>
+			<div className='border border-dashed border-gray-700 rounded-2xl overflow-hidden'>
 				<Table>
 					<TableHeader>
 						<TableRow>
