@@ -33,35 +33,37 @@ export default async function FAQPage() {
 					</Button>
 				</Link>
 			</div>
-			<Table className='border-2 border-dashed mt-4 rounded-lg'>
-				<TableHeader>
-					<TableRow>
-						<TableHead className='w-[5%]'>Sl. no.</TableHead>
-						<TableHead>Title</TableHead>
-						<TableHead>Info</TableHead>
-						<TableHead className='text-center w-10%'>Action</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					<Each
-						items={list}
-						render={(item, index) => (
-							<TableRow key={item.title}>
-								<TableCell>{index + 1}</TableCell>
-								<TableCell className='whitespace-pre-wrap'>{item.title}</TableCell>
-								<TableCell className='whitespace-pre-wrap'>{item.info}</TableCell>
-								<TableCell className='text-center'>
-									<FAQContextMenu list={list} id={index} FAQ={item}>
-										<Button size='sm' variant={'outline'}>
-											Action
-										</Button>
-									</FAQContextMenu>
-								</TableCell>
-							</TableRow>
-						)}
-					/>
-				</TableBody>
-			</Table>
+			<div className='border border-dashed border-gray-700 rounded-2xl overflow-hidden'>
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead className='w-[5%]'>Sl. no.</TableHead>
+							<TableHead>Title</TableHead>
+							<TableHead>Info</TableHead>
+							<TableHead className='text-center w-10%'>Action</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						<Each
+							items={list}
+							render={(item, index) => (
+								<TableRow key={item.title}>
+									<TableCell>{index + 1}</TableCell>
+									<TableCell className='whitespace-pre-wrap'>{item.title}</TableCell>
+									<TableCell className='whitespace-pre-wrap'>{item.info}</TableCell>
+									<TableCell className='text-center'>
+										<FAQContextMenu list={list} id={index} FAQ={item}>
+											<Button size='sm' variant={'outline'}>
+												Action
+											</Button>
+										</FAQContextMenu>
+									</TableCell>
+								</TableRow>
+							)}
+						/>
+					</TableBody>
+				</Table>
+			</div>
 			<FAQDialog list={list} />
 		</div>
 	);

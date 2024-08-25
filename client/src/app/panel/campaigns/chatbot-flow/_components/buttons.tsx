@@ -1,6 +1,7 @@
 'use client';
 import { usePermissions } from '@/components/context/user-details';
 import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 import Link from 'next/link';
 
 export function CreateButton() {
@@ -9,7 +10,10 @@ export function CreateButton() {
 	if (!createPermission) return null;
 	return (
 		<Link href={`/panel/campaigns/chatbot-flow/new`}>
-			<Button size={'sm'}>Create New</Button>
+			<Button size={'sm'}>
+				<Plus className='w-4 h-4 mr-2' />
+				Create New
+			</Button>
 		</Link>
 	);
 }

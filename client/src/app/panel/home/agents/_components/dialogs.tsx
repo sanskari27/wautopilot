@@ -145,7 +145,7 @@ export function DetailsDialog() {
 							</div>
 						</div>
 						<div className='grid gap-2'>
-							<Label className='text-primary' htmlFor='email'>
+							<Label className='text-primary' htmlFor='phone'>
 								Phone (with country code)
 							</Label>
 							<Input

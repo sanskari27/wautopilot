@@ -10,19 +10,24 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Recurring } from '@/schema/broadcastSchema';
 import RecurringService from '@/services/recurring.service';
-import { Delete, Download, ToggleLeftIcon, ToggleRightIcon } from 'lucide-react';
+import { Delete, Download, Edit, ToggleLeftIcon, ToggleRightIcon } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { MdScheduleSend } from 'react-icons/md';
+import { deleteRecurring, toggleRecurring } from '../action';
 
 export default function RecurringActionContextMenu({
 	children,
 	campaignId,
+	recurring,
 	active,
 }: {
 	children: React.ReactNode;
 	campaignId: string;
+	recurring: Recurring;
 	active: 'ACTIVE' | 'PAUSED';
 }) {
 	const router = useRouter();
@@ -39,7 +44,7 @@ export default function RecurringActionContextMenu({
 	};
 
 	const toggleRecurringCampaign = () => {
-		const promise = RecurringService.toggleRecurring(campaignId);
+		const promise = toggleRecurring(campaignId);
 
 		toast.promise(promise, {
 			loading: 'Toggling Campaign...',
@@ -63,7 +68,7 @@ export default function RecurringActionContextMenu({
 	};
 
 	const deleteRecurringCampaign = () => {
-		const promise = RecurringService.deleteRecurring(campaignId);
+		const promise = deleteRecurring(campaignId);
 
 		toast.promise(promise, {
 			loading: 'Deleting Campaign...',
@@ -79,6 +84,12 @@ export default function RecurringActionContextMenu({
 			<DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
 			<DropdownMenuContent className='w-56'>
 				<Show.ShowIf condition={permission.update}>
+					<Link href={`/panel/campaigns/recurring/${campaignId}?data=${JSON.stringify(recurring)}`}>
+						<DropdownMenuItem>
+							<Edit className='mr-2 h-4 w-4' />
+							Edit
+						</DropdownMenuItem>
+					</Link>
 					<DropdownMenuItem onClick={toggleRecurringCampaign}>
 						<Show>
 							<Show.When condition={active === 'ACTIVE'}>

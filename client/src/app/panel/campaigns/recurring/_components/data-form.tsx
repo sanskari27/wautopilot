@@ -96,6 +96,7 @@ export default function DataForm({
 		);
 	}
 
+	const isValid = recurringSchema.safeParse(form.getValues()).success;
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSave)} className='w-full space-y-2'>
@@ -346,7 +347,7 @@ export default function DataForm({
 								<TemplatePreview components={template?.components ?? []} />
 							</Show.ShowIf>
 
-							<Button type='submit' className='w-[80%] mx-auto' disabled={!form.formState.isValid}>
+							<Button type='submit' className='w-[80%] mx-auto' disabled={!isValid}>
 								Schedule
 							</Button>
 						</div>

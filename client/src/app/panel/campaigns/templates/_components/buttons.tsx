@@ -11,7 +11,7 @@ import { toast } from 'react-hot-toast';
 export function AddTemplate() {
 	return (
 		<Link href={`/panel/campaigns/templates/create`}>
-			<Button size={'sm'} variant={'outline'} className='border-primary text-primary'>
+			<Button size={'sm'} className='border-primary'>
 				<LayoutPanelTop className='w-4 h-4 mr-2' />
 				Add Template
 			</Button>

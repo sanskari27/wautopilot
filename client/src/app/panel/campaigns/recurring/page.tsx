@@ -5,7 +5,6 @@ import {
 	Table,
 	TableBody,
 	TableCell,
-	TableCellLink,
 	TableHead,
 	TableHeader,
 	TableRow,
@@ -31,48 +30,45 @@ export default async function Recurring({
 					<CreateButton />
 				</div>
 			</div>
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Name</TableHead>
-						<TableHead>Description</TableHead>
-						<TableHead>Wish Type</TableHead>
-						<TableHead className='text-right'>Delay</TableHead>
-						<TableHead>Status</TableHead>
-						<TableHead className='text-center'>Action</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					<Each
-						items={list}
-						render={(recurring) => {
-							const link = `/panel/campaigns/recurring/${recurring.id}?data=${JSON.stringify(
-								recurring
-							)}`;
-							return (
+			<div className='border border-dashed border-gray-700 rounded-2xl overflow-hidden'>
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Name</TableHead>
+							<TableHead>Description</TableHead>
+							<TableHead>Wish Type</TableHead>
+							<TableHead className='text-right'>Delay</TableHead>
+							<TableHead>Status</TableHead>
+							<TableHead className='text-center'>Action</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						<Each
+							items={list}
+							render={(recurring) => (
 								<TableRow>
-									<TableCellLink href={link} className='font-medium'>
-										{recurring.name}
-									</TableCellLink>
-									<TableCellLink href={link}>{recurring.description}</TableCellLink>
-									<TableCellLink href={link}>{recurring.wish_from}</TableCellLink>
-									<TableCellLink href={link} className='text-right'>
-										{recurring.delay} Days
-									</TableCellLink>
-									<TableCellLink href={link}>{recurring.active}</TableCellLink>
+									<TableCell className='font-medium'>{recurring.name}</TableCell>
+									<TableCell>{recurring.description}</TableCell>
+									<TableCell>{recurring.wish_from}</TableCell>
+									<TableCell className='text-right'>{recurring.delay} Days</TableCell>
+									<TableCell>{recurring.active}</TableCell>
 									<TableCell className='text-center'>
-										<RecurringActionContextMenu active={recurring.active} campaignId={recurring.id}>
+										<RecurringActionContextMenu
+											recurring={recurring}
+											active={recurring.active}
+											campaignId={recurring.id}
+										>
 											<Button variant={'outline'} size={'sm'}>
 												Actions
 											</Button>
 										</RecurringActionContextMenu>
 									</TableCell>
 								</TableRow>
-							);
-						}}
-					/>
-				</TableBody>
-			</Table>
+							)}
+						/>
+					</TableBody>
+				</Table>
+			</div>
 		</div>
 	);
 }

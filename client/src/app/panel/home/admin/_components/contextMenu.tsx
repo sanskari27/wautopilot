@@ -36,10 +36,10 @@ export function AdminContextMenu({
 		<ContextMenu>
 			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 			<ContextMenuContent className='w-64'>
+				<ContextMenuLink href={`?upgrade-plan=${admin.id}`} inset>
+					Upgrade Plan
+				</ContextMenuLink>
 				<Show.ShowIf condition={admin.isSubscribed}>
-					<ContextMenuLink href={`?upgrade-plan=${admin.id}`} inset>
-						Upgrade Plan
-					</ContextMenuLink>
 					<ContextMenuLink href={`?extend-expiry=${admin.id}&admin=${JSON.stringify(admin)}`} inset>
 						Extend Expiry
 					</ContextMenuLink>
@@ -50,7 +50,9 @@ export function AdminContextMenu({
 				>
 					Set markup price
 				</ContextMenuLink>
-				<ContextMenuItem onClick={openServiceAccount} inset>Service account</ContextMenuItem>
+				<ContextMenuItem onClick={openServiceAccount} inset>
+					Service account
+				</ContextMenuItem>
 			</ContextMenuContent>
 		</ContextMenu>
 	);

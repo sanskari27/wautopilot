@@ -42,7 +42,7 @@ export default async function AgentPage({
 					</Link>
 				</Show.ShowIf>
 			</div>
-			<div className='border border-dashed border-gray-700 rounded-2xl'>
+			<div className='border border-dashed border-gray-700 rounded-2xl overflow-hidden'>
 				<Table>
 					<TableCaption>{agents.length} Agents Found.</TableCaption>
 					<TableHeader>

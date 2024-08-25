@@ -39,7 +39,7 @@ export default async function Tasks({
 			<div className='flex justify-between'>
 				<h2 className='text-2xl font-bold'>Tasks</h2>
 				<AssignTaskDialog agents={agents}>
-					<Button variant={'outline'}>
+					<Button>
 						<Plus className='h-4 w-4' />
 						<span>Assign task</span>
 					</Button>

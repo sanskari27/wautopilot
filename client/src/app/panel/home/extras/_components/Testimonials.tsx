@@ -33,37 +33,39 @@ export default async function TestimonialsPage() {
 					</Button>
 				</Link>
 			</div>
-			<Table className='border-2 border-dashed mt-4 rounded-lg'>
-				<TableHeader>
-					<TableRow>
-						<TableHead className='w-[7%]'>Sl. no.</TableHead>
-						<TableHead>Title</TableHead>
-						<TableHead>Info</TableHead>
-						<TableHead>Description</TableHead>
-						<TableHead className='text-center w-10%'>Action</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					<Each
-						items={list}
-						render={(item, index) => (
-							<TableRow key={item.title}>
-								<TableCell className='px-4'>{index + 1}</TableCell>
-								<TableCell className='px-4 whitespace-pre-wrap'>{item.title}</TableCell>
-								<TableCell className='px-4 whitespace-pre-wrap'>{item.name}</TableCell>
-								<TableCell className='px-4 whitespace-pre-wrap'>{item.description}</TableCell>
-								<TableCell className='px-4 text-center'>
-									<TestimonialsContextMenu list={list} id={index} testimonial={item}>
-										<Button size='sm' variant={'outline'}>
-											Action
-										</Button>
-									</TestimonialsContextMenu>
-								</TableCell>
-							</TableRow>
-						)}
-					/>
-				</TableBody>
-			</Table>
+			<div className='border border-dashed border-gray-700 rounded-2xl overflow-hidden'>
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead className='w-[7%]'>Sl. no.</TableHead>
+							<TableHead>Title</TableHead>
+							<TableHead>Info</TableHead>
+							<TableHead>Description</TableHead>
+							<TableHead className='text-center w-10%'>Action</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						<Each
+							items={list}
+							render={(item, index) => (
+								<TableRow key={item.title}>
+									<TableCell className='px-4'>{index + 1}</TableCell>
+									<TableCell className='px-4 whitespace-pre-wrap'>{item.title}</TableCell>
+									<TableCell className='px-4 whitespace-pre-wrap'>{item.name}</TableCell>
+									<TableCell className='px-4 whitespace-pre-wrap'>{item.description}</TableCell>
+									<TableCell className='px-4 text-center'>
+										<TestimonialsContextMenu list={list} id={index} testimonial={item}>
+											<Button size='sm' variant={'outline'}>
+												Action
+											</Button>
+										</TestimonialsContextMenu>
+									</TableCell>
+								</TableRow>
+							)}
+						/>
+					</TableBody>
+				</Table>
+			</div>
 			<TestimonialDialog list={list} />
 		</div>
 	);

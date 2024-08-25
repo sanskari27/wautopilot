@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import AgentService from '@/services/agent.service';
 import MessagesService from '@/services/messages.service';
 import PhoneBookService from '@/services/phonebook.service';
-import { Database, FolderDown, Headset, ListFilter, Trash } from 'lucide-react';
+import { Database, FolderDown, Headset, ListFilter, Plus, Trash } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -19,7 +19,8 @@ export function CreateButton() {
 	if (!createPermission) return null;
 	return (
 		<Link href={`/panel/campaigns/recurring/create`}>
-			<Button variant={'outline'} size={'sm'}>
+			<Button size={'sm'}>
+				<Plus className='w-4 h-4 mr-2' />
 				Create New
 			</Button>
 		</Link>

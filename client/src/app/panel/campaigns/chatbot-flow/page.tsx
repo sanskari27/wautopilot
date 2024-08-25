@@ -28,37 +28,41 @@ export default async function ChatbotFlow({ params }: { params: { panel: string 
 					<CreateButton />
 				</div>
 			</div>
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Name</TableHead>
-						<TableHead>Trigger</TableHead>
-						<TableHead>Condition</TableHead>
-						<TableHead>Status</TableHead>
-						<TableHead className='text-center'>Action</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					<Each
-						items={list}
-						render={(item) => (
-							<TableRow>
-								<TableCell>{item.name}</TableCell>
-								<TableCell>{item.trigger.join(', ')}</TableCell>
-								<TableCell className='capitalize'>
-									{item.options.toLowerCase().replaceAll('_', ' ')}
-								</TableCell>
-								<TableCell>{item.isActive ? 'Active' : 'Inactive'}</TableCell>
-								<TableCell className='text-center'>
-									<MainContextMenu details={item}>
-										<Button size={'sm'}>Actions</Button>
-									</MainContextMenu>
-								</TableCell>
-							</TableRow>
-						)}
-					/>
-				</TableBody>
-			</Table>
+			<div className='border border-dashed border-gray-700 rounded-2xl overflow-hidden'>
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Name</TableHead>
+							<TableHead>Trigger</TableHead>
+							<TableHead>Condition</TableHead>
+							<TableHead>Status</TableHead>
+							<TableHead className='text-center'>Action</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						<Each
+							items={list}
+							render={(item) => (
+								<TableRow>
+									<TableCell>{item.name}</TableCell>
+									<TableCell>{item.trigger.join(', ')}</TableCell>
+									<TableCell className='capitalize'>
+										{item.options.toLowerCase().replaceAll('_', ' ')}
+									</TableCell>
+									<TableCell>{item.isActive ? 'Active' : 'Inactive'}</TableCell>
+									<TableCell className='text-center'>
+										<MainContextMenu details={item}>
+											<Button variant={'outline'} size={'sm'}>
+												Actions
+											</Button>
+										</MainContextMenu>
+									</TableCell>
+								</TableRow>
+							)}
+						/>
+					</TableBody>
+				</Table>
+			</div>
 		</div>
 	);
 }

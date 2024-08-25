@@ -22,39 +22,41 @@ export default async function ChatbotPage({ params: { panel } }: { params: { pan
 					<CreateButton />
 				</div>
 			</div>
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Trigger</TableHead>
-						<TableHead>Message</TableHead>
-						<TableHead>Condition</TableHead>
-						<TableHead>Delay</TableHead>
-						<TableHead className='text-center'>Action</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					<Each
-						items={chatbotList}
-						render={(chatbot) => (
-							<TableRow>
-								<TableCell className=''>{chatbot.trigger}</TableCell>
-								<TableCell className='whitespace-break-spaces'>{chatbot.message}</TableCell>
-								<TableCell>{chatbot.options.split('_').join(' ')}</TableCell>
-								<TableCell className='capitalize'>
-									{chatbot.response_delay_time} {chatbot.response_delay_type}
-								</TableCell>
-								<TableCell className='text-center'>
-									<ChatbotContextMenu panel={panel} chatbot={chatbot}>
-										<Button size={'sm'} variant={'outline'}>
-											Action
-										</Button>
-									</ChatbotContextMenu>
-								</TableCell>
-							</TableRow>
-						)}
-					/>
-				</TableBody>
-			</Table>
+			<div className='border border-dashed border-gray-700 rounded-2xl overflow-hidden'>
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Trigger</TableHead>
+							<TableHead>Message</TableHead>
+							<TableHead>Condition</TableHead>
+							<TableHead>Delay</TableHead>
+							<TableHead className='text-center'>Action</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						<Each
+							items={chatbotList}
+							render={(chatbot) => (
+								<TableRow>
+									<TableCell className=''>{chatbot.trigger}</TableCell>
+									<TableCell className='whitespace-break-spaces'>{chatbot.message}</TableCell>
+									<TableCell>{chatbot.options.split('_').join(' ')}</TableCell>
+									<TableCell className='capitalize'>
+										{chatbot.response_delay_time} {chatbot.response_delay_type}
+									</TableCell>
+									<TableCell className='text-center'>
+										<ChatbotContextMenu panel={panel} chatbot={chatbot}>
+											<Button size={'sm'} variant={'outline'}>
+												Action
+											</Button>
+										</ChatbotContextMenu>
+									</TableCell>
+								</TableRow>
+							)}
+						/>
+					</TableBody>
+				</Table>
+			</div>
 		</div>
 	);
 }

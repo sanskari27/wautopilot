@@ -20,7 +20,7 @@ export default async function AdminPage() {
 			<div className='flex justify-between'>
 				<h1 className='text-2xl font-bold'>Admins</h1>
 			</div>
-			<div className='border border-dashed border-gray-700 rounded-2xl'>
+			<div className='border border-dashed border-gray-700 rounded-2xl overflow-hidden'>
 				<Table>
 					<TableCaption>{list.length} Agents Found.</TableCaption>
 					<TableHeader>
@@ -55,9 +55,6 @@ export default async function AdminPage() {
 			<ExtendExpiryDialog />
 			<MarkupPriceDialog />
 			<UpgradePlanDialog />
-			{/* {edit && <DetailsDialog />}
-			{update_password && <PasswordDialog />}
-			{permissions && <PermissionDialog />} */}
 		</div>
 	);
 }

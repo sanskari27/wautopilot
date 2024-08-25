@@ -3,19 +3,23 @@ import { Coupon } from '@/schema/coupon';
 
 export default class CouponService {
 	static async listCoupons() {
-		const { data } = await api.get('/coupon');
-		return (data.list ?? []).map((coupon: any) => {
-			return {
-				id: coupon.id,
-				couponCode: coupon.code ?? '',
-				availableCoupon: (coupon.available_coupons ?? 0).toString(),
-				couponPerUser: (coupon.count_per_user ?? 0).toString(),
-				discountAmount: (coupon.discount_amount ?? 0).toString(),
-				discountPercentage: (coupon.discount_percentage ?? 0).toString(),
-				discountType: coupon.discount_type ?? 'percentage',
-				totalCoupons: (coupon.total_coupons ?? 0).toString(),
-			};
-		}) as Coupon[];
+		try {
+			const { data } = await api.get('/coupon');
+			return (data.list ?? []).map((coupon: any) => {
+				return {
+					id: coupon.id,
+					couponCode: coupon.code ?? '',
+					availableCoupon: (coupon.available_coupons ?? 0).toString(),
+					couponPerUser: (coupon.count_per_user ?? 0).toString(),
+					discountAmount: (coupon.discount_amount ?? 0).toString(),
+					discountPercentage: (coupon.discount_percentage ?? 0).toString(),
+					discountType: coupon.discount_type ?? 'percentage',
+					totalCoupons: (coupon.total_coupons ?? 0).toString(),
+				};
+			}) as Coupon[];
+		} catch (err) {
+			return null;
+		}
 	}
 	static async createCoupon(coupon: {
 		code: string;
