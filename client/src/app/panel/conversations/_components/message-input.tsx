@@ -122,8 +122,8 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 		<>
 			<div
 				className={`${
-					quickReply ? 'h-0 p-0' : 'p-2'
-				} overflow-hidden flex w-full bg-white border-b border-b-gray-200 gap-x-2`}
+					quickReply ? 'h-0 p-0' : 'p-2 h-[60px]'
+				} overflow-hidden flex w-full bg-white border-b border-b-gray-200 gap-x-2 transition-[1s]`}
 			>
 				<Select
 					disabled={isExpired}
