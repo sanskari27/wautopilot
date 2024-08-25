@@ -17,6 +17,7 @@ import { Copy } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { createWebhook } from '../action';
 
 type Device = {
 	id: string;
@@ -131,6 +132,90 @@ export function CreateAPIKeyDialog() {
 					<DialogClose asChild>
 						<Button variant='secondary'>Close</Button>
 					</DialogClose>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+export function CreateWebhookDialog() {
+	const webhook = useSearchParams().get('webhook');
+	const router = useRouter();
+	const pathname = usePathname();
+
+	const [devices, setDevices] = useState<Device[]>([]);
+	const [selectedDevice, setSelectedDevice] = useState<string>('');
+	const [name, setName] = useState<string>('');
+	const [url, setUrl] = useState<string>('');
+
+	const fetchDevices = useCallback(() => {
+		DeviceService.listDevices().then(({ devices }) => {
+			setDevices(devices);
+		});
+	}, []);
+
+	useEffect(() => {
+		fetchDevices();
+	}, [fetchDevices]);
+
+	const handleSave = () => {
+		if (!name || !selectedDevice || !url) {
+			return toast.error('Please fill all fields');
+		}
+		if (!Boolean(new URL(url))) {
+			return toast.error('Invalid URL');
+		}
+		const promise = createWebhook(name, selectedDevice, url);
+
+		toast.promise(promise, {
+			loading: 'Creating Webhook...',
+			success: () => {
+				router.replace(pathname);
+				return 'Webhook created successfully';
+			},
+			error: (err) => {
+				console.log(err);
+				return 'Failed to create Webhook';
+			},
+		});
+	};
+
+	if (!webhook) {
+		return null;
+	}
+
+	return (
+		<Dialog
+			open={true}
+			onOpenChange={(value) => {
+				if (!value) {
+					router.replace(pathname);
+				}
+			}}
+		>
+			<DialogContent>
+				<DialogHeader>Create Webhook</DialogHeader>
+				<div className='grid space-y-1'>
+					<Label className='mb-0'>Name</Label>
+					<Input value={name} onChange={(e) => setName(e.target.value)} placeholder='Name' />
+					<Label className='mb-0'>Device</Label>
+					<Combobox
+						placeholder='Select device'
+						value={selectedDevice}
+						items={devices.map((device) => ({
+							label: device.verifiedName,
+							value: device.id,
+						}))}
+						onChange={setSelectedDevice}
+					/>
+					<Label className='mb-0'>URL</Label>
+					<Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder='URL' />
+				</div>
+				<DialogFooter>
+					<DialogClose asChild>
+						<Button variant='secondary'>Cancel</Button>
+					</DialogClose>
+					<Button onClick={handleSave}>Save</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

@@ -32,7 +32,7 @@ export default class APIWebhookService {
 	}
 
 	static async createWebhook(name: string, device: string, url: string) {
-		await api.post('/webhooks', {
+		await api.post('/api-keys/webhooks', {
 			name,
 			device,
 			url,
@@ -40,23 +40,34 @@ export default class APIWebhookService {
 	}
 
 	static async listWebhook() {
-		const { data } = await api.get('/webhooks');
+		const { data } = await api.get('/api-keys/webhooks');
 		return (data.list ?? []).map((list: any) => {
+			console.log(list.createdAt);
 			return {
 				id: list.id ?? '',
 				name: list.name ?? '',
 				device: list.device ?? '',
-				created_at: list.created_at ?? '',
+				created_at: list.createdAt ?? '',
 				url: list.url ?? '',
 			};
 		}) as {
 			id: string;
 			name: string;
 			device: string;
+			url: string;
+			created_at: string;
 		}[];
 	}
 
 	static async deleteApiKey(id: string) {
 		await api.delete(`/api-keys/${id}`);
+	}
+
+	static async deleteWebhook(id: string) {
+		await api.delete(`/api-keys/webhooks/${id}`);
+	}
+
+	static async validateWebhook(id: string) {
+		await api.post(`/api-keys/webhooks/${id}/validate`);
 	}
 }

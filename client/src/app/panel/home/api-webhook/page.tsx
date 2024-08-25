@@ -11,11 +11,19 @@ import {
 import APIWebhookService from '@/services/apiwebhook.service';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { DeleteAPIKey, RegenerateAPIKey } from './_components/button';
-import { CreateAPIKeyDialog } from './_components/dialogs';
+import {
+	DeleteAPIKey,
+	DeleteWebhookButton,
+	RegenerateAPIKey,
+	ValidateWebhook,
+} from './_components/button';
+import { CreateAPIKeyDialog, CreateWebhookDialog } from './_components/dialogs';
 
 export default async function APIWebhookPage() {
-	const list = await APIWebhookService.listKeys();
+	const APIList = await APIWebhookService.listKeys();
+	const webhookList = await APIWebhookService.listWebhook();
+	if (!APIList) return null;
+	if (!webhookList) return null;
 
 	return (
 		<div className='flex flex-col gap-2 justify-center p-4'>
@@ -32,19 +40,19 @@ export default async function APIWebhookPage() {
 				<Table>
 					<TableHeader>
 						<TableRow>
-							<TableHead className='w-[30%]'>Name</TableHead>
-							<TableHead className='w-[60%]'>Device</TableHead>
-							<TableHead className='w-[10%]'>Action</TableHead>
+							<TableHead className='w-[20%]'>Name</TableHead>
+							<TableHead className='w-[70%]'>Device</TableHead>
+							<TableHead className='w-[10%] text-center'>Action</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						<Each
-							items={list}
+							items={APIList}
 							render={(item) => (
 								<TableRow>
 									<TableCell className='font-medium'>{item.name}</TableCell>
 									<TableCell className='font-medium'>{item.device}</TableCell>
-									<TableCell className='font-medium flex gap-2'>
+									<TableCell className='font-medium flex gap-2 justify-center'>
 										<DeleteAPIKey id={item.id} />
 										<RegenerateAPIKey id={item.id} />
 									</TableCell>
@@ -54,8 +62,47 @@ export default async function APIWebhookPage() {
 					</TableBody>
 				</Table>
 			</div>
-			<h1 className='text-2xl font-bold'>Webhook</h1>
+			<div className='flex justify-between mt-4'>
+				<h1 className='text-2xl font-bold'>Webhook</h1>
+				<Link href={'?webhook=create'}>
+					<Button size={'sm'}>
+						<Plus className='mr-2 w-4 h-4' />
+						Create Webhook
+					</Button>
+				</Link>
+			</div>
+			<div className='border border-dashed border-gray-700 rounded-2xl overflow-hidden'>
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Name</TableHead>
+							<TableHead>Device</TableHead>
+							<TableHead>URL</TableHead>
+							<TableHead className='text-right'>Created At</TableHead>
+							<TableHead className='text-center'>Action</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						<Each
+							items={webhookList}
+							render={(item) => (
+								<TableRow>
+									<TableCell className='font-medium'>{item.name}</TableCell>
+									<TableCell className='font-medium'>{item.device}</TableCell>
+									<TableCell className='font-medium whitespace-pre-wrap'>{item.url}</TableCell>
+									<TableCell className='font-medium text-right'>{item.created_at}</TableCell>
+									<TableCell className='font-medium justify-center flex gap-2'>
+										<DeleteWebhookButton id={item.id} />
+										<ValidateWebhook id={item.id} />
+									</TableCell>
+								</TableRow>
+							)}
+						/>
+					</TableBody>
+				</Table>
+			</div>
 			<CreateAPIKeyDialog />
+			<CreateWebhookDialog />
 		</div>
 	);
 }

@@ -3,10 +3,10 @@
 import DeleteDialog from '@/components/elements/dialogs/delete';
 import { Button } from '@/components/ui/button';
 import APIWebhookService from '@/services/apiwebhook.service';
-import { RefreshCcw, Trash } from 'lucide-react';
-import toast from 'react-hot-toast';
-import { deleteApiKey } from '../action';
+import { CheckCheck, RefreshCcw, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { deleteApiKey, deleteWebhook } from '../action';
 
 export function DeleteAPIKey({ id }: { id: string }) {
 	const deleteAPIKey = () => {
@@ -25,6 +25,43 @@ export function DeleteAPIKey({ id }: { id: string }) {
 				<Trash />
 			</Button>
 		</DeleteDialog>
+	);
+}
+export function DeleteWebhookButton({ id }: { id: string }) {
+	const handleWebhookDelete = () => {
+		const promise = deleteWebhook(id);
+
+		toast.promise(promise, {
+			loading: 'Deleting Webhook...',
+			success: 'Webhook deleted successfully',
+			error: 'Failed to delete Webhook',
+		});
+	};
+
+	return (
+		<DeleteDialog onDelete={handleWebhookDelete}>
+			<Button variant={'destructive'} size={'icon'}>
+				<Trash />
+			</Button>
+		</DeleteDialog>
+	);
+}
+
+export function ValidateWebhook({ id }: { id: string }) {
+	const validateWebhook = () => {
+		const promise = APIWebhookService.validateWebhook(id);
+
+		toast.promise(promise, {
+			loading: 'Validating Webhook...',
+			success: 'Webhook validated successfully',
+			error: 'Failed to validate Webhook',
+		});
+	};
+
+	return (
+		<Button variant={'secondary'} size={'icon'} onClick={validateWebhook}>
+			<CheckCheck />
+		</Button>
 	);
 }
 
