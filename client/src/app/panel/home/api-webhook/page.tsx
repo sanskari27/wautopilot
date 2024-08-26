@@ -9,7 +9,7 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import APIWebhookService from '@/services/apiwebhook.service';
-import { Plus } from 'lucide-react';
+import { Info, Plus } from 'lucide-react';
 import Link from 'next/link';
 import {
 	DeleteAPIKey,
@@ -64,6 +64,12 @@ export default async function APIWebhookPage() {
 					</TableBody>
 				</Table>
 			</div>
+			<Link href='https://documenter.getpostman.com/view/15958498/2sAXjGcDg8' target='_blank'>
+				<Button variant={'link'}>
+					<Info className='mr-2 w-4 h-4' />
+					Refer to documentation for more information.
+				</Button>
+			</Link>
 			<div className='flex justify-between mt-4'>
 				<h1 className='text-2xl font-bold'>Webhook</h1>
 				<Link href={'?webhook=create'}>

@@ -21,4 +21,5 @@ export async function UpgradePlan(id: string, plan: string, date: string) {
 
 export async function switchServiceAccount(id: string) {
 	await AuthService.serviceAccount(id);
+	revalidatePath('/panel/home/dashboard', 'layout');
 }
