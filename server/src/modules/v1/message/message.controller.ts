@@ -76,7 +76,18 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 				},
 			};
 		} else if (_type === 'whatsapp_flow') {
-			const details = await whatsappFlow.getWhatsappFlowContents(data.message.flow_id);
+			let details;
+			try {
+				details = await whatsappFlow.getWhatsappFlowContents(data.message.flow_id);
+			} catch (e) {
+				return next(
+					new CustomError({
+						STATUS: 400,
+						TITLE: 'BAD_REQUEST',
+						MESSAGE: `Invalid flow id`,
+					})
+				);
+			}
 
 			msgObj[type] = {
 				type: 'flow',
