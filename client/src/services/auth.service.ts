@@ -198,12 +198,7 @@ export default class AuthService {
 	}
 
 	static async serviceAccount(id: string) {
-		try {
-			await api.post(`/sessions/service-account/${id}`);
-			return true;
-		} catch (err) {
-			return false;
-		}
+		await api.post(`/sessions/service-account/${id}`);
 	}
 
 	static async generateConversationMessageKey() {

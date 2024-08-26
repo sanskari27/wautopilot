@@ -15,7 +15,7 @@ export async function editCoupon(
 	}
 ) {
 	await CouponService.updateCoupon(id, coupon);
-	revalidatePath('/[panel]/home/coupons', 'page');
+	revalidatePath('/panel/home/coupons', 'page');
 }
 
 export async function createCoupon(coupon: {
@@ -27,10 +27,10 @@ export async function createCoupon(coupon: {
 	count_per_user: number;
 }) {
 	await CouponService.createCoupon(coupon);
-	revalidatePath('/[panel]/home/coupons', 'page');
+	revalidatePath('/panel/home/coupons', 'page');
 }
 
 export async function deleteCoupon(id: string) {
 	await CouponService.deleteCoupon(id);
-	revalidatePath('/[panel]/home/coupons', 'page');
+	revalidatePath('/panel/home/coupons', 'page');
 }

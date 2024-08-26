@@ -9,5 +9,5 @@ export async function AssignTask(
 	selectedAgent: string | undefined
 ) {
 	await AgentService.assignTask(text, due_date, selectedAgent);
-	revalidatePath('[panel]/home/tasks', 'page');
+	revalidatePath('panel/home/tasks', 'page');
 }

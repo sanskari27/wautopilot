@@ -7,9 +7,10 @@ import {
 	ContextMenuLink,
 	ContextMenuTrigger,
 } from '@/components/ui/context-menu';
+import AuthService from '@/services/auth.service';
 import { Admin } from '@/types/admin';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { switchServiceAccount } from '../action';
 
 export function AdminContextMenu({
 	children,
@@ -22,11 +23,19 @@ export function AdminContextMenu({
 	disabled?: boolean;
 	admin: Admin;
 }) {
+	const router = useRouter();
 	const openServiceAccount = async () => {
-		toast.loading('Switching account...', {
-			duration: 5000,
+		toast.promise(AuthService.serviceAccount(id), {
+			loading: 'Switching account...',
+			success: () => {
+				// router.replace('/panel/home/dashboard');
+				return 'Account switched';
+			},
+			error: (err) => {
+				console.log(err);
+				return 'Failed to switch account';
+			},
 		});
-		await switchServiceAccount(id);
 	};
 	if (disabled) {
 		return <>{children}</>;

@@ -15,7 +15,7 @@ export async function switchServiceAccount(id: string) {
 export async function deleteAgent(id: string) {
 	try {
 		await AgentService.deleteAgent(id);
-		revalidatePath('[panel]/home/agents', 'page');
+		revalidatePath('panel/home/agents', 'page');
 	} catch (e) {}
 }
 
