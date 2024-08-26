@@ -311,6 +311,7 @@ async function logout(req: Request, res: Response, next: NextFunction) {
 	}
 	clearCookie(res, Cookie.Auth);
 	clearCookie(res, Cookie.Refresh);
+	clearCookie(res, Cookie.Device);
 	return Respond({
 		res,
 		status: 200,
