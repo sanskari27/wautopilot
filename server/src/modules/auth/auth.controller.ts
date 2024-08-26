@@ -81,7 +81,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
 
 async function serviceAccount(req: Request, res: Response, next: NextFunction) {
 	const { id, user } = req.locals;
-	let authToken, refreshToken,userService;
+	let authToken, refreshToken, userService;
 
 	try {
 		if (user.userLevel === UserLevel.Agent) {
@@ -105,6 +105,10 @@ async function serviceAccount(req: Request, res: Response, next: NextFunction) {
 	} catch (err) {
 		return next(new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR));
 	}
+
+	clearCookie(res, Cookie.Auth);
+	clearCookie(res, Cookie.Refresh);
+	clearCookie(res, Cookie.Device);
 
 	setCookie(res, {
 		key: Cookie.Auth,
