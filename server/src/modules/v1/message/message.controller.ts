@@ -172,7 +172,6 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 		const body = extractTemplateBody(template.components, components);
 		const footer = extractTemplateFooter(template.components);
 		const buttons = extractTemplateButtons(template.components);
-		console.log(components);
 		try {
 			const { data: res } = await MetaAPI(device.accessToken).post(
 				`/${device.phoneNumberId}/messages`,
