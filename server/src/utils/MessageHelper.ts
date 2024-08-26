@@ -372,11 +372,10 @@ export function generateTemplateMessageObject(
 		}),
 	};
 	return {
-		messaging_product: 'whatsapp',
 		template_name: details.template_name,
 		to: recipient,
 		template: {
-			components: [...headers, [body]],
+			components: [...headers, body],
 		},
 	};
 }

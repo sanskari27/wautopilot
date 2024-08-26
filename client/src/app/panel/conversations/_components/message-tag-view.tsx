@@ -24,8 +24,6 @@ export default function MessageTagsView({
 	};
 
 	useEffect(() => {
-		console.log('id', id, 'isOpen', isOpen);
-
 		if (!id || !isOpen) {
 			return;
 		}

@@ -159,22 +159,36 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 		const phonebook = new PhoneBookService(serviceAccount);
 		const contact = await phonebook.findRecordByPhone(data.recipient);
 
-		const msgObj = generateTemplateMessageObject(data.recipient, {
+		const {
+			template: { components },
+		} = generateTemplateMessageObject(data.recipient, {
 			template_name: data.message.template_name,
 			header: data.message.template_header,
 			body: data.message.template_body,
 			contact: contact as unknown as IPhoneBook,
 		});
 
-		const header = extractTemplateHeader(template.components, msgObj.template.components);
-		const body = extractTemplateBody(template.components, msgObj.template.components);
+		const header = extractTemplateHeader(template.components, components);
+		const body = extractTemplateBody(template.components, components);
 		const footer = extractTemplateFooter(template.components);
 		const buttons = extractTemplateButtons(template.components);
-
+		console.log(components);
 		try {
 			const { data: res } = await MetaAPI(device.accessToken).post(
 				`/${device.phoneNumberId}/messages`,
-				msgObj
+				{
+					messaging_product: 'whatsapp',
+					to: data.recipient,
+					recipient_type: 'individual',
+					type: 'template',
+					template: {
+						name: data.message.template_name,
+						language: {
+							code: 'en_US',
+						},
+						components: components,
+					},
+				}
 			);
 			await conversationService.addMessageToConversation(recipient._id, {
 				message_id: res.messages[0].id,
