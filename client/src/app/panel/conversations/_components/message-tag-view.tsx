@@ -24,7 +24,9 @@ export default function MessageTagsView({
 	};
 
 	useEffect(() => {
-		if (!id && !isOpen) {
+		console.log('id', id, 'isOpen', isOpen);
+
+		if (!id || !isOpen) {
 			return;
 		}
 		MessagesService.fetchConversationMessages(id, {
