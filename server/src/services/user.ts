@@ -17,6 +17,7 @@ import { IDType } from '../types';
 import DateUtils from '../utils/DateUtils';
 import { filterUndefinedKeys, idValidator } from '../utils/ExpressUtils';
 import SessionService from './session';
+import WhatsappLinkService from './whatsappLink';
 
 type SessionDetails = {
 	ipAddress?: string;
@@ -109,6 +110,7 @@ export default class UserService {
 			isSubscribed: false,
 			subscription_expiry: '',
 			walletBalance: this._account.walletBalance ?? 0,
+			max_devices: 0,
 			no_of_devices: 0,
 			plan_id: '',
 		};
@@ -129,15 +131,18 @@ export default class UserService {
 			? DateUtils.getMoment(subscription.end_date).format('YYYY-MM-DD')
 			: '';
 
-		let no_of_devices = 0;
+		let max_devices = 0;
 
 		if (isSubscribed) {
 			const plan = await PlanDB.findById(subscription.plan_id);
-			no_of_devices = plan?.no_of_devices ?? 0;
+			max_devices = plan?.no_of_devices ?? 0;
 		}
+		const devices = await WhatsappLinkService.fetchRecords(this.userId);
+
 		details.isSubscribed = isSubscribed;
 		details.subscription_expiry = subscription_expiry;
-		details.no_of_devices = no_of_devices;
+		details.max_devices = max_devices;
+		details.no_of_devices = devices.length;
 		details.plan_id = subscription.plan_id?.toString() ?? '';
 
 		return details;

@@ -118,6 +118,7 @@ export default class AuthService {
 				isSubscribed: data.account.isSubscribed ?? false,
 				subscription_expiry: data.account.subscription_expiry ?? '',
 				walletBalance: data.account.walletBalance ?? 0,
+				max_devices: data.account.max_devices ?? 0,
 				no_of_devices: data.account.no_of_devices ?? 0,
 				permissions: data.account.permissions ?? {},
 				isMaster: data.account.isMaster ?? false,
@@ -130,6 +131,7 @@ export default class AuthService {
 				isSubscribed: boolean;
 				subscription_expiry: string;
 				walletBalance: number;
+				max_devices: number;
 				no_of_devices: number;
 				permissions: Permissions;
 				isMaster: boolean;

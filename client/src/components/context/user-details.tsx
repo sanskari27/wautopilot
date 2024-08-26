@@ -10,7 +10,7 @@ export type UserDetailsType = {
 	isSubscribed: boolean;
 	subscription_expiry: string;
 	walletBalance: number;
-	no_of_devices: number;
+	max_devices: number;
 	permissions: Permissions;
 	isMaster: boolean;
 	isAdmin: boolean;
@@ -30,7 +30,7 @@ const DEFAULT_VALUES = {
 	isSubscribed: false,
 	subscription_expiry: '',
 	walletBalance: 0,
-	no_of_devices: 0,
+	max_devices: 0,
 	permissions: {
 		auto_assign_chats: true,
 		assigned_labels: [] as string[],
