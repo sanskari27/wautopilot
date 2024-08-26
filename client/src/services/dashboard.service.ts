@@ -26,7 +26,7 @@ export class DashboardService {
 				phoneRecords: data.phoneRecords ?? 0,
 				contacts: data.contacts ?? 0,
 			};
-		} catch (error) {
+		} catch (error: any) {
 			return null;
 		}
 	}

@@ -48,7 +48,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
 			phoneNumberId: string;
 			waid: string;
 		}[] = [];
-		
+
 		if (userService.userLevel >= UserLevel.Admin) {
 			devices = await WhatsappLinkService.fetchRecords(userService.userId);
 		} else {
@@ -81,7 +81,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
 
 async function serviceAccount(req: Request, res: Response, next: NextFunction) {
 	const { id, user } = req.locals;
-	let authToken: string, refreshToken: string;
+	let authToken, refreshToken,userService;
 
 	try {
 		if (user.userLevel === UserLevel.Agent) {
@@ -98,9 +98,10 @@ async function serviceAccount(req: Request, res: Response, next: NextFunction) {
 			}
 		}
 
-		const { authToken: a, refreshToken: r } = await UserService.loginById(id);
-		authToken = a;
-		refreshToken = r;
+		const details = await UserService.loginById(id);
+		userService = details.userService;
+		authToken = details.authToken;
+		refreshToken = details.refreshToken;
 	} catch (err) {
 		return next(new CustomError(AUTH_ERRORS.USER_NOT_FOUND_ERROR));
 	}
@@ -116,6 +117,31 @@ async function serviceAccount(req: Request, res: Response, next: NextFunction) {
 		value: refreshToken,
 		expires: SESSION_EXPIRE_TIME,
 	});
+
+	let devices: {
+		id: string;
+		phoneNumber: string;
+		verifiedName: string;
+		phoneNumberId: string;
+		waid: string;
+	}[] = [];
+
+	if (userService.userLevel >= UserLevel.Admin) {
+		devices = await WhatsappLinkService.fetchRecords(userService.userId);
+	} else {
+		if (userService.account.parent) {
+			devices = await WhatsappLinkService.fetchRecords(userService.account.parent!);
+		}
+	}
+
+	if (devices.length > 0) {
+		setCookie(res, {
+			key: Cookie.Device,
+			value: devices[0].id,
+			expires: SESSION_EXPIRE_TIME,
+		});
+	}
+
 	return Respond({
 		res,
 		status: 200,
