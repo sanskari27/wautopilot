@@ -7,10 +7,10 @@ import {
 	ContextMenuLink,
 	ContextMenuTrigger,
 } from '@/components/ui/context-menu';
+import AuthService from '@/services/auth.service';
 import { Admin } from '@/types/admin';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { switchServiceAccount } from '../action';
 
 export function AdminContextMenu({
 	children,
@@ -25,10 +25,11 @@ export function AdminContextMenu({
 }) {
 	const router = useRouter();
 	const openServiceAccount = async () => {
-		toast.promise(switchServiceAccount(id), {
+		toast.promise(AuthService.serviceAccount(id), {
 			loading: 'Switching account...',
 			success: () => {
-				return 'Please reload to switch account';
+				window.location.href = '/panel/home/dashboard';
+				return 'Please wait while we switch your account';
 			},
 			error: (err) => {
 				console.log(err);
