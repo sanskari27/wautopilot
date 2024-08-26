@@ -66,6 +66,21 @@ function getMimeType(path: string) {
 function getExt(mime_type: string) {
 	return mime.extension(mime_type);
 }
+function createFile({
+	base_path,
+	file_name,
+	data,
+	mime_type,
+}: {
+	base_path: string;
+	file_name: string;
+	data: string;
+	mime_type: string;
+}) {
+	const path = `${base_path}/${file_name}.${getExt(mime_type)}`;
+	fs.writeFileSync(path, data, 'base64');
+	return path;
+}
 
 export default {
 	moveFile,
@@ -77,4 +92,5 @@ export default {
 	generateJSONFile,
 	getMimeType,
 	getExt,
+	createFile,
 };

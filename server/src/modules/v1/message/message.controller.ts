@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { NextFunction, Request, Response } from 'express';
+import FormData from 'form-data';
+import fs from 'fs';
 import IPhoneBook from '../../../../mongo/types/phonebook';
+import { Path } from '../../../config/const';
 import MetaAPI from '../../../config/MetaAPI';
 import { CustomError } from '../../../errors';
 import COMMON_ERRORS from '../../../errors/common-errors';
@@ -9,6 +12,7 @@ import PhoneBookService from '../../../services/phonebook';
 import TemplateService from '../../../services/templates';
 import WhatsappFlowService from '../../../services/wa_flow';
 import { generateText, Respond } from '../../../utils/ExpressUtils';
+import FileUtils from '../../../utils/FileUtils';
 import {
 	extractInteractiveBody,
 	extractInteractiveButtons,
@@ -193,6 +197,48 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 			);
 		}
 	} else {
+
+		let media_id;
+		
+		if (_type === 'audio' || _type === 'video' || _type === 'document' || _type === 'image') {
+			if (data.message.media_link) {
+				const media_link = data.message.media_link;
+				const media = await axios.get(media_link, {
+					responseType: 'arraybuffer',
+				});
+
+				const uploadedFilePath = FileUtils.createFile({
+					base_path: __basedir + Path.Misc,
+					file_name: `media_${generateText(5)}`,
+					data: Buffer.from(media.data).toString('base64'),
+					mime_type: media.headers['content-type'],
+				});
+
+				try {
+					const form = new FormData();
+					form.append('messaging_product', 'whatsapp');
+					form.append('file', fs.createReadStream(uploadedFilePath));
+
+					const { data } = await MetaAPI(device.accessToken).post(
+						`/${device.phoneNumberId}/media`,
+						form,
+						{
+							headers: {
+								'Content-Type': 'multipart/form-data',
+							},
+						}
+					);
+					FileUtils.deleteFile(uploadedFilePath);
+					media_id = data.id;
+				} catch (e) {
+					FileUtils.deleteFile(uploadedFilePath);
+					return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR, e));
+				}
+			} else {
+				media_id = data.message.media_id;
+			}
+		}
+
 		msgObj[type] =
 			_type === 'text'
 				? {
@@ -203,7 +249,7 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 				: _type === 'contacts'
 				? data.message.contacts
 				: {
-						id: data.message.media_id,
+						id: media_id,
 				  };
 
 		try {
