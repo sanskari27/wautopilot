@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import MessagesService from '@/services/messages.service';
 import { Message as TMessage } from '@/types/recipient';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Message } from './message-template';
 
 export default function MessageTagsView({
@@ -15,8 +15,6 @@ export default function MessageTagsView({
 	isOpen: boolean;
 	onClose: () => void;
 }) {
-	const buttonRef = useRef<HTMLButtonElement>(null);
-
 	const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 	const [messages, setMessages] = useState<TMessage[]>([]);
 	const [messageLabels, setMessageLabels] = useState<string[]>([]);
@@ -26,7 +24,7 @@ export default function MessageTagsView({
 	};
 
 	useEffect(() => {
-		if (!id) {
+		if (!id && !isOpen) {
 			return;
 		}
 		MessagesService.fetchConversationMessages(id, {
@@ -36,7 +34,7 @@ export default function MessageTagsView({
 			setMessages(data.messages);
 			setMessageLabels(data.messageLabels);
 		});
-	}, [id]);
+	}, [id, isOpen]);
 
 	const filteredMessages = messages.filter((message) => {
 		return message.labels.some((tag) => selectedLabels.includes(tag));
