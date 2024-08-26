@@ -197,9 +197,8 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 			);
 		}
 	} else {
-
 		let media_id;
-		
+
 		if (_type === 'audio' || _type === 'video' || _type === 'document' || _type === 'image') {
 			if (data.message.media_link) {
 				const media_link = data.message.media_link;
@@ -269,7 +268,7 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 							: type === 'location'
 							? 'LOCATION'
 							: 'MEDIA',
-					...message,
+					...{ ...message, media_id: media_id ?? null },
 				},
 				...(data.context
 					? {

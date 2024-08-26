@@ -64,15 +64,6 @@ export type SendMessageValidationResult = {
 				}[];
 		  }
 		| {
-				type: 'location';
-				location: {
-					latitude: string;
-					longitude: string;
-					name: string;
-					address: string;
-				};
-		  }
-		| {
 				type: 'button';
 				text: string;
 				buttons: {
