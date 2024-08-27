@@ -24,10 +24,9 @@ export default function Navbar() {
 	const userDetails = useUserDetails();
 	const pathname = usePathname();
 	const router = useRouter();
-	let panel_id = pathname.split('/')[1];
 
 	function getLink(link: string) {
-		return `/${panel_id}${link}`;
+		return `/panel${link}`;
 	}
 
 	function openSettings() {

@@ -159,7 +159,14 @@ function DevicesList() {
 						</TableBody>
 					</Table>
 				</RadioGroup>
-
+				<Show.ShowIf condition={max_devices === 0}>
+					<Label>
+						Please subscribe to add devices.{' '}
+						<Link href={'?settings=true'} className='hover:underline text-primary'>
+							Subscribe
+						</Link>
+					</Label>
+				</Show.ShowIf>
 				<DialogFooter>
 					<Button
 						variant={'ghost'}

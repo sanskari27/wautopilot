@@ -10,11 +10,24 @@ import {
 	DialogFooter,
 	DialogTitle,
 } from '@/components/ui/dialog';
-import useBoolean from '@/hooks/useBoolean';
+import { useRouter } from 'next/navigation';
 
 export default function DevicesAlertDialog() {
-	const { value, on, off } = useBoolean(false);
 	const { deviceAlert, setDeviceAlert } = useDeviceAlert();
+	const router = useRouter();
+
+	function openDevices() {
+		setDeviceAlert(false);
+		const url = new URL((window as any).location);
+		if (!url.searchParams.has(`devices`)) {
+			url.searchParams.set(`devices`, 'true');
+		}
+		router.replace(url.toString());
+	}
+
+	
+
+
 
 	return (
 		<Dialog
@@ -34,7 +47,7 @@ export default function DevicesAlertDialog() {
 					<DialogClose asChild>
 						<Button variant={'destructive'}>Close</Button>
 					</DialogClose>
-					{/* <Button>Add Device</Button> */}
+					<Button onClick={openDevices}>Add Device</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
