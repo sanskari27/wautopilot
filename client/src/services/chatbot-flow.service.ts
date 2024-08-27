@@ -180,7 +180,7 @@ export default class ChatbotFlowService {
 	}
 
 	static async exportChatbotFlow(botId: string) {
-		const response = await api.get(`/chatbot/flow/${botId}/download-responses`, {
+		const response = await api.get(`/chatbot/flows/${botId}/download-responses`, {
 			responseType: 'blob',
 		});
 		const blob = new Blob([response.data]);

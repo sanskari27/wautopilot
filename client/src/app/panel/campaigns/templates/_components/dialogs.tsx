@@ -46,7 +46,7 @@ export function AddQuickReply({
 				<div className='grid gap-4'>
 					<div className='grid gap-2'>
 						<Label className='text-primary' htmlFor='name'>
-							Text
+							Text ({text.length} / 25)
 						</Label>
 						<Textarea
 							id='name'
