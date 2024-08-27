@@ -22,7 +22,7 @@ export type TWebhook = {
 
 export async function CreateAPIKeyValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		name: z.string().min(3, 'Name must be at least 3 characters long'),
+		name: z.string().trim().min(3, 'Name must be at least 3 characters long'),
 		device: idSchema,
 		permissions: z
 			.object({
@@ -52,9 +52,9 @@ export async function CreateAPIKeyValidator(req: Request, res: Response, next: N
 
 export async function WebhookValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		name: z.string().min(3, 'Name must be at least 3 characters long'),
+		name: z.string().trim().min(3, 'Name must be at least 3 characters long'),
 		device: idSchema,
-		url: z.string().url(),
+		url: z.string().trim().url(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

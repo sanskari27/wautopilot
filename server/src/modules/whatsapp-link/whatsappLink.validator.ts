@@ -11,10 +11,10 @@ export type WhatsappLinkCreateValidationResult = {
 
 export async function WhatsappLinkCreateValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		phoneNumberId: z.string(),
-		waid: z.string(),
-		accessToken: z.string().optional(),
-		code: z.string().optional(),
+		phoneNumberId: z.string().trim(),
+		waid: z.string().trim(),
+		accessToken: z.string().trim().optional(),
+		code: z.string().trim().optional(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

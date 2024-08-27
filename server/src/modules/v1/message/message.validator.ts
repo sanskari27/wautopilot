@@ -118,22 +118,22 @@ export type SendMessageValidationResult = {
 export async function SendMessageValidator(req: Request, res: Response, next: NextFunction) {
 	const textType = z.object({
 		type: z.literal('text'),
-		text: z.string().trim().min(1),
+		text: z.string().trim().trim().min(1),
 	});
 
 	const mediaType = z.object({
 		type: z.enum(['image', 'video', 'document', 'audio']),
-		media_id: z.string().default(''),
-		media_link: z.string().default(''),
+		media_id: z.string().trim().default(''),
+		media_link: z.string().trim().default(''),
 	});
 
 	const locationType = z.object({
 		type: z.literal('location'),
 		location: z.object({
-			latitude: z.string().min(1),
-			longitude: z.string().min(1),
-			name: z.string().default(''),
-			address: z.string().default(''),
+			latitude: z.string().trim().min(1),
+			longitude: z.string().trim().min(1),
+			name: z.string().trim().default(''),
+			address: z.string().trim().default(''),
 		}),
 	});
 
@@ -142,46 +142,46 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 		contacts: z
 			.object({
 				name: z.object({
-					formatted_name: z.string(),
-					first_name: z.string(),
-					last_name: z.string(),
-					middle_name: z.string(),
-					suffix: z.string(),
-					prefix: z.string(),
+					formatted_name: z.string().trim(),
+					first_name: z.string().trim(),
+					last_name: z.string().trim(),
+					middle_name: z.string().trim(),
+					suffix: z.string().trim(),
+					prefix: z.string().trim(),
 				}),
 				addresses: z.array(
 					z.object({
-						street: z.string(),
-						city: z.string(),
-						state: z.string(),
-						zip: z.string(),
-						country: z.string(),
-						country_code: z.string(),
+						street: z.string().trim(),
+						city: z.string().trim(),
+						state: z.string().trim(),
+						zip: z.string().trim(),
+						country: z.string().trim(),
+						country_code: z.string().trim(),
 						type: z.enum(['HOME', 'WORK']).default('HOME'),
 					})
 				),
-				birthday: z.string(),
+				birthday: z.string().trim(),
 				emails: z.array(
 					z.object({
-						email: z.string(),
+						email: z.string().trim(),
 						type: z.enum(['WORK', 'HOME']).default('HOME'),
 					})
 				),
 				org: z.object({
-					company: z.string(),
-					department: z.string(),
-					title: z.string(),
+					company: z.string().trim(),
+					department: z.string().trim(),
+					title: z.string().trim(),
 				}),
 				phones: z.array(
 					z.object({
-						phone: z.string(),
-						wa_id: z.string(),
+						phone: z.string().trim(),
+						wa_id: z.string().trim(),
 						type: z.enum(['HOME', 'WORK']).default('HOME'),
 					})
 				),
 				urls: z.array(
 					z.object({
-						url: z.string(),
+						url: z.string().trim(),
 						type: z.enum(['HOME', 'WORK']).default('HOME'),
 					})
 				),
@@ -191,40 +191,42 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 
 	const buttonType = z.object({
 		type: z.literal('button'),
-		text: z.string().trim().min(1),
+		text: z.string().trim().trim().min(1),
 		buttons: z.array(
 			z.object({
 				id: z
 					.string()
 					.trim()
+					.trim()
 					.min(1)
 					.refine((val) => val.match(/^[a-z]+$/), {
 						message: 'Button ID must be lowercase alphabets only.',
 					}),
-				text: z.string().trim().min(1),
+				text: z.string().trim().trim().min(1),
 			})
 		),
 	});
 
 	const listType = z.object({
 		type: z.literal('list'),
-		header: z.string().trim().optional(),
-		body: z.string().trim().min(1),
-		footer: z.string().trim().optional(),
-		button_text: z.string().trim().min(1),
+		header: z.string().trim().trim().optional(),
+		body: z.string().trim().trim().min(1),
+		footer: z.string().trim().trim().optional(),
+		button_text: z.string().trim().trim().min(1),
 		sections: z.array(
 			z.object({
-				title: z.string().trim().min(1),
+				title: z.string().trim().trim().min(1),
 				buttons: z.array(
 					z.object({
 						id: z
 							.string()
 							.trim()
+							.trim()
 							.min(1)
 							.refine((val) => val.match(/^[a-z]+$/), {
 								message: 'Button ID must be lowercase alphabets only.',
 							}),
-						text: z.string().trim().min(1),
+						text: z.string().trim().trim().min(1),
 					})
 				),
 			})
@@ -233,38 +235,38 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 
 	const flowType = z.object({
 		type: z.literal('whatsapp_flow'),
-		header: z.string().trim().optional(),
-		body: z.string().trim().min(1),
-		footer: z.string().trim().optional(),
-		flow_id: z.string().trim().min(1),
-		button_text: z.string().trim().min(1),
+		header: z.string().trim().trim().optional(),
+		body: z.string().trim().trim().min(1),
+		footer: z.string().trim().trim().optional(),
+		flow_id: z.string().trim().trim().min(1),
+		button_text: z.string().trim().trim().min(1),
 	});
 
 	const templateType = z.object({
 		type: z.literal('template'),
-		template_id: z.string().trim().min(1),
-		template_name: z.string().trim().min(1),
+		template_id: z.string().trim().trim().min(1),
+		template_name: z.string().trim().trim().min(1),
 		template_header: z
 			.object({
 				type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']).optional(),
-				media_id: z.string().optional(),
-				link: z.string().optional(),
+				media_id: z.string().trim().optional(),
+				link: z.string().trim().optional(),
 			})
 			.optional(),
 		template_body: z
 			.array(
 				z.object({
-					custom_text: z.string(),
-					phonebook_data: z.string(),
+					custom_text: z.string().trim(),
+					phonebook_data: z.string().trim(),
 					variable_from: z.enum(['custom_text', 'phonebook_data']),
-					fallback_value: z.string(),
+					fallback_value: z.string().trim(),
 				})
 			)
 			.default([]),
 	});
 
 	const reqValidator = z.object({
-		recipient: z.string().min(1, 'Please provide a valid phone number.'),
+		recipient: z.string().trim().min(1, 'Please provide a valid phone number.'),
 		message: z
 			.discriminatedUnion('type', [
 				textType,
@@ -292,7 +294,7 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 			}),
 		context: z
 			.object({
-				message_id: z.string(),
+				message_id: z.string().trim(),
 			})
 			.optional(),
 	});

@@ -109,6 +109,7 @@ type IDValidatorResult = [true, IDType] | [false, undefined];
 export function idValidator(id: string): IDValidatorResult {
 	const validator = z
 		.string()
+		.trim()
 		.refine((value) => Types.ObjectId.isValid(value))
 		.transform((value) => new Types.ObjectId(value));
 

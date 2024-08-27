@@ -13,11 +13,11 @@ export type CreateLinkValidationResult = {
 export async function LinkValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z
 		.object({
-			title: z.string().default(''),
+			title: z.string().trim().default(''),
 			type: z.enum(['whatsapp', 'link']),
-			link: z.string().optional(),
-			number: z.string().optional(),
-			message: z.string().optional(),
+			link: z.string().trim().optional(),
+			number: z.string().trim().optional(),
+			message: z.string().trim().optional(),
 		})
 		.refine((data) => {
 			if (data.type === 'whatsapp') {

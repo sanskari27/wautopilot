@@ -56,19 +56,20 @@ export type FieldsResult = {
 
 export async function RecordUpdateValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		salutation: z.string().optional(),
-		first_name: z.string().optional(),
-		last_name: z.string().optional(),
-		middle_name: z.string().optional(),
+		salutation: z.string().trim().optional(),
+		first_name: z.string().trim().optional(),
+		last_name: z.string().trim().optional(),
+		middle_name: z.string().trim().optional(),
 		phone_number: z
 			.string()
+			.trim()
 			.transform((val) => val.replace(/\D/g, ''))
 			.optional(),
-		email: z.string().optional(),
-		birthday: z.string().optional(),
-		anniversary: z.string().optional(),
-		others: z.record(z.string(), z.string()).default({}),
-		labels: z.string().array().default([]),
+		email: z.string().trim().optional(),
+		birthday: z.string().trim().optional(),
+		anniversary: z.string().trim().optional(),
+		others: z.record(z.string().trim(), z.string().trim()).default({}),
+		labels: z.string().trim().array().default([]),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
@@ -92,8 +93,8 @@ export async function LabelValidator(req: Request, res: Response, next: NextFunc
 	const reqValidator = z
 		.object({
 			ids: idsArray.default([]),
-			numbers: z.string().array().default([]),
-			labels: z.string().array().default([]),
+			numbers: z.string().trim().array().default([]),
+			labels: z.string().trim().array().default([]),
 		})
 		.refine(
 			(data) => data.ids.length || data.numbers.length,
@@ -143,16 +144,16 @@ export async function RecordsValidator(req: Request, res: Response, next: NextFu
 	const reqValidator = z.object({
 		records: z
 			.object({
-				salutation: z.string().optional(),
-				first_name: z.string().optional(),
-				last_name: z.string().optional(),
-				middle_name: z.string().optional(),
-				phone_number: z.string().optional(),
-				email: z.string().optional(),
-				birthday: z.string().optional(),
-				anniversary: z.string().optional(),
-				others: z.record(z.string(), z.string()).default({}),
-				labels: z.string().array().default([]),
+				salutation: z.string().trim().optional(),
+				first_name: z.string().trim().optional(),
+				last_name: z.string().trim().optional(),
+				middle_name: z.string().trim().optional(),
+				phone_number: z.string().trim().optional(),
+				email: z.string().trim().optional(),
+				birthday: z.string().trim().optional(),
+				anniversary: z.string().trim().optional(),
+				others: z.record(z.string().trim(), z.string().trim()).default({}),
+				labels: z.string().trim().array().default([]),
 			})
 			.array()
 			.default([]),
@@ -177,8 +178,8 @@ export async function RecordsValidator(req: Request, res: Response, next: NextFu
 
 export async function FieldsValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		name: z.string(),
-		defaultValue: z.string().default(''),
+		name: z.string().trim(),
+		defaultValue: z.string().trim().default(''),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

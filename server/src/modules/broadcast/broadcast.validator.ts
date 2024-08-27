@@ -61,16 +61,16 @@ export type CreateRecurringValidationResult = {
 
 export async function CreateBroadcastValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		name: z.string(),
-		description: z.string().default(''),
-		template_id: z.string(),
-		template_name: z.string(),
+		name: z.string().trim(),
+		description: z.string().trim().default(''),
+		template_id: z.string().trim(),
+		template_name: z.string().trim(),
 		broadcast_options: z
 			.object({
 				broadcast_type: z.enum(['instant', 'scheduled']),
-				startDate: z.string().optional(),
-				startTime: z.string().optional(),
-				endTime: z.string().optional(),
+				startDate: z.string().trim().optional(),
+				startTime: z.string().trim().optional(),
+				endTime: z.string().trim().optional(),
 				daily_messages_count: z.number().optional(),
 			})
 			.refine((data) => {
@@ -79,23 +79,23 @@ export async function CreateBroadcastValidator(req: Request, res: Response, next
 				}
 				return true;
 			}),
-		to: z.string().array().default([]),
-		labels: z.string().array().default([]),
+		to: z.string().trim().array().default([]),
+		labels: z.string().trim().array().default([]),
 		body: z
 			.array(
 				z.object({
-					custom_text: z.string(),
-					phonebook_data: z.string(),
+					custom_text: z.string().trim(),
+					phonebook_data: z.string().trim(),
 					variable_from: z.enum(['custom_text', 'phonebook_data']),
-					fallback_value: z.string(),
+					fallback_value: z.string().trim(),
 				})
 			)
 			.default([]),
 		header: z
 			.object({
 				type: z.enum(['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT']),
-				media_id: z.string().optional(),
-				link: z.string().optional(),
+				media_id: z.string().trim().optional(),
+				link: z.string().trim().optional(),
 			})
 			.optional(),
 	});
@@ -119,34 +119,34 @@ export async function CreateBroadcastValidator(req: Request, res: Response, next
 
 export async function CreateRecurringValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		name: z.string(),
-		description: z.string().default(''),
-		wish_from: z.string(),
-		template_id: z.string(),
-		template_name: z.string(),
+		name: z.string().trim(),
+		description: z.string().trim().default(''),
+		wish_from: z.string().trim(),
+		template_id: z.string().trim(),
+		template_name: z.string().trim(),
 
-		labels: z.string().array().default([]),
+		labels: z.string().trim().array().default([]),
 		template_header: z
 			.object({
 				type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']).optional(),
-				media_id: z.string().optional(),
-				link: z.string().optional(),
-				text: z.string().optional(),
+				media_id: z.string().trim().optional(),
+				link: z.string().trim().optional(),
+				text: z.string().trim().optional(),
 			})
 			.optional(),
 		template_body: z
 			.array(
 				z.object({
-					custom_text: z.string(),
-					phonebook_data: z.string(),
+					custom_text: z.string().trim(),
+					phonebook_data: z.string().trim(),
 					variable_from: z.enum(['custom_text', 'phonebook_data']),
-					fallback_value: z.string(),
+					fallback_value: z.string().trim(),
 				})
 			)
 			.default([]),
 		delay: z.number().default(0),
-		startTime: z.string().trim().default('00:01'),
-		endTime: z.string().trim().default('23:59'),
+		startTime: z.string().trim().trim().default('00:01'),
+		endTime: z.string().trim().trim().default('23:59'),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

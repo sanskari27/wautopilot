@@ -185,7 +185,7 @@ export type UpdateWhatsappFlowValidationResult = {
 
 export async function CreateBotValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		trigger: z.array(z.string().min(1)).default([]),
+		trigger: z.array(z.string().trim().min(1)).default([]),
 		trigger_gap_seconds: z.number().positive().default(1),
 		response_delay_seconds: z.number().nonnegative().default(0),
 		options: z.enum([
@@ -194,33 +194,33 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 			BOT_TRIGGER_OPTIONS.INCLUDES_IGNORE_CASE,
 			BOT_TRIGGER_OPTIONS.INCLUDES_MATCH_CASE,
 		]),
-		startAt: z.string().default('00:01'),
-		endAt: z.string().default('23:59'),
+		startAt: z.string().trim().default('00:01'),
+		endAt: z.string().trim().default('23:59'),
 
 		respond_type: z.enum(['template', 'normal']),
-		message: z.string().trim().default(''),
+		message: z.string().trim().trim().default(''),
 		images: idsArray.default([]),
 		videos: idsArray.default([]),
 		audios: idsArray.default([]),
 		documents: idsArray.default([]),
 		contacts: idsArray.default([]),
 
-		template_id: z.string().default(''),
-		template_name: z.string().default(''),
+		template_id: z.string().trim().default(''),
+		template_name: z.string().trim().default(''),
 		template_header: z
 			.object({
 				type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']).optional(),
-				media_id: z.string().optional(),
-				link: z.string().optional(),
+				media_id: z.string().trim().optional(),
+				link: z.string().trim().optional(),
 			})
 			.optional(),
 		template_body: z
 			.array(
 				z.object({
-					custom_text: z.string(),
-					phonebook_data: z.string(),
+					custom_text: z.string().trim(),
+					phonebook_data: z.string().trim(),
 					variable_from: z.enum(['custom_text', 'phonebook_data']),
-					fallback_value: z.string(),
+					fallback_value: z.string().trim(),
 				})
 			)
 			.default([]),
@@ -228,24 +228,24 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 		nurturing: z
 			.object({
 				after: z.number(),
-				start_from: z.string().trim().default('00:01'),
-				end_at: z.string().trim().default('23:59'),
-				template_id: z.string().default(''),
-				template_name: z.string().default(''),
+				start_from: z.string().trim().trim().default('00:01'),
+				end_at: z.string().trim().trim().default('23:59'),
+				template_id: z.string().trim().default(''),
+				template_name: z.string().trim().default(''),
 				template_header: z
 					.object({
 						type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
-						media_id: z.string().optional(),
-						link: z.string().optional(),
+						media_id: z.string().trim().optional(),
+						link: z.string().trim().optional(),
 					})
 					.optional(),
 				template_body: z
 					.array(
 						z.object({
-							custom_text: z.string(),
-							phonebook_data: z.string(),
+							custom_text: z.string().trim(),
+							phonebook_data: z.string().trim(),
 							variable_from: z.enum(['custom_text', 'phonebook_data']),
-							fallback_value: z.string(),
+							fallback_value: z.string().trim(),
 						})
 					)
 					.default([]),
@@ -254,8 +254,8 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 			.default([]),
 
 		forward: z.object({
-			number: z.string().default(''),
-			message: z.string().default(''),
+			number: z.string().trim().default(''),
+			message: z.string().trim().default(''),
 		}),
 	});
 
@@ -278,7 +278,7 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 
 export async function CreateFlowValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		trigger: z.array(z.string().min(1)).default([]),
+		trigger: z.array(z.string().trim().min(1)).default([]),
 		options: z.enum([
 			BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE,
 			BOT_TRIGGER_OPTIONS.EXACT_MATCH_CASE,
@@ -286,11 +286,11 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 			BOT_TRIGGER_OPTIONS.INCLUDES_MATCH_CASE,
 		]),
 
-		name: z.string(),
+		name: z.string().trim(),
 		nodes: z
 			.array(
 				z.object({
-					id: z.string(),
+					id: z.string().trim(),
 					data: z.any().optional(),
 					position: z.object({
 						x: z.number(),
@@ -318,17 +318,17 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 		edges: z
 			.array(
 				z.object({
-					id: z.string(),
-					source: z.string(),
-					target: z.string(),
+					id: z.string().trim(),
+					source: z.string().trim(),
+					target: z.string().trim(),
 					animated: z.boolean().default(true),
 					style: z
 						.object({
-							stroke: z.string().default('#000'),
+							stroke: z.string().trim().default('#000'),
 						})
 						.optional(),
-					sourceHandle: z.string().or(z.null()).optional(),
-					targetHandle: z.string().or(z.null()).optional(),
+					sourceHandle: z.string().trim().or(z.null()).optional(),
+					targetHandle: z.string().trim().or(z.null()).optional(),
 				})
 			)
 			.default([]),
@@ -338,27 +338,27 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 				z.object({
 					after: z.number().min(1),
 					respond_type: z.enum(['template', 'normal']).default('normal'),
-					message: z.string().default(''),
+					message: z.string().trim().default(''),
 					images: idsArray.default([]),
 					videos: idsArray.default([]),
 					audios: idsArray.default([]),
 					documents: idsArray.default([]),
 					contacts: idsArray.default([]),
-					template_id: z.string().default(''),
-					template_name: z.string().default(''),
+					template_id: z.string().trim().default(''),
+					template_name: z.string().trim().default(''),
 					template_header: z
 						.object({
 							type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
-							media_id: z.string().optional(),
+							media_id: z.string().trim().optional(),
 						})
 						.optional(),
 					template_body: z
 						.array(
 							z.object({
-								custom_text: z.string(),
-								phonebook_data: z.string(),
+								custom_text: z.string().trim(),
+								phonebook_data: z.string().trim(),
 								variable_from: z.enum(['custom_text', 'phonebook_data']),
-								fallback_value: z.string(),
+								fallback_value: z.string().trim(),
 							})
 						)
 						.default([]),
@@ -366,8 +366,8 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 			)
 			.default([]),
 		forward: z.object({
-			number: z.string().default(''),
-			message: z.string().default(''),
+			number: z.string().trim().default(''),
+			message: z.string().trim().default(''),
 		}),
 	});
 
@@ -390,7 +390,7 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 
 export async function UpdateFlowValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		trigger: z.array(z.string().min(1)).optional(),
+		trigger: z.array(z.string().trim().min(1)).optional(),
 		options: z
 			.enum([
 				BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE,
@@ -400,11 +400,11 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 			])
 			.optional(),
 
-		name: z.string().optional(),
+		name: z.string().trim().optional(),
 		nodes: z
 			.array(
 				z.object({
-					id: z.string(),
+					id: z.string().trim(),
 					data: z.any().optional(),
 					position: z.object({
 						x: z.number(),
@@ -432,17 +432,17 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 		edges: z
 			.array(
 				z.object({
-					id: z.string(),
-					source: z.string(),
-					target: z.string(),
+					id: z.string().trim(),
+					source: z.string().trim(),
+					target: z.string().trim(),
 					animated: z.boolean().default(true),
 					style: z
 						.object({
-							stroke: z.string().default('#000'),
+							stroke: z.string().trim().default('#000'),
 						})
 						.optional(),
-					sourceHandle: z.string().or(z.null()).optional(),
-					targetHandle: z.string().or(z.null()).optional(),
+					sourceHandle: z.string().trim().or(z.null()).optional(),
+					targetHandle: z.string().trim().or(z.null()).optional(),
 				})
 			)
 			.optional(),
@@ -452,37 +452,39 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 				z.object({
 					after: z.number().min(1),
 					respond_type: z.enum(['template', 'normal']).default('normal'),
-					message: z.string().default(''),
+					message: z.string().trim().default(''),
 					images: idsArray.default([]),
 					videos: idsArray.default([]),
 					audios: idsArray.default([]),
 					documents: idsArray.default([]),
 					contacts: idsArray.default([]),
-					template_id: z.string().default(''),
-					template_name: z.string().default(''),
+					template_id: z.string().trim().default(''),
+					template_name: z.string().trim().default(''),
 					template_header: z
 						.object({
 							type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
-							media_id: z.string().optional(),
+							media_id: z.string().trim().optional(),
 						})
 						.optional(),
 					template_body: z
 						.array(
 							z.object({
-								custom_text: z.string(),
-								phonebook_data: z.string(),
+								custom_text: z.string().trim(),
+								phonebook_data: z.string().trim(),
 								variable_from: z.enum(['custom_text', 'phonebook_data']),
-								fallback_value: z.string(),
+								fallback_value: z.string().trim(),
 							})
 						)
 						.default([]),
 				})
 			)
 			.default([]),
-		forward: z.object({
-			number: z.string().default(''),
-			message: z.string().default(''),
-		}).optional(),
+		forward: z
+			.object({
+				number: z.string().trim().default(''),
+				message: z.string().trim().default(''),
+			})
+			.optional(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
@@ -504,7 +506,7 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 
 export async function WhatsappFlowValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		name: z.string().min(1),
+		name: z.string().trim().min(1),
 		categories: z.array(
 			z.enum([
 				'SIGN_UP',
@@ -539,51 +541,51 @@ export async function WhatsappFlowValidator(req: Request, res: Response, next: N
 export async function UpdateWhatsappFlowValidator(req: Request, res: Response, next: NextFunction) {
 	const textType = z.object({
 		type: z.enum(['TextBody', 'TextCaption', 'TextSubheading', 'TextHeading']),
-		text: z.string(),
+		text: z.string().trim(),
 	});
 
 	const imageType = z.object({
 		type: z.literal('Image'),
-		src: z.string(),
+		src: z.string().trim(),
 		height: z.number().default(300),
 		'scale-type': z.literal('contain'),
 	});
 
 	const inputType = z.object({
 		type: z.literal('TextInput'),
-		name: z.string(),
-		label: z.string(),
+		name: z.string().trim(),
+		label: z.string().trim(),
 		required: z.boolean(),
 		'input-type': z.enum(['text', 'number', 'email', 'number', 'password', 'phone']),
-		'helper-text': z.string().optional(),
+		'helper-text': z.string().trim().optional(),
 	});
 
 	const textAreaType = z.object({
 		type: z.enum(['TextArea', 'DatePicker']),
-		name: z.string(),
-		label: z.string(),
+		name: z.string().trim(),
+		label: z.string().trim(),
 		required: z.boolean(),
-		'helper-text': z.string().optional(),
+		'helper-text': z.string().trim().optional(),
 	});
 
 	const selectType = z.object({
 		type: z.enum(['RadioButtonsGroup', 'CheckboxGroup', 'Dropdown']),
-		name: z.string(),
-		label: z.string(),
+		name: z.string().trim(),
+		label: z.string().trim(),
 		required: z.boolean(),
-		'data-source': z.array(z.string()).min(1),
+		'data-source': z.array(z.string().trim()).min(1),
 	});
 
 	const optInType = z.object({
 		type: z.literal('OptIn'),
-		name: z.string(),
-		label: z.string(),
+		name: z.string().trim(),
+		label: z.string().trim(),
 		required: z.boolean(),
 	});
 
 	const footerType = z.object({
 		type: z.literal('Footer'),
-		label: z.string(),
+		label: z.string().trim(),
 	});
 
 	const types = z.discriminatedUnion('type', [
@@ -600,7 +602,7 @@ export async function UpdateWhatsappFlowValidator(req: Request, res: Response, n
 		screens: z
 			.array(
 				z.object({
-					title: z.string(),
+					title: z.string().trim(),
 					children: z.array(types),
 				})
 			)

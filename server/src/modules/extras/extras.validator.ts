@@ -18,8 +18,8 @@ export async function FAQValidator(req: Request, res: Response, next: NextFuncti
 	const reqValidator = z.object({
 		list: z
 			.object({
-				title: z.string(),
-				info: z.string(),
+				title: z.string().trim(),
+				info: z.string().trim(),
 			})
 			.array(),
 	});
@@ -45,10 +45,10 @@ export async function TestimonialValidator(req: Request, res: Response, next: Ne
 	const reqValidator = z.object({
 		list: z
 			.object({
-				name: z.string(),
-				photo_url: z.string(),
-				title: z.string(),
-				description: z.string(),
+				name: z.string().trim(),
+				photo_url: z.string().trim(),
+				title: z.string().trim(),
+				description: z.string().trim(),
 			})
 			.array(),
 	});

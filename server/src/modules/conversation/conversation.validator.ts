@@ -67,60 +67,60 @@ export type NumbersValidationResult = {
 export async function SendMessageValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
 		type: z.enum(['text', 'image', 'video', 'document', 'audio', 'location', 'contacts']),
-		text: z.string().optional(),
-		media_id: z.string().optional(),
+		text: z.string().trim().optional(),
+		media_id: z.string().trim().optional(),
 		location: z
 			.object({
-				latitude: z.string(),
-				longitude: z.string(),
-				name: z.string(),
-				address: z.string(),
+				latitude: z.string().trim(),
+				longitude: z.string().trim(),
+				name: z.string().trim(),
+				address: z.string().trim(),
 			})
 			.optional(),
 
 		contacts: z
 			.object({
 				name: z.object({
-					formatted_name: z.string(),
-					first_name: z.string(),
-					last_name: z.string(),
-					middle_name: z.string(),
-					suffix: z.string(),
-					prefix: z.string(),
+					formatted_name: z.string().trim(),
+					first_name: z.string().trim(),
+					last_name: z.string().trim(),
+					middle_name: z.string().trim(),
+					suffix: z.string().trim(),
+					prefix: z.string().trim(),
 				}),
 				addresses: z.array(
 					z.object({
-						street: z.string(),
-						city: z.string(),
-						state: z.string(),
-						zip: z.string(),
-						country: z.string(),
-						country_code: z.string(),
+						street: z.string().trim(),
+						city: z.string().trim(),
+						state: z.string().trim(),
+						zip: z.string().trim(),
+						country: z.string().trim(),
+						country_code: z.string().trim(),
 						type: z.enum(['HOME', 'WORK']).default('HOME'),
 					})
 				),
-				birthday: z.string(),
+				birthday: z.string().trim(),
 				emails: z.array(
 					z.object({
-						email: z.string(),
+						email: z.string().trim(),
 						type: z.enum(['WORK', 'HOME']).default('HOME'),
 					})
 				),
 				org: z.object({
-					company: z.string(),
-					department: z.string(),
-					title: z.string(),
+					company: z.string().trim(),
+					department: z.string().trim(),
+					title: z.string().trim(),
 				}),
 				phones: z.array(
 					z.object({
-						phone: z.string(),
-						wa_id: z.string(),
+						phone: z.string().trim(),
+						wa_id: z.string().trim(),
 						type: z.enum(['HOME', 'WORK']).default('HOME'),
 					})
 				),
 				urls: z.array(
 					z.object({
-						url: z.string(),
+						url: z.string().trim(),
 						type: z.enum(['HOME', 'WORK']).default('HOME'),
 					})
 				),
@@ -129,7 +129,7 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 			.optional(),
 		context: z
 			.object({
-				message_id: z.string(),
+				message_id: z.string().trim(),
 			})
 			.optional(),
 	});
@@ -153,7 +153,7 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 
 export async function LabelValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		labels: z.string().array().default([]),
+		labels: z.string().trim().array().default([]),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
@@ -176,7 +176,7 @@ export async function LabelValidator(req: Request, res: Response, next: NextFunc
 export async function NumbersValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z
 		.object({
-			numbers: z.string().array().default([]),
+			numbers: z.string().trim().array().default([]),
 			phonebook_ids: idsArray.default([]),
 		})
 		.refine((data) => {

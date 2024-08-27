@@ -81,9 +81,10 @@ export type PermissionsValidationResult = {
 
 export async function UpgradePlanValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		date: z.string(),
+		date: z.string().trim(),
 		plan_id: z
 			.string()
+			.trim()
 			.refine((value) => Types.ObjectId.isValid(value))
 			.transform((value) => new Types.ObjectId(value))
 			.optional(),
@@ -108,10 +109,10 @@ export async function UpgradePlanValidator(req: Request, res: Response, next: Ne
 
 export async function CreateAgentValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		name: z.string(),
-		phone: z.string(),
-		email: z.string().email(),
-		password: z.string().min(6),
+		name: z.string().trim(),
+		phone: z.string().trim(),
+		email: z.string().trim().email(),
+		password: z.string().trim().min(6),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
@@ -133,7 +134,7 @@ export async function CreateAgentValidator(req: Request, res: Response, next: Ne
 
 export async function PasswordValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		password: z.string().min(6),
+		password: z.string().trim().min(6),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
@@ -155,7 +156,7 @@ export async function PasswordValidator(req: Request, res: Response, next: NextF
 
 export async function PermissionsValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		assigned_labels: z.array(z.string()).optional(),
+		assigned_labels: z.array(z.string().trim()).optional(),
 		auto_assign_chats: z.boolean().optional(),
 		phonebook: z
 			.object({
@@ -245,7 +246,7 @@ export async function PermissionsValidator(req: Request, res: Response, next: Ne
 
 export async function CreateQuickReplyValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		message: z.string(),
+		message: z.string().trim(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
@@ -267,13 +268,14 @@ export async function CreateQuickReplyValidator(req: Request, res: Response, nex
 
 export async function AssignTaskValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		message: z.string(),
+		message: z.string().trim(),
 		assign_to: z
 			.string()
+			.trim()
 			.refine((value) => Types.ObjectId.isValid(value))
 			.transform((value) => new Types.ObjectId(value))
 			.optional(),
-		due_date: z.string().optional(),
+		due_date: z.string().trim().optional(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

@@ -9,8 +9,8 @@ export type TemplateRemoveValidationResult = {
 
 export async function TemplateRemoveValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		id: z.string(),
-		name: z.string(),
+		id: z.string().trim(),
+		name: z.string().trim(),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
@@ -34,28 +34,28 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 	const headerSchema = z.object({
 		type: z.literal('HEADER'),
 		format: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
-		text: z.string().optional(),
+		text: z.string().trim().optional(),
 		example: z
 			.object({
-				header_text: z.array(z.string()).default([]),
-				header_handle: z.array(z.string()).default([]),
+				header_text: z.array(z.string().trim()).default([]),
+				header_handle: z.array(z.string().trim()).default([]),
 			})
 			.optional(),
 	});
 
 	const bodySchema = z.object({
 		type: z.literal('BODY'),
-		text: z.string(),
+		text: z.string().trim(),
 		example: z
 			.object({
-				body_text: z.array(z.array(z.string())),
+				body_text: z.array(z.array(z.string().trim())),
 			})
 			.optional(),
 	});
 
 	const footerSchema = z.object({
 		type: z.literal('FOOTER'),
-		text: z.string(),
+		text: z.string().trim(),
 	});
 
 	const buttonsSchema = z.object({
@@ -63,9 +63,9 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 		buttons: z.array(
 			z.object({
 				type: z.enum(['URL', 'PHONE_NUMBER', 'QUICK_REPLY', 'VOICE_CALL']),
-				text: z.string(),
-				url: z.string().optional(),
-				phone_number: z.string().optional(),
+				text: z.string().trim(),
+				url: z.string().trim().optional(),
+				phone_number: z.string().trim().optional(),
 			})
 		),
 	});
@@ -78,10 +78,10 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 	]);
 
 	const reqValidator = z.object({
-		name: z.string(),
+		name: z.string().trim(),
 		category: z.enum(['MARKETING', 'UTILITY']),
 		allow_category_change: z.boolean().default(true),
-		language: z.string().default('en_US'),
+		language: z.string().trim().default('en_US'),
 		components: z.array(componentSchema),
 	});
 
@@ -106,28 +106,28 @@ export async function TemplateEditValidator(req: Request, res: Response, next: N
 	const headerSchema = z.object({
 		type: z.literal('HEADER'),
 		format: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
-		text: z.string().optional(),
+		text: z.string().trim().optional(),
 		example: z
 			.object({
-				header_text: z.array(z.string()).default([]),
-				header_handle: z.array(z.string()).default([]),
+				header_text: z.array(z.string().trim()).default([]),
+				header_handle: z.array(z.string().trim()).default([]),
 			})
 			.optional(),
 	});
 
 	const bodySchema = z.object({
 		type: z.literal('BODY'),
-		text: z.string(),
+		text: z.string().trim(),
 		example: z
 			.object({
-				body_text: z.array(z.array(z.string())),
+				body_text: z.array(z.array(z.string().trim())),
 			})
 			.optional(),
 	});
 
 	const footerSchema = z.object({
 		type: z.literal('FOOTER'),
-		text: z.string(),
+		text: z.string().trim(),
 	});
 
 	const buttonsSchema = z.object({
@@ -135,9 +135,9 @@ export async function TemplateEditValidator(req: Request, res: Response, next: N
 		buttons: z.array(
 			z.object({
 				type: z.enum(['URL', 'PHONE_NUMBER', 'QUICK_REPLY', 'VOICE_CALL']),
-				text: z.string(),
-				url: z.string().optional(),
-				phone_number: z.string().optional(),
+				text: z.string().trim(),
+				url: z.string().trim().optional(),
+				phone_number: z.string().trim().optional(),
 			})
 		),
 	});
@@ -155,11 +155,11 @@ export async function TemplateEditValidator(req: Request, res: Response, next: N
 	}
 
 	const reqValidator = z.object({
-		id: z.string(),
-		name: z.string(),
+		id: z.string().trim(),
+		name: z.string().trim(),
 		category: z.enum(['MARKETING', 'UTILITY']),
 		allow_category_change: z.boolean().default(true),
-		language: z.string().default('en_US'),
+		language: z.string().trim().default('en_US'),
 		components: z.array(componentSchema),
 	});
 

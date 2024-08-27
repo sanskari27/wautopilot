@@ -51,50 +51,50 @@ export function CreateContactValidator(req: Request, res: Response, next: NextFu
 	const reqValidator = z.object({
 		address: z
 			.object({
-				type: z.string().default(''),
-				street: z.string().default(''),
-				city: z.string().default(''),
-				state: z.string().default(''),
-				zip: z.string().default(''),
-				country: z.string().default(''),
-				country_code: z.string().default(''),
+				type: z.string().trim().default(''),
+				street: z.string().trim().default(''),
+				city: z.string().trim().default(''),
+				state: z.string().trim().default(''),
+				zip: z.string().trim().default(''),
+				country: z.string().trim().default(''),
+				country_code: z.string().trim().default(''),
 			})
 			.array()
 			.default([]),
-		birthday: z.string().default(''),
+		birthday: z.string().trim().default(''),
 		emails: z
 			.object({
-				email: z.string().default(''),
-				type: z.string().default(''),
+				email: z.string().trim().default(''),
+				type: z.string().trim().default(''),
 			})
 			.array()
 			.default([]),
 
 		name: z.object({
-			formatted_name: z.string().default(''),
-			first_name: z.string().default(''),
-			last_name: z.string().default(''),
-			middle_name: z.string().default(''),
-			suffix: z.string().default(''),
-			prefix: z.string().default(''),
+			formatted_name: z.string().trim().default(''),
+			first_name: z.string().trim().default(''),
+			last_name: z.string().trim().default(''),
+			middle_name: z.string().trim().default(''),
+			suffix: z.string().trim().default(''),
+			prefix: z.string().trim().default(''),
 		}),
 		org: z.object({
-			company: z.string().default(''),
-			department: z.string().default(''),
-			title: z.string().default(''),
+			company: z.string().trim().default(''),
+			department: z.string().trim().default(''),
+			title: z.string().trim().default(''),
 		}),
 		phones: z
 			.object({
-				phone: z.string().default(''),
-				wa_id: z.string().default(''),
-				type: z.string().default(''),
+				phone: z.string().trim().default(''),
+				wa_id: z.string().trim().default(''),
+				type: z.string().trim().default(''),
 			})
 			.array()
 			.default([]),
 		urls: z
 			.object({
-				url: z.string().default(''),
-				type: z.string().default(''),
+				url: z.string().trim().default(''),
+				type: z.string().trim().default(''),
 			})
 			.array()
 			.default([]),

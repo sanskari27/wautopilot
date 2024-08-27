@@ -13,7 +13,7 @@ export type CreateCouponValidationResult = {
 
 export async function CreateCouponValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
-		code: z.string().min(1),
+		code: z.string().trim().min(1),
 		total_coupons: z.number().int(),
 		discount_type: z.enum(['percentage', 'amount']),
 		discount_amount: z.number().int().nonnegative(),
