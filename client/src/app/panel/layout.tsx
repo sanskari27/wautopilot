@@ -1,5 +1,6 @@
 import PageLayout from '@/components/containers/page-layout';
 import { AgentProvider } from '@/components/context/agents';
+import { DeviceAlertProvider } from '@/components/context/device-alert';
 import { FieldsContextProvider, TagsProvider } from '@/components/context/tags';
 import { UserDetailsProvider } from '@/components/context/user-details';
 import DevicesDialog from '@/components/elements/dialogs/devices';
@@ -11,6 +12,7 @@ import AuthService from '@/services/auth.service';
 import PhoneBookService from '@/services/phonebook.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
+import DevicesAlertDialog from '../devices-alert';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,16 +35,19 @@ export default async function Layout({
 		<Suspense fallback={<Loading />}>
 			<main className='w-full h-full '>
 				<UserDetailsProvider data={userDetails!}>
-					<Navbar />
-					<PageLayout className='overflow-scroll'>
-						<TagsProvider data={labels}>
-							<FieldsContextProvider data={fields}>
-								<AgentProvider data={agents}>{children}</AgentProvider>
-								<SettingsDialog />
-							</FieldsContextProvider>
-						</TagsProvider>
-						<DevicesDialog />
-					</PageLayout>
+					<DeviceAlertProvider data={userDetails?.no_of_devices!}>
+						<DevicesAlertDialog />
+						<Navbar />
+						<PageLayout className='overflow-scroll'>
+							<TagsProvider data={labels}>
+								<FieldsContextProvider data={fields}>
+									<AgentProvider data={agents}>{children}</AgentProvider>
+									<SettingsDialog />
+								</FieldsContextProvider>
+							</TagsProvider>
+							<DevicesDialog />
+						</PageLayout>
+					</DeviceAlertProvider>
 				</UserDetailsProvider>
 			</main>
 		</Suspense>
