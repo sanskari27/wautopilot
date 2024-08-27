@@ -81,7 +81,9 @@ export default function LeadsTemplateMessageDialog({
 								render={({ field }) => (
 									<FormItem>
 										<div className='flex items-center gap-6'>
-											<p className='font-medium'>Header Media:- </p>
+											<p className='font-medium'>
+												Header Media<span className=' text-red-800'>*</span>:{' '}
+											</p>
 											<MediaSelectorDialog
 												singleSelect
 												selectedValue={field.value ? [field.value] : []}
@@ -109,7 +111,10 @@ export default function LeadsTemplateMessageDialog({
 								items={template_body}
 								render={(item, idx) => (
 									<div className='flex flex-col'>
-										<FormLabel>Variable value {idx + 1}</FormLabel>
+										<FormLabel>
+											Variable value {idx + 1}
+											<span className='ml-[0.2rem] text-red-800'>*</span>
+										</FormLabel>
 										<div className='flex gap-3 flex-col md:flex-row'>
 											<FormField
 												control={form.control}
@@ -208,20 +213,20 @@ export default function LeadsTemplateMessageDialog({
 						</Show.ShowIf>
 					</div>
 				</div>
-					<DialogFooter>
-						<Button
-							type='button'
-							onClick={(e) => {
-								e.preventDefault();
-								e.stopPropagation();
-								handleSubmit();
-							}}
-							disabled={!isBodyValid || !isHeaderValid}
-							variant='outline'
-						>
-							Save
-						</Button>
-					</DialogFooter>
+				<DialogFooter>
+					<Button
+						type='button'
+						onClick={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							handleSubmit();
+						}}
+						disabled={!isBodyValid || !isHeaderValid}
+						variant='outline'
+					>
+						Save
+					</Button>
+				</DialogFooter>
 			</DialogContent>
 		</Dialog>
 	);

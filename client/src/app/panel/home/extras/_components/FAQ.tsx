@@ -24,7 +24,7 @@ export default async function FAQPage() {
 
 	return (
 		<div className='flex flex-col'>
-			<div className='flex gap-2 justify-between'>
+			<div className='flex gap-2 justify-between mb-4'>
 				<h1 className='text-2xl font-semibold'>FAQ</h1>
 				<Link href='?faq=create'>
 					<Button>

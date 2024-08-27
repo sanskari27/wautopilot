@@ -46,7 +46,7 @@ const WhatsappFlowMessage = ({
 			<DialogTrigger asChild>{children}</DialogTrigger>
 			<DialogContent className='sm:max-w-[425px] md:max-w-lg lg:max-w-2xl'>
 				<DialogHeader>
-					<DialogTitle>List Message</DialogTitle>
+					<DialogTitle>Whatsapp Flow Message</DialogTitle>
 				</DialogHeader>
 				<div className='max-h-[70vh] grid gap-2 overflow-y-auto px-0'>
 					<div>

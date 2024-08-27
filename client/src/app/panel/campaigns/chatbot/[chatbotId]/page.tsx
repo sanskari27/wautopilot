@@ -259,7 +259,7 @@ export default function ChatbotForm() {
 						</div>
 						<Each
 							items={trigger}
-							render={(trigger, index) => (
+							render={(_trigger, index) => (
 								<FormField
 									control={form.control}
 									name={`trigger.${index}`}
@@ -284,7 +284,9 @@ export default function ChatbotForm() {
 							name='options'
 							render={({ field }) => (
 								<FormItem className='space-y-0 flex-1'>
-									<FormLabel>Conditions</FormLabel>
+									<FormLabel>
+										Conditions<span className='ml-[0.2rem] text-red-800'>*</span>
+									</FormLabel>
 									<FormControl>
 										<Select value={field.value} onValueChange={field.onChange}>
 											<SelectTrigger>
@@ -314,7 +316,9 @@ export default function ChatbotForm() {
 										name='trigger_gap_time'
 										render={({ field }) => (
 											<FormItem className='space-y-0 flex-1 max-w-md'>
-												<FormLabel>Gap Delay</FormLabel>
+												<FormLabel>
+													Gap Delay<span className='ml-[0.2rem] text-red-800'>*</span>
+												</FormLabel>
 												<FormControl>
 													<Input type='number' placeholder='eg. 10' {...field} />
 												</FormControl>
@@ -353,7 +357,9 @@ export default function ChatbotForm() {
 										name='response_delay_time'
 										render={({ field }) => (
 											<FormItem className='space-y-0 flex-1 max-w-md'>
-												<FormLabel>Message Delay</FormLabel>
+												<FormLabel>
+													Message Delay<span className='ml-[0.2rem] text-red-800'>*</span>
+												</FormLabel>
 												<FormControl>
 													<Input type='number' placeholder='eg. 10' {...field} />
 												</FormControl>
@@ -392,7 +398,9 @@ export default function ChatbotForm() {
 								name='startAt'
 								render={({ field }) => (
 									<FormItem className='space-y-0 flex-1 max-w-md'>
-										<FormLabel>Start At (in IST)</FormLabel>
+										<FormLabel>
+											Start At (in IST)<span className='ml-[0.2rem] text-red-800'>*</span>
+										</FormLabel>
 										<FormControl>
 											<Input type='time' {...field} />
 										</FormControl>
@@ -405,7 +413,9 @@ export default function ChatbotForm() {
 								name='endAt'
 								render={({ field }) => (
 									<FormItem className='space-y-0 flex-1 max-w-md'>
-										<FormLabel>End At (in IST)</FormLabel>
+										<FormLabel>
+											End At (in IST)<span className='ml-[0.2rem] text-red-800'>*</span>
+										</FormLabel>
 										<FormControl>
 											<Input type='time' {...field} />
 										</FormControl>
@@ -550,7 +560,9 @@ export default function ChatbotForm() {
 									</p>
 									<Show.ShowIf condition={!!header && header.type !== 'TEXT' && header.type !== ''}>
 										<div className='flex items-center gap-6'>
-											<p className='font-medium'>Header Media:- </p>
+											<p className='font-medium'>
+												Header Media<span className='mr-[0.2rem] text-red-800'>*</span>:{' '}
+											</p>
 											<MediaSelectorDialog
 												singleSelect
 												selectedValue={header?.media_id ? [header?.media_id] : []}
@@ -568,7 +580,10 @@ export default function ChatbotForm() {
 											items={template_body}
 											render={(item, index) => (
 												<div className='flex flex-col'>
-													<FormLabel>Variable value {index + 1}</FormLabel>
+													<FormLabel>
+														Variable value {index + 1}
+														<span className='ml-[0.2rem] text-red-800'>*</span>
+													</FormLabel>
 													<div className='flex gap-3 flex-col md:flex-row'>
 														<FormField
 															control={form.control}

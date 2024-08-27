@@ -58,7 +58,7 @@ export function AddFields() {
 				<div className='grid gap-4'>
 					<div className='grid gap-2'>
 						<Label className='text-primary' htmlFor='first-name'>
-							Field Name
+							Field Name<span className='ml-[0.2rem] text-red-800'>*</span>
 						</Label>
 						<Input
 							id='field-name'
@@ -70,7 +70,7 @@ export function AddFields() {
 
 					<div className='grid gap-2'>
 						<Label className='text-primary' htmlFor='first-name'>
-							Field Name
+							Field Name<span className='ml-[0.2rem] text-red-800'>*</span>
 						</Label>
 						<Input
 							id='field-value'
@@ -224,7 +224,10 @@ export function UploadCSV() {
 											'!cursor-pointer text-center border border-gray-400 border-dashed py-12 rounded-lg text-normal text-primary'
 										}
 									>
-										<>Drag and drop file here, or click to select file</>
+										<>
+											Drag and drop file here, or click to select file
+											<span className='ml-[0.2rem] text-red-800'>*</span>
+										</>
 									</Label>
 								)}
 								<Input
@@ -238,7 +241,7 @@ export function UploadCSV() {
 							</div>
 							<div className='grid gap-2'>
 								<Label className='text-primary' htmlFor='tags'>
-									Tags (comma separated)
+									Tags (comma separated)<span className='ml-[0.2rem] text-red-800'>*</span>
 								</Label>
 								<Textarea
 									id='tags'
@@ -367,7 +370,7 @@ export function AssignTags({ ids }: { ids: string[] }) {
 				<div className='grid gap-4'>
 					<div className='grid gap-2'>
 						<Label className='text-primary' htmlFor='first-name'>
-							Tags (comma separated)
+							Tags (comma separated)<span className='ml-[0.2rem] text-red-800'>*</span>
 						</Label>
 						<Textarea
 							id='field-value'

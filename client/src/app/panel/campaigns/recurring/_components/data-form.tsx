@@ -107,7 +107,9 @@ export default function DataForm({
 							name='name'
 							render={({ field }) => (
 								<FormItem className='space-y-0 flex-1 max-w-md'>
-									<FormLabel className='text-primary'>Campaign Name</FormLabel>
+									<FormLabel className='text-primary'>
+										Campaign Name<span className='ml-[0.2rem] text-red-800'>*</span>
+									</FormLabel>
 									<FormControl>
 										<Input placeholder='eg. Fanfest' {...field} />
 									</FormControl>
@@ -116,7 +118,9 @@ export default function DataForm({
 							)}
 						/>
 						<FormItem className='space-y-0 flex-1 max-w-sm'>
-							<FormLabel className='text-primary'>Select Template</FormLabel>
+							<FormLabel className='text-primary'>
+								Select Template<span className='ml-[0.2rem] text-red-800'>*</span>
+							</FormLabel>
 							<FormControl>
 								<TemplatesSelector
 									placeholder='Select Template'
@@ -131,7 +135,9 @@ export default function DataForm({
 							name='wish_from'
 							render={({ field }) => (
 								<FormItem className='space-y-0 flex-1 max-w-[15rem]'>
-									<FormLabel className='text-primary'>Wish Type</FormLabel>
+									<FormLabel className='text-primary'>
+										Wish Type<span className='ml-[0.2rem] text-red-800'>*</span>
+									</FormLabel>
 									<FormControl>
 										<ToggleGroup
 											className='justify-start'
@@ -157,7 +163,8 @@ export default function DataForm({
 								}}
 							>
 								<Button variant={'outline'} className='w-full'>
-									Select Tags:- {fields.labels.length ? `(${fields.labels.length})` : '(0)'}
+									Select Tags<span className='mr-1 text-red-800'>*</span>:{' '}
+									{fields.labels.length ? `(${fields.labels.length})` : '(0)'}
 								</Button>
 							</TagsSelector>
 						</div>
@@ -185,7 +192,9 @@ export default function DataForm({
 									name='delay'
 									render={({ field }) => (
 										<FormItem className='space-y-0 flex-1 max-w-xs'>
-											<FormLabel className='text-primary'>Delay (in Days)</FormLabel>
+											<FormLabel className='text-primary'>
+												Delay (in Days)<span className='ml-[0.2rem] text-red-800'>*</span>
+											</FormLabel>
 											<FormControl>
 												<Input
 													value={field.value}
@@ -201,7 +210,9 @@ export default function DataForm({
 									name='startTime'
 									render={({ field }) => (
 										<FormItem className='space-y-0'>
-											<FormLabel className='text-primary'>Start Time</FormLabel>
+											<FormLabel className='text-primary'>
+												Start Time<span className='ml-[0.2rem] text-red-800'>*</span>
+											</FormLabel>
 											<FormControl>
 												<Input type='time' {...field} />
 											</FormControl>
@@ -214,7 +225,9 @@ export default function DataForm({
 									name='endTime'
 									render={({ field }) => (
 										<FormItem className='space-y-0'>
-											<FormLabel className='text-primary'>End Time</FormLabel>
+											<FormLabel className='text-primary'>
+												End Time<span className='ml-[0.2rem] text-red-800'>*</span>
+											</FormLabel>
 											<FormControl>
 												<Input type='time' {...field} />
 											</FormControl>

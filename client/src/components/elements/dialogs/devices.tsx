@@ -352,7 +352,7 @@ function AddDeviceDialog() {
 					<div className='space-y-4'>
 						<div>
 							<Label htmlFor='phoneNumberId' className='text-primary'>
-								Phone Number ID
+								Phone Number ID<span className='ml-[0.2rem] text-red-800'>*</span>
 							</Label>
 							<Input
 								type='text'
@@ -365,7 +365,7 @@ function AddDeviceDialog() {
 
 						<div>
 							<Label htmlFor='waid' className='text-primary'>
-								WABA ID
+								WABA ID<span className='ml-[0.2rem] text-red-800'>*</span>
 							</Label>
 							<Input
 								type='text'
@@ -378,7 +378,7 @@ function AddDeviceDialog() {
 
 						<div>
 							<Label htmlFor='accessToken' className='text-primary'>
-								Access Token
+								Access Token<span className='ml-[0.2rem] text-red-800'>*</span>
 							</Label>
 							<Textarea
 								value={details.accessToken}

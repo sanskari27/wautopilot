@@ -178,7 +178,9 @@ export default function DataForm({
 								name='name'
 								render={({ field }) => (
 									<FormItem className='space-y-0 flex-1'>
-										<FormLabel className='text-primary'>Template Name</FormLabel>
+										<FormLabel className='text-primary'>
+											Template Name<span className='ml-[0.2rem] text-red-800'>*</span>
+										</FormLabel>
 										<FormControl>
 											<Input placeholder='lowercase_without_any_spaces' {...field} />
 										</FormControl>
@@ -196,7 +198,9 @@ export default function DataForm({
 								name='category'
 								render={({ field }) => (
 									<FormItem className='space-y-0 flex-1'>
-										<FormLabel className='text-primary'>Template Type</FormLabel>
+										<FormLabel className='text-primary'>
+											Template Type<span className='ml-[0.2rem] text-red-800'>*</span>
+										</FormLabel>
 										<FormControl>
 											<ToggleGroup
 												className='justify-start'
@@ -222,7 +226,9 @@ export default function DataForm({
 
 						<div>
 							<FormItem className='space-y-0 flex-1'>
-								<FormLabel className='text-primary'>Template Header</FormLabel>
+								<FormLabel className='text-primary'>
+									Template Header<span className='ml-[0.2rem] text-red-800'>*</span>
+								</FormLabel>
 								<FormControl>
 									<ToggleGroup
 										className='justify-start'
@@ -323,7 +329,9 @@ export default function DataForm({
 
 						<div className='flex flex-col gap-3'>
 							<FormItem className='space-y-0 flex-1'>
-								<FormLabel className='text-primary'>Template Body</FormLabel>
+								<FormLabel className='text-primary'>
+									Template Body<span className='ml-[0.2rem] text-red-800'>*</span>
+								</FormLabel>
 								<FormDescription className='text-xs pb-2'>
 									{`Use dynamic variable like {{1}} {{2}} and so on`}. (Limit{' '}
 									{body?.text?.length ?? 0} / 2000)
@@ -363,16 +371,17 @@ export default function DataForm({
 								<FormItem className='space-y-0 flex-1'>
 									<FormLabel className='text-primary'>
 										Example Values (Total:- {bodyVariables})
+										<span className='ml-[0.2rem] text-red-800'>*</span>
 									</FormLabel>
 									<FormDescription className='text-xs'>
-										eg. Dave, John, 1234567890 (Comma separated) (
+										eg. Dave; John; 1234567890 (Semi-colon separated) (
 										{(body?.example?.body_text?.[0] ?? []).length} of {bodyVariables} provided)
 									</FormDescription>
 									<FormControl>
 										<Input
 											placeholder='Example Values'
 											isInvalid={bodyVariables !== (body?.example?.body_text?.[0] ?? []).length}
-											value={(body?.example?.body_text?.[0] ?? []).join(', ')}
+											value={(body?.example?.body_text?.[0] ?? []).join('; ')}
 											onChange={(e) => {
 												form.setValue(
 													'components',
@@ -381,7 +390,7 @@ export default function DataForm({
 															return {
 																...component,
 																example: {
-																	body_text: [e.target.value.split(',').map((t) => t.trim())],
+																	body_text: [e.target.value.split(';').map((t) => t.trim())],
 																},
 															};
 														}
@@ -465,10 +474,10 @@ export default function DataForm({
 						</div>
 					</div>
 					<div className='w-full lg:w-[30%] flex flex-col-reverse lg:flex-col justify-start items-start gap-3'>
+						<TemplatePreview components={components} />
 						<Button type='submit' className='w-[80%] mx-auto'>
 							Save
 						</Button>
-						<TemplatePreview components={components} />
 					</div>
 				</div>
 

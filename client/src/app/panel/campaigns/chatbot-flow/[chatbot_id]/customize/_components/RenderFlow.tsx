@@ -1,5 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { randomString } from '@/lib/utils';
 import {
 	Background,
@@ -16,7 +17,7 @@ import {
 	useNodesState,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Save } from 'lucide-react';
+import { Info, Save } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
@@ -239,6 +240,12 @@ export default function RenderFlow({
 							<Save className='w-4 h-4' />
 						</Button>
 					</div>
+				</Panel>
+				<Panel position='bottom-right'>
+					<Label className='pb-4'>
+						<Info className='inline-block w-4 h-4 mr-2' />
+						To delete elements, select them and press the BACKSPACE key
+					</Label>
 				</Panel>
 				<CreateNodeDrawer addNode={handleAddNode} />
 				<Background color='#000' size={1.25} variant={BackgroundVariant.Dots} />

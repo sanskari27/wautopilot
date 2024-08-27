@@ -142,7 +142,9 @@ export default function BroadcastPage() {
 								name='name'
 								render={({ field }) => (
 									<FormItem className='space-y-0 flex-1 max-w-md'>
-										<FormLabel className='text-primary'>Campaign Name</FormLabel>
+										<FormLabel className='text-primary'>
+											Campaign Name<span className='ml-[0.2rem] text-red-800'>*</span>
+										</FormLabel>
 										<FormControl>
 											<Input placeholder='eg. Fanfest' {...field} />
 										</FormControl>
@@ -151,7 +153,9 @@ export default function BroadcastPage() {
 								)}
 							/>
 							<FormItem className='space-y-0 flex-1 max-w-sm'>
-								<FormLabel className='text-primary'>Select Template</FormLabel>
+								<FormLabel className='text-primary'>
+									Select Template<span className='ml-[0.2rem] text-red-800'>*</span>
+								</FormLabel>
 								<FormControl>
 									<TemplatesSelector
 										placeholder='Select Template'
@@ -166,7 +170,9 @@ export default function BroadcastPage() {
 								name='broadcast_options.broadcast_type'
 								render={({ field }) => (
 									<FormItem className='space-y-0 flex-1 max-w-[15rem]'>
-										<FormLabel className='text-primary'>Broadcast Type</FormLabel>
+										<FormLabel className='text-primary'>
+											Broadcast Type<span className='ml-[0.2rem] text-red-800'>*</span>
+										</FormLabel>
 										<FormControl>
 											<ToggleGroup
 												className='justify-start'
@@ -190,7 +196,9 @@ export default function BroadcastPage() {
 								name='recipients_from'
 								render={({ field }) => (
 									<FormItem className='space-y-0 flex-1 max-w-[15rem]'>
-										<FormLabel className='text-primary'>Recipients From</FormLabel>
+										<FormLabel className='text-primary'>
+											Recipients From<span className='ml-[0.2rem] text-red-800'>*</span>
+										</FormLabel>
 										<FormControl>
 											<ToggleGroup
 												className='justify-start'
@@ -259,7 +267,9 @@ export default function BroadcastPage() {
 											name='broadcast_options.startDate'
 											render={({ field }) => (
 												<FormItem className='space-y-0 flex-1 max-w-xs'>
-													<FormLabel className='text-primary'>Start Date</FormLabel>
+													<FormLabel className='text-primary'>
+														Start Date<span className='ml-[0.2rem] text-red-800'>*</span>
+													</FormLabel>
 													<FormControl>
 														<DatePicker
 															onChange={(date) => {
@@ -280,7 +290,9 @@ export default function BroadcastPage() {
 											name='broadcast_options.startTime'
 											render={({ field }) => (
 												<FormItem className='space-y-0'>
-													<FormLabel className='text-primary'>Start Time</FormLabel>
+													<FormLabel className='text-primary'>
+														Start Time<span className='ml-[0.2rem] text-red-800'>*</span>
+													</FormLabel>
 													<FormControl>
 														<Input type='time' {...field} />
 													</FormControl>
@@ -293,7 +305,9 @@ export default function BroadcastPage() {
 											name='broadcast_options.endTime'
 											render={({ field }) => (
 												<FormItem className='space-y-0'>
-													<FormLabel className='text-primary'>End Time</FormLabel>
+													<FormLabel className='text-primary'>
+														End Time<span className='ml-[0.2rem] text-red-800'>*</span>
+													</FormLabel>
 													<FormControl>
 														<Input type='time' {...field} />
 													</FormControl>
@@ -306,7 +320,9 @@ export default function BroadcastPage() {
 											name='broadcast_options.daily_messages_count'
 											render={({ field }) => (
 												<FormItem className='space-y-0 flex-1 max-w-xs'>
-													<FormLabel className='text-primary'>No of messages daily</FormLabel>
+													<FormLabel className='text-primary'>
+														No of messages daily<span className='ml-[0.2rem] text-red-800'>*</span>
+													</FormLabel>
 													<FormControl>
 														<Input {...field} />
 													</FormControl>

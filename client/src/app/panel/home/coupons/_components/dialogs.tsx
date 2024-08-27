@@ -128,7 +128,9 @@ export function CouponDetails({
 							name='couponCode'
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Coupon Code</FormLabel>
+									<FormLabel>
+										Coupon Code<span className='ml-[0.2rem] text-red-800'>*</span>
+									</FormLabel>
 									<FormControl>
 										<Input {...field} />
 									</FormControl>
@@ -140,7 +142,9 @@ export function CouponDetails({
 							name='totalCoupons'
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Total Coupons</FormLabel>
+									<FormLabel>
+										Total Coupons<span className='ml-[0.2rem] text-red-800'>*</span>
+									</FormLabel>
 									<FormControl>
 										<Input type='number' {...field} />
 									</FormControl>
@@ -152,7 +156,9 @@ export function CouponDetails({
 							name='couponPerUser'
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Coupon per user</FormLabel>
+									<FormLabel>
+										Coupon per user<span className='ml-[0.2rem] text-red-800'>*</span>
+									</FormLabel>
 									<FormControl>
 										<Input type='number' {...field} />
 									</FormControl>
@@ -164,7 +170,9 @@ export function CouponDetails({
 							name='discountType'
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Discount Type</FormLabel>
+									<FormLabel>
+										Discount Type<span className='ml-[0.2rem] text-red-800'>*</span>
+									</FormLabel>
 									<FormControl>
 										<Select value={field.value} onValueChange={(value) => field.onChange(value)}>
 											<SelectTrigger>
@@ -187,7 +195,9 @@ export function CouponDetails({
 										name='discountAmount'
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>Discount Amount</FormLabel>
+												<FormLabel>
+													Discount Amount<span className='ml-[0.2rem] text-red-800'>*</span>
+												</FormLabel>
 												<FormControl>
 													<Input type='number' {...field} />
 												</FormControl>
@@ -201,7 +211,9 @@ export function CouponDetails({
 										name='discountPercentage'
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>Discount Percentage</FormLabel>
+												<FormLabel>
+													Discount Percentage<span className='ml-[0.2rem] text-red-800'>*</span>
+												</FormLabel>
 												<FormControl>
 													<Input type='number' {...field} />
 												</FormControl>

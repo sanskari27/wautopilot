@@ -162,7 +162,9 @@ function ContactForm({
 						name='name.first_name'
 						render={({ field }) => (
 							<FormItem className='space-y-0  flex-1'>
-								<FormLabel className='text-primary'>First Name</FormLabel>
+								<FormLabel className='text-primary'>
+									First Name<span className='ml-[0.2rem] text-red-800'>*</span>
+								</FormLabel>
 								<FormControl>
 									<Input placeholder='eg. John' {...field} />
 								</FormControl>

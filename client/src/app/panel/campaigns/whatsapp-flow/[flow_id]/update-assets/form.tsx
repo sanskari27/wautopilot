@@ -509,7 +509,6 @@ function ContentEditor({
 								</div>
 							);
 						} else if (content.type === 'TextInput') {
-							const inputType = content['input-type'] === 'phone' ? 'tel' : content['input-type'];
 							return (
 								<div className='max-w-md rounded-md overflow-hidden bg-primary/20 p-2'>
 									<Collapse
@@ -529,7 +528,9 @@ function ContentEditor({
 												name={`screens.${screenIndex}.children.${index}.input-type`}
 												render={({ field }) => (
 													<FormItem className='space-y-0 flex-1 max-w-md px-4'>
-														<Label className='font-normal'>Type</Label>
+														<Label className='font-normal'>
+															Type<span className='ml-[0.2rem] text-red-800'>*</span>
+														</Label>
 														<FormControl>
 															<Select onValueChange={field.onChange} defaultValue={field.value}>
 																<SelectTrigger>
@@ -555,7 +556,9 @@ function ContentEditor({
 												name={`screens.${screenIndex}.children.${index}.name`}
 												render={({ field }) => (
 													<FormItem className='space-y-0 flex-1 max-w-md px-4'>
-														<Label className='font-normal'>Field name</Label>
+														<Label className='font-normal'>
+															Field name<span className='ml-[0.2rem] text-red-800'>*</span>
+														</Label>
 														<FormControl>
 															<Input
 																value={field.value}
@@ -573,9 +576,11 @@ function ContentEditor({
 												name={`screens.${screenIndex}.children.${index}.label`}
 												render={({ field }) => (
 													<FormItem className='space-y-0 flex-1 max-w-md px-4'>
-														<Label className='font-normal'>Label</Label>
+														<Label className='font-normal'>
+															Label<span className='ml-[0.2rem] text-red-800'>*</span>
+														</Label>
 														<FormControl>
-															<Input type={inputType} {...field} />
+															<Input {...field} />
 														</FormControl>
 														<FormMessage />
 													</FormItem>
@@ -648,7 +653,9 @@ function ContentEditor({
 												name={`screens.${screenIndex}.children.${index}.name`}
 												render={({ field }) => (
 													<FormItem className='space-y-0 flex-1 max-w-md px-4'>
-														<Label className='font-normal'>Field name</Label>
+														<Label className='font-normal'>
+															Field name<span className='ml-[0.2rem] text-red-800'>*</span>
+														</Label>
 														<FormControl>
 															<Input
 																value={field.value}
@@ -666,7 +673,9 @@ function ContentEditor({
 												name={`screens.${screenIndex}.children.${index}.label`}
 												render={({ field }) => (
 													<FormItem className='space-y-0 flex-1 max-w-md px-4'>
-														<Label className='font-normal'>Label</Label>
+														<Label className='font-normal'>
+															Label<span className='ml-[0.2rem] text-red-800'>*</span>
+														</Label>
 														<FormControl>
 															<Input {...field} />
 														</FormControl>
@@ -749,7 +758,9 @@ function ContentEditor({
 												name={`screens.${screenIndex}.children.${index}.name`}
 												render={({ field }) => (
 													<FormItem className='space-y-0 flex-1 max-w-md px-4'>
-														<Label className='font-normal'>Field name</Label>
+														<Label className='font-normal'>
+															Field name<span className='ml-[0.2rem] text-red-800'>*</span>
+														</Label>
 														<FormControl>
 															<Input
 																value={field.value}
@@ -767,7 +778,9 @@ function ContentEditor({
 												name={`screens.${screenIndex}.children.${index}.label`}
 												render={({ field }) => (
 													<FormItem className='space-y-0 flex-1 max-w-md px-4'>
-														<Label className='font-normal'>Label</Label>
+														<Label className='font-normal'>
+															Label<span className='ml-[0.2rem] text-red-800'>*</span>
+														</Label>
 														<FormControl>
 															<Input {...field} />
 														</FormControl>
@@ -777,7 +790,9 @@ function ContentEditor({
 											/>
 
 											<div>
-												<Label className='font-normal px-4'>Options</Label>
+												<Label className='font-normal px-4'>
+													Options<span className='ml-[0.2rem] text-red-800'>*</span>
+												</Label>
 												<Each
 													items={content['data-source']}
 													render={(item, opt_index) => (
@@ -884,7 +899,9 @@ function ContentEditor({
 												name={`screens.${screenIndex}.children.${index}.label`}
 												render={({ field }) => (
 													<FormItem className='space-y-0 flex-1 max-w-md px-4'>
-														<Label className='font-normal'>Label</Label>
+														<Label className='font-normal'>
+															Label<span className='ml-[0.2rem] text-red-800'>*</span>
+														</Label>
 														<FormControl>
 															<Input {...field} />
 														</FormControl>
@@ -945,7 +962,9 @@ function ContentEditor({
 												name={`screens.${screenIndex}.children.${index}.label`}
 												render={({ field }) => (
 													<FormItem className='space-y-0 flex-1 max-w-md px-4'>
-														<Label className='font-normal'>Label</Label>
+														<Label className='font-normal'>
+															Label<span className='ml-[0.2rem] text-red-800'>*</span>
+														</Label>
 														<FormControl>
 															<Input {...field} />
 														</FormControl>

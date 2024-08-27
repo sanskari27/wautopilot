@@ -104,7 +104,9 @@ export default function AssignTaskDialog({
 					/>
 				</div>
 				<div>
-					<p>Due Date</p>
+					<p>
+						Due Date<span className='ml-[0.2rem] text-red-800'>*</span>
+					</p>
 					<Input
 						value={selectedDate}
 						onChange={(e) => setSelectedDate(e.target.value)}

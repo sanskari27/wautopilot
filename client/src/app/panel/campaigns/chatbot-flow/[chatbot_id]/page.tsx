@@ -243,7 +243,9 @@ export default function CreateChatbotFlow() {
 							name='name'
 							render={({ field }) => (
 								<FormItem className='space-y-0 flex-1'>
-									<FormLabel>Name</FormLabel>
+									<FormLabel>
+										Name<span className='ml-[0.2rem] text-red-800'>*</span>
+									</FormLabel>
 									<FormControl>
 										<Input placeholder='eg. Fanfest' {...field} />
 									</FormControl>
@@ -302,7 +304,9 @@ export default function CreateChatbotFlow() {
 							name='options'
 							render={({ field }) => (
 								<FormItem className='space-y-0 flex-1'>
-									<FormLabel>Conditions</FormLabel>
+									<FormLabel>
+										Conditions<span className='ml-[0.2rem] text-red-800'>*</span>
+									</FormLabel>
 									<FormControl>
 										<Select value={field.value} onValueChange={field.onChange}>
 											<SelectTrigger>
@@ -601,7 +605,9 @@ export default function CreateChatbotFlow() {
 																}
 															>
 																<div className='flex items-center gap-6'>
-																	<p className='font-medium'>Header Media:- </p>
+																	<p className='font-medium'>
+																		Header Media<span className='mr-[0.2rem] text-red-800'>*</span>:{' '}
+																	</p>
 																	<MediaSelectorDialog
 																		singleSelect
 																		selectedValue={
@@ -632,7 +638,10 @@ export default function CreateChatbotFlow() {
 																	items={nurturing[index].template_body}
 																	render={(item, idx) => (
 																		<div className='flex flex-col'>
-																			<FormLabel>Variable value {idx + 1}</FormLabel>
+																			<FormLabel>
+																				Variable value {idx + 1}
+																				<span className='ml-[0.2rem] text-red-800'>*</span>
+																			</FormLabel>
 																			<div className='flex gap-3 flex-col md:flex-row'>
 																				<FormField
 																					control={form.control}

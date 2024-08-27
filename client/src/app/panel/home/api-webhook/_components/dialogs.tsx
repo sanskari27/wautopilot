@@ -87,9 +87,13 @@ export function CreateAPIKeyDialog() {
 				<DialogContent>
 					<DialogHeader>Create API key</DialogHeader>
 					<div className='grid space-y-1'>
-						<Label className='mb-0'>Name</Label>
+						<Label className='mb-0'>
+							Name<span className='ml-[0.2rem] text-red-800'>*</span>
+						</Label>
 						<Input value={name} onChange={(e) => setName(e.target.value)} placeholder='Name' />
-						<Label className='mb-0'>Device</Label>
+						<Label className='mb-0'>
+							Device<span className='ml-[0.2rem] text-red-800'>*</span>
+						</Label>
 						<Combobox
 							placeholder='Select device'
 							value={selectedDevice}
@@ -194,9 +198,13 @@ export function CreateWebhookDialog() {
 			<DialogContent>
 				<DialogHeader>Create Webhook</DialogHeader>
 				<div className='grid space-y-1'>
-					<Label className='mb-0'>Name</Label>
+					<Label className='mb-0'>
+						Name<span className='ml-[0.2rem] text-red-800'>*</span>
+					</Label>
 					<Input value={name} onChange={(e) => setName(e.target.value)} placeholder='Name' />
-					<Label className='mb-0'>Device</Label>
+					<Label className='mb-0'>
+						Device<span className='ml-[0.2rem] text-red-800'>*</span>
+					</Label>
 					<Combobox
 						placeholder='Select device'
 						value={selectedDevice}
@@ -206,7 +214,9 @@ export function CreateWebhookDialog() {
 						}))}
 						onChange={setSelectedDevice}
 					/>
-					<Label className='mb-0'>URL</Label>
+					<Label className='mb-0'>
+						URL<span className='ml-[0.2rem] text-red-800'>*</span>
+					</Label>
 					<Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder='URL' />
 				</div>
 				<DialogFooter>

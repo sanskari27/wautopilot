@@ -9,6 +9,7 @@ import {
 	DialogHeader,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { parseToObject } from '@/lib/utils';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -86,7 +87,9 @@ function FAQDetails({
 		<Dialog open={true} onOpenChange={(value) => !value && onClose()}>
 			<DialogContent>
 				<DialogHeader>FAQ Details</DialogHeader>
-				<div>Title</div>
+				<Label>
+					Title<span className='ml-[0.2rem] text-red-800'>*</span>
+				</Label>
 				<Input
 					value={details.title}
 					onChange={(e) =>
@@ -98,7 +101,9 @@ function FAQDetails({
 						})
 					}
 				/>
-				<div>Info</div>
+				<Label>
+					Info<span className='ml-[0.2rem] text-red-800'>*</span>
+				</Label>
 				<Input
 					value={details.info}
 					onChange={(e) =>
@@ -227,7 +232,9 @@ function TestimonialDetails({
 		<Dialog open={true} onOpenChange={(value) => !value && onClose()}>
 			<DialogContent>
 				<DialogHeader>Testimonial Details</DialogHeader>
-				<div>Title</div>
+				<Label>
+					Title<span className='ml-[0.2rem] text-red-800'>*</span>
+				</Label>
 				<Input
 					placeholder='eg. Love it...'
 					value={details.title}
@@ -240,7 +247,9 @@ function TestimonialDetails({
 						})
 					}
 				/>
-				<div>Name</div>
+				<Label>
+					Name<span className='ml-[0.2rem] text-red-800'>*</span>
+				</Label>
 				<Input
 					placeholder='eg. John Doe'
 					value={details.name}
@@ -253,7 +262,10 @@ function TestimonialDetails({
 						})
 					}
 				/>
-				<p>Description ({details.description.length} words)</p>
+				<Label>
+					Description ({details.description.length} words)
+					<span className='ml-[0.2rem] text-red-800'>*</span>
+				</Label>
 				<Input
 					placeholder='eg. I love the product...'
 					value={details.description}

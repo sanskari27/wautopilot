@@ -127,7 +127,10 @@ export function UploadMedia() {
 									'!cursor-pointer text-center border border-gray-400 border-dashed py-12 rounded-lg text-normal text-primary'
 								}
 							>
-								<>Drag and drop file here, or click to select file</>
+								<>
+									Drag and drop file here, or click to select file
+									<span className='ml-[0.2rem] text-red-800'>*</span>
+								</>
 							</Label>
 						)}
 						<Input
@@ -140,7 +143,7 @@ export function UploadMedia() {
 					</div>
 					<div className='grid gap-2'>
 						<Label className='text-primary' htmlFor='name'>
-							Filename
+							Filename<span className='ml-[0.2rem] text-red-800'>*</span>
 						</Label>
 						<Input
 							id='name'

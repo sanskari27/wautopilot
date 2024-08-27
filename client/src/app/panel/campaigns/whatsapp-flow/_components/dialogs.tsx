@@ -10,6 +10,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -106,9 +107,19 @@ function WhatsappFlowDetails({
 					<DialogTitle className='text-center'>Whatsapp flow details</DialogTitle>
 				</DialogHeader>
 				<div className='grid gird-cols-1 gap-4'>
+					<Label>
+						Title<span className='ml-[0.2rem] text-red-800'>*</span>
+					</Label>
 					<div>
-						<Input placeholder='Title' value={name} onChange={(e) => setName(e.target.value)} />
+						<Input
+							placeholder='eg. Survey'
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+						/>
 					</div>
+					<Label>
+						Category<span className='ml-[0.2rem] text-red-800'>*</span>
+					</Label>
 					<ComboboxMultiselect
 						items={Categories.map((category) => ({
 							value: category,
