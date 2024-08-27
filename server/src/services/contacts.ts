@@ -65,6 +65,13 @@ export default class ContactService extends UserService {
 		return processContactDocs(records);
 	}
 
+	public async totalContacts(): Promise<number> {
+		const records = await ContactDB.count({
+			linked_to: this.userId,
+		});
+		return records;
+	}
+
 	public async totalRecords(labels: string[] = []): Promise<number> {
 		const records = await ContactDB.count({
 			linked_to: this.userId,

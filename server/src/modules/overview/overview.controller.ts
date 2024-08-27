@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Cookie } from '../../config/const';
 import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
+import ContactService from '../../services/contacts';
 import ConversationService from '../../services/conversation';
 import MediaService from '../../services/media';
 import PhoneBookService from '../../services/phonebook';
@@ -16,6 +17,7 @@ async function dashboardDetails(req: Request, res: Response, next: NextFunction)
 
 	try {
 		const phoneBook = new PhoneBookService(account);
+		const contactService = new ContactService(account);
 
 		if (!device_id) {
 			return Respond({
@@ -27,6 +29,7 @@ async function dashboardDetails(req: Request, res: Response, next: NextFunction)
 					health: 'N/A',
 					messages: [],
 					phoneRecords: await phoneBook.totalRecords(),
+					contacts: await contactService.totalContacts(),
 					mediaSize: 0,
 				},
 			});
@@ -51,6 +54,7 @@ async function dashboardDetails(req: Request, res: Response, next: NextFunction)
 				health: await whatsappLink.fetchMessageHealth(),
 				messages: await conversation.dailySentMessages(),
 				phoneRecords: await phoneBook.totalRecords(),
+				contacts: await contactService.totalContacts(),
 				mediaSize: await media.totalMediaStorage(),
 			},
 		});
