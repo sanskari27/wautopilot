@@ -19,16 +19,21 @@ function processConversationDocs(
 		labels: string[];
 	})[]
 ) {
-	return docs.map((doc) => ({
-		id: doc._id,
-		recipient: doc.recipient,
-		profile_name: doc.profile_name ?? '',
-		labels: doc.labels ?? [],
-		last_message_at: doc.last_message_at,
-		pinned: doc.pinned,
-		archived: doc.archived,
-		unreadCount: doc.unreadCount,
-	}));
+	return docs.map((doc) => {
+		const last_message_at = DateUtils.getMoment(doc.last_message_at);
+		const expiresAt = DateUtils.getMoment(doc.last_message_at).add(24, 'hours').fromNow();
+		return {
+			id: doc._id,
+			recipient: doc.recipient,
+			profile_name: doc.profile_name ?? '',
+			labels: doc.labels ?? [],
+			last_message_at: last_message_at.fromNow(),
+			active: !expiresAt.includes('ago'),
+			pinned: doc.pinned,
+			archived: doc.archived,
+			unreadCount: doc.unreadCount,
+		};
+	});
 }
 
 function processConversationMessages(docs: Partial<IConversationMessage>[]) {
@@ -263,10 +268,7 @@ export default class ConversationService extends WhatsappLinkService {
 			}
 		);
 
-		SocketServer.getInstance().markRead(
-			this.userId.toString(),
-			conversation_id.toString()
-		);
+		SocketServer.getInstance().markRead(this.userId.toString(), conversation_id.toString());
 	}
 
 	public async toggleConversationPin(conversation_id: Types.ObjectId) {

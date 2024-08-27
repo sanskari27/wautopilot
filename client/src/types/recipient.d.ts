@@ -7,6 +7,7 @@ export type Recipient = {
 	pinned: boolean;
 	archived: boolean;
 	last_message_at: string;
+	active: boolean;
 };
 
 export type Message = {

@@ -1,8 +1,9 @@
 import api from '@/lib/api';
 import { Contact } from '@/schema/phonebook';
+import { Recipient } from '@/types/recipient';
 
 export default class MessagesService {
-	static async fetchAllConversation(label_filter: string[] = []) {
+	static async fetchAllConversation(label_filter: string[] = []): Promise<Recipient[]> {
 		try {
 			const { data } = await api.get(`/conversation`, {
 				params: {
@@ -18,6 +19,8 @@ export default class MessagesService {
 					archived: conversation.archived ?? false,
 					pinned: conversation.pinned ?? false,
 					unreadCount: conversation.unreadCount ?? 0,
+					last_message_at: conversation.last_message_at ?? '',
+					active: conversation.active ?? false,
 				};
 			});
 		} catch (err) {

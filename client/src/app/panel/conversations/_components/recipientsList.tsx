@@ -26,6 +26,7 @@ export default function RecipientsList() {
 		showUnread,
 		toggleShowArchived,
 		toggleShowUnread,
+		selected_recipient,
 	} = useRecipient();
 
 	const handleRecipientClick = (item: TRecipient) => {
@@ -126,7 +127,7 @@ export default function RecipientsList() {
 								<Recipient
 									onClick={handleRecipientClick}
 									recipient={item}
-									isActive={false}
+									isConversationOpen={selected_recipient?.id === item.id}
 									isSelected={selectedConversations.includes(item.id)}
 								/>
 							)}
@@ -138,6 +139,7 @@ export default function RecipientsList() {
 								<Recipient
 									onClick={handleRecipientClick}
 									recipient={item}
+									isConversationOpen={selected_recipient?.id === item.id}
 									isSelected={selectedConversations.includes(item.id)}
 								/>
 							)}
