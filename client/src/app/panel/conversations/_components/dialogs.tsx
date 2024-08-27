@@ -310,7 +310,9 @@ export function ConversationNoteDialog({
 			}}
 		>
 			<DialogContent className='max-w-sm md:max-w-lg lg:max-w-2xl'>
-				<DialogHeader>Conversation Note</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>Conversation Note</DialogTitle>
+				</DialogHeader>
 				<Textarea className='h-[300px]' value={notes} onChange={(e) => setNotes(e.target.value)} />
 				<DialogFooter>
 					<Button onClick={handleSave}>Save</Button>

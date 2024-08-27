@@ -4,7 +4,13 @@ import { useFields } from '@/components/context/tags';
 import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
 import TemplatePreview from '@/components/elements/template-preview';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/dialog';
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from '@/components/ui/dialog';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
@@ -60,7 +66,9 @@ export default function LeadsTemplateMessageDialog({
 	return (
 		<Dialog open={isOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
 			<DialogContent className='sm:max-w-[425px] md:max-w-3xl lg:max-w-6xl h-full overflow-y-auto'>
-				<DialogHeader>Leads Template Message</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>Leads Template Message</DialogTitle>
+				</DialogHeader>
 				<div className='flex flex-col lg:flex-row w-full justify-between gap-3'>
 					<div className='flex flex-col lg:w-[70%] w-full space-y-2'>
 						<p

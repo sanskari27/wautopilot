@@ -9,6 +9,7 @@ import {
 	DialogDescription,
 	DialogFooter,
 	DialogHeader,
+	DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
@@ -53,7 +54,9 @@ export function ExtendExpiryDialog() {
 			}}
 		>
 			<DialogContent>
-				<DialogHeader>Extend Expiry</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>Extend Expiry</DialogTitle>
+				</DialogHeader>
 				<DialogDescription>
 					Are you sure? You can{'&apos'}t undo this action afterwards.
 				</DialogDescription>
@@ -123,7 +126,9 @@ export function MarkupPriceDialog() {
 			}}
 		>
 			<DialogContent>
-				<DialogHeader>Set Markup Price</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>Set Markup Price</DialogTitle>
+				</DialogHeader>
 				<Input
 					placeholder='Enter Markup Price'
 					value={markupPrice}
@@ -173,7 +178,9 @@ export function UpgradePlanDialog() {
 			}}
 		>
 			<DialogContent>
-				<DialogHeader>Upgrade plan</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>Upgrade plan</DialogTitle>
+				</DialogHeader>
 				<Select value={plan} onValueChange={(value) => setPlan(value)}>
 					<SelectTrigger>
 						<SelectValue placeholder='Select Plan' />

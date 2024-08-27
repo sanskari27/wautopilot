@@ -3,7 +3,13 @@
 import Show from '@/components/containers/show';
 import { useUserDetails, useUserDetailsSetter } from '@/components/context/user-details';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/dialog';
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AuthService from '@/services/auth.service';
@@ -93,7 +99,9 @@ export function SettingsForm({ onClose }: { onClose: () => void }) {
 	return (
 		<Dialog open={true} onOpenChange={(value) => !value && onClose()}>
 			<DialogContent>
-				<DialogHeader>Settings</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>Settings</DialogTitle>
+				</DialogHeader>
 				<Tabs defaultValue='profile' className='w-full'>
 					<TabsList className='grid w-full grid-cols-2'>
 						<TabsTrigger value='profile'>Profile</TabsTrigger>

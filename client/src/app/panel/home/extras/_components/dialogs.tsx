@@ -7,6 +7,7 @@ import {
 	DialogContent,
 	DialogFooter,
 	DialogHeader,
+	DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -86,7 +87,9 @@ function FAQDetails({
 	return (
 		<Dialog open={true} onOpenChange={(value) => !value && onClose()}>
 			<DialogContent>
-				<DialogHeader>FAQ Details</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>FAQ Details</DialogTitle>
+				</DialogHeader>
 				<Label>
 					Title<span className='ml-[0.2rem] text-red-800'>*</span>
 				</Label>
@@ -231,7 +234,9 @@ function TestimonialDetails({
 	return (
 		<Dialog open={true} onOpenChange={(value) => !value && onClose()}>
 			<DialogContent>
-				<DialogHeader>Testimonial Details</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>Testimonial Details</DialogTitle>
+				</DialogHeader>
 				<Label>
 					Title<span className='ml-[0.2rem] text-red-800'>*</span>
 				</Label>

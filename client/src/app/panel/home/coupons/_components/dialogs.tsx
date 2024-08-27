@@ -8,6 +8,7 @@ import {
 	DialogContent,
 	DialogFooter,
 	DialogHeader,
+	DialogTitle,
 } from '@/components/ui/dialog';
 import {
 	Form,
@@ -121,7 +122,9 @@ export function CouponDetails({
 			}}
 		>
 			<DialogContent>
-				<DialogHeader>Coupon Details</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>Coupon Details</DialogTitle>
+				</DialogHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)}>
 						<FormField

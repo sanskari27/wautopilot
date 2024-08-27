@@ -8,6 +8,7 @@ import {
 	DialogContent,
 	DialogFooter,
 	DialogHeader,
+	DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -85,7 +86,9 @@ export function CreateAPIKeyDialog() {
 				}}
 			>
 				<DialogContent>
-					<DialogHeader>Create API key</DialogHeader>
+					<DialogHeader>
+						<DialogTitle>Create API key</DialogTitle>
+					</DialogHeader>
 					<div className='grid space-y-1'>
 						<Label className='mb-0'>
 							Name<span className='ml-[0.2rem] text-red-800'>*</span>
@@ -122,7 +125,9 @@ export function CreateAPIKeyDialog() {
 			}}
 		>
 			<DialogContent>
-				<DialogHeader>Token</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>Token</DialogTitle>
+				</DialogHeader>
 				<div className='flex gap-2'>
 					<div className='flex-1'>
 						<Input value={token} readOnly placeholder='Token' />
@@ -196,7 +201,9 @@ export function CreateWebhookDialog() {
 			}}
 		>
 			<DialogContent>
-				<DialogHeader>Create Webhook</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>Create Webhook</DialogTitle>
+				</DialogHeader>
 				<div className='grid space-y-1'>
 					<Label className='mb-0'>
 						Name<span className='ml-[0.2rem] text-red-800'>*</span>

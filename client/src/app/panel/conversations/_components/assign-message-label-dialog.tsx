@@ -9,6 +9,7 @@ import {
 	DialogContent,
 	DialogFooter,
 	DialogHeader,
+	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -104,7 +105,9 @@ export default function AssignMessageLabelDialog({
 				{children}
 			</DialogTrigger>
 			<DialogContent>
-				<DialogHeader>Assign Tags</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>Assign Tags</DialogTitle>
+				</DialogHeader>
 				<div className='flex flex-wrap border-2 p-2 rounded-lg'>
 					<Each
 						items={selectedTags}
