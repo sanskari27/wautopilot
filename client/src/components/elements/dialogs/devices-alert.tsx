@@ -34,7 +34,7 @@ export default function DevicesAlertDialog() {
 					<DialogClose asChild>
 						<Button variant={'destructive'}>Close</Button>
 					</DialogClose>
-					<Button>Add Device</Button>
+					{/* <Button>Add Device</Button> */}
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

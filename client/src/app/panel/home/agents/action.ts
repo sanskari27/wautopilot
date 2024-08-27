@@ -7,7 +7,7 @@ import { redirect, RedirectType } from 'next/navigation';
 
 export async function switchServiceAccount(id: string) {
 	const status = await AuthService.serviceAccount(id);
-	if (status) {
+	if (status !== undefined && status !== null) {
 		redirect('/agent/home/dashboard', RedirectType.replace);
 	}
 }

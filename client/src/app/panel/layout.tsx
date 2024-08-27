@@ -12,7 +12,7 @@ import AuthService from '@/services/auth.service';
 import PhoneBookService from '@/services/phonebook.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import DevicesAlertDialog from '../devices-alert';
+import DevicesAlertDialog from '../../components/elements/dialogs/devices-alert';
 
 export const dynamic = 'force-dynamic';
 
