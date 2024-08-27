@@ -53,7 +53,7 @@ export default function DevicesDialog() {
 }
 
 function DevicesList() {
-	const { isAgent } = useUserDetails();
+	const { isAgent, max_devices } = useUserDetails();
 	const router = useRouter();
 	const pathname = usePathname();
 	const [devices, setDevices] = useState<Device[]>([]);
@@ -169,7 +169,7 @@ function DevicesList() {
 					>
 						Close
 					</Button>
-					<Show.ShowIf condition={!isAgent}>
+					<Show.ShowIf condition={!isAgent && max_devices > devices.length}>
 						<Button onClick={openAddDevices}>Add Device</Button>
 					</Show.ShowIf>
 				</DialogFooter>
