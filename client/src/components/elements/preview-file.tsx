@@ -34,7 +34,12 @@ export default function PreviewFile({
 	} else if (data.type === 'video') {
 		return (
 			<div>
-				<video style={{ borderRadius: '0.75rem' }} controls autoPlay={false} muted>
+				<video
+					style={{ borderRadius: '0.75rem', aspectRatio: 1 / 1 }}
+					controls
+					autoPlay={false}
+					muted
+				>
 					<source src={data.url} type='video/mp4' />
 				</video>
 			</div>
@@ -47,6 +52,7 @@ export default function PreviewFile({
 					type='application/pdf'
 					width='100%'
 					height='100%'
+					style={{ borderRadius: '0.75rem', aspectRatio: 1 / 1 }}
 				/>
 			</div>
 		);

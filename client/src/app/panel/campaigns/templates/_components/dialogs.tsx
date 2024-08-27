@@ -53,7 +53,7 @@ export function AddQuickReply({
 							className='h-48'
 							value={text}
 							placeholder='enter preferred text'
-							onChange={(e) => setText(e.target.value)}
+							onChange={(e) => setText(e.target.value.substring(0, 25))}
 						/>
 					</div>
 				</div>
