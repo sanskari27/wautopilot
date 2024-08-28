@@ -838,7 +838,7 @@ function ContentEditor({
 															e.stopPropagation();
 															form.setValue(
 																`screens.${screenIndex}.children.${index}.data-source`,
-																[...content['data-source'], '']
+																[...content['data-source'], `Option ${content['data-source'].length + 1}`]
 															);
 														}}
 													>
