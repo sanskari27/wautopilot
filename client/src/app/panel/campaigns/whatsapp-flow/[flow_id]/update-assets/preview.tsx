@@ -163,22 +163,16 @@ export default function PreviewFlowContents({
 																	<SelectValue placeholder={content.label} />
 																</SelectTrigger>
 																<SelectContent>
-																	{content['data-source'].map((option, index) => {
-																		console.log(option)
-																		return (
-																			<SelectItem
-																				key={index}
-																				value={
-																					option.trim() === ''
-																						? `Option ${index + 1}`
-																						: option.trim()
-																				}
-																			>
-																				{option.trim() === ''
-																					? `Option ${index + 1}`
-																					: option.trim()}
-																			</SelectItem>
-																		);})}
+																	{content['data-source'].map((option, index) => (
+																		<SelectItem
+																			key={index}
+																			value={
+																				option.trim() === '' ? `Option ${index + 1}` : option.trim()
+																			}
+																		>
+																			{option.trim() === '' ? `Option ${index + 1}` : option.trim()}
+																		</SelectItem>
+																	))}
 																</SelectContent>
 															</Select>
 														</div>
