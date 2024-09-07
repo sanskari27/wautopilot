@@ -195,6 +195,14 @@ export default function ContentsForm({
 		});
 	}
 
+	const validationResult = whatsappFlowSchema.safeParse(form.getValues());
+
+	const errors = !validationResult.success ? validationResult.error.errors : [];
+
+	console.log(errors);
+
+	const customErrorMessage = errors.find((error) => error.code === 'custom')?.message ?? '';
+
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
 			<Form {...form}>
@@ -387,13 +395,24 @@ export default function ContentsForm({
 							<div className='flex-1 min-w-[500px]'>
 								<div className='w-[500px] border-dashed border border-gray-400 p-4 rounded-2xl'>
 									<Show.ShowIf condition={screens.length > 0}>
-										<ContentEditor screenIndex={currentScreen} form={form} />
+										<ContentEditor
+											customErrorMessage={customErrorMessage}
+											screenIndex={currentScreen}
+											form={form}
+										/>
 									</Show.ShowIf>
 								</div>
 							</div>
 						</div>
 						<div className='max-w-md w-full'>
 							<PreviewFlowContentsWrapper form={form} index={currentScreen} />
+							<Button
+								className='mt-4 w-full'
+								type='submit'
+								disabled={!form.formState.isValid || !editable}
+							>
+								Save
+							</Button>
 						</div>
 					</div>
 				</form>
@@ -405,7 +424,9 @@ export default function ContentsForm({
 function ContentEditor({
 	screenIndex,
 	form,
+	customErrorMessage,
 }: {
+	customErrorMessage: string;
 	screenIndex: number;
 	form: UseFormReturn<TWhatsappFlow>;
 }) {
@@ -568,6 +589,13 @@ function ContentEditor({
 															/>
 														</FormControl>
 														<FormMessage />
+														{customErrorMessage.startsWith(`${field.value} `) ? (
+															<p className='text-sm font-medium text-destructive'>
+																{customErrorMessage}
+															</p>
+														) : (
+															<FormMessage />
+														)}
 													</FormItem>
 												)}
 											/>
@@ -664,7 +692,13 @@ function ContentEditor({
 																}}
 															/>
 														</FormControl>
-														<FormMessage />
+														{customErrorMessage.startsWith(`${field.value} `) ? (
+															<p className='text-sm font-medium text-destructive'>
+																{customErrorMessage}
+															</p>
+														) : (
+															<FormMessage />
+														)}
 													</FormItem>
 												)}
 											/>
@@ -769,7 +803,13 @@ function ContentEditor({
 																}}
 															/>
 														</FormControl>
-														<FormMessage />
+														{customErrorMessage.startsWith(`${field.value} `) ? (
+															<p className='text-sm font-medium text-destructive'>
+																{customErrorMessage}
+															</p>
+														) : (
+															<FormMessage />
+														)}
 													</FormItem>
 												)}
 											/>
@@ -838,7 +878,10 @@ function ContentEditor({
 															e.stopPropagation();
 															form.setValue(
 																`screens.${screenIndex}.children.${index}.data-source`,
-																[...content['data-source'], `Option ${content['data-source'].length + 1}`]
+																[
+																	...content['data-source'],
+																	`Option ${content['data-source'].length + 1}`,
+																]
 															);
 														}}
 													>

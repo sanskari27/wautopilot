@@ -92,7 +92,37 @@ const whatsappFlowValidator = z.object({
 		.array(
 			z.object({
 				title: z.string().min(1, 'Minimum 1 character required').default("Screen's title"),
-				children: z.array(types).min(1),
+				children: z
+					.array(types)
+					.min(1)
+					.superRefine((values, ctx) => {
+						const set = new Set();
+						for (let i = 0; i < values.length; i++) {
+							const value = values[i];
+
+							if (
+								[
+									'Footer',
+									'TextBody',
+									'TextCaption',
+									'TextSubheading',
+									'TextHeading',
+									'Image',
+								].includes(values[i].type)
+							) {
+								continue;
+							}
+							if ('name' in value && set.has(value.name)) {
+								ctx.addIssue({
+									code: z.ZodIssueCode.custom,
+									message: `${value.name} is already used`,
+								});
+							}
+							if ('name' in value) {
+								set.add(value.name);
+							}
+						}
+					}),
 			})
 		)
 		.min(1)
