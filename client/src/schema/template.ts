@@ -1,3 +1,4 @@
+import { countOccurrences } from '@/lib/utils';
 import { z } from 'zod';
 
 const headerSchema = z.object({
@@ -14,10 +15,10 @@ const headerSchema = z.object({
 
 const bodySchema = z.object({
 	type: z.literal('BODY'),
-	text: z.string(),
+	text: z.string().trim(),
 	example: z
 		.object({
-			body_text: z.array(z.array(z.string())),
+			body_text: z.array(z.array(z.string().trim())),
 		})
 		.optional(),
 });
@@ -56,7 +57,22 @@ export const templateSchema = z.object({
 	category: z.enum(['MARKETING', 'UTILITY']),
 	allow_category_change: z.boolean().default(true),
 	language: z.string().default('en_US'),
-	components: z.array(componentSchema),
+	components: z.array(componentSchema).refine((values) => {
+		const body = values.find((v) => v.type === 'BODY');
+		if (!body) {
+			return false;
+		}
+		const bodyVariablesCount = countOccurrences(body?.text ?? '');
+		if (bodyVariablesCount !== body.example?.body_text[0].length) {
+			return false;
+		}
+		for (let i = 0; i < bodyVariablesCount; i++) {
+			if (body.example?.body_text[0][i].length === 0) {
+				return false;
+			}
+		}
+		return true;
+	}),
 });
 
 export type Template = z.infer<typeof templateSchema>;

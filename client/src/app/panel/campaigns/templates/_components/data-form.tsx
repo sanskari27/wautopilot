@@ -166,6 +166,8 @@ export default function DataForm({
 		addButton({ type: 'URL', ...payload });
 	}
 
+	const hasError = templateSchema.safeParse(form.getValues()).success === false;
+
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSave)} className='w-full space-y-2'>
@@ -374,32 +376,40 @@ export default function DataForm({
 										<span className='ml-[0.2rem] text-red-800'>*</span>
 									</FormLabel>
 									<FormDescription className='text-xs'>
-										eg. Dave; John; 1234567890 (Semi-colon separated) (
-										{(body?.example?.body_text?.[0] ?? []).length} of {bodyVariables} provided)
+										({body?.example?.body_text?.[0].filter((v) => v.trim().length > 0).length ?? 0}{' '}
+										of {bodyVariables} provided)
 									</FormDescription>
-									<FormControl>
-										<Input
-											placeholder='Example Values'
-											isInvalid={bodyVariables !== (body?.example?.body_text?.[0] ?? []).length}
-											value={(body?.example?.body_text?.[0] ?? []).join('; ')}
-											onChange={(e) => {
-												form.setValue(
-													'components',
-													components.map((component) => {
-														if (component.type === 'BODY') {
-															return {
-																...component,
-																example: {
-																	body_text: [e.target.value.split(';').map((t) => t.trim())],
-																},
-															};
-														}
-														return component;
-													})
-												);
-											}}
-										/>
-									</FormControl>
+									<Each
+										items={Array.from({ length: bodyVariables })}
+										render={(variable, index) => (
+											<FormControl>
+												<Input
+													key={index}
+													placeholder={`Example Value ${index + 1}`}
+													isInvalid={(body?.example?.body_text?.[0]?.[index] ?? '').length === 0}
+													value={(body?.example?.body_text?.[0] ?? [])[index]}
+													onChange={(e) => {
+														form.setValue(
+															'components',
+															components.map((component, idx) => {
+																if (component.type === 'BODY') {
+																	if (!component.example) {
+																		component.example = {
+																			body_text: [
+																				Array.from({ length: bodyVariables }).map(() => ''),
+																			],
+																		};
+																	}
+																	component.example.body_text[0][index] = e.target.value;
+																}
+																return component;
+															})
+														);
+													}}
+												/>
+											</FormControl>
+										)}
+									/>
 								</FormItem>
 							</Show.ShowIf>
 						</div>
@@ -475,7 +485,7 @@ export default function DataForm({
 					</div>
 					<div className='w-full lg:w-[30%] flex flex-col-reverse lg:flex-col justify-start items-start gap-3'>
 						<TemplatePreview components={components} />
-						<Button type='submit' className='w-[80%] mx-auto'>
+						<Button type='submit' className='w-[80%] mx-auto' disabled={hasError}>
 							Save
 						</Button>
 					</div>
