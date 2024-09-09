@@ -70,6 +70,7 @@ const tagsVariable = [
 	'{{email}}',
 	'{{birthday}}',
 	'{{anniversary}}',
+	'{{trigger}}',
 ];
 
 export default function CreateChatbotFlow() {

@@ -53,6 +53,17 @@ const tagsVariable = [
 	'{{email}}',
 	'{{birthday}}',
 	'{{anniversary}}',
+	'{{trigger}}',
+];
+
+const tagsVariableMessage = [
+	'{{first_name}}',
+	'{{last_name}}',
+	'{{middle_name}}',
+	'{{phone_number}}',
+	'{{email}}',
+	'{{birthday}}',
+	'{{anniversary}}',
 ];
 
 const DEFAULT_DATA: ChatBot = {
@@ -517,7 +528,7 @@ export default function ChatbotForm() {
 
 							<div className='flex flex-wrap gap-4 mt-4'>
 								<Each
-									items={tagsVariable}
+									items={tagsVariableMessage}
 									render={(tag) => (
 										<Badge className='cursor-pointer' onClick={() => insertVariablesToMessage(tag)}>
 											{tag}
