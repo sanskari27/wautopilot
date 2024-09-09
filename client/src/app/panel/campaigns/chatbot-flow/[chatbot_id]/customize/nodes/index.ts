@@ -5,6 +5,7 @@ export { default as DocumentNode } from './DocumentNode';
 export { default as EndNode } from './EndNode';
 export { default as ImageNode } from './ImageNode';
 export { default as ListNode } from './ListNode';
+export { default as LocationRequestNode } from './LocationRequestNode';
 export { default as StartNode } from './StartNode';
 export { default as TextNode } from './TextNode';
 export { default as VideoNode } from './VideoNode';

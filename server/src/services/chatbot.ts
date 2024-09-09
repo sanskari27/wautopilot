@@ -98,6 +98,7 @@ type CreateFlowData = {
 			| 'listNode'
 			| 'flowNode'
 			| 'contactNode'
+			| 'locationRequestNode'
 			| 'endNode';
 		id: string;
 		position: {
@@ -1025,6 +1026,24 @@ export default class ChatBotService extends WhatsappLinkService {
 									screen: details[0].id,
 								},
 							},
+						},
+					},
+				};
+				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+			} catch (err) {}
+		} else if (node.node_type === 'locationRequestNode') {
+			try {
+				const msgObj = {
+					messaging_product: 'whatsapp',
+					to: recipient,
+					type: 'interactive',
+					interactive: {
+						type: 'location_request_message',
+						body: {
+							text: node.data.label,
+						},
+						action: {
+							name: 'send_location',
 						},
 					},
 				};

@@ -69,6 +69,7 @@ export type CreateFlowValidationResult = {
 			| 'listNode'
 			| 'flowNode'
 			| 'contactNode'
+			| 'locationRequestNode'
 			| 'endNode';
 		id: string;
 		position: {
@@ -312,6 +313,7 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 						'listNode',
 						'flowNode',
 						'contactNode',
+						'locationRequestNode',
 						'endNode',
 					]),
 				})
@@ -427,6 +429,7 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 						'listNode',
 						'flowNode',
 						'contactNode',
+						'locationRequestNode',
 						'endNode',
 					]),
 				})

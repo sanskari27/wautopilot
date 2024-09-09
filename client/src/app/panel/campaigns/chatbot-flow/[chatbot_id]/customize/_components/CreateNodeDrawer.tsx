@@ -18,10 +18,12 @@ import {
 	DocumentMessage,
 	ImageMessage,
 	ListMessage,
+	LocationRequestMessage,
 	TextMessage,
 	VideoMessage,
 	WhatsappFlowMessage,
 } from '../message';
+import ContactMessage from '../message/ContactMessage';
 import {
 	ButtonNodeDetails,
 	ContactNodeDetails,
@@ -29,10 +31,10 @@ import {
 	EndNodeDetails,
 	FlowNodeDetails,
 	ListNodeDetails,
+	LocationRequestNodeDetails,
 	StartNodeDetails,
 	TextNodeDetails,
 } from './RenderFlow';
-import ContactMessage from '../message/ContactMessage';
 
 type Props = {
 	addNode: (
@@ -44,6 +46,7 @@ type Props = {
 			| ListNodeDetails
 			| FlowNodeDetails
 			| ContactNodeDetails
+			| LocationRequestNodeDetails
 			| EndNodeDetails
 	) => void;
 };
@@ -115,6 +118,13 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 		addNode({
 			type: 'WHATSAPP_FLOW',
 			data: details,
+		});
+	};
+
+	const handleLocationRequestMessage = (body: string) => {
+		addNode({
+			type: 'LOCATION_REQUEST',
+			data: body,
 		});
 	};
 
@@ -230,6 +240,15 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 								className={'bg-indigo-500'}
 							/>
 						</WhatsappFlowMessage>
+
+						<LocationRequestMessage onLocationRequestMessageAdded={handleLocationRequestMessage}>
+							<MessageType
+								body={'Location Request Message'}
+								icon={<MdContactPage size={'1.25rem'} />}
+								className={'bg-orange-500'}
+							/>
+						</LocationRequestMessage>
+
 						<MessageType
 							body={'End Flow'}
 							icon={<FaPause size={'1.25rem'} />}

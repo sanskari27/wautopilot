@@ -31,6 +31,7 @@ import {
 	EndNode,
 	ImageNode,
 	ListNode,
+	LocationRequestNode,
 	StartNode,
 	TextNode,
 	VideoNode,
@@ -98,6 +99,10 @@ export type FlowNodeDetails = {
 		button_text: string;
 	};
 };
+export type LocationRequestNodeDetails = {
+	type: 'LOCATION_REQUEST';
+	data: string;
+};
 
 const nodeTypes = {
 	startNode: StartNode,
@@ -110,6 +115,7 @@ const nodeTypes = {
 	listNode: ListNode,
 	flowNode: WaFlowNode,
 	contactNode: ContactNode,
+	locationRequestNode: LocationRequestNode,
 	endNode: EndNode,
 };
 
@@ -135,6 +141,7 @@ export default function RenderFlow({
 			| ListNodeDetails
 			| FlowNodeDetails
 			| ContactNodeDetails
+			| LocationRequestNodeDetails
 			| EndNodeDetails
 	) => {
 		const node: Node = {
@@ -183,6 +190,9 @@ export default function RenderFlow({
 		} else if (details.type === 'CONTACT') {
 			node.type = 'contactNode';
 			node.data = details.data;
+		} else if (details.type === 'LOCATION_REQUEST') {
+			node.type = 'locationRequestNode';
+			node.data = { label: details.data };
 		} else if (details.type === 'END') {
 			node.type = 'endNode';
 			const endNodeExists = nodes.some((n) => n.type === 'endNode');
