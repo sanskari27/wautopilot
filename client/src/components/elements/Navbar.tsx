@@ -149,6 +149,11 @@ const HomeNavbar = () => {
 										How it works
 									</Link>
 								</li>
+								<li className={`relative cursor-pointer font-medium`}>
+									<Link href='/docs-apiwebhook' className='hover:text-slate-300'>
+										Developer Docs
+									</Link>
+								</li>
 								{/* <li className={`relative cursor-pointer font-medium`}>
 									<Link href='/#faq' className='hover:text-slate-300'>FAQ</Link>
 								</li> */}

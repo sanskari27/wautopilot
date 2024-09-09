@@ -136,6 +136,7 @@ const MenubarLink = React.forwardRef<
 			className
 		)}
 		{...props}
+		asChild
 	>
 		<Link href={href} className='flex w-full items-center '>
 			{children}
