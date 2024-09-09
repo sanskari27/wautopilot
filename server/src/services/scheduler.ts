@@ -271,6 +271,12 @@ export default class SchedulerService extends WhatsappLinkService {
 					prev_id: msg._id,
 					new_id: addedMessage._id,
 				});
+			} else if (addedMessage && msg.scheduler_type === ChatBotFlowDB_name) {
+				ChatBotService.updateMessageId(msg.scheduler_id, {
+					prev_id: msg._id,
+					new_id: addedMessage._id,
+					meta_message_id: message_id,
+				});
 			}
 			msg.remove();
 		});
