@@ -60,14 +60,21 @@ export const templateSchema = z.object({
 	components: z.array(componentSchema).refine((values) => {
 		const body = values.find((v) => v.type === 'BODY');
 		if (!body) {
+			console.log('missing body');
+			return false;
+		}
+		if (body.text.length === 0) {
+			console.log('empty body text');
 			return false;
 		}
 		const bodyVariablesCount = countOccurrences(body?.text ?? '');
-		if (bodyVariablesCount !== body.example?.body_text[0].length) {
+		if (bodyVariablesCount !== (body.example?.body_text[0].length ?? 0)) {
+			console.log('body variables count mismatch', bodyVariablesCount, body.example?.body_text[0].length);
 			return false;
 		}
 		for (let i = 0; i < bodyVariablesCount; i++) {
 			if (body.example?.body_text[0][i].length === 0) {
+				console.log('empty body variable');
 				return false;
 			}
 		}

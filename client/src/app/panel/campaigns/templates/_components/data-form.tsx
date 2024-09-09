@@ -166,6 +166,42 @@ export default function DataForm({
 		addButton({ type: 'URL', ...payload });
 	}
 
+	function handleBodyTextChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+		if (e.target.value.length > 2000) return;
+		if (!body) {
+			form.setValue('components', [...components, { type: 'BODY', text: e.target.value }]);
+		} else {
+			form.setValue(
+				'components',
+				components.map((component) => {
+					if (component.type === 'BODY') {
+						return {
+							...component,
+							text: e.target.value,
+						};
+					}
+					return component;
+				})
+			);
+		}
+		const _bodyVariableCount = countOccurrences(e.target.value);
+		if (_bodyVariableCount === 0 && body?.example) {
+			form.setValue(
+				'components',
+				components.map((component) => {
+					if (component.type === 'BODY') {
+						delete component.example;
+						return {
+							...component,
+							text: e.target.value,
+						};
+					}
+					return component;
+				})
+			);
+		}
+	}
+
 	const hasError = templateSchema.safeParse(form.getValues()).success === false;
 
 	return (
@@ -343,28 +379,7 @@ export default function DataForm({
 										placeholder='Body Text'
 										value={body?.text ?? ''}
 										className='h-[300px]'
-										onChange={(e) => {
-											if (e.target.value.length > 2000) return;
-											if (!body) {
-												form.setValue('components', [
-													...components,
-													{ type: 'BODY', text: e.target.value },
-												]);
-											} else {
-												form.setValue(
-													'components',
-													components.map((component) => {
-														if (component.type === 'BODY') {
-															return {
-																...component,
-																text: e.target.value,
-															};
-														}
-														return component;
-													})
-												);
-											}
-										}}
+										onChange={handleBodyTextChange}
 									/>
 								</FormControl>
 							</FormItem>
@@ -387,7 +402,7 @@ export default function DataForm({
 													key={index}
 													placeholder={`Example Value ${index + 1}`}
 													isInvalid={(body?.example?.body_text?.[0]?.[index] ?? '').length === 0}
-													value={(body?.example?.body_text?.[0] ?? [])[index]}
+													value={(body?.example?.body_text?.[0] ?? [])[index] ?? ''}
 													onChange={(e) => {
 														form.setValue(
 															'components',

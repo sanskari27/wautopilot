@@ -168,11 +168,18 @@ export function CreateWebhookDialog() {
 
 	const handleSave = () => {
 		if (!name || !selectedDevice || !url) {
-			return toast.error('Please fill all fields');
+			toast.error('Please fill all fields');
+			return;
 		}
-		if (!Boolean(new URL(url))) {
-			return toast.error('Invalid URL');
+
+		// check if the url if in proper format
+		const urlRegex = new RegExp('^(https?|ftp)://[a-zA-Z0-9-.]+.[a-zA-Z]{2,}(:[0-9]+)?(/.*)?$');
+
+		if (!urlRegex.test(url)) {
+			toast.error('Please enter a valid URL');
+			return;
 		}
+
 		const promise = createWebhook(name, selectedDevice, url);
 
 		toast.promise(promise, {
