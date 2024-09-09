@@ -19,7 +19,7 @@ export default function FieldSearch() {
 	const loaded = useRef(false);
 	const router = useRouter();
 	const fieldsList = useFields();
-	const [fieldName, setFieldName] = useState('');
+	const [fieldName, setFieldName] = useState('all');
 	const [search, setSearch] = useState('');
 	const [fields, setFields] = useState<Fields>({});
 
