@@ -701,7 +701,8 @@ export default class ChatBotService extends WhatsappLinkService {
 				const custom_message = parseVariables(
 					bot.forward.message,
 					contact as unknown as Record<string, string>
-				);
+				).replace(`{{trigger}}`, text);
+
 				const msgObj = generateTextMessageObject(bot.forward.number, custom_message);
 				await schedulerService.schedule(bot.forward.number, msgObj, {
 					scheduler_id: bot._id,
@@ -726,7 +727,7 @@ export default class ChatBotService extends WhatsappLinkService {
 				const custom_message = parseVariables(
 					bot.forward.message,
 					contact as unknown as Record<string, string>
-				);
+				).replace(`{{trigger}}`, text);
 				const msgObj = generateTextMessageObject(bot.forward.number, custom_message);
 				await schedulerService.schedule(bot.forward.number, msgObj, {
 					scheduler_id: bot._id,
