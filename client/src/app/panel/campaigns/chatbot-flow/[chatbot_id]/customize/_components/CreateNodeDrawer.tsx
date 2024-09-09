@@ -9,7 +9,7 @@ import { ChevronsLeft } from 'lucide-react';
 import { FaGooglePlay, FaImage, FaListAlt, FaVideo } from 'react-icons/fa';
 import { FaPause } from 'react-icons/fa6';
 import { IoMdRadioButtonOn, IoMdText } from 'react-icons/io';
-import { IoDocumentText } from 'react-icons/io5';
+import { IoDocumentText, IoLocationSharp } from 'react-icons/io5';
 import { MdAudiotrack, MdContactPage } from 'react-icons/md';
 import { PiFlowArrowBold } from 'react-icons/pi';
 import {
@@ -233,22 +233,28 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 								className={'bg-gray-500'}
 							/>
 						</ListMessage>
-						<WhatsappFlowMessage onWhatsappFlowMessageAdded={handleWhatsappFlowMessage}>
+						<ContactMessage onContactAdded={handleContactElement}>
 							<MessageType
 								body={'Contact Message'}
-								icon={<PiFlowArrowBold size={'1.25rem'} />}
+								icon={<MdContactPage size={'1.25rem'} />}
 								className={'bg-indigo-500'}
 							/>
-						</WhatsappFlowMessage>
+						</ContactMessage>
 
 						<LocationRequestMessage onLocationRequestMessageAdded={handleLocationRequestMessage}>
 							<MessageType
 								body={'Location Request Message'}
-								icon={<MdContactPage size={'1.25rem'} />}
+								icon={<IoLocationSharp size={'1.25rem'} />}
 								className={'bg-orange-500'}
 							/>
 						</LocationRequestMessage>
-
+						<WhatsappFlowMessage onWhatsappFlowMessageAdded={handleWhatsappFlowMessage}>
+							<MessageType
+								body={'Whatsapp Flow Message'}
+								icon={<PiFlowArrowBold size={'1.25rem'} />}
+								className={'bg-indigo-500'}
+							/>
+						</WhatsappFlowMessage>
 						<MessageType
 							body={'End Flow'}
 							icon={<FaPause size={'1.25rem'} />}
