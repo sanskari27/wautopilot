@@ -987,6 +987,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					},
 				},
 			};
+			schedulerOptions.message_type = 'interactive';
 			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 		} else if (node.node_type === 'listNode') {
 			const msgObj = {
@@ -1002,6 +1003,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					},
 				},
 			};
+			schedulerOptions.message_type = 'interactive';
 			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 		} else if (node.node_type === 'flowNode') {
 			try {
@@ -1029,6 +1031,7 @@ export default class ChatBotService extends WhatsappLinkService {
 						},
 					},
 				};
+				schedulerOptions.message_type = 'interactive';
 				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 			} catch (err) {}
 		} else if (node.node_type === 'locationRequestNode') {
@@ -1047,6 +1050,7 @@ export default class ChatBotService extends WhatsappLinkService {
 						},
 					},
 				};
+				schedulerOptions.message_type = 'interactive';
 				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 			} catch (err) {}
 		} else {
