@@ -3,13 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import useBoolean from '@/hooks/useBoolean';
 import { cn } from '@/lib/utils';
+import { Contact } from '@/schema/phonebook';
 import { Panel } from '@xyflow/react';
 import { ChevronsLeft } from 'lucide-react';
 import { FaGooglePlay, FaImage, FaListAlt, FaVideo } from 'react-icons/fa';
 import { FaPause } from 'react-icons/fa6';
 import { IoMdRadioButtonOn, IoMdText } from 'react-icons/io';
 import { IoDocumentText } from 'react-icons/io5';
-import { MdAudiotrack } from 'react-icons/md';
+import { MdAudiotrack, MdContactPage } from 'react-icons/md';
 import { PiFlowArrowBold } from 'react-icons/pi';
 import {
 	AudioMessage,
@@ -23,6 +24,7 @@ import {
 } from '../message';
 import {
 	ButtonNodeDetails,
+	ContactNodeDetails,
 	DocumentNodeDetails,
 	EndNodeDetails,
 	FlowNodeDetails,
@@ -30,6 +32,7 @@ import {
 	StartNodeDetails,
 	TextNodeDetails,
 } from './RenderFlow';
+import ContactMessage from '../message/ContactMessage';
 
 type Props = {
 	addNode: (
@@ -40,6 +43,7 @@ type Props = {
 			| ButtonNodeDetails
 			| ListNodeDetails
 			| FlowNodeDetails
+			| ContactNodeDetails
 			| EndNodeDetails
 	) => void;
 };
@@ -111,6 +115,13 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 		addNode({
 			type: 'WHATSAPP_FLOW',
 			data: details,
+		});
+	};
+
+	const handleContactElement = (contact: Contact) => {
+		addNode({
+			type: 'CONTACT',
+			data: contact,
 		});
 	};
 
@@ -189,6 +200,14 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</DocumentMessage>
 
+						<ContactMessage onContactAdded={handleContactElement}>
+							<MessageType
+								body={'Contact Message'}
+								icon={<MdContactPage size={'1.25rem'} />}
+								className={'bg-lime-500'}
+							/>
+						</ContactMessage>
+
 						<ButtonMessage onButtonMessageAdded={handleButtonElement}>
 							<MessageType
 								body={'Button Message'}
@@ -206,7 +225,7 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 						</ListMessage>
 						<WhatsappFlowMessage onWhatsappFlowMessageAdded={handleWhatsappFlowMessage}>
 							<MessageType
-								body={'Whatsapp Flow Message'}
+								body={'Contact Message'}
 								icon={<PiFlowArrowBold size={'1.25rem'} />}
 								className={'bg-indigo-500'}
 							/>

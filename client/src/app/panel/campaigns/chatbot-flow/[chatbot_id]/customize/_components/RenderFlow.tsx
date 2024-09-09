@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { randomString } from '@/lib/utils';
+import { Contact } from '@/schema/phonebook';
 import {
 	Background,
 	BackgroundVariant,
@@ -25,6 +26,7 @@ import { updateNodesAndEdges } from '../../../action';
 import {
 	AudioNode,
 	ButtonNode,
+	ContactNode,
 	DocumentNode,
 	EndNode,
 	ImageNode,
@@ -45,6 +47,10 @@ export type EndNodeDetails = {
 export type TextNodeDetails = {
 	type: 'TEXT';
 	data: string;
+};
+export type ContactNodeDetails = {
+	type: 'CONTACT';
+	data: Contact;
 };
 export type DocumentNodeDetails = {
 	type: 'IMAGE' | 'AUDIO' | 'VIDEO' | 'DOCUMENT';
@@ -103,6 +109,7 @@ const nodeTypes = {
 	buttonNode: ButtonNode,
 	listNode: ListNode,
 	flowNode: WaFlowNode,
+	contactNode: ContactNode,
 	endNode: EndNode,
 };
 
@@ -127,6 +134,7 @@ export default function RenderFlow({
 			| ButtonNodeDetails
 			| ListNodeDetails
 			| FlowNodeDetails
+			| ContactNodeDetails
 			| EndNodeDetails
 	) => {
 		const node: Node = {
@@ -171,6 +179,9 @@ export default function RenderFlow({
 			node.data = details.data;
 		} else if (details.type === 'WHATSAPP_FLOW') {
 			node.type = 'flowNode';
+			node.data = details.data;
+		} else if (details.type === 'CONTACT') {
+			node.type = 'contactNode';
 			node.data = details.data;
 		} else if (details.type === 'END') {
 			node.type = 'endNode';

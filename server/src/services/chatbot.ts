@@ -97,6 +97,7 @@ type CreateFlowData = {
 			| 'buttonNode'
 			| 'listNode'
 			| 'flowNode'
+			| 'contactNode'
 			| 'endNode';
 		id: string;
 		position: {
@@ -931,6 +932,16 @@ export default class ChatBotService extends WhatsappLinkService {
 				},
 			};
 			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+		} else if (node.node_type === 'contactNode') {
+			try {
+				const msgObj = {
+					messaging_product: 'whatsapp',
+					to: recipient,
+					type: 'contact',
+					contact: [node.data],
+				};
+				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+			} catch (err) {}
 		} else if (
 			node.node_type === 'imageNode' ||
 			node.node_type === 'videoNode' ||

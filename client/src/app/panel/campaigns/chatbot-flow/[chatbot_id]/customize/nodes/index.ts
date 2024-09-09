@@ -1,5 +1,6 @@
 export { default as AudioNode } from './AudioNode';
 export { default as ButtonNode } from './ButtonNode';
+export { default as ContactNode } from './ContactNode';
 export { default as DocumentNode } from './DocumentNode';
 export { default as EndNode } from './EndNode';
 export { default as ImageNode } from './ImageNode';

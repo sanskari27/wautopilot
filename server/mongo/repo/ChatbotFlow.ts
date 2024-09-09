@@ -40,6 +40,7 @@ const schema = new mongoose.Schema<IChatBotFlow>(
 						'buttonNode',
 						'listNode',
 						'flowNode',
+						'contactNode',
 						'endNode',
 					],
 				},
