@@ -759,9 +759,20 @@ export default class ChatBotService extends WhatsappLinkService {
 			return;
 		}
 
+		const connectedEdge = bot.edges.find(
+			(edge) =>
+				edge.sourceHandle === button_id ||
+				(edge.sourceHandle === 'source' && edge.source === button_id)
+		);
+
+		if (!connectedEdge) {
+			return;
+		}
+
 		this.processFlowNode(recipient, {
 			bot,
-			start_node_id: flowMessage.node_id,
+			start_node_id: connectedEdge.target,
+			isNodeStarted: true,
 		});
 	}
 
@@ -770,6 +781,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		details: {
 			bot: IChatBotFlowPopulated;
 			start_node_id: string;
+			isNodeStarted?: boolean;
 		}
 	) {
 		const phonebook = new PhoneBookService(this.account);
@@ -778,12 +790,21 @@ export default class ChatBotService extends WhatsappLinkService {
 		const nodes = details.bot.nodes;
 		const edges = details.bot.edges;
 		let startNode = details.bot.nodes.find((node) => node.id === details.start_node_id);
+
+		if (details.isNodeStarted && startNode) {
+			this.sendFlowMessage(recipient, details.bot._id, startNode.id);
+		}
+
 		let isEnd = false;
 		do {
 			if (!startNode) {
 				break;
 			}
-			const connectedEdge = edges.find((edge) => edge.source === startNode?.id);
+			const connectedEdge = edges.find(
+				(edge) =>
+					edge.sourceHandle === startNode?.id ||
+					(edge.sourceHandle === 'source' && edge.source === startNode?.id)
+			);
 			if (!connectedEdge) {
 				break;
 			}
