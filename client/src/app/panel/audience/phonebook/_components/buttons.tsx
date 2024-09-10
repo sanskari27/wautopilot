@@ -41,7 +41,7 @@ export function ExportChatButton({ ids }: { ids: string[] }) {
 	return (
 		<Button size={'sm'} className='bg-teal-600 hover:bg-teal-700' onClick={handleExport}>
 			<FolderDown className='w-4 h-4 mr-2' />
-			Export
+			Export Conversations
 		</Button>
 	);
 }
