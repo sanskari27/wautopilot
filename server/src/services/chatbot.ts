@@ -1021,7 +1021,7 @@ export default class ChatBotService extends WhatsappLinkService {
 							parameters: {
 								flow_message_version: '3',
 								flow_action: 'navigate',
-								flow_token: `wautopilot_${node.data.flow_id}_${node.id}`,
+								flow_token: `wautopilot_${node.data.flow_id}_${node.data.button.id}`,
 								flow_id: node.data.flow_id,
 								flow_cta: node.data.button.text,
 								flow_action_payload: {

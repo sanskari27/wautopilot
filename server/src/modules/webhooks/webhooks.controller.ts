@@ -268,7 +268,7 @@ function processIncomingMessage(details: {
 
 		const data = JSON.parse(nfm_reply.response_json);
 
-		const flow_token = data.flow_token.split(' ')?.[2] ?? 'ZZZZ';
+		const flow_token = data.flow_token.split('_')?.[2] ?? 'ZZZZ';
 
 		chatBotService.continueFlow(recipient, message.context.id, flow_token);
 
