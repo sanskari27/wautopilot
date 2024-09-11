@@ -31,7 +31,9 @@ export default class PhoneBookService {
 		link.click();
 	}
 
-	static async addRecord(record: Record<string, string | string[] | Record<string, string | undefined>>) {
+	static async addRecord(
+		record: Record<string, string | string[] | Record<string, string | undefined>>
+	) {
 		await api.post(`/phonebook`, {
 			records: [record],
 		});
@@ -77,5 +79,14 @@ export default class PhoneBookService {
 
 	static async addFields(data: { name: string; defaultValue: string }) {
 		await api.post(`/phonebook/add-fields`, data);
+	}
+
+	static async getAllIds() {
+		try {
+			const { data } = await api.get(`/phonebook/all-ids`);
+			return data.ids as string[];
+		} catch (err) {
+			return [];
+		}
 	}
 }

@@ -14,6 +14,7 @@ import {
 const router = express.Router();
 
 router.route('/all-labels').get(Controller.getAllLabels);
+router.route('/all-ids').get(Controller.getAllIds);
 
 router
 	.route('/set-labels/phone/:phone_number')

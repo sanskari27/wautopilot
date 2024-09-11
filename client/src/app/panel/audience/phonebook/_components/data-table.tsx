@@ -295,6 +295,20 @@ export function DataTable({
 		router.replace(url.toString());
 	}
 
+	const handleSelectAll = async () => {
+		const ids = await PhoneBookService.getAllIds();
+		setRowSelection(
+			ids.reduce((acc, id) => {
+				acc[id] = true;
+				return acc;
+			}, {} as { [key: string]: boolean })
+		);
+	};
+
+	const handleDeselectAll = () => {
+		setRowSelection({});
+	};
+
 	const handlePhonebookInput = (phonebook: PhonebookRecord) => {
 		let id = searchParams.get('add-phonebook');
 		id = id === 'true' ? '' : id;
@@ -374,6 +388,17 @@ export function DataTable({
 						</div>
 						<div className=' text-sm text-muted-foreground'>
 							Total {Object.keys(rowSelection).length} row(s) selected.
+						</div>
+						<div className=' text-sm text-muted-foreground'>
+							{Object.keys(rowSelection).length === 0 ? (
+								<Button variant={'link'} className='text-gray-600' onClick={handleSelectAll}>
+									Select All
+								</Button>
+							) : (
+								<Button variant={'link'} className='text-gray-600' onClick={handleDeselectAll}>
+									Deselect All
+								</Button>
+							)}
 						</div>
 					</div>
 					<div className='flex items-center space-x-3 lg:space-x-5'>

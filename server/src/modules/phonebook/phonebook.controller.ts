@@ -135,6 +135,50 @@ async function records(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function getAllIds(req: Request, res: Response, next: NextFunction) {
+	const { user, serviceAccount } = req.locals;
+
+	let labels: string[] = [];
+
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		const allowedLabels = permissions.assigned_labels;
+
+		if (allowedLabels.length === 0) {
+			return Respond({
+				res,
+				status: 200,
+				data: {
+					records: [],
+					totalRecords: 0,
+				},
+			});
+		}
+		labels = allowedLabels;
+	}
+
+	try {
+		const phoneBookService = new PhoneBookService(serviceAccount);
+
+		const records = await phoneBookService.fetchRecords({
+			page: 1,
+			limit: 999999,
+			labels,
+			search: {},
+		});
+
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				ids: records.map((record) => record.id),
+			},
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 async function exportRecords(req: Request, res: Response, next: NextFunction) {
 	const { user, serviceAccount, agentLogService } = req.locals;
 	let labels = req.query.labels ? (req.query.labels as string).split(',') : [];
@@ -495,6 +539,7 @@ const Controller = {
 	setLabelsByPhone,
 	bulkUpload,
 	addFields,
+	getAllIds,
 };
 
 export default Controller;
