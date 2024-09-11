@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { randomString } from '@/lib/utils';
 import { useState } from 'react';
 
 export type WhatsappFlowMessageProps = {
@@ -21,7 +22,10 @@ export type WhatsappFlowMessageProps = {
 		body: string;
 		footer: string;
 		flow_id: string;
-		button_text: string;
+		button: {
+			id: string;
+			text: string;
+		};
 	}) => void;
 	children: React.ReactNode;
 };
@@ -38,7 +42,16 @@ const WhatsappFlowMessage = ({
 
 	const handleSave = () => {
 		if (!body || !flow_id || !button_text) return;
-		onWhatsappFlowMessageAdded({ header, body, footer, flow_id, button_text });
+		onWhatsappFlowMessageAdded({
+			header,
+			body,
+			footer,
+			flow_id,
+			button: {
+				id: randomString(),
+				text: button_text,
+			},
+		});
 	};
 
 	return (

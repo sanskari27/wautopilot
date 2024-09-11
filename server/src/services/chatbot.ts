@@ -14,7 +14,7 @@ import { BOT_TRIGGER_OPTIONS } from '../config/const';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
 import DateUtils from '../utils/DateUtils';
-import { Delay, filterUndefinedKeys, generateText } from '../utils/ExpressUtils';
+import { Delay, filterUndefinedKeys } from '../utils/ExpressUtils';
 import {
 	generateBodyText,
 	generateButtons,
@@ -1021,9 +1021,9 @@ export default class ChatBotService extends WhatsappLinkService {
 							parameters: {
 								flow_message_version: '3',
 								flow_action: 'navigate',
-								flow_token: `wautopilot_${node.data.flow_id}_${generateText(2)}`,
+								flow_token: `wautopilot_${node.data.flow_id}_${node.id}`,
 								flow_id: node.data.flow_id,
-								flow_cta: node.data.button_text,
+								flow_cta: node.data.button.text,
 								flow_action_payload: {
 									screen: details[0].id,
 								},

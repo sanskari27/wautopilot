@@ -5,14 +5,17 @@ import { Handle, Position, useNodeId } from '@xyflow/react';
 const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
 
 export default function WaFlowNode({
-	data: { body, footer, header, button_text, flow_id },
+	data: { body, footer, header, button, flow_id },
 }: {
 	data: {
 		header: string;
 		body: string;
 		footer: string;
 		flow_id: string;
-		button_text: string;
+		button: {
+			id: string;
+			text: string;
+		};
 	};
 }) {
 	const nodeId = useNodeId();
@@ -52,8 +55,15 @@ export default function WaFlowNode({
 					<div className='flex justify-center mt-2'>{flow_name}</div>
 					<div className='relative'>
 						<div className='bg-gray-50 my-1 rounded-lg border border-gray-400 p-2 relative'>
-							{button_text}
+							{button.text}
 						</div>
+						<Handle
+							type='source'
+							position={Position.Right}
+							id={button.id}
+							style={{ ...dotStyle, right: -8, top: '50%' }}
+							isConnectable
+						/>
 					</div>
 				</div>
 			</div>

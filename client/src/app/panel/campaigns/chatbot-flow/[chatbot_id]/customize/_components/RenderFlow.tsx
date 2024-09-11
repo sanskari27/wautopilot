@@ -96,7 +96,10 @@ export type FlowNodeDetails = {
 		body: string;
 		footer: string;
 		flow_id: string;
-		button_text: string;
+		button: {
+			id: string;
+			text: string;
+		};
 	};
 };
 export type LocationRequestNodeDetails = {

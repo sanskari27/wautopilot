@@ -113,7 +113,10 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 		body: string;
 		footer: string;
 		flow_id: string;
-		button_text: string;
+		button: {
+			id: string;
+			text: string;
+		};
 	}) => {
 		addNode({
 			type: 'WHATSAPP_FLOW',

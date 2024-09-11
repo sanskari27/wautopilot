@@ -268,6 +268,10 @@ function processIncomingMessage(details: {
 
 		const data = JSON.parse(nfm_reply.response_json);
 
+		const flow_token = data.flow_token.split(' ')?.[2] ?? 'ZZZZ';
+
+		chatBotService.continueFlow(recipient, message.context.id, flow_token);
+
 		conversationService.addMessageToConversation(conversation_id, {
 			message_id: meta_message_id,
 			recipient,
