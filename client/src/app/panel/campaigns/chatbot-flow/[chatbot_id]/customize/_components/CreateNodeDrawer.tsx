@@ -147,8 +147,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 					</Button>
 				</Panel>
 			</SheetTrigger>
-			<SheetContent>
-				<div className='py-8 overflow-y-auto'>
+			<SheetContent className='p-0'>
+				<div className='py-10 px-8 h-full w-full overflow-y-auto'>
 					<div className='flex flex-col w-full gap-4'>
 						<MessageType
 							body={'Start Flow'}
