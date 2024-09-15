@@ -69,9 +69,18 @@ export type SendQuickReplyValidationResult =
 	  }
 	| {
 			type: 'template';
-			// template: ;
-			context: {
-				message_id: string;
+			template_id: string;
+			template_name: string;
+			body: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
+			header?: {
+				type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+				media_id?: string | undefined;
+				link?: string | undefined;
 			};
 	  };
 
@@ -184,10 +193,23 @@ export async function SendQuickReplyValidator(req: Request, res: Response, next:
 
 	const templateValidator = z.object({
 		type: z.enum(['template']),
-		// template: ;
-		context: z
+		template_id: z.string().trim(),
+		template_name: z.string().trim(),
+		body: z
+			.array(
+				z.object({
+					custom_text: z.string().trim(),
+					phonebook_data: z.string().trim(),
+					variable_from: z.enum(['custom_text', 'phonebook_data']),
+					fallback_value: z.string().trim(),
+				})
+			)
+			.default([]),
+		header: z
 			.object({
-				message_id: z.string().trim(),
+				type: z.enum(['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT']),
+				media_id: z.string().trim().optional(),
+				link: z.string().trim().optional(),
 			})
 			.optional(),
 	});

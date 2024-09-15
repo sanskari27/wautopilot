@@ -7,6 +7,7 @@ import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import ConversationService from '../../services/conversation';
 import PhoneBookService from '../../services/phonebook';
+import TemplateService from '../../services/templates';
 import WhatsappFlowService from '../../services/wa_flow';
 import CSVHelper from '../../utils/CSVHelper';
 import DateUtils from '../../utils/DateUtils';
@@ -17,6 +18,10 @@ import {
 	extractInteractiveButtons,
 	extractInteractiveFooter,
 	extractInteractiveHeader,
+	extractTemplateBody,
+	extractTemplateButtons,
+	extractTemplateFooter,
+	extractTemplateHeader,
 	generateBodyText,
 	generateButtons,
 	generateListBody,
@@ -27,6 +32,16 @@ import {
 	SendMessageValidationResult,
 	SendQuickReplyValidationResult,
 } from './conversation.validator';
+
+const bodyParametersList = [
+	'first_name',
+	'last_name',
+	'middle_name',
+	'phone_number',
+	'email',
+	'birthday',
+	'anniversary',
+];
 
 async function fetchConversations(req: Request, res: Response, next: NextFunction) {
 	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];
@@ -189,17 +204,16 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 
-	const msgObj: any = {
-		messaging_product: 'whatsapp',
-		to: recipient,
-		context: data.context,
-	};
-
 	if (data.type === 'quickReply') {
 		const quickReply = await QuickReplyDB.findById(data.quickReply);
 		if (!quickReply) {
 			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 		}
+		const msgObj: any = {
+			messaging_product: 'whatsapp',
+			to: recipient,
+			context: data.context,
+		};
 
 		if (quickReply.type === 'flow') {
 			const whatsappFlow = new WhatsappFlowService(serviceAccount, device);
@@ -298,6 +312,118 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 		}
 	} else if (data.type === 'template') {
+		const { header, body, template_name } = data;
+		const phoneBookService = new PhoneBookService(serviceAccount);
+		const templateService = new TemplateService(serviceAccount, device);
+		const template = await templateService.fetchTemplateByName(template_name);
+
+		if (!template) {
+			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+		}
+
+		const fields = await phoneBookService.findRecordByPhone(recipient);
+
+		let headers = [] as Record<string, unknown>[];
+
+		if (header) {
+			const object = {
+				...(header.media_id ? { id: header.media_id } : header.link ? { link: header.link } : {}),
+			};
+
+			headers = [
+				{
+					type: 'HEADER',
+					parameters:
+						header.type !== 'TEXT'
+							? [
+									{
+										type: header.type,
+										[header.type.toLowerCase()]: object,
+									},
+							  ]
+							: [],
+				},
+			];
+		}
+
+		const msgObj = {
+			messaging_product: 'whatsapp',
+			to: recipient,
+			recipient_type: 'individual',
+			type: 'template',
+			template: {
+				name: template_name,
+				language: {
+					code: 'en_US',
+				},
+				components: [
+					{
+						type: 'BODY',
+						parameters: body.map((b) => {
+							if (b.variable_from === 'custom_text') {
+								return {
+									type: 'text',
+									text: b.custom_text,
+								};
+							} else {
+								if (!fields) {
+									return {
+										type: 'text',
+										text: b.fallback_value,
+									};
+								}
+
+								const fieldVal = (
+									bodyParametersList.includes(b.phonebook_data)
+										? fields[b.phonebook_data as keyof typeof fields]
+										: fields.others[b.phonebook_data]
+								) as string;
+
+								if (typeof fieldVal === 'string') {
+									return {
+										type: 'text',
+										text: fieldVal || b.fallback_value,
+									};
+								}
+								return {
+									type: 'text',
+									text: b.fallback_value,
+								};
+							}
+						}),
+					},
+					...headers,
+				],
+			},
+		};
+		try {
+			const { data: res } = await MetaAPI(device.accessToken).post(
+				`/${device.phoneNumberId}/messages`,
+				msgObj
+			);
+
+			const header = extractTemplateHeader(template.components, msgObj.template.components);
+			const body = extractTemplateBody(template.components, msgObj.template.components);
+			const footer = extractTemplateFooter(template.components);
+			const buttons = extractTemplateButtons(template.components);
+
+			await conversationService.addMessageToConversation(id, {
+				message_id: res.messages[0].id,
+				recipient: recipient,
+				...(header ? { ...header } : {}),
+				...(body ? { body: { body_type: 'TEXT', text: body } } : {}),
+				...(footer ? { footer_content: footer } : {}),
+				...(buttons ? { buttons } : {}),
+				sender: {
+					id: user.userId,
+					name: user.account.name,
+				},
+			});
+
+			serviceUser.deductCredit(1);
+		} catch (err) {
+			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+		}
 	}
 
 	return Respond({
