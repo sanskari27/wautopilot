@@ -40,7 +40,7 @@ export default function QuickReplyDialog({
 			success: (res) => {
 				onClose();
 				if (id) {
-					updateQuickReply(id, res.message);
+					updateQuickReply(id, res.data);
 				} else {
 					addQuickReply(res);
 				}

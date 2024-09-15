@@ -52,7 +52,7 @@ const QuickReplyContext = React.createContext<{
 	}[];
 	addQuickReply: (quickReply: QuickReply) => void;
 	removeQuickReply: (id: string) => void;
-	updateQuickReply: (id: string, message: string) => void;
+	updateQuickReply: (id: string, quickReply: QuickReply) => void;
 }>({
 	textTemplates: [],
 	buttonTemplates: [],
@@ -81,14 +81,11 @@ export function QuickReplyProvider({
 		setItems(items.filter((item) => item.id !== id));
 	};
 
-	const updateQuickReply = (id: string, message: string) => {
+	const updateQuickReply = (id: string, data: QuickReply) => {
 		setItems(
 			items.map((item) => {
 				if (item.id === id) {
-					return {
-						...item,
-						message,
-					};
+					return data;
 				}
 				return item;
 			})
