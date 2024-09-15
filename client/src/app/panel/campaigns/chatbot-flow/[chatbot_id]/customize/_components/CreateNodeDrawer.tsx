@@ -59,18 +59,22 @@ type Button = {
 export default function CreateNodeDrawer({ addNode }: Props) {
 	const { value: isOpen, on: onOpen, set: setSheetOpen } = useBoolean();
 
-	const handleTextElement = (text: string) => {
+	const handleTextElement = (text: string, delay: number) => {
 		addNode({
 			type: 'TEXT',
-			data: text,
+			data: {
+				label: text,
+				delay,
+			},
 		});
 	};
-	const handleButtonElement = (text: string, buttons: Button[]) => {
+	const handleButtonElement = (text: string, buttons: Button[], delay: number) => {
 		addNode({
 			type: 'BUTTON',
 			data: {
 				text,
 				buttons,
+				delay,
 			},
 		});
 	};
@@ -85,6 +89,7 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 				text: string;
 			}[];
 		}[];
+		delay: number;
 	}) => {
 		addNode({
 			type: 'LIST',
@@ -96,7 +101,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 		type: 'IMAGE' | 'AUDIO' | 'VIDEO' | 'DOCUMENT',
 		id: string,
 		caption: string,
-		buttons: Button[]
+		buttons: Button[],
+		delay: number
 	) => {
 		addNode({
 			type: type,
@@ -104,6 +110,7 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 				id,
 				caption,
 				buttons,
+				delay,
 			},
 		});
 	};
@@ -117,6 +124,7 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 			id: string;
 			text: string;
 		};
+		delay: number;
 	}) => {
 		addNode({
 			type: 'WHATSAPP_FLOW',
@@ -124,17 +132,23 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 		});
 	};
 
-	const handleLocationRequestMessage = (body: string) => {
+	const handleLocationRequestMessage = (body: string, delay: number) => {
 		addNode({
 			type: 'LOCATION_REQUEST',
-			data: body,
+			data: {
+				label: body,
+				delay,
+			},
 		});
 	};
 
-	const handleContactElement = (contact: Contact) => {
+	const handleContactElement = (contact: Contact, delay: number) => {
 		addNode({
 			type: 'CONTACT',
-			data: contact,
+			data: {
+				contact,
+				delay,
+			},
 		});
 	};
 
@@ -168,8 +182,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</TextMessage>
 						<ImageMessage
-							onImageMessageAdded={(id, cap, buttons) =>
-								handleDocumentElement('IMAGE', id, cap, buttons)
+							onImageMessageAdded={(id, cap, buttons, delay) =>
+								handleDocumentElement('IMAGE', id, cap, buttons, delay)
 							}
 						>
 							<MessageType
@@ -179,8 +193,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</ImageMessage>
 						<AudioMessage
-							onAudioMessageAdded={(id, cap, buttons) =>
-								handleDocumentElement('AUDIO', id, cap, buttons)
+							onAudioMessageAdded={(id, cap, buttons, delay) =>
+								handleDocumentElement('AUDIO', id, cap, buttons, delay)
 							}
 						>
 							<MessageType
@@ -190,8 +204,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</AudioMessage>
 						<VideoMessage
-							onVideoMessageAdded={(id, cap, buttons) =>
-								handleDocumentElement('VIDEO', id, cap, buttons)
+							onVideoMessageAdded={(id, cap, buttons, delay) =>
+								handleDocumentElement('VIDEO', id, cap, buttons, delay)
 							}
 						>
 							<MessageType
@@ -202,8 +216,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 						</VideoMessage>
 
 						<DocumentMessage
-							onDocumentMessageAdded={(id, cap, buttons) =>
-								handleDocumentElement('DOCUMENT', id, cap, buttons)
+							onDocumentMessageAdded={(id, cap, buttons, delay) =>
+								handleDocumentElement('DOCUMENT', id, cap, buttons, delay)
 							}
 						>
 							<MessageType
@@ -236,14 +250,6 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 								className={'bg-gray-500'}
 							/>
 						</ListMessage>
-						<ContactMessage onContactAdded={handleContactElement}>
-							<MessageType
-								body={'Contact Message'}
-								icon={<MdContactPage size={'1.25rem'} />}
-								className={'bg-indigo-500'}
-							/>
-						</ContactMessage>
-
 						<LocationRequestMessage onLocationRequestMessageAdded={handleLocationRequestMessage}>
 							<MessageType
 								body={'Location Request Message'}

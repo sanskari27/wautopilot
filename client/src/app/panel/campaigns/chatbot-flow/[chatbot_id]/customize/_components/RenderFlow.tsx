@@ -47,11 +47,17 @@ export type EndNodeDetails = {
 };
 export type TextNodeDetails = {
 	type: 'TEXT';
-	data: string;
+	data: {
+		label: string;
+		delay: number;
+	};
 };
 export type ContactNodeDetails = {
 	type: 'CONTACT';
-	data: Contact;
+	data: {
+		contact: Contact;
+		delay: number;
+	};
 };
 export type DocumentNodeDetails = {
 	type: 'IMAGE' | 'AUDIO' | 'VIDEO' | 'DOCUMENT';
@@ -62,6 +68,7 @@ export type DocumentNodeDetails = {
 			id: string;
 			text: string;
 		}[];
+		delay: number;
 	};
 };
 export type ButtonNodeDetails = {
@@ -72,6 +79,7 @@ export type ButtonNodeDetails = {
 			id: string;
 			text: string;
 		}[];
+		delay: number;
 	};
 };
 export type ListNodeDetails = {
@@ -87,6 +95,7 @@ export type ListNodeDetails = {
 				text: string;
 			}[];
 		}[];
+		delay: number;
 	};
 };
 export type FlowNodeDetails = {
@@ -100,11 +109,15 @@ export type FlowNodeDetails = {
 			id: string;
 			text: string;
 		};
+		delay: number;
 	};
 };
 export type LocationRequestNodeDetails = {
 	type: 'LOCATION_REQUEST';
-	data: string;
+	data: {
+		label: string;
+		delay: number;
+	};
 };
 
 const nodeTypes = {
@@ -168,7 +181,7 @@ export default function RenderFlow({
 			}
 		} else if (details.type === 'TEXT') {
 			node.type = 'textNode';
-			node.data = { label: details.data };
+			node.data = details.data;
 		} else if (details.type === 'IMAGE') {
 			node.type = 'imageNode';
 			node.data = details.data;
@@ -195,7 +208,7 @@ export default function RenderFlow({
 			node.data = details.data;
 		} else if (details.type === 'LOCATION_REQUEST') {
 			node.type = 'locationRequestNode';
-			node.data = { label: details.data };
+			node.data = details.data;
 		} else if (details.type === 'END') {
 			node.type = 'endNode';
 			const endNodeExists = nodes.some((n) => n.type === 'endNode');

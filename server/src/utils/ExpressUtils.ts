@@ -43,6 +43,7 @@ export const RespondFile = ({ res, filename, filepath }: FileResponseData) => {
 };
 
 export const Delay = async (seconds: number) => {
+	if (seconds <= 0) return Promise.resolve(null);
 	return new Promise((resolve, reject) => {
 		setTimeout(() => {
 			resolve(null);

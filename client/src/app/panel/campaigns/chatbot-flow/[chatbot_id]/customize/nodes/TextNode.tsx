@@ -1,9 +1,14 @@
 'use client';
+import { parseToMaxTime } from '@/lib/utils';
 import { Handle, Position, useNodeId } from '@xyflow/react';
 
 const dotStyle = { background: '#555', top: 80, width: '0.75rem', height: '0.75rem' };
 
-export default function TextNode({ data: { label } }: { data: { label: string } }) {
+export default function TextNode({
+	data: { label, delay },
+}: {
+	data: { label: string; delay: number };
+}) {
 	const nodeId = useNodeId();
 	return (
 		<>
@@ -24,6 +29,11 @@ export default function TextNode({ data: { label } }: { data: { label: string } 
 				<div className='bg-red-400 text-center text-white rounded-t-2xl h-12 flex justify-center items-center font-medium text-lg'>
 					Text Message
 				</div>
+				{delay > 0 ? (
+					<div className='p-1 text-center text-sm '>Send after {parseToMaxTime(delay)}</div>
+				) : (
+					<div className='p-1 text-center text-sm '>Send immediately</div>
+				)}
 				<div className='p-2'>
 					<div className='rounded-lg border border-black p-2 max-h-[400px] max-w-[400px]'>
 						{label}

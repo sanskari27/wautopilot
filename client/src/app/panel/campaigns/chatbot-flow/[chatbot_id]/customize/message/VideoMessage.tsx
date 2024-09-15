@@ -11,9 +11,20 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { AddButton, ListButtons } from '../_components/buttons';
+import { parseToSeconds } from '@/lib/utils';
 
 export type VideoMessageProps = {
 	onVideoMessageAdded: (
@@ -22,7 +33,8 @@ export type VideoMessageProps = {
 		buttons: {
 			id: string;
 			text: string;
-		}[]
+		}[],
+		delay: number
 	) => void;
 	children: React.ReactNode;
 };
@@ -30,6 +42,8 @@ export type VideoMessageProps = {
 const VideoMessage = ({ onVideoMessageAdded, children }: VideoMessageProps) => {
 	const [attachment, setAttachment] = useState('');
 	const [caption, setCaption] = useState('');
+	const [delay, setDelay] = useState(0);
+	const [delayType, setDelayType] = useState<'sec' | 'min' | 'hour'>('sec');
 	const [buttons, setButtons] = useState<
 		{
 			id: string;
@@ -38,7 +52,7 @@ const VideoMessage = ({ onVideoMessageAdded, children }: VideoMessageProps) => {
 	>([]);
 
 	const handleSave = () => {
-		onVideoMessageAdded(attachment, caption, buttons);
+		onVideoMessageAdded(attachment, caption, buttons, parseToSeconds(delay, delayType));
 	};
 
 	return (
@@ -77,7 +91,33 @@ const VideoMessage = ({ onVideoMessageAdded, children }: VideoMessageProps) => {
 						onSubmit={(data) => setButtons([...buttons, data])}
 					/>
 				</div>
+
+				<Separator />
 				<DialogFooter>
+					<div className='inline-flex items-center gap-2 mr-auto'>
+						<p className='text-sm'>Send after</p>
+						<Input
+							className='w-20'
+							placeholder={'Enter delay in seconds'}
+							value={delay.toString()}
+							onChange={(e) => setDelay(Number(e.target.value))}
+						/>
+						<Select
+							value={delayType}
+							onValueChange={(val: 'sec' | 'min' | 'hour') => setDelayType(val)}
+						>
+							<SelectTrigger className='w-[180px]'>
+								<SelectValue placeholder='Select one' />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									<SelectItem value='sec'>Seconds</SelectItem>
+									<SelectItem value='min'>Minutes</SelectItem>
+									<SelectItem value='hour'>Hours</SelectItem>
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+					</div>
 					<DialogClose asChild>
 						<Button type='submit' disabled={!attachment || !caption} onClick={handleSave}>
 							Save

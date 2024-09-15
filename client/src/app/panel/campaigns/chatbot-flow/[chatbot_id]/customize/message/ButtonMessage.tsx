@@ -10,7 +10,18 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { parseToSeconds } from '@/lib/utils';
 import { useState } from 'react';
 import { AddButton, ListButtons } from '../_components/buttons';
 
@@ -20,13 +31,16 @@ export type ButtonMessageProps = {
 		buttons: {
 			id: string;
 			text: string;
-		}[]
+		}[],
+		delay: number
 	) => void;
 	children: React.ReactNode;
 };
 
 const ButtonMessage = ({ onButtonMessageAdded, children }: ButtonMessageProps) => {
 	const [text, setText] = useState('');
+	const [delay, setDelay] = useState(0);
+	const [delayType, setDelayType] = useState<'sec' | 'min' | 'hour'>('sec');
 	const [buttons, setButtons] = useState<
 		{
 			id: string;
@@ -35,7 +49,7 @@ const ButtonMessage = ({ onButtonMessageAdded, children }: ButtonMessageProps) =
 	>([]);
 
 	const handleSave = () => {
-		onButtonMessageAdded(text, buttons);
+		onButtonMessageAdded(text, buttons, parseToSeconds(delay, delayType));
 	};
 
 	return (
@@ -67,7 +81,32 @@ const ButtonMessage = ({ onButtonMessageAdded, children }: ButtonMessageProps) =
 						onSubmit={(data) => setButtons([...buttons, data])}
 					/>
 				</div>
+				<Separator />
 				<DialogFooter>
+					<div className='inline-flex items-center gap-2 mr-auto'>
+						<p className='text-sm'>Send after</p>
+						<Input
+							className='w-20'
+							placeholder={'Enter delay in seconds'}
+							value={delay.toString()}
+							onChange={(e) => setDelay(Number(e.target.value))}
+						/>
+						<Select
+							value={delayType}
+							onValueChange={(val: 'sec' | 'min' | 'hour') => setDelayType(val)}
+						>
+							<SelectTrigger className='w-[180px]'>
+								<SelectValue placeholder='Select one' />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									<SelectItem value='sec'>Seconds</SelectItem>
+									<SelectItem value='min'>Minutes</SelectItem>
+									<SelectItem value='hour'>Hours</SelectItem>
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+					</div>
 					<DialogClose asChild>
 						<Button type='submit' disabled={!text || buttons.length === 0} onClick={handleSave}>
 							Save

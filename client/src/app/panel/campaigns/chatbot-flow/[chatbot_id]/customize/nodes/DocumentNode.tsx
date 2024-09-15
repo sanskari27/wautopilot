@@ -2,12 +2,13 @@
 import Each from '@/components/containers/each';
 import PreviewFile from '@/components/elements/preview-file';
 import AbsoluteCenter from '@/components/ui/absolute-center';
+import { parseToMaxTime } from '@/lib/utils';
 import { Handle, Position, useNodeId } from '@xyflow/react';
 
 const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
 
 export default function DocumentNode({
-	data: { caption, buttons },
+	data: { caption, buttons, delay },
 }: {
 	data: {
 		id: string;
@@ -16,6 +17,7 @@ export default function DocumentNode({
 			id: string;
 			text: string;
 		}[];
+		delay: number;
 	};
 }) {
 	const nodeId = useNodeId();
@@ -61,6 +63,11 @@ export default function DocumentNode({
 				<div className='bg-cyan-400 text-center text-white rounded-t-2xl h-12 flex justify-center items-center font-medium text-lg'>
 					Document Message
 				</div>
+				{delay > 0 ? (
+					<div className='p-1 text-center text-sm '>Send after {parseToMaxTime(delay)}</div>
+				) : (
+					<div className='p-1 text-center text-sm '>Send immediately</div>
+				)}
 				<div className='p-2'>
 					<div className='rounded-lg border border-black p-2 max-h-[400px] max-w-[400px]'>
 						<PreviewFile

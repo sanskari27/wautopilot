@@ -126,3 +126,34 @@ export function randomString(length: number = 6) {
 	return result;
 }
 
+export function parseSecondsTo(seconds: number, type: 'sec' | 'min' | 'hour') {
+	if (type === 'sec') {
+		return seconds;
+	} else if (type === 'min') {
+		return Math.floor(seconds / 60);
+	} else if (type === 'hour') {
+		return Math.floor(seconds / 3600);
+	}
+	return seconds;
+}
+
+export function parseToSeconds(value: number, type: 'sec' | 'min' | 'hour') {
+	if (type === 'sec') {
+		return value;
+	} else if (type === 'min') {
+		return Math.floor(value) * 60;
+	} else if (type === 'hour') {
+		return Math.floor(value) * 3600;
+	}
+	return value;
+}
+
+export function parseToMaxTime(value: number) {
+	if (value < 60) {
+		return `${value} seconds`;
+	} else if (value < 3600) {
+		return `${value / 60} minutes`;
+	} else {
+		return `${value / 3600} hours`;
+	}
+}

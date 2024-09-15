@@ -917,11 +917,12 @@ export default class ChatBotService extends WhatsappLinkService {
 		if (!node) {
 			return;
 		}
+		const delay = Math.max(0, node.data.delay || 0);
 		let message_id;
 		const schedulerOptions = {
 			scheduler_id: bot_id,
 			scheduler_type: ChatBotFlowDB_name,
-			sendAt: DateUtils.getMomentNow().toDate(),
+			sendAt: DateUtils.getMomentNow().add(delay, 'seconds').toDate(),
 			message_type: 'normal' as 'interactive' | 'normal' | 'template',
 		};
 		if (node.node_type === 'textNode') {
@@ -940,7 +941,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					messaging_product: 'whatsapp',
 					to: recipient,
 					type: 'contacts',
-					contacts: [node.data],
+					contacts: [node.data.contact],
 				};
 				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 			} catch (err) {}

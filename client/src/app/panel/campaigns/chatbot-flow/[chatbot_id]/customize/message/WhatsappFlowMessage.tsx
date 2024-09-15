@@ -11,9 +11,17 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { randomString } from '@/lib/utils';
+import { parseToSeconds, randomString } from '@/lib/utils';
 import { useState } from 'react';
 
 export type WhatsappFlowMessageProps = {
@@ -26,6 +34,7 @@ export type WhatsappFlowMessageProps = {
 			id: string;
 			text: string;
 		};
+		delay: number;
 	}) => void;
 	children: React.ReactNode;
 };
@@ -38,6 +47,8 @@ const WhatsappFlowMessage = ({
 	const [body, setBody] = useState('');
 	const [footer, setFooter] = useState('');
 	const [flow_id, setFlowId] = useState('');
+	const [delay, setDelay] = useState(0);
+	const [delayType, setDelayType] = useState<'sec' | 'min' | 'hour'>('sec');
 	const [button_text, setButtonText] = useState('');
 
 	const handleSave = () => {
@@ -51,6 +62,7 @@ const WhatsappFlowMessage = ({
 				id: randomString(),
 				text: button_text,
 			},
+			delay: parseToSeconds(delay, delayType),
 		});
 	};
 
@@ -107,7 +119,32 @@ const WhatsappFlowMessage = ({
 						/>
 					</div>
 				</div>
+				<Separator />
 				<DialogFooter>
+					<div className='inline-flex items-center gap-2 mr-auto'>
+						<p className='text-sm'>Send after</p>
+						<Input
+							className='w-20'
+							placeholder={'Enter delay in seconds'}
+							value={delay.toString()}
+							onChange={(e) => setDelay(Number(e.target.value))}
+						/>
+						<Select
+							value={delayType}
+							onValueChange={(val: 'sec' | 'min' | 'hour') => setDelayType(val)}
+						>
+							<SelectTrigger className='w-[180px]'>
+								<SelectValue placeholder='Select one' />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									<SelectItem value='sec'>Seconds</SelectItem>
+									<SelectItem value='min'>Minutes</SelectItem>
+									<SelectItem value='hour'>Hours</SelectItem>
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+					</div>
 					<DialogClose asChild>
 						<Button type='submit' disabled={!body || !flow_id || !button_text} onClick={handleSave}>
 							Save
