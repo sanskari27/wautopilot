@@ -1,15 +1,32 @@
 import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
+import { QuickReplyDB } from '../../../mongo';
 import MetaAPI from '../../config/MetaAPI';
 import { UserLevel } from '../../config/const';
 import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import ConversationService from '../../services/conversation';
 import PhoneBookService from '../../services/phonebook';
+import WhatsappFlowService from '../../services/wa_flow';
 import CSVHelper from '../../utils/CSVHelper';
 import DateUtils from '../../utils/DateUtils';
-import { Respond, RespondCSV } from '../../utils/ExpressUtils';
-import { NumbersValidationResult, SendMessageValidationResult } from './conversation.validator';
+import { generateText, Respond, RespondCSV } from '../../utils/ExpressUtils';
+import {
+	convertToId,
+	extractInteractiveBody,
+	extractInteractiveButtons,
+	extractInteractiveFooter,
+	extractInteractiveHeader,
+	generateBodyText,
+	generateButtons,
+	generateListBody,
+	generateSections,
+} from '../../utils/MessageHelper';
+import {
+	NumbersValidationResult,
+	SendMessageValidationResult,
+	SendQuickReplyValidationResult,
+} from './conversation.validator';
 
 async function fetchConversations(req: Request, res: Response, next: NextFunction) {
 	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];
@@ -89,10 +106,11 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 	if (!recipient) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
-	const msgObj = {
+
+	const msgObj: any = {
 		messaging_product: 'whatsapp',
 		to: recipient,
-		type: data.type,
+		type: data.type as string,
 		[data.type]:
 			data.type === 'text'
 				? {
@@ -148,6 +166,138 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 		serviceUser.deductCredit(1);
 	} catch (err) {
 		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+	}
+
+	return Respond({
+		res,
+		status: 200,
+	});
+}
+
+async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
+	const {
+		serviceAccount,
+		serviceUser,
+		id,
+		user,
+		device: { device },
+	} = req.locals;
+	const data = req.locals.data as SendQuickReplyValidationResult;
+	const conversationService = new ConversationService(serviceAccount, device);
+	const recipient = await conversationService.findRecipientByConversation(id);
+	if (!recipient) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	const msgObj: any = {
+		messaging_product: 'whatsapp',
+		to: recipient,
+		context: data.context,
+	};
+
+	if (data.type === 'quickReply') {
+		const quickReply = await QuickReplyDB.findById(data.quickReply);
+		if (!quickReply) {
+			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+		}
+
+		if (quickReply.type === 'flow') {
+			const whatsappFlow = new WhatsappFlowService(serviceAccount, device);
+
+			const details = await whatsappFlow.getWhatsappFlowContents(quickReply.data.flow_id);
+
+			msgObj.type = 'interactive';
+			msgObj.interactive = {
+				type: 'flow',
+				...generateListBody(quickReply.data),
+				action: {
+					name: 'flow',
+					parameters: {
+						flow_message_version: '3',
+						flow_action: 'navigate',
+						flow_token: `wautopilot_${quickReply.data.flow_id}_${generateText(2)}`,
+						flow_id: quickReply.data.flow_id,
+						flow_cta: quickReply.data.button_text,
+						flow_action_payload: {
+							screen: details[0].id,
+						},
+					},
+				},
+			};
+		} else if (quickReply.type === 'button') {
+			msgObj.type = 'interactive';
+			msgObj.interactive = {
+				type: 'button',
+				...generateBodyText(quickReply.data.body),
+				action: {
+					buttons: generateButtons(
+						quickReply.data.buttons.map((item: any) => ({
+							id: convertToId(item),
+							text: item,
+						}))
+					),
+				},
+			};
+		} else if (quickReply.type === 'list') {
+			msgObj.type = 'interactive';
+			msgObj.interactive = {
+				type: 'list',
+				...generateListBody(quickReply.data),
+				action: {
+					button: 'Select an option',
+					sections: generateSections(quickReply.data.sections),
+				},
+			};
+		} else if (quickReply.type === 'location') {
+			msgObj.type = 'interactive';
+			msgObj.interactive = {
+				type: 'location_request_message',
+				body: {
+					text: quickReply.data.body,
+				},
+				action: {
+					name: 'send_location',
+				},
+			};
+		} else {
+			return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
+		}
+		try {
+			const { data: res } = await MetaAPI(device.accessToken).post(
+				`/${device.phoneNumberId}/messages`,
+				msgObj
+			);
+
+			const header = extractInteractiveHeader(msgObj.interactive);
+			const body = extractInteractiveBody(msgObj.interactive);
+			const footer = extractInteractiveFooter(msgObj.interactive);
+			const buttons = extractInteractiveButtons(msgObj.interactive);
+
+			await conversationService.addMessageToConversation(id, {
+				message_id: res.messages[0].id,
+				recipient: recipient,
+				...(header ? { ...header } : {}),
+				...(body ? { body: { body_type: 'TEXT', text: body } } : {}),
+				...(footer ? { footer_content: footer } : {}),
+				...(buttons ? { buttons } : {}),
+				...(data.context
+					? {
+							context: {
+								id: data.context.message_id,
+							},
+					  }
+					: {}),
+				sender: {
+					id: user.userId,
+					name: user.account.name,
+				},
+			});
+
+			serviceUser.deductCredit(1);
+		} catch (err) {
+			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+		}
+	} else if (data.type === 'template') {
 	}
 
 	return Respond({
@@ -434,6 +584,7 @@ const Controller = {
 	removeConversationFromAgent,
 	assignLabelToMessage,
 	sendMessageToConversation,
+	sendQuickReply,
 	exportConversationsFromPhonebook,
 	addNote,
 	getNote,

@@ -1,6 +1,6 @@
 import api from '@/lib/api';
 import { Contact } from '@/schema/phonebook';
-import { Recipient } from '@/types/recipient';
+import { QuickReply, Recipient } from '@/types/recipient';
 
 export default class MessagesService {
 	static async fetchAllConversation(label_filter: string[] = []): Promise<Recipient[]> {
@@ -231,12 +231,7 @@ export default class MessagesService {
 	static async fetchQuickReplies() {
 		try {
 			const { data } = await api.get('/users/quick-replies');
-			return (data.quickReplies ?? []).map((reply: any) => {
-				return {
-					id: reply.id,
-					message: reply.message,
-				};
-			});
+			return (data.quickReplies ?? []) as QuickReply[];
 		} catch (err) {
 			return [];
 		}
@@ -248,7 +243,8 @@ export default class MessagesService {
 		});
 		return {
 			id: data.id,
-			message: data.message,
+			type: data.type,
+			data: data.data,
 		};
 	}
 
@@ -258,7 +254,8 @@ export default class MessagesService {
 		});
 		return {
 			id: data.id,
-			message: data.message,
+			type: data.type,
+			data: data.data,
 		};
 	}
 

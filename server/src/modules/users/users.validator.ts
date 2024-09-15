@@ -79,6 +79,39 @@ export type PermissionsValidationResult = {
 	};
 };
 
+export type CreateQuickReplyValidationResult =
+	| {
+			type: 'text';
+			message: string;
+	  }
+	| {
+			type: 'button';
+			text: string;
+			buttons: string[];
+	  }
+	| {
+			type: 'list';
+			header: string;
+			body: string;
+			footer: string;
+			sections: {
+				title: string;
+				buttons: string[];
+			}[];
+	  }
+	| {
+			type: 'flow';
+			header: string;
+			body: string;
+			footer: string;
+			flow_id: string;
+			button_text: string;
+	  }
+	| {
+			type: 'location';
+			body: string;
+	  };
+
 export async function UpgradePlanValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
 		date: z.string().trim(),
@@ -245,14 +278,56 @@ export async function PermissionsValidator(req: Request, res: Response, next: Ne
 }
 
 export async function CreateQuickReplyValidator(req: Request, res: Response, next: NextFunction) {
-	const reqValidator = z.object({
+	const textValidator = z.object({
+		type: z.literal('text'),
 		message: z.string().trim(),
 	});
+
+	const buttonValidator = z.object({
+		type: z.literal('button'),
+		body: z.string().trim().min(1),
+		buttons: z.array(z.string().trim().min(1).max(20)),
+	});
+
+	const listMessageValidator = z.object({
+		type: z.literal('list'),
+		header: z.string().trim(),
+		body: z.string().trim().min(1),
+		footer: z.string().trim(),
+		sections: z.array(
+			z.object({
+				title: z.string().trim(),
+				buttons: z.array(z.string().trim().min(1).max(20)),
+			})
+		),
+	});
+
+	const flowValidator = z.object({
+		type: z.literal('flow'),
+		header: z.string().trim(),
+		body: z.string().trim().min(1),
+		footer: z.string().trim(),
+		flow_id: z.string().trim().min(1),
+		button_text: z.string().trim().min(1),
+	});
+
+	const locationValidator = z.object({
+		type: z.literal('location'),
+		body: z.string().trim(),
+	});
+
+	const reqValidator = z.union([
+		textValidator,
+		buttonValidator,
+		listMessageValidator,
+		flowValidator,
+		locationValidator,
+	]);
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
 
 	if (reqValidatorResult.success) {
-		req.locals.data = reqValidatorResult.data.message;
+		req.locals.data = reqValidatorResult.data;
 		return next();
 	}
 

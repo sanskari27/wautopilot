@@ -2,7 +2,12 @@ import express from 'express';
 import { AgentValidator, IDValidator } from '../../middleware';
 import { IDsValidator } from '../../middleware/idValidator';
 import Controller from './conversation.controller';
-import { LabelValidator, NumbersValidator, SendMessageValidator } from './conversation.validator';
+import {
+	LabelValidator,
+	NumbersValidator,
+	SendMessageValidator,
+	SendQuickReplyValidator,
+} from './conversation.validator';
 
 const router = express.Router();
 
@@ -40,6 +45,10 @@ router
 	.route('/:id/send-message')
 	.all(IDValidator, SendMessageValidator)
 	.post(Controller.sendMessageToConversation);
+router
+	.route('/:id/send-quick-message')
+	.all(IDValidator, SendQuickReplyValidator)
+	.post(Controller.sendQuickReply);
 
 router
 	.route('/:id/assign-agent/:agent_id')

@@ -97,7 +97,42 @@ export type Message = {
 	};
 };
 
-export type QuickReply = {
-	id: string;
-	message: string;
-};
+export type QuickReply =
+	| {
+			id: string;
+			type: 'text';
+			data: {
+				message: string;
+			};
+	  }
+	| {
+			id: string;
+			type: 'button';
+			data: {
+				text: string;
+				buttons: string[];
+			};
+	  }
+	| {
+			id: string;
+			type: 'list';
+			data: {
+				header: string;
+				body: string;
+				footer: string;
+				sections: {
+					title: string;
+					buttons: string[];
+				}[];
+			};
+	  }
+	| {
+			id: string;
+			type: 'flow';
+			data: { header: string; body: string; footer: string; flow_id: string; button_text: string };
+	  }
+	| {
+			id: string;
+			type: 'location';
+			data: { body: string };
+	  };

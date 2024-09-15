@@ -46,7 +46,7 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 	const { value: quickReply, toggle: toggleQuickReply } = useBoolean(true);
 	const { selected_recipient } = useRecipient();
 	const [textMessage, setTextMessage] = useState('');
-	const { list } = useQuickReplies();
+	const { textTemplates } = useQuickReplies();
 	const [selectedQuickReply, setSelectedQuickReply] = useState('');
 
 	const handleTextMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -114,7 +114,7 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 	};
 
 	function formatMessage(text: string) {
-		const firstLine = text.split('\n')?.[0].trim() ?? '';
+		const firstLine = text?.split('\n')?.[0].trim() ?? '';
 		return firstLine.length > 70 ? firstLine.slice(0, 70) + '...' : firstLine;
 	}
 
@@ -129,7 +129,7 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 					disabled={isExpired}
 					value={selectedQuickReply}
 					onValueChange={(val) => {
-						setTextMessage(list.find((item) => item.id === val)?.message ?? '');
+						setTextMessage(textTemplates.find((item) => item.id === val)?.data.message ?? '');
 						setSelectedQuickReply(val);
 					}}
 				>
@@ -139,9 +139,9 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 					<SelectContent>
 						<SelectGroup>
 							<Each
-								items={list}
+								items={textTemplates}
 								render={(item) => (
-									<SelectItem value={item.id}>{formatMessage(item.message)}</SelectItem>
+									<SelectItem value={item.id}>{formatMessage(item.data.message)}</SelectItem>
 								)}
 							/>
 						</SelectGroup>
@@ -157,7 +157,9 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 				) : (
 					<QuickReplyDialog
 						id={selectedQuickReply}
-						message={list.find((item) => item.id === selectedQuickReply)?.message ?? ''}
+						message={
+							textTemplates.find((item) => item.id === selectedQuickReply)?.data.message ?? ''
+						}
 					>
 						<Button disabled={isExpired} variant={'secondary'} size={'icon'}>
 							<Pencil className='w-4 h-4' />

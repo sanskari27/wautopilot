@@ -1,7 +1,8 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export default interface IQuickReply extends Document {
 	_id: Types.ObjectId;
 	linked_to: Types.ObjectId;
-	message: string;
+	type: 'text' | 'button' | 'list' | 'flow' | 'location';
+	data: any;
 }

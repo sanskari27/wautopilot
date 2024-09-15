@@ -59,6 +59,22 @@ export type SendMessageValidationResult = {
 	};
 };
 
+export type SendQuickReplyValidationResult =
+	| {
+			type: 'quickReply';
+			quickReply: Types.ObjectId;
+			context: {
+				message_id: string;
+			};
+	  }
+	| {
+			type: 'template';
+			// template: ;
+			context: {
+				message_id: string;
+			};
+	  };
+
 export type NumbersValidationResult = {
 	numbers: string[];
 	phonebook_ids: Types.ObjectId[];
@@ -133,6 +149,50 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 			})
 			.optional(),
 	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data;
+		return next();
+	}
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
+		})
+	);
+}
+
+export async function SendQuickReplyValidator(req: Request, res: Response, next: NextFunction) {
+	const quickReplyValidator = z.object({
+		type: z.enum(['quickReply']),
+		quickReply: z
+			.string()
+			.trim()
+			.refine((value) => Types.ObjectId.isValid(value))
+			.transform((value) => new Types.ObjectId(value)),
+		context: z
+			.object({
+				message_id: z.string().trim(),
+			})
+			.optional(),
+	});
+
+	const templateValidator = z.object({
+		type: z.enum(['template']),
+		// template: ;
+		context: z
+			.object({
+				message_id: z.string().trim(),
+			})
+			.optional(),
+	});
+
+	const reqValidator = z.union([quickReplyValidator, templateValidator]);
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
 

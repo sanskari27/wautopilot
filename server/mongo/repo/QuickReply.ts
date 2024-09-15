@@ -10,8 +10,13 @@ const schema = new mongoose.Schema<IQuickReply>({
 		required: true,
 		ref: AccountDB_name,
 	},
-	message: {
+	type: {
 		type: String,
+		required: true,
+		enum: ['text', 'button', 'list', 'flow', 'location'],
+	},
+	data: {
+		type: {},
 		required: true,
 	},
 });

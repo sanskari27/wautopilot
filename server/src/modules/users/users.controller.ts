@@ -10,6 +10,7 @@ import { Respond } from '../../utils/ExpressUtils';
 import {
 	AssignTaskValidationResult,
 	CreateAgentValidationResult,
+	CreateQuickReplyValidationResult,
 	PasswordValidationResult,
 	PermissionsValidationResult,
 	UpgradePlanValidationResult,
@@ -239,28 +240,29 @@ async function quickReplies(req: Request, res: Response, next: NextFunction) {
 		data: {
 			quickReplies: quickRepliesDocs.map((doc) => ({
 				id: doc._id,
-				message: doc.message,
+				type: doc.type,
+				data: doc.data,
 			})),
 		},
 	});
 }
 
 async function saveQuickReply(req: Request, res: Response, next: NextFunction) {
-	const { user, data } = req.locals;
-
-	const quickReply = new QuickReplyDB({
+	const { user } = req.locals;
+	const data = req.locals.data as CreateQuickReplyValidationResult;
+	const quickReply = await QuickReplyDB.create({
 		linked_to: user.userId,
-		message: data,
+		type: data.type,
+		data: data,
 	});
-
-	await quickReply.save();
 
 	return Respond({
 		res,
 		status: 200,
 		data: {
 			id: quickReply._id,
-			message: quickReply.message,
+			type: quickReply.type,
+			data: quickReply.data,
 		},
 	});
 }
@@ -285,7 +287,9 @@ async function editQuickReply(req: Request, res: Response, next: NextFunction) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 
-	quickReply.message = data;
+	quickReply.type = data.type;
+	quickReply.data = data;
+
 	await quickReply.save();
 
 	return Respond({
@@ -293,7 +297,8 @@ async function editQuickReply(req: Request, res: Response, next: NextFunction) {
 		status: 200,
 		data: {
 			id: quickReply._id,
-			message: quickReply.message,
+			type: quickReply.type,
+			data: quickReply.data,
 		},
 	});
 }
