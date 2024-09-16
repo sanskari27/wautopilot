@@ -446,38 +446,40 @@ export function QuickButtonTemplateMessage({
 											<p>{template.data.body}</p>
 											<p>{template.data.buttons.join(', ')}</p>
 										</TableCell>
-										<TableCell>
-											<DropdownMenu>
-												<DropdownMenuTrigger>
-													<Button variant='ghost' size={'icon'}>
-														<EllipsisVertical className='w-4 h-4' />
-													</Button>
-												</DropdownMenuTrigger>
-												<DropdownMenuContent>
-													<DropdownMenuItem asChild>
-														<AddQuickButtonMessage
-															id={template.id}
-															body={template.data.body}
-															buttons={template.data.buttons}
-															onConfirm={handleAddQuickReply}
-														>
-															<Button size={'sm'} className='w-full' variant='secondary'>
-																<span className='mr-auto'>Edit</span>
-															</Button>
-														</AddQuickButtonMessage>
-													</DropdownMenuItem>
-													<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)}>
-														<Button
-															variant={'destructive'}
-															className='w-full p-2 font-normal'
-															size={'sm'}
-														>
-															<span className='mr-auto'>Delete</span>
+										<Show.ShowIf condition={!isAdmin}>
+											<TableCell>
+												<DropdownMenu>
+													<DropdownMenuTrigger>
+														<Button variant='ghost' size={'icon'}>
+															<EllipsisVertical className='w-4 h-4' />
 														</Button>
-													</DeleteDialog>
-												</DropdownMenuContent>
-											</DropdownMenu>
-										</TableCell>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent>
+														<DropdownMenuItem asChild>
+															<AddQuickButtonMessage
+																id={template.id}
+																body={template.data.body}
+																buttons={template.data.buttons}
+																onConfirm={handleAddQuickReply}
+															>
+																<Button size={'sm'} className='w-full' variant='secondary'>
+																	<span className='mr-auto'>Edit</span>
+																</Button>
+															</AddQuickButtonMessage>
+														</DropdownMenuItem>
+														<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)}>
+															<Button
+																variant={'destructive'}
+																className='w-full p-2 font-normal'
+																size={'sm'}
+															>
+																<span className='mr-auto'>Delete</span>
+															</Button>
+														</DeleteDialog>
+													</DropdownMenuContent>
+												</DropdownMenu>
+											</TableCell>
+										</Show.ShowIf>
 									</TableRow>
 								)}
 							/>
@@ -720,40 +722,42 @@ export function QuickListTemplateMessage({
 												</Badge>
 											))}
 										</TableCell>
-										<TableCell>
-											<DropdownMenu>
-												<DropdownMenuTrigger>
-													<Button variant='ghost' size={'icon'}>
-														<EllipsisVertical className='w-4 h-4' />
-													</Button>
-												</DropdownMenuTrigger>
-												<DropdownMenuContent>
-													<DropdownMenuItem asChild>
-														<AddQuickListMessage
-															id={template.id}
-															body={template.data.body}
-															sections={template.data.sections}
-															header={template.data.header}
-															footer={template.data.footer}
-															onConfirm={handleAddQuickReply}
-														>
-															<Button size={'sm'} className='w-full' variant='secondary'>
-																<span className='mr-auto'>Edit</span>
-															</Button>
-														</AddQuickListMessage>
-													</DropdownMenuItem>
-													<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)}>
-														<Button
-															variant={'destructive'}
-															className='w-full p-2 font-normal'
-															size={'sm'}
-														>
-															<span className='mr-auto'>Delete</span>
+										<Show.ShowIf condition={!isAdmin}>
+											<TableCell>
+												<DropdownMenu>
+													<DropdownMenuTrigger>
+														<Button variant='ghost' size={'icon'}>
+															<EllipsisVertical className='w-4 h-4' />
 														</Button>
-													</DeleteDialog>
-												</DropdownMenuContent>
-											</DropdownMenu>
-										</TableCell>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent>
+														<DropdownMenuItem asChild>
+															<AddQuickListMessage
+																id={template.id}
+																body={template.data.body}
+																sections={template.data.sections}
+																header={template.data.header}
+																footer={template.data.footer}
+																onConfirm={handleAddQuickReply}
+															>
+																<Button size={'sm'} className='w-full' variant='secondary'>
+																	<span className='mr-auto'>Edit</span>
+																</Button>
+															</AddQuickListMessage>
+														</DropdownMenuItem>
+														<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)}>
+															<Button
+																variant={'destructive'}
+																className='w-full p-2 font-normal'
+																size={'sm'}
+															>
+																<span className='mr-auto'>Delete</span>
+															</Button>
+														</DeleteDialog>
+													</DropdownMenuContent>
+												</DropdownMenu>
+											</TableCell>
+										</Show.ShowIf>
 									</TableRow>
 								)}
 							/>
@@ -1053,41 +1057,43 @@ export function QuickFlowTemplateMessage({
 											/>
 										</TableCell>
 										<TableCell>{template.data.body}</TableCell>
-										<TableCell>
-											<DropdownMenu>
-												<DropdownMenuTrigger>
-													<Button variant='ghost' size={'icon'}>
-														<EllipsisVertical className='w-4 h-4' />
-													</Button>
-												</DropdownMenuTrigger>
-												<DropdownMenuContent>
-													<DropdownMenuItem asChild>
-														<AddQuickFlowTemplateMessage
-															id={template.id}
-															body={template.data.body}
-															header={template.data.header}
-															footer={template.data.footer}
-															button_text={template.data.button_text}
-															flow_id={template.data.flow_id}
-															onConfirm={handleAddQuickReply}
-														>
-															<Button size={'sm'} className='w-full' variant='secondary'>
-																<span className='mr-auto'>Edit</span>
-															</Button>
-														</AddQuickFlowTemplateMessage>
-													</DropdownMenuItem>
-													<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)}>
-														<Button
-															variant={'destructive'}
-															className='w-full p-2 font-normal'
-															size={'sm'}
-														>
-															<span className='mr-auto'>Delete</span>
+										<Show.ShowIf condition={!isAdmin}>
+											<TableCell>
+												<DropdownMenu>
+													<DropdownMenuTrigger>
+														<Button variant='ghost' size={'icon'}>
+															<EllipsisVertical className='w-4 h-4' />
 														</Button>
-													</DeleteDialog>
-												</DropdownMenuContent>
-											</DropdownMenu>
-										</TableCell>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent>
+														<DropdownMenuItem asChild>
+															<AddQuickFlowTemplateMessage
+																id={template.id}
+																body={template.data.body}
+																header={template.data.header}
+																footer={template.data.footer}
+																button_text={template.data.button_text}
+																flow_id={template.data.flow_id}
+																onConfirm={handleAddQuickReply}
+															>
+																<Button size={'sm'} className='w-full' variant='secondary'>
+																	<span className='mr-auto'>Edit</span>
+																</Button>
+															</AddQuickFlowTemplateMessage>
+														</DropdownMenuItem>
+														<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)}>
+															<Button
+																variant={'destructive'}
+																className='w-full p-2 font-normal'
+																size={'sm'}
+															>
+																<span className='mr-auto'>Delete</span>
+															</Button>
+														</DeleteDialog>
+													</DropdownMenuContent>
+												</DropdownMenu>
+											</TableCell>
+										</Show.ShowIf>
 									</TableRow>
 								)}
 							/>
@@ -1315,37 +1321,39 @@ export function QuickLocationTemplateMessage({
 											/>
 										</TableCell>
 										<TableCell>{template.data.body}</TableCell>
-										<TableCell>
-											<DropdownMenu>
-												<DropdownMenuTrigger>
-													<Button variant='ghost' size={'icon'}>
-														<EllipsisVertical className='w-4 h-4' />
-													</Button>
-												</DropdownMenuTrigger>
-												<DropdownMenuContent>
-													<DropdownMenuItem asChild>
-														<AddQuickLocationTemplateMessage
-															id={template.id}
-															body={template.data.body}
-															onConfirm={handleAddQuickReply}
-														>
-															<Button size={'sm'} className='w-full' variant='secondary'>
-																<span className='mr-auto'>Edit</span>
-															</Button>
-														</AddQuickLocationTemplateMessage>
-													</DropdownMenuItem>
-													<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)}>
-														<Button
-															variant={'destructive'}
-															className='w-full p-2 font-normal'
-															size={'sm'}
-														>
-															<span className='mr-auto'>Delete</span>
+										<Show.ShowIf condition={!isAdmin}>
+											<TableCell>
+												<DropdownMenu>
+													<DropdownMenuTrigger>
+														<Button variant='ghost' size={'icon'}>
+															<EllipsisVertical className='w-4 h-4' />
 														</Button>
-													</DeleteDialog>
-												</DropdownMenuContent>
-											</DropdownMenu>
-										</TableCell>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent>
+														<DropdownMenuItem asChild>
+															<AddQuickLocationTemplateMessage
+																id={template.id}
+																body={template.data.body}
+																onConfirm={handleAddQuickReply}
+															>
+																<Button size={'sm'} className='w-full' variant='secondary'>
+																	<span className='mr-auto'>Edit</span>
+																</Button>
+															</AddQuickLocationTemplateMessage>
+														</DropdownMenuItem>
+														<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)}>
+															<Button
+																variant={'destructive'}
+																className='w-full p-2 font-normal'
+																size={'sm'}
+															>
+																<span className='mr-auto'>Delete</span>
+															</Button>
+														</DeleteDialog>
+													</DropdownMenuContent>
+												</DropdownMenu>
+											</TableCell>
+										</Show.ShowIf>
 									</TableRow>
 								)}
 							/>
