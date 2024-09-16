@@ -1,5 +1,6 @@
 import IContact from '../../mongo/types/contact';
 import IPhoneBook from '../../mongo/types/phonebook';
+import { generateText } from './ExpressUtils';
 
 export function extractTemplateHeader(
 	components: Record<string, any>[],
@@ -186,7 +187,7 @@ export function generateSections(
 	return sections.map((section) => ({
 		title: section.title,
 		rows: section.buttons.map((button: { id: string; text: string }) => ({
-			id: button.id,
+			id: button.id ?? generateText(2),
 			title: button.text,
 		})),
 	}));

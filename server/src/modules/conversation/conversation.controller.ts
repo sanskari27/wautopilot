@@ -13,7 +13,6 @@ import CSVHelper from '../../utils/CSVHelper';
 import DateUtils from '../../utils/DateUtils';
 import { generateText, Respond, RespondCSV } from '../../utils/ExpressUtils';
 import {
-	convertToId,
 	extractInteractiveBody,
 	extractInteractiveButtons,
 	extractInteractiveFooter,
@@ -246,7 +245,7 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 				action: {
 					buttons: generateButtons(
 						quickReply.data.buttons.map((item: any) => ({
-							id: convertToId(item),
+							id: generateText(2),
 							text: item,
 						}))
 					),
