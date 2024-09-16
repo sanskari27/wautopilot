@@ -258,7 +258,15 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 				...generateListBody(quickReply.data),
 				action: {
 					button: 'Select an option',
-					sections: generateSections(quickReply.data.sections),
+					sections: generateSections(
+						quickReply.data.sections.map((item: any) => ({
+							title: item.title,
+							buttons: item.buttons.map((button: any) => ({
+								id: generateText(2),
+								text: button,
+							})),
+						}))
+					),
 				},
 			};
 		} else if (quickReply.type === 'location') {
