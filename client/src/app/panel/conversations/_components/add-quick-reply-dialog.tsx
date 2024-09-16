@@ -33,7 +33,7 @@ export default function QuickReplyDialog({
 	const onSubmit = () => {
 		const promise = id
 			? MessagesService.editQuickReply({ id, message })
-			: MessagesService.addQuickReply(message);
+			: MessagesService.addQuickReply({message});
 
 		toast.promise(promise, {
 			loading: 'Saving quick reply...',

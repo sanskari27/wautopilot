@@ -193,6 +193,24 @@ export default class MessagesService {
 		}
 	}
 
+	static async sendQuickTemplateMessage({
+		recipientId,
+		quickReply,
+	}: {
+		recipientId: string;
+		quickReply: string;
+	}) {
+		try {
+			await api.post(`/conversation/${recipientId}/send-quick-message`, {
+				type: 'quickReply',
+				quickReply,
+			});
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
 	static async setNote(recipientId: string, note: string) {
 		await api.post(`/conversation/${recipientId}/note`, { note });
 	}
@@ -237,9 +255,40 @@ export default class MessagesService {
 		}
 	}
 
-	static async addQuickReply(message: string) {
+	static async addQuickReply({
+		body,
+		buttons,
+		sections,
+		message,
+		footer,
+		header,
+		type,
+		button_text,
+		flow_id,
+	}: {
+		header?: string;
+		footer?: string;
+		message?: string;
+		type?: string;
+		body?: string;
+		buttons?: string[];
+		sections?: {
+			title: string;
+			buttons: string[];
+		}[];
+		flow_id?: string;
+		button_text?: string;
+	}) {
 		const { data } = await api.post('/users/quick-replies', {
+			type,
+			body,
+			buttons,
+			sections,
 			message,
+			header,
+			footer,
+			button_text,
+			flow_id,
 		});
 		return {
 			id: data.id,
@@ -248,9 +297,42 @@ export default class MessagesService {
 		};
 	}
 
-	static async editQuickReply({ id, message }: { id: string; message: string }) {
+	static async editQuickReply({
+		id,
+		message,
+		body,
+		buttons,
+		sections,
+		type,
+		button_text,
+		flow_id,
+		footer,
+		header,
+	}: {
+		id: string;
+		header?: string;
+		footer?: string;
+		message?: string;
+		type?: string;
+		body?: string;
+		buttons?: string[];
+		sections?: {
+			title: string;
+			buttons: string[];
+		}[];
+		button_text?: string;
+		flow_id?: string;
+	}) {
 		const { data } = await api.put(`/users/quick-replies/${id}`, {
+			type,
 			message,
+			body,
+			buttons,
+			sections,
+			button_text,
+			flow_id,
+			footer,
+			header,
 		});
 		return {
 			id: data.id,

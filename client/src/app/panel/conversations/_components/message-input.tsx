@@ -28,7 +28,9 @@ import {
 	FileText,
 	HardDriveUpload,
 	Image as ImageIcon,
+	List,
 	Loader2,
+	LocateIcon,
 	MessageSquareQuote,
 	Music,
 	Paperclip,
@@ -38,8 +40,15 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { MdSmartButton } from 'react-icons/md';
 import QuickReplyDialog from './add-quick-reply-dialog';
-import { UploadMediaDialog } from './dialogs';
+import {
+	QuickButtonTemplateMessage,
+	QuickFlowTemplateMessage,
+	QuickListTemplateMessage,
+	QuickLocationTemplateMessage,
+	UploadMediaDialog,
+} from './dialogs';
 
 export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 	const { value: isMessageSending, on: setSending, off: setNotSending } = useBoolean(false);
@@ -118,6 +127,17 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 		return firstLine.length > 70 ? firstLine.slice(0, 70) + '...' : firstLine;
 	}
 
+	function sendQuickReplyMessage(id: string) {
+		MessagesService.sendQuickTemplateMessage({
+			recipientId: selected_recipient!.id,
+			quickReply: id,
+		}).then((data) => {
+			if (!data) {
+				toast.error('Failed to send message');
+			}
+		});
+	}
+
 	return (
 		<>
 			<div
@@ -170,7 +190,7 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 			<div className='flex bg-white w-full p-2 items-end gap-1'>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button disabled={isExpired} variant='ghost' size={'icon'}>
+						<Button variant='ghost' size={'icon'}>
 							<Paperclip className='w-4 h-4' />
 						</Button>
 					</DropdownMenuTrigger>
@@ -180,7 +200,12 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 							returnType='media_id'
 							type='document'
 						>
-							<Button variant={'ghost'} size={'sm'} className='w-full justify-start'>
+							<Button
+								disabled={isExpired}
+								variant={'ghost'}
+								size={'sm'}
+								className='w-full justify-start'
+							>
 								<FileText className='w-4 h-4 mr-2' />
 								Documents
 							</Button>
@@ -191,7 +216,12 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 							returnType='media_id'
 							type='image'
 						>
-							<Button variant={'ghost'} size={'sm'} className='w-full justify-start'>
+							<Button
+								disabled={isExpired}
+								variant={'ghost'}
+								size={'sm'}
+								className='w-full justify-start'
+							>
 								<ImageIcon className='w-4 h-4 mr-2' />
 								Photos
 							</Button>
@@ -202,7 +232,12 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 							returnType='media_id'
 							type='video'
 						>
-							<Button variant={'ghost'} size={'sm'} className='w-full justify-start'>
+							<Button
+								disabled={isExpired}
+								variant={'ghost'}
+								size={'sm'}
+								className='w-full justify-start'
+							>
 								<Clapperboard className='w-4 h-4 mr-2' />
 								Video
 							</Button>
@@ -213,24 +248,83 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 							returnType='media_id'
 							type='audio'
 						>
-							<Button variant={'ghost'} size={'sm'} className='w-full justify-start'>
+							<Button
+								disabled={isExpired}
+								variant={'ghost'}
+								size={'sm'}
+								className='w-full justify-start'
+							>
 								<Music className='w-4 h-4 mr-2' />
 								Audio
 							</Button>
 						</MediaSelectorDialog>
 
 						<ContactSelectorDialog onConfirm={sendContactMessage} newEntryAllowed>
-							<Button variant={'ghost'} size={'sm'} className='w-full justify-start'>
+							<Button
+								disabled={isExpired}
+								variant={'ghost'}
+								size={'sm'}
+								className='w-full justify-start'
+							>
 								<ContactIcon className='w-4 h-4 mr-2' />
 								VCards
 							</Button>
 						</ContactSelectorDialog>
 						<UploadMediaDialog onConfirm={(media) => sendAttachmentMessage('DOCUMENT', [media])}>
-							<Button variant={'ghost'} size={'sm'} className='w-full justify-start'>
+							<Button
+								disabled={isExpired}
+								variant={'ghost'}
+								size={'sm'}
+								className='w-full justify-start'
+							>
 								<HardDriveUpload className='w-4 h-4 mr-2' />
 								Upload File
 							</Button>
 						</UploadMediaDialog>
+						<QuickButtonTemplateMessage onConfirm={(id) => sendQuickReplyMessage(id)}>
+							<Button
+								disabled={isExpired}
+								variant={'ghost'}
+								size={'sm'}
+								className='w-full justify-start'
+							>
+								<MdSmartButton className='w-4 h-4 mr-2' />
+								Button message
+							</Button>
+						</QuickButtonTemplateMessage>
+						<QuickListTemplateMessage onConfirm={(id) => sendQuickReplyMessage(id)}>
+							<Button
+								disabled={isExpired}
+								variant={'ghost'}
+								size={'sm'}
+								className='w-full justify-start'
+							>
+								<List className='w-4 h-4 mr-2' />
+								List message
+							</Button>
+						</QuickListTemplateMessage>
+						<QuickFlowTemplateMessage onConfirm={(id) => sendQuickReplyMessage(id)}>
+							<Button
+								disabled={isExpired}
+								variant={'ghost'}
+								size={'sm'}
+								className='w-full justify-start'
+							>
+								<HardDriveUpload className='w-4 h-4 mr-2' />
+								Flow message
+							</Button>
+						</QuickFlowTemplateMessage>
+						<QuickLocationTemplateMessage onConfirm={(id) => sendQuickReplyMessage(id)}>
+							<Button
+								disabled={isExpired}
+								variant={'ghost'}
+								size={'sm'}
+								className='w-full justify-start'
+							>
+								<LocateIcon className='w-4 h-4 mr-2' />
+								Location message
+							</Button>
+						</QuickLocationTemplateMessage>
 					</DropdownMenuContent>
 				</DropdownMenu>
 				<Button disabled={isExpired} variant={'ghost'} size={'icon'} onClick={toggleQuickReply}>

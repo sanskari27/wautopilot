@@ -109,7 +109,7 @@ export type QuickReply =
 			id: string;
 			type: 'button';
 			data: {
-				text: string;
+				body: string;
 				buttons: string[];
 			};
 	  }

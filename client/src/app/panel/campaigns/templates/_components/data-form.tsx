@@ -2,6 +2,7 @@
 
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
+import DeleteDialog from '@/components/elements/dialogs/delete';
 import TemplatePreview from '@/components/elements/template-preview';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,7 +23,7 @@ import { cn, countOccurrences } from '@/lib/utils';
 import { Template, templateSchema } from '@/schema/template';
 import UploadService from '@/services/upload.service';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CircleMinus } from 'lucide-react';
+import { CircleMinus, Trash } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
@@ -31,8 +32,10 @@ import { AddQuickReply, PhoneNumberButton, URLButton } from './dialogs';
 export default function DataForm({
 	onSave,
 	defaultValues,
+	onDelete,
 }: {
 	onSave: (data: Template) => void;
+	onDelete: () => void;
 	defaultValues?: Template;
 }) {
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -500,9 +503,16 @@ export default function DataForm({
 					</div>
 					<div className='w-full lg:w-[30%] flex flex-col-reverse lg:flex-col justify-start items-start gap-3'>
 						<TemplatePreview components={components} />
-						<Button type='submit' className='w-[80%] mx-auto' disabled={hasError}>
-							Save
-						</Button>
+						<div className='w-full flex'>
+							<Button type='submit' className='w-[80%] mx-auto' disabled={hasError}>
+								Save
+							</Button>
+							<DeleteDialog onDelete={onDelete}>
+								<Button variant={'destructive'} size={'icon'}>
+									<Trash className='w-4 h-4' />
+								</Button>
+							</DeleteDialog>
+						</div>
 					</div>
 				</div>
 

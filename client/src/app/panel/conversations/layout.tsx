@@ -3,10 +3,14 @@ import { ContactsProvider } from '@/components/context/contact';
 import { MediaProvider } from '@/components/context/media';
 import { QuickReplyProvider } from '@/components/context/quick-replies';
 import { RecipientProvider } from '@/components/context/recipients';
+import { TemplatesProvider } from '@/components/context/templates';
+import { WhatsappFlowProvider } from '@/components/context/whatsappFlows';
 import Loading from '@/components/elements/loading';
+import ChatBotService from '@/services/chatbot.service';
 import ContactService from '@/services/contact.service';
 import MediaService from '@/services/media.service';
 import MessagesService from '@/services/messages.service';
+import TemplateService from '@/services/template.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 
@@ -19,24 +23,30 @@ export default async function Layout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const [conversations, quickReplies, media, contacts] = await Promise.all([
+	const [conversations, quickReplies, media, contacts, template, flow] = await Promise.all([
 		MessagesService.fetchAllConversation(),
 		MessagesService.fetchQuickReplies(),
 		MediaService.getMedias(),
 		ContactService.listContacts(),
+		TemplateService.listTemplates(),
+		ChatBotService.listWhatsappFlows(),
 	]);
 
 	return (
 		<Suspense fallback={<Loading />}>
 			<section>
 				<MediaProvider data={media}>
-					<ContactsProvider data={contacts}>
-						<QuickReplyProvider data={quickReplies}>
-							<RecipientProvider data={conversations}>
-								<ChatListExpandedProvider>{children}</ChatListExpandedProvider>
-							</RecipientProvider>
-						</QuickReplyProvider>
-					</ContactsProvider>
+					<WhatsappFlowProvider data={flow as any}>
+						<TemplatesProvider data={template}>
+							<ContactsProvider data={contacts}>
+								<QuickReplyProvider data={quickReplies}>
+									<RecipientProvider data={conversations}>
+										<ChatListExpandedProvider>{children}</ChatListExpandedProvider>
+									</RecipientProvider>
+								</QuickReplyProvider>
+							</ContactsProvider>
+						</TemplatesProvider>
+					</WhatsappFlowProvider>
 				</MediaProvider>
 			</section>
 		</Suspense>
