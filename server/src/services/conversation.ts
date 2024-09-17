@@ -455,7 +455,12 @@ export default class ConversationService extends WhatsappLinkService {
 			.limit(1);
 
 		if (doc.length === 0) return 'EXPIRED';
-		const time = DateUtils.getMoment(doc[0].received_at).add(24, 'hours');
+		let time;
+		if (doc[0].received_at) {
+			time = DateUtils.getMoment(doc[0].received_at).add(24, 'hours');
+		} else {
+			time = DateUtils.getMoment(doc[0].sent_at).add(24, 'hours');
+		}
 		const time_diff = time.diff(DateUtils.getMomentNow(), 'seconds');
 		if (time_diff < 0) return 'EXPIRED';
 		return time_diff;
