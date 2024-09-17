@@ -41,12 +41,14 @@ import {
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { MdSmartButton } from 'react-icons/md';
+import { TbTemplate } from 'react-icons/tb';
 import QuickReplyDialog from './add-quick-reply-dialog';
 import {
 	QuickButtonTemplateMessage,
 	QuickFlowTemplateMessage,
 	QuickListTemplateMessage,
 	QuickLocationTemplateMessage,
+	QuickTemplateMessage,
 	UploadMediaDialog,
 } from './dialogs';
 
@@ -131,6 +133,35 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 		MessagesService.sendQuickTemplateMessage({
 			recipientId: selected_recipient!.id,
 			quickReply: id,
+		}).then((data) => {
+			if (!data) {
+				toast.error('Failed to send message');
+			}
+		});
+	}
+
+	function sendQuickTemplateMessage(
+		template_id: string,
+		template_name: string,
+		template_body: {
+			variable_from: 'custom_text' | 'phonebook_data';
+			custom_text: string;
+			phonebook_data: string;
+			fallback_value: string;
+		}[],
+		template_header: {
+			type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | '';
+			media_id: string;
+			link?: string;
+		}
+	) {
+		MessagesService.sendQuickTemplateMessage({
+			recipientId: selected_recipient!.id,
+			template_id,
+			template_name,
+			body: template_body,
+			header: template_header,
+			type: 'template',
 		}).then((data) => {
 			if (!data) {
 				toast.error('Failed to send message');
@@ -325,6 +356,16 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 								Location message
 							</Button>
 						</QuickLocationTemplateMessage>
+						<QuickTemplateMessage
+							onConfirm={(template_id, template_name, template_header, template_body) =>
+								sendQuickTemplateMessage(template_id, template_name, template_body, template_header)
+							}
+						>
+							<Button variant={'ghost'} size={'sm'} className='w-full justify-start'>
+								<TbTemplate className='w-4 h-4 mr-2' />
+								Template message
+							</Button>
+						</QuickTemplateMessage>
 					</DropdownMenuContent>
 				</DropdownMenu>
 				<Button disabled={isExpired} variant={'ghost'} size={'icon'} onClick={toggleQuickReply}>

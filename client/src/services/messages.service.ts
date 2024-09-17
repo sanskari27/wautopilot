@@ -196,14 +196,42 @@ export default class MessagesService {
 	static async sendQuickTemplateMessage({
 		recipientId,
 		quickReply,
+		template_id,
+		template_name,
+		body,
+		header,
+		type = 'quickReply',
 	}: {
 		recipientId: string;
-		quickReply: string;
+		type?: string;
+		quickReply?: string;
+		template_id?: string;
+		template_name?: string;
+		body?: {
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
+		}[];
+		header?: {
+			type?: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | '';
+			media_id?: string;
+			link?: string;
+		};
 	}) {
+		if (header?.type === '') {
+			delete header.type;
+			delete header.media_id;
+			delete header.link;
+		}
 		try {
 			await api.post(`/conversation/${recipientId}/send-quick-message`, {
-				type: 'quickReply',
+				type,
 				quickReply,
+				template_id,
+				template_name,
+				body,
+				header,
 			});
 			return true;
 		} catch (err) {
