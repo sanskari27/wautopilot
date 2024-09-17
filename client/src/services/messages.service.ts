@@ -196,11 +196,8 @@ export default class MessagesService {
 	static async sendQuickTemplateMessage({
 		recipientId,
 		quickReply,
-		template_id,
-		template_name,
-		body,
-		header,
 		type = 'quickReply',
+		...details
 	}: {
 		recipientId: string;
 		type?: string;
@@ -219,19 +216,14 @@ export default class MessagesService {
 			link?: string;
 		};
 	}) {
-		if (header?.type === '') {
-			delete header.type;
-			delete header.media_id;
-			delete header.link;
+		if (details.header?.type === '') {
+			delete details.header;
 		}
 		try {
 			await api.post(`/conversation/${recipientId}/send-quick-message`, {
 				type,
 				quickReply,
-				template_id,
-				template_name,
-				body,
-				header,
+				...details,
 			});
 			return true;
 		} catch (err) {

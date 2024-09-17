@@ -199,8 +199,6 @@ export default function ContentsForm({
 
 	const errors = !validationResult.success ? validationResult.error.errors : [];
 
-	console.log(errors);
-
 	const customErrorMessage = errors.find((error) => error.code === 'custom')?.message ?? '';
 
 	return (

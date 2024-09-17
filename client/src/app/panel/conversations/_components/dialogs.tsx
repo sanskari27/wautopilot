@@ -416,7 +416,6 @@ export function QuickButtonTemplateMessage({
 				return 'Quick button message added successfully';
 			},
 			error: (err) => {
-				console.log(err);
 				return 'Failed to add quick button message';
 			},
 		});
@@ -688,7 +687,6 @@ export function QuickListTemplateMessage({
 				return 'Quick button message added successfully';
 			},
 			error: (err) => {
-				console.log(err);
 				return 'Failed to add quick button message';
 			},
 		});
@@ -996,7 +994,6 @@ export function QuickFlowTemplateMessage({
 		button_text: string,
 		id?: string
 	) => {
-		console.log(header, body, footer, flow_id, button_text);
 		const promise = id
 			? MessagesService.editQuickReply({
 					id,
@@ -1030,7 +1027,6 @@ export function QuickFlowTemplateMessage({
 				return 'Quick button message added successfully';
 			},
 			error: (err) => {
-				console.log(err);
 				return 'Failed to add quick button message';
 			},
 		});

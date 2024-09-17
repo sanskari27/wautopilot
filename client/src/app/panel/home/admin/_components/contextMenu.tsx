@@ -32,7 +32,6 @@ export function AdminContextMenu({
 				return 'Please wait while we switch your account';
 			},
 			error: (err) => {
-				console.log(err);
 				return 'Failed to switch account';
 			},
 		});
