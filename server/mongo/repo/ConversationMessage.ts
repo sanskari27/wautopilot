@@ -121,7 +121,7 @@ const schema = new mongoose.Schema<IConversationMessage>(
 			id: mongoose.Schema.Types.ObjectId,
 			name: String,
 		},
-		messageType: {
+		message_type: {
 			type: String,
 			enum: ['template', 'normal', 'interactive'],
 		},

@@ -443,7 +443,7 @@ export default class ConversationService extends WhatsappLinkService {
 			conversation_id: id,
 			$or: [
 				{
-					messageType: 'template',
+					message_type: 'template',
 				},
 				{
 					received_at: { $exists: true },
