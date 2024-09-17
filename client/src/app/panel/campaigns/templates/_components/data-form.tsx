@@ -32,10 +32,10 @@ import { AddQuickReply, PhoneNumberButton, URLButton } from './dialogs';
 export default function DataForm({
 	onSave,
 	defaultValues,
-	onDelete,
+	onDelete = () => {},
 }: {
 	onSave: (data: Template) => void;
-	onDelete: () => void;
+	onDelete?: () => void;
 	defaultValues?: Template;
 }) {
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -503,15 +503,19 @@ export default function DataForm({
 					</div>
 					<div className='w-full lg:w-[30%] flex flex-col-reverse lg:flex-col justify-start items-start gap-3'>
 						<TemplatePreview components={components} />
-						<div className='w-full flex'>
-							<Button type='submit' className='w-[80%] mx-auto' disabled={hasError}>
-								Save
-							</Button>
-							<DeleteDialog onDelete={onDelete}>
-								<Button variant={'destructive'} size={'icon'}>
-									<Trash className='w-4 h-4' />
+						<div className='w-[90%] mx-auto'>
+							<div className='w-full flex gap-3'>
+								<Button type='submit' className='w-full' disabled={hasError}>
+									Save
 								</Button>
-							</DeleteDialog>
+								<Show.ShowIf condition={!!defaultValues}>
+									<DeleteDialog onDelete={onDelete}>
+										<Button variant={'destructive'} size={'icon'}>
+											<Trash className='w-4 h-4' />
+										</Button>
+									</DeleteDialog>
+								</Show.ShowIf>
+							</div>
 						</div>
 					</div>
 				</div>
