@@ -155,6 +155,7 @@ export default class ConversationService extends WhatsappLinkService {
 				id: Types.ObjectId;
 				name: string;
 			};
+			message_type?: 'normal' | 'template' | 'interactive';
 		}
 	) {
 		details = filterUndefinedKeys(details);
@@ -440,7 +441,14 @@ export default class ConversationService extends WhatsappLinkService {
 			linked_to: this.userId,
 			device_id: this.deviceId,
 			conversation_id: id,
-			received_at: { $exists: true },
+			$or: [
+				{
+					messageType: 'template',
+				},
+				{
+					received_at: { $exists: true },
+				},
+			],
 		})
 			.sort({ createdAt: -1 })
 			.limit(1);

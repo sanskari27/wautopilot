@@ -92,6 +92,7 @@ export default interface IConversationMessage extends Document {
 		id: Types.ObjectId;
 		name: string;
 	};
+	messageType: 'template' | 'normal' | 'interactive';
 
 	createdAt: Date;
 	sendAt: Date;

@@ -176,6 +176,7 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 				id: user.userId,
 				name: user.account.name,
 			},
+			message_type: 'normal',
 		});
 		serviceUser.deductCredit(1);
 	} catch (err) {
@@ -312,6 +313,7 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 					id: user.userId,
 					name: user.account.name,
 				},
+				message_type: 'interactive',
 			});
 
 			serviceUser.deductCredit(1);
@@ -425,6 +427,7 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 					id: user.userId,
 					name: user.account.name,
 				},
+				message_type: 'template',
 			});
 
 			serviceUser.deductCredit(1);

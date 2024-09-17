@@ -132,6 +132,7 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 							},
 					  }
 					: {}),
+				message_type: 'interactive',
 			});
 			serviceUser.deductCredit(1);
 		} catch (err) {
@@ -203,6 +204,7 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 							},
 					  }
 					: {}),
+				message_type: 'template',
 			});
 			serviceUser.deductCredit(1);
 		} catch (err) {
@@ -301,6 +303,7 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 							},
 					  }
 					: {}),
+				message_type: 'normal',
 			});
 			serviceUser.deductCredit(1);
 		} catch (err) {

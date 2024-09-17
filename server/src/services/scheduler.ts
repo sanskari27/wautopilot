@@ -160,6 +160,7 @@ export default class SchedulerService extends WhatsappLinkService {
 				failed_at,
 				failed_reason,
 				status,
+				message_type: 'template',
 			});
 
 			if (addedMessage && msg.scheduler_type === BroadcastDB_name) {
@@ -264,6 +265,7 @@ export default class SchedulerService extends WhatsappLinkService {
 				failed_at,
 				failed_reason,
 				status,
+				message_type: 'normal',
 			});
 
 			if (addedMessage && msg.scheduler_type === BroadcastDB_name) {
@@ -366,6 +368,7 @@ export default class SchedulerService extends WhatsappLinkService {
 				failed_at,
 				failed_reason,
 				status,
+				message_type: 'interactive',
 			});
 
 			if (addedMessage && msg.scheduler_type === ChatBotFlowDB_name) {

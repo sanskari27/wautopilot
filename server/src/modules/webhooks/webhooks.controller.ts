@@ -156,6 +156,7 @@ function processIncomingMessage(details: {
 			received_at: timestamp,
 			status: MESSAGE_STATUS.DELIVERED,
 			context: message.context,
+			message_type: 'normal',
 		});
 		chatBotService.handleMessage(recipient, message.text.body);
 	} else if (
@@ -175,6 +176,7 @@ function processIncomingMessage(details: {
 			received_at: timestamp,
 			status: MESSAGE_STATUS.DELIVERED,
 			context: message.context,
+			message_type: 'normal',
 		});
 	} else if (message.contacts && message.contacts.length > 0) {
 		conversationService.addMessageToConversation(conversation_id, {
@@ -187,6 +189,7 @@ function processIncomingMessage(details: {
 			received_at: timestamp,
 			status: MESSAGE_STATUS.DELIVERED,
 			context: message.context,
+			message_type: 'normal',
 		});
 	} else if (message.type === 'button') {
 		conversationService.addMessageToConversation(conversation_id, {
@@ -199,6 +202,7 @@ function processIncomingMessage(details: {
 			received_at: timestamp,
 			status: MESSAGE_STATUS.DELIVERED,
 			context: message.context,
+			message_type: 'normal',
 		});
 		chatBotService.handleMessage(recipient, message.button.text);
 		buttonResponseService.createResponse({
@@ -218,6 +222,7 @@ function processIncomingMessage(details: {
 			received_at: timestamp,
 			status: MESSAGE_STATUS.DELIVERED,
 			context: message.context,
+			message_type: 'normal',
 		});
 	} else if (message.interactive && message.interactive.type === 'list_reply') {
 		conversationService.addMessageToConversation(conversation_id, {
@@ -230,6 +235,7 @@ function processIncomingMessage(details: {
 			received_at: timestamp,
 			status: MESSAGE_STATUS.DELIVERED,
 			context: message.context,
+			message_type: 'normal',
 		});
 		chatBotService.handleMessage(recipient, message.interactive?.list_reply?.title ?? '');
 		chatBotService.continueFlow(
@@ -249,6 +255,7 @@ function processIncomingMessage(details: {
 			received_at: timestamp,
 			status: MESSAGE_STATUS.DELIVERED,
 			context: message.context,
+			message_type: 'normal',
 		});
 		chatBotService.handleMessage(recipient, button_reply?.title ?? '');
 		chatBotService.continueFlow(recipient, message.context.id, button_reply.id ?? '');
@@ -282,6 +289,7 @@ function processIncomingMessage(details: {
 			received_at: timestamp,
 			status: MESSAGE_STATUS.DELIVERED,
 			context: message.context,
+			message_type: 'normal',
 		});
 
 		WhatsappFlowResponseDB.create({
@@ -290,6 +298,7 @@ function processIncomingMessage(details: {
 			received_at: timestamp,
 			message_id: meta_message_id,
 			context: message.context,
+			message_type: 'normal',
 			data,
 			recipient_name: details.recipient_name,
 		});
@@ -303,6 +312,7 @@ function processIncomingMessage(details: {
 			received_at: timestamp,
 			status: MESSAGE_STATUS.DELIVERED,
 			context: message.context,
+			message_type: 'normal',
 		});
 	}
 }
