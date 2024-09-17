@@ -158,7 +158,7 @@ function processIncomingMessage(details: {
 			context: message.context,
 			message_type: 'normal',
 		});
-		chatBotService.handleMessage(recipient, message.text.body);
+		chatBotService.handleMessage(recipient, message.text.body, meta_message_id);
 	} else if (
 		message.type === 'image' ||
 		message.type === 'video' ||
@@ -204,7 +204,7 @@ function processIncomingMessage(details: {
 			context: message.context,
 			message_type: 'normal',
 		});
-		chatBotService.handleMessage(recipient, message.button.text);
+		chatBotService.handleMessage(recipient, message.button.text, meta_message_id);
 		buttonResponseService.createResponse({
 			button_text: message.button.text,
 			recipient,
@@ -237,11 +237,16 @@ function processIncomingMessage(details: {
 			context: message.context,
 			message_type: 'normal',
 		});
-		chatBotService.handleMessage(recipient, message.interactive?.list_reply?.title ?? '');
+		chatBotService.handleMessage(
+			recipient,
+			message.interactive?.list_reply?.title ?? '',
+			meta_message_id
+		);
 		chatBotService.continueFlow(
 			recipient,
 			message.context.id,
-			message.interactive?.list_reply?.id ?? ''
+			message.interactive?.list_reply?.id ?? '',
+			meta_message_id
 		);
 	} else if (message.interactive && message.interactive.type === 'button_reply') {
 		const button_reply = message.interactive.button_reply;
@@ -257,8 +262,13 @@ function processIncomingMessage(details: {
 			context: message.context,
 			message_type: 'normal',
 		});
-		chatBotService.handleMessage(recipient, button_reply?.title ?? '');
-		chatBotService.continueFlow(recipient, message.context.id, button_reply.id ?? '');
+		chatBotService.handleMessage(recipient, button_reply?.title ?? '', meta_message_id);
+		chatBotService.continueFlow(
+			recipient,
+			message.context.id,
+			button_reply.id ?? '',
+			meta_message_id
+		);
 		buttonResponseService.createResponse({
 			button_id: button_reply.id,
 			button_text: button_reply.title,

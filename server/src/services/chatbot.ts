@@ -570,7 +570,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		});
 	}
 
-	public async handleMessage(recipient: string, text: string) {
+	public async handleMessage(recipient: string, text: string, meta_message_id?: string) {
 		const schedulerService = new SchedulerService(this.account, this.device);
 		const phonebook = new PhoneBookService(this.account);
 		const contact = await phonebook.findRecordByPhone(recipient);
@@ -722,6 +722,7 @@ export default class ChatBotService extends WhatsappLinkService {
 			this.processFlowNode(recipient, {
 				bot,
 				start_node_id: startNode?.id,
+				meta_message_id,
 			});
 
 			if (bot.forward && bot.forward.number) {
@@ -740,8 +741,13 @@ export default class ChatBotService extends WhatsappLinkService {
 		});
 	}
 
-	public async continueFlow(recipient: string, meta_message_id: string, button_id: string) {
-		const flowMessage = await FlowMessageDB.findOne({ meta_message_id });
+	public async continueFlow(
+		recipient: string,
+		context_message_id: string,
+		button_id: string,
+		meta_message_id?: string
+	) {
+		const flowMessage = await FlowMessageDB.findOne({ meta_message_id: context_message_id });
 		if (!flowMessage) {
 			return;
 		}
@@ -785,6 +791,7 @@ export default class ChatBotService extends WhatsappLinkService {
 			bot: IChatBotFlowPopulated;
 			start_node_id: string;
 			isNodeStarted?: boolean;
+			meta_message_id?: string;
 		}
 	) {
 		const phonebook = new PhoneBookService(this.account);
@@ -820,6 +827,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			this.sendFlowMessage(recipient, details.bot._id, nextNode.id, {
 				extra_delay,
+				meta_message_id: details.meta_message_id,
 			});
 			startNode = nextNode;
 			if (nextNode.node_type === 'endNode') {
@@ -910,12 +918,9 @@ export default class ChatBotService extends WhatsappLinkService {
 		recipient: string,
 		bot_id: Types.ObjectId,
 		node_id: string,
-		{
-			extra_delay = 0,
-		}: {
+		details?: {
 			extra_delay?: number;
-		} = {
-			extra_delay: 0,
+			meta_message_id?: string;
 		}
 	) {
 		const schedulerService = new SchedulerService(this.account, this.device);
@@ -933,7 +938,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		if (!node) {
 			return;
 		}
-		const delay = extra_delay + Math.max(0, node.data.delay || 0);
+		const delay = (details?.extra_delay ?? 0) + Math.max(0, node.data.delay || 0);
 		let message_id;
 		const schedulerOptions = {
 			scheduler_id: bot_id,
@@ -941,6 +946,14 @@ export default class ChatBotService extends WhatsappLinkService {
 			sendAt: DateUtils.getMomentNow().add(delay, 'seconds').toDate(),
 			message_type: 'normal' as 'interactive' | 'normal' | 'template',
 		};
+		const context =
+			details?.meta_message_id && node.data.reply_to_message
+				? {
+						context: {
+							message_id: details.meta_message_id,
+						},
+				  }
+				: {};
 		if (node.node_type === 'textNode') {
 			const msgObj = {
 				messaging_product: 'whatsapp',
@@ -949,6 +962,7 @@ export default class ChatBotService extends WhatsappLinkService {
 				text: {
 					body: node.data.label,
 				},
+				...context,
 			};
 			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 		} else if (node.node_type === 'contactNode') {
@@ -958,6 +972,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					to: recipient,
 					type: 'contacts',
 					contacts: [node.data.contact],
+					...context,
 				};
 				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 			} catch (err) {}
@@ -988,6 +1003,7 @@ export default class ChatBotService extends WhatsappLinkService {
 						buttons: generateButtons(node.data.buttons),
 					},
 				},
+				...context,
 			};
 			schedulerOptions.message_type = 'interactive';
 			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
@@ -1003,6 +1019,7 @@ export default class ChatBotService extends WhatsappLinkService {
 						buttons: generateButtons(node.data.buttons),
 					},
 				},
+				...context,
 			};
 			schedulerOptions.message_type = 'interactive';
 			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
@@ -1019,6 +1036,7 @@ export default class ChatBotService extends WhatsappLinkService {
 						sections: generateSections(node.data.sections),
 					},
 				},
+				...context,
 			};
 			schedulerOptions.message_type = 'interactive';
 			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
@@ -1047,6 +1065,7 @@ export default class ChatBotService extends WhatsappLinkService {
 							},
 						},
 					},
+					...context,
 				};
 				schedulerOptions.message_type = 'interactive';
 				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
@@ -1066,6 +1085,7 @@ export default class ChatBotService extends WhatsappLinkService {
 							name: 'send_location',
 						},
 					},
+					...context,
 				};
 				schedulerOptions.message_type = 'interactive';
 				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
