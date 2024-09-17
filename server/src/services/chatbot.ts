@@ -782,6 +782,7 @@ export default class ChatBotService extends WhatsappLinkService {
 			bot,
 			start_node_id: connectedEdge.target,
 			isNodeStarted: true,
+			meta_message_id,
 		});
 	}
 
