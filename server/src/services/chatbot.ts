@@ -794,8 +794,10 @@ export default class ChatBotService extends WhatsappLinkService {
 		const edges = details.bot.edges;
 		let startNode = details.bot.nodes.find((node) => node.id === details.start_node_id);
 
+		let extra_delay = 0;
 		if (details.isNodeStarted && startNode) {
 			this.sendFlowMessage(recipient, details.bot._id, startNode.id);
+			extra_delay += Math.max(0, startNode.data.delay || 0);
 		}
 
 		let isEnd = false;
@@ -816,11 +818,14 @@ export default class ChatBotService extends WhatsappLinkService {
 				break;
 			}
 
-			this.sendFlowMessage(recipient, details.bot._id, nextNode.id);
+			this.sendFlowMessage(recipient, details.bot._id, nextNode.id, {
+				extra_delay,
+			});
 			startNode = nextNode;
 			if (nextNode.node_type === 'endNode') {
 				isEnd = true;
 			}
+			extra_delay += Math.max(0, nextNode.data.delay || 0);
 			await Delay(2);
 		} while (true);
 
@@ -901,7 +906,18 @@ export default class ChatBotService extends WhatsappLinkService {
 		}
 	}
 
-	public async sendFlowMessage(recipient: string, bot_id: Types.ObjectId, node_id: string) {
+	public async sendFlowMessage(
+		recipient: string,
+		bot_id: Types.ObjectId,
+		node_id: string,
+		{
+			extra_delay = 0,
+		}: {
+			extra_delay?: number;
+		} = {
+			extra_delay: 0,
+		}
+	) {
 		const schedulerService = new SchedulerService(this.account, this.device);
 		const whatsappFlow = new WhatsappFlowService(this.account, this.device);
 		const mediaService = new MediaService(this.account, this.device);
@@ -917,7 +933,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		if (!node) {
 			return;
 		}
-		const delay = Math.max(0, node.data.delay || 0);
+		const delay = extra_delay + Math.max(0, node.data.delay || 0);
 		let message_id;
 		const schedulerOptions = {
 			scheduler_id: bot_id,
