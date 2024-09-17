@@ -444,6 +444,7 @@ export default class ConversationService extends WhatsappLinkService {
 			$or: [
 				{
 					message_type: 'template',
+					status: MESSAGE_STATUS.SENT,
 				},
 				{
 					received_at: { $exists: true },
