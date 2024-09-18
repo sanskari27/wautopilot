@@ -1,5 +1,6 @@
 'use client';
 import ContactDialog from '@/components/elements/dialogs/contact';
+import ContactSelectorDialog from '@/components/elements/dialogs/contact-selector';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -54,9 +55,11 @@ const ContactMessage = ({ onContactAdded, children }: ContactMessageProps) => {
 					<DialogTitle>Contact Message</DialogTitle>
 				</DialogHeader>
 				<div className='max-h-[70vh] grid gap-2 overflow-y-auto px-0'>
-					<Button variant={'secondary'} onClick={openContactDialog}>
-						{contact ? contact.name.formatted_name ?? 'No name' : 'Edit Contact'}
-					</Button>
+					<ContactSelectorDialog onConfirm={(c) => setContact(c[0])} newEntryAllowed singleSelect>
+						<Button variant={'secondary'}>
+							{contact ? contact.name.formatted_name ?? 'No name' : 'Select Contact'}
+						</Button>
+					</ContactSelectorDialog>
 				</div>
 				<Separator />
 				<DialogFooter>
