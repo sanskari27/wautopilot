@@ -228,7 +228,7 @@ export function objectToMessageBody(object: { [key: string]: string }, separator
 
 export function parseVariables(text: string, variables: { [key: string]: string }) {
 	return text.replace(/{{(.*?)}}/g, (match, variable) => {
-		return variables[variable] ?? '';
+		return variables[variable] ?? `{{${variable}}}`;
 	});
 }
 
