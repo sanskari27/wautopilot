@@ -7,6 +7,7 @@ import IAccount from '../../mongo/types/account';
 import IChatBot from '../../mongo/types/chatbot';
 import IChatBotFlow from '../../mongo/types/chatbotFlow';
 import IContact from '../../mongo/types/contact';
+import IFlowMessage from '../../mongo/types/flowMessage';
 import IMedia from '../../mongo/types/media';
 import IPhoneBook from '../../mongo/types/phonebook';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
@@ -1106,12 +1107,16 @@ export default class ChatBotService extends WhatsappLinkService {
 		// recipient, bot_id, node_id, message_id
 	}
 
-	static async getFlowMessageDoc(meta_message_id: string) {
+	static async getFlowDocByMessageId(meta_message_id: string) {
 		const flowMessage = await FlowMessageDB.findOne({ meta_message_id });
 		if (!flowMessage) {
 			return null;
 		}
-		return flowMessage;
+		const flow = await ChatBotFlowDB.findById(flowMessage.bot_id);
+		if (!flow) {
+			return null;
+		}
+		return [flow, flowMessage] as [IChatBotFlow, IFlowMessage];
 	}
 }
 

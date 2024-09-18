@@ -225,14 +225,21 @@ async function processIncomingMessage(details: {
 			message_type: 'normal',
 		});
 
-		const flowMessage = await ChatBotService.getFlowMessageDoc(message.context.id);
-		if (!flowMessage) {
+		const doc = await ChatBotService.getFlowDocByMessageId(message.context.id);
+		if (!doc) {
 			return;
 		}
+		const [flow, flowMessage] = doc;
+		const edge = flow.edges.find((e) => e.source === flowMessage.node_id);
+
+		if (!edge) {
+			return;
+		}
+
 		chatBotService.continueFlow(
 			recipient,
 			message.context.id,
-			flowMessage.node_id,
+			edge.sourceHandle || edge.source,
 			meta_message_id
 		);
 	} else if (message.interactive && message.interactive.type === 'list_reply') {
