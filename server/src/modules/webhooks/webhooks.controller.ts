@@ -130,7 +130,7 @@ const Controller = {
 
 export default Controller;
 
-function processIncomingMessage(details: {
+async function processIncomingMessage(details: {
 	message: any;
 	user: IAccount;
 	link: IWhatsappLink;
@@ -224,6 +224,17 @@ function processIncomingMessage(details: {
 			context: message.context,
 			message_type: 'normal',
 		});
+
+		const flowMessage = await ChatBotService.getFlowMessageDoc(message.context.id);
+		if (!flowMessage) {
+			return;
+		}
+		chatBotService.continueFlow(
+			recipient,
+			message.context.id,
+			flowMessage.node_id,
+			meta_message_id
+		);
 	} else if (message.interactive && message.interactive.type === 'list_reply') {
 		conversationService.addMessageToConversation(conversation_id, {
 			message_id: meta_message_id,

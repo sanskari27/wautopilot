@@ -132,12 +132,19 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 		});
 	};
 
-	const handleLocationRequestMessage = (body: string, delay: number) => {
+	const handleLocationRequestMessage = (details: {
+		text: string;
+		delay: number;
+		button_id: string;
+	}) => {
 		addNode({
 			type: 'LOCATION_REQUEST',
 			data: {
-				label: body,
-				delay,
+				label: details.text,
+				delay: details.delay,
+				button: {
+					id: details.button_id,
+				},
 			},
 		});
 	};

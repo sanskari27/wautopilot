@@ -1105,6 +1105,14 @@ export default class ChatBotService extends WhatsappLinkService {
 		});
 		// recipient, bot_id, node_id, message_id
 	}
+
+	static async getFlowMessageDoc(meta_message_id: string) {
+		const flowMessage = await FlowMessageDB.findOne({ meta_message_id });
+		if (!flowMessage) {
+			return null;
+		}
+		return flowMessage;
+	}
 }
 
 function instanceOfChatbot(object: any): object is IChatBot {

@@ -19,11 +19,15 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { parseToSeconds } from '@/lib/utils';
+import { parseToSeconds, randomString } from '@/lib/utils';
 import { useState } from 'react';
 
 export type LocationRequestMessageProps = {
-	onLocationRequestMessageAdded: (text: string, delay: number) => void;
+	onLocationRequestMessageAdded: (details: {
+		text: string;
+		delay: number;
+		button_id: string;
+	}) => void;
 	children: React.ReactNode;
 };
 
@@ -35,7 +39,11 @@ const LocationRequestMessage = ({
 	const [delay, setDelay] = useState(0);
 	const [delayType, setDelayType] = useState<'sec' | 'min' | 'hour'>('sec');
 	const handleSave = () => {
-		onLocationRequestMessageAdded(message, parseToSeconds(delay, delayType));
+		onLocationRequestMessageAdded({
+			text: message,
+			delay: parseToSeconds(delay, delayType),
+			button_id: randomString(),
+		});
 	};
 
 	return (

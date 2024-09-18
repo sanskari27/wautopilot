@@ -5,11 +5,12 @@ import { Handle, Position, useNodeId } from '@xyflow/react';
 const dotStyle = { background: '#555', top: 80, width: '0.75rem', height: '0.75rem' };
 
 export default function LocationRequestNode({
-	data: { label, delay },
+	data: { label, delay, button },
 }: {
 	data: {
 		label: string;
 		delay: number;
+		button: { id: string };
 	};
 }) {
 	const nodeId = useNodeId();
@@ -45,6 +46,13 @@ export default function LocationRequestNode({
 						<div className='bg-gray-50 my-1 rounded-lg border border-gray-400 p-2 relative'>
 							Send Location
 						</div>
+						<Handle
+							type='source'
+							position={Position.Right}
+							id={button.id}
+							style={{ ...dotStyle, right: -8, top: '50%' }}
+							isConnectable
+						/>
 					</div>
 				</div>
 			</div>

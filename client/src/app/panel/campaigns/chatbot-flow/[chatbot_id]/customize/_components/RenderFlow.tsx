@@ -117,6 +117,9 @@ export type LocationRequestNodeDetails = {
 	data: {
 		label: string;
 		delay: number;
+		button: {
+			id: string;
+		};
 	};
 };
 
