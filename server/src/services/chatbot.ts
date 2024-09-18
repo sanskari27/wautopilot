@@ -968,12 +968,14 @@ export default class ChatBotService extends WhatsappLinkService {
 			};
 			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 		} else if (node.node_type === 'contactNode') {
+			const { id, formatted_name, ...contact } = node.data.contact;
+
 			try {
 				const msgObj = {
 					messaging_product: 'whatsapp',
 					to: recipient,
 					type: 'contacts',
-					contacts: [node.data.contact],
+					contacts: [contact],
 					...context,
 				};
 				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
