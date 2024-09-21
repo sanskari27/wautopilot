@@ -69,6 +69,11 @@ export default function BroadcastPage() {
 	const template = templates.find((t) => t.id === fields.template_id);
 	const header = template?.components.find((component) => component.type === 'HEADER');
 
+	const validationResult = broadcastSchema.safeParse(fields);
+	if (!validationResult.success) {
+		console.error(validationResult.error.errors);
+	}
+
 	function handleSave(data: Broadcast) {
 		if (!permissions.create) return toast.error('You do not have permission to create a broadcast');
 		const promise = api.post(`/broadcast/send`, {
@@ -324,7 +329,17 @@ export default function BroadcastPage() {
 														No of messages daily<span className='ml-[0.2rem] text-red-800'>*</span>
 													</FormLabel>
 													<FormControl>
-														<Input {...field} />
+														<Input
+															type='number'
+															value={field.value}
+															onChange={(e) => {
+																const value = Number(e.target.value);
+																if (isNaN(value) || value < 0) {
+																	field.onChange(0);
+																}
+																field.onChange(Number(value));
+															}}
+														/>
 													</FormControl>
 													<FormMessage />
 												</FormItem>
