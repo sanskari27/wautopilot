@@ -338,7 +338,7 @@ export function PhonebookForm({
 							</div>
 							<Show.ShowIf condition={!isAgent}>
 								<div className='flex-1'>
-									<Input value={tags} onChange={handleNewTagsInput} placeholder='Add new labels' />
+									<Input value={tags} onChange={handleNewTagsInput} placeholder='Add new tags' />
 								</div>
 							</Show.ShowIf>
 						</FormItem>

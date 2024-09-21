@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
-	title: 'Campaign Report • Wautopilot',
+	title: 'Broadcast Report • Wautopilot',
 };
 
 export default async function Layout({

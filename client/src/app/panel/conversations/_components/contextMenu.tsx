@@ -44,7 +44,7 @@ export function RecipientContextMenu({
 				)}
 				<AssignLabelDialog recipient={recipient}>
 					<Button size={'sm'} variant={'ghost'} className='w-full p-2 font-normal'>
-						<span className='mr-auto'>Assign Label</span>
+						<span className='mr-auto'>Assign Tags</span>
 					</Button>
 				</AssignLabelDialog>
 			</ContextMenuContent>

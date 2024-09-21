@@ -114,14 +114,14 @@ export default function AssignLabelDialog({
 		)
 			.then((res) => {
 				if (res) {
-					toast.success('Labels assigned successfully');
+					toast.success('Tags assigned successfully');
 					onClose();
 					return;
 				}
-				toast.error('Failed to assign labels');
+				toast.error('Failed to assign tags');
 			})
 			.catch(() => {
-				toast.error('Failed to assign labels');
+				toast.error('Failed to assign tags');
 			});
 	};
 	return (
@@ -131,7 +131,7 @@ export default function AssignLabelDialog({
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Assign Labels</DialogTitle>{' '}
+					<DialogTitle>Assign Tags</DialogTitle>{' '}
 				</DialogHeader>
 
 				<div className='flex flex-wrap justify-start mt-2 gap-1'>

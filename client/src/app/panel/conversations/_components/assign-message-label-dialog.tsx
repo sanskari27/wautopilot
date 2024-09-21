@@ -88,13 +88,13 @@ export default function AssignMessageLabelDialog({
 				newTags.trim().length !== 0 ? [...selectedTags, newTags.trim()] : selectedTags
 			),
 			{
-				loading: 'Assigning labels...',
+				loading: 'Assigning tags...',
 				success: () => {
 					onConfirm(selectedTags);
 					onClose();
-					return 'Labels assigned successfully';
+					return 'Tags assigned successfully';
 				},
-				error: 'Failed to assign labels',
+				error: 'Failed to assign tags',
 			}
 		);
 	};

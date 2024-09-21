@@ -7,7 +7,7 @@ import COMMON_ERRORS from '../../errors/common-errors';
 import PhoneBookService from '../../services/phonebook';
 import SocketServer from '../../socket';
 import CSVHelper from '../../utils/CSVHelper';
-import { Respond, RespondCSV, intersection } from '../../utils/ExpressUtils';
+import { Respond, RespondCSV, filterUndefinedKeys, intersection } from '../../utils/ExpressUtils';
 import FileUtils from '../../utils/FileUtils';
 import {
 	FieldsResult,
@@ -454,11 +454,31 @@ export async function bulkUpload(req: Request, res: Response, next: NextFunction
 		}
 
 		const phoneBookService = new PhoneBookService(serviceAccount);
-		const data = parsed_csv.map((record) => {
-			const { prefix, tags, ...rest } = record;
+		const data = parsed_csv.map((record, index) => {
+			const {
+				prefix,
+				first_name,
+				last_name,
+				middle_name,
+				phone_number,
+				email,
+				birthday,
+				anniversary,
+				tags,
+				...rest
+			} = record;
 			return {
-				...rest,
-				salutation: prefix,
+				...filterUndefinedKeys({
+					salutation: prefix,
+					first_name,
+					last_name,
+					middle_name,
+					phone_number,
+					email,
+					birthday,
+					anniversary,
+				}),
+				others: rest,
 				labels: [...labels, ...(tags ?? '').split(',')].filter(Boolean),
 			};
 		});

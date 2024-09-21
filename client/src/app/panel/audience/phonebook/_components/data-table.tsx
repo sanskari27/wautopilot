@@ -340,8 +340,7 @@ export function DataTable({
 	};
 
 	const phonebookData = phonebookSchema.safeParse(parseToObject(searchParams.get('data')));
-	const isOpenPhonebookDialog =
-		searchParams.get('add-phonebook') === 'true' || phonebookData.success;
+	const isOpenPhonebookDialog = searchParams.has('add-phonebook') || phonebookData.success;
 
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>

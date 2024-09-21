@@ -79,7 +79,7 @@ export default class PhoneBookService extends UserService {
 							$set: {
 								phone_number: record.phone_number?.replace(/\D/g, '') ?? '',
 								salutation: record.salutation ?? existingRecord.salutation,
-								first_name: record.first_name ?? existingRecord.first_name,
+								first_name: record.first_name ?? existingRecord.first_name ?? '~',
 								last_name: record.last_name ?? existingRecord.last_name,
 								middle_name: record.middle_name ?? existingRecord.middle_name,
 								email: record.email ?? existingRecord.email,
@@ -94,6 +94,7 @@ export default class PhoneBookService extends UserService {
 			} else {
 				insertRecords.push({
 					...record,
+					first_name: record.first_name ?? '~',
 					phone_number: record.phone_number?.replace(/\D/g, '') ?? '',
 					linked_to: this.userId,
 				});
