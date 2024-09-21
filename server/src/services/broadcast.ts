@@ -372,112 +372,6 @@ export default class BroadcastService extends WhatsappLinkService {
 	}
 
 	public async fetchBroadcastReports() {
-		// const campaigns = await BroadcastDB.aggregate([
-		// 	{ $match: { linked_to: this.account._id, device_id: this.deviceId } },
-		// 	{
-		// 		$sort: {
-		// 			createdAt: -1,
-		// 		},
-		// 	},
-		// 	{
-		// 		$lookup: {
-		// 			from: ConversationMessageDB.collection.name, // Name of the OtherModel collection
-		// 			localField: 'processedMessages',
-		// 			foreignField: '_id',
-		// 			as: 'conversationMessages',
-		// 		},
-		// 	},
-		// 	{
-		// 		$lookup: {
-		// 			from: ScheduledMessageDB.collection.name, // Name of the OtherModel collection
-		// 			localField: 'unProcessedMessages',
-		// 			foreignField: '_id',
-		// 			as: 'scheduledMessages',
-		// 		},
-		// 	},
-		// 	{
-		// 		$unwind: { path: '$conversationMessages', preserveNullAndEmptyArrays: true },
-		// 	},
-		// 	{
-		// 		$unwind: { path: '$scheduledMessages', preserveNullAndEmptyArrays: true },
-		// 	},
-		// 	{
-		// 		$group: {
-		// 			_id: '$_id', // Group by the campaign ID
-		// 			name: { $first: '$name' },
-		// 			description: { $first: '$description' },
-		// 			template_name: { $first: '$template_name' },
-		// 			status: { $first: '$status' },
-		// 			startTime: { $first: '$startTime' },
-		// 			endTime: { $first: '$endTime' },
-		// 			daily_messages_count: { $first: '$daily_messages_count' },
-		// 			createdAt: { $first: '$createdAt' },
-		// 			sent: {
-		// 				$sum: {
-		// 					$cond: {
-		// 						if: {
-		// 							$or: [
-		// 								{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.SENT] },
-		// 								{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.READ] },
-		// 								{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.DELIVERED] },
-		// 							],
-		// 						},
-		// 						then: 1,
-		// 						else: 0,
-		// 					},
-		// 				},
-		// 			},
-		// 			failed: {
-		// 				$sum: {
-		// 					$cond: {
-		// 						if: {
-		// 							$or: [
-		// 								{ $eq: ['$scheduledMessages.status', MESSAGE_STATUS.FAILED] },
-		// 								{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.FAILED] },
-		// 							],
-		// 						},
-		// 						then: 1,
-		// 						else: 0,
-		// 					},
-		// 				},
-		// 			},
-		// 			pending: {
-		// 				$sum: {
-		// 					$cond: {
-		// 						if: {
-		// 							$or: [
-		// 								{ $eq: ['$conversationMessages.status', MESSAGE_STATUS.PROCESSING] },
-		// 								{ $eq: ['$scheduledMessages.status', MESSAGE_STATUS.PROCESSING] },
-		// 								{ $eq: ['$scheduledMessages.status', MESSAGE_STATUS.PENDING] },
-		// 								{ $eq: ['$scheduledMessages.status', MESSAGE_STATUS.PAUSED] },
-		// 							],
-		// 						},
-		// 						then: 1,
-		// 						else: 0,
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	{
-		// 		$project: {
-		// 			broadcast_id: '$_id',
-		// 			_id: 0,
-		// 			name: 1,
-		// 			description: 1,
-		// 			template_name: 1,
-		// 			status: 1,
-		// 			sent: 1,
-		// 			failed: 1,
-		// 			pending: 1,
-		// 			createdAt: 1,
-		// 			startTime: 1,
-		// 			endTime: 1,
-		// 			isPaused: { $eq: ['$status', BROADCAST_STATUS.PAUSED] },
-		// 		},
-		// 	},
-		// ]);
-
 		const campaigns = await BroadcastDB.aggregate([
 			{ $match: { linked_to: this.account._id, device_id: this.deviceId } },
 			{
@@ -544,7 +438,6 @@ export default class BroadcastService extends WhatsappLinkService {
 					failed: 0,
 					pending: 0,
 				};
-				console.log(message);
 
 				const _itr1 = message.messages[0].reduce((acc: typeof defaultMap, curr: any) => {
 					if (

@@ -10,7 +10,7 @@ export default async function ChatbotButtonReport({
 	};
 }) {
 	if (!params) return notFound();
-	if (!params.campaignId) return <div>Invalid campaign id</div>;
+	if (!params.campaignId) return <div>Invalid broadcast id</div>;
 
 	const list = await BroadcastService.buttonResponseReport({
 		campaignId: params.campaignId,

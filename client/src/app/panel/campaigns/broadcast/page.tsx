@@ -97,12 +97,12 @@ export default function BroadcastPage() {
 		});
 
 		toast.promise(promise, {
-			loading: 'Scheduling campaign...',
+			loading: 'Scheduling Broadcast...',
 			success: () => {
 				form.reset();
-				return 'Campaign scheduled successfully';
+				return 'Broadcast scheduled successfully';
 			},
-			error: 'Failed to schedule campaign',
+			error: 'Failed to schedule broadcast',
 		});
 	}
 
@@ -148,7 +148,7 @@ export default function BroadcastPage() {
 								render={({ field }) => (
 									<FormItem className='space-y-0 flex-1 max-w-md'>
 										<FormLabel className='text-primary'>
-											Campaign Name<span className='ml-[0.2rem] text-red-800'>*</span>
+											Broadcast Name<span className='ml-[0.2rem] text-red-800'>*</span>
 										</FormLabel>
 										<FormControl>
 											<Input placeholder='eg. Fanfest' {...field} />

@@ -69,10 +69,10 @@ export default function ReportDataTable({
 			success: () => {
 				setSelectedBroadcast([]);
 				router.refresh();
-				return 'Campaign deleted successfully';
+				return 'Broadcast deleted successfully';
 			},
-			error: 'Failed to delete campaign',
-			loading: 'Deleting campaign...',
+			error: 'Failed to delete broadcast',
+			loading: 'Deleting Broadcast...',
 		});
 	};
 

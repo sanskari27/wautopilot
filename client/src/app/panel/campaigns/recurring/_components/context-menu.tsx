@@ -47,13 +47,13 @@ export default function RecurringActionContextMenu({
 		const promise = toggleRecurring(campaignId);
 
 		toast.promise(promise, {
-			loading: 'Toggling Campaign...',
+			loading: 'Toggling Broadcast...',
 			success: (res) => {
 				router.refresh();
 				router.push(`/panel/campaigns/recurring`);
-				return `Campaign ${res.status === 'ACTIVE' ? 'Paused' : 'Resumed'}`;
+				return `Broadcast ${res.status === 'ACTIVE' ? 'Paused' : 'Resumed'}`;
 			},
-			error: 'Failed to Toggle Campaign',
+			error: 'Failed to Toggle Broadcast',
 		});
 	};
 
@@ -61,9 +61,9 @@ export default function RecurringActionContextMenu({
 		const promise = RecurringService.downloadRecurring(campaignId);
 
 		toast.promise(promise, {
-			loading: 'Downloading Campaign...',
-			success: 'Campaign Downloaded',
-			error: 'Failed to Download Campaign',
+			loading: 'Downloading Broadcast...',
+			success: 'Broadcast Downloaded',
+			error: 'Failed to Download Broadcast',
 		});
 	};
 
