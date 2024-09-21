@@ -334,8 +334,10 @@ export default function BroadcastPage() {
 															value={field.value}
 															onChange={(e) => {
 																const value = Number(e.target.value);
+																console.log(value);
+
 																if (isNaN(value) || value < 0) {
-																	field.onChange(0);
+																	return field.onChange(0);
 																}
 																field.onChange(Number(value));
 															}}
