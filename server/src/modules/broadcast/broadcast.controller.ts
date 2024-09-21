@@ -30,7 +30,9 @@ async function broadcastReport(req: Request, res: Response, next: NextFunction) 
 	try {
 		const broadcastService = new BroadcastService(account, device);
 
+		console.log('reports');
 		const reports = await broadcastService.fetchBroadcastReports();
+		console.log('reports result');
 
 		return Respond({
 			res,
