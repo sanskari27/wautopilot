@@ -31,19 +31,26 @@ function processPhonebookDocs(
 ): (IPhonebookRecord & {
 	id: Types.ObjectId;
 })[] {
-	return docs.map((doc) => ({
-		id: doc._id,
-		salutation: doc.salutation ?? '',
-		first_name: doc.first_name ?? '',
-		last_name: doc.last_name ?? '',
-		middle_name: doc.middle_name ?? '',
-		phone_number: doc.phone_number ?? '',
-		email: doc.email ?? '',
-		birthday: doc.birthday ?? '',
-		anniversary: doc.anniversary ?? '',
-		others: (filterUndefinedKeys(doc.others as object) ?? {}) as IPhonebookRecord['others'],
-		labels: doc.labels ?? [],
-	}));
+	return docs.map((doc) => {
+		const { tags, Tags, ...rem } = doc.others ?? {};
+		const others = {
+			...rem,
+			Tags: doc.labels?.join(', ') ?? '',
+		};
+		return {
+			id: doc._id,
+			salutation: doc.salutation ?? '',
+			first_name: doc.first_name ?? '',
+			last_name: doc.last_name ?? '',
+			middle_name: doc.middle_name ?? '',
+			phone_number: doc.phone_number ?? '',
+			email: doc.email ?? '',
+			birthday: doc.birthday ?? '',
+			anniversary: doc.anniversary ?? '',
+			others: (filterUndefinedKeys(others as object) ?? {}) as IPhonebookRecord['others'],
+			labels: doc.labels ?? [],
+		};
+	});
 }
 
 export default class PhoneBookService extends UserService {
@@ -274,7 +281,7 @@ export default class PhoneBookService extends UserService {
 			return acc;
 		}, new Set<string>());
 
-		const list = Array.from(fields).map((field) => ({ value: field, label: field }));
+		let list = Array.from(fields).map((field) => ({ value: field, label: field }));
 
 		list.push(
 			...[
@@ -317,6 +324,7 @@ export default class PhoneBookService extends UserService {
 			]
 		);
 
+		list = list.filter((field) => !['Tags', 'tags'].includes(field.value));
 		list.sort((a, b) => a.label.localeCompare(b.label));
 
 		return list;
