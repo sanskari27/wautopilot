@@ -456,6 +456,12 @@ export default class BroadcastService extends WhatsappLinkService {
 				const { sent, failed, pending } = message.messages[1].reduce(
 					(acc: typeof defaultMap, curr: any) => {
 						if (
+							curr.status === MESSAGE_STATUS.PENDING ||
+							curr.status === MESSAGE_STATUS.PAUSED ||
+							curr.status === MESSAGE_STATUS.PROCESSING
+						) {
+							acc.pending++;
+						} else if (
 							curr.status === MESSAGE_STATUS.SENT ||
 							curr.status === MESSAGE_STATUS.READ ||
 							curr.status === MESSAGE_STATUS.DELIVERED
@@ -515,7 +521,7 @@ export default class BroadcastService extends WhatsappLinkService {
 		const sentMessages = reportSent.map((message) => ({
 			to: message.recipient as string,
 			status: message.status as string,
-			sendAt: DateUtils.format(message.sendAt, 'DD-MM-YYYY HH:mm') as string,
+			sendAt: DateUtils.format(message.createdAt, 'DD-MM-YYYY HH:mm') as string,
 			text: message.body?.body_type === 'TEXT' ? message.body.text : '',
 			template_name: broadcast.template_name as string,
 			sent_at: DateUtils.format(message.sent_at, 'DD-MM-YYYY HH:mm') as string,
@@ -538,11 +544,9 @@ export default class BroadcastService extends WhatsappLinkService {
 			sendAt: DateUtils.format(message.sendAt, 'DD-MM-YYYY HH:mm') as string,
 			text: '', //message.body?.body_type === 'TEXT' ? message.body.text : '',
 			template_name: broadcast.template_name as string,
-			sent_at: DateUtils.format(message.sent_at, 'DD-MM-YYYY HH:mm') as string,
-			read_at: message.read_at ? DateUtils.format(message.read_at, 'DD-MM-YYYY HH:mm') : '',
-			delivered_at: message.delivered_at
-				? DateUtils.format(message.delivered_at, 'DD-MM-YYYY HH:mm')
-				: '',
+			sent_at: '',
+			read_at: '',
+			delivered_at: '',
 			failed_at: message.failed_at ? DateUtils.format(message.failed_at, 'DD-MM-YYYY HH:mm') : '',
 			failed_reason: message.failed_reason as string,
 			description: broadcast.description as string,

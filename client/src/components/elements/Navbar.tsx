@@ -82,7 +82,7 @@ export default function Navbar() {
 					<MenubarLink href={getLink('/campaigns/templates')}>Templates</MenubarLink>
 					<MenubarSeparator />
 					<MenubarLink href={getLink('/campaigns/broadcast')}>Broadcast</MenubarLink>
-					<MenubarLink href={getLink('/campaigns/report')}>Campaign Report</MenubarLink>
+					<MenubarLink href={getLink('/campaigns/report')}>Broadcast Report</MenubarLink>
 					<MenubarLink href={getLink('/campaigns/recurring')}>Recurring</MenubarLink>
 					<MenubarSeparator />
 					<MenubarLink href={getLink('/campaigns/chatbot')}>Chatbot</MenubarLink>

@@ -49,6 +49,10 @@ export default class CSVHelper {
 				label: 'Status',
 			},
 			{
+				value: 'sendAt',
+				label: 'Send At',
+			},
+			{
 				value: 'sent_at',
 				label: 'Sent At',
 			},

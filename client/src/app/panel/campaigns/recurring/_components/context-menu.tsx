@@ -37,9 +37,9 @@ export default function RecurringActionContextMenu({
 		const promise = RecurringService.rescheduleRecurring(campaignId);
 
 		toast.promise(promise, {
-			loading: 'Rescheduling Campaign...',
-			success: 'Campaign Rescheduled',
-			error: 'Failed to Reschedule Campaign',
+			loading: 'Rescheduling Broadcast...',
+			success: 'Broadcast Rescheduled',
+			error: 'Failed to Reschedule Broadcast',
 		});
 	};
 
@@ -71,12 +71,12 @@ export default function RecurringActionContextMenu({
 		const promise = deleteRecurring(campaignId);
 
 		toast.promise(promise, {
-			loading: 'Deleting Campaign...',
+			loading: 'Deleting Broadcast...',
 			success: () => {
 				router.refresh();
-				return 'Campaign Deleted';
+				return 'Broadcast Deleted';
 			},
-			error: 'Failed to Delete Campaign',
+			error: 'Failed to Delete Broadcast',
 		});
 	};
 	return (

@@ -79,7 +79,7 @@ export default function ReportDataTable({
 	return (
 		<div>
 			<div className='justify-between flex'>
-				<h2 className='text-2xl font-bold'>Campaign Report</h2>
+				<h2 className='text-2xl font-bold'>Broadcast Report</h2>
 				<div className='flex gap-x-2 gap-y-1 flex-wrap '>
 					<Show.ShowIf condition={permissions.export}>
 						<Button onClick={handleExport} size={'sm'}>
@@ -120,8 +120,8 @@ export default function ReportDataTable({
 						<TableHead>Description</TableHead>
 						<TableHead>Created At</TableHead>
 						<TableHead className='text-right text-primary'>Sent</TableHead>
-						<TableHead className='text-right text-destructive'>Pending</TableHead>
-						<TableHead className='text-right'>Failed</TableHead>
+						<TableHead className='text-right text-destructive'>Failed</TableHead>
+						<TableHead className='text-right'>Pending</TableHead>
 						<TableHead className='text-center'>Status</TableHead>
 					</TableRow>
 				</TableHeader>
