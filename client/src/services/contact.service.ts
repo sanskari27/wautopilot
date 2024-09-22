@@ -85,6 +85,7 @@ export default class ContactService {
 	static async assignLabels(phone_number: string, labels: string[] = []) {
 		await api.post(`/phonebook/set-labels/phone/${phone_number}`, {
 			labels,
+			numbers: [phone_number],
 		});
 	}
 }

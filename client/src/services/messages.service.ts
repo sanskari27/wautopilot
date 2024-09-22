@@ -244,6 +244,7 @@ export default class MessagesService {
 		try {
 			await api.post(`/phonebook/set-labels/phone/${phone_number}`, {
 				labels,
+				numbers: [phone_number],
 			});
 			return true;
 		} catch (err) {

@@ -175,6 +175,7 @@ export default class BroadcastService {
 		try {
 			await api.post(`/phonebook/set-labels/phone/${phone_number}`, {
 				labels,
+				numbers: [phone_number],
 			});
 			return true;
 		} catch (err) {
