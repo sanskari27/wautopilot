@@ -3,8 +3,10 @@ import { LOGO_WHITE } from '@/lib/consts';
 import { CircleUserRound } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Show from '../containers/show';
+import { useDevicesDialogState } from '../context/devicesState';
+import { useSettingDialogState } from '../context/settingState';
 import { useUserDetails } from '../context/user-details';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -22,7 +24,8 @@ import { LogoutButton } from './logout-button';
 export default function Navbar() {
 	const { isMaster } = useUserDetails();
 	const userDetails = useUserDetails();
-	const pathname = usePathname();
+	const { setDevices } = useDevicesDialogState();
+	const { setSetting } = useSettingDialogState();
 	const router = useRouter();
 
 	function getLink(link: string) {
@@ -30,19 +33,11 @@ export default function Navbar() {
 	}
 
 	function openSettings() {
-		const url = new URL((window as any).location);
-		if (!url.searchParams.has(`settings`)) {
-			url.searchParams.set(`settings`, 'true');
-		}
-		router.replace(url.toString());
+		setSetting(true);
 	}
 
 	function openDevices() {
-		const url = new URL((window as any).location);
-		if (!url.searchParams.has(`devices`)) {
-			url.searchParams.set(`devices`, 'true');
-		}
-		router.replace(url.toString());
+		setDevices(true);
 	}
 
 	return (

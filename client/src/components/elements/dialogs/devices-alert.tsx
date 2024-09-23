@@ -1,6 +1,7 @@
 'use client';
 
 import { useDeviceAlert } from '@/components/context/device-alert';
+import { useDevicesDialogState } from '@/components/context/devicesState';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -10,24 +11,15 @@ import {
 	DialogFooter,
 	DialogTitle,
 } from '@/components/ui/dialog';
-import { useRouter } from 'next/navigation';
 
 export default function DevicesAlertDialog() {
 	const { deviceAlert, setDeviceAlert } = useDeviceAlert();
-	const router = useRouter();
+	const { setDevices } = useDevicesDialogState();
 
 	function openDevices() {
 		setDeviceAlert(false);
-		const url = new URL((window as any).location);
-		if (!url.searchParams.has(`devices`)) {
-			url.searchParams.set(`devices`, 'true');
-		}
-		router.replace(url.toString());
+		setDevices(true);
 	}
-
-	
-
-
 
 	return (
 		<Dialog

@@ -1,6 +1,7 @@
 'use client';
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
+import { useDevicesDialogState } from '@/components/context/devicesState';
 import { useUserDetails } from '@/components/context/user-details';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,7 +28,7 @@ import { META_APP_ID, META_CONFIG_ID } from '@/lib/consts';
 import DeviceService from '@/services/device.service';
 import { Facebook, ShieldCheck, Trash } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import DeleteDialog from './delete';
@@ -41,12 +42,9 @@ type Device = {
 };
 
 export default function DevicesDialog() {
-	const searchParams = useSearchParams();
-	const devices = searchParams.get('devices');
-	const addDevices = searchParams.get('add-device');
-
-	if (devices) return <DevicesList />;
-	else if (addDevices) return <AddDeviceDialog />;
+	const state = useDevicesDialogState();
+	if (state.devices) return <DevicesList />;
+	else if (state.addDevice) return <AddDeviceDialog />;
 	else {
 		return null;
 	}
@@ -56,6 +54,7 @@ function DevicesList() {
 	const { isAgent, max_devices } = useUserDetails();
 	const router = useRouter();
 	const pathname = usePathname();
+	const { setDevices: setDevicesState, setAddDevice: setAddDeviceState } = useDevicesDialogState();
 	const [devices, setDevices] = useState<Device[]>([]);
 	const [current, setCurrent] = useState<string>('');
 
@@ -87,21 +86,13 @@ function DevicesList() {
 	};
 
 	const closeDevices = () => {
-		const url = new URL((window as any).location);
-		if (url.searchParams.has('devices')) {
-			url.searchParams.delete('devices');
-		}
-		router.replace(url.toString());
+		setDevicesState(false);
 	};
 
 	const openAddDevices = () => {
 		const url = new URL((window as any).location);
-		if (!url.searchParams.has(`add-device`)) {
-			if (url.searchParams.has('devices')) {
-				url.searchParams.delete('devices');
-			}
-			url.searchParams.set(`add-device`, 'true');
-		}
+		setAddDeviceState(true);
+		setDevicesState(false);
 		router.replace(url.toString());
 	};
 
@@ -191,6 +182,7 @@ function AddDeviceDialog() {
 	const { value: isOpen, ...setIsOpen } = useBoolean(false);
 	const { value: loading, ...setLoading } = useBoolean();
 	const { value: facebookSignupLoading, ...setFacebookSignupLoading } = useBoolean();
+	const { setAddDevice, setDevices } = useDevicesDialogState();
 
 	const [details, setDetails] = useState({
 		phoneNumberId: '',
@@ -200,26 +192,14 @@ function AddDeviceDialog() {
 	});
 
 	const closeAddDevice = () => {
-		const url = new URL((window as any).location);
-		if (url.searchParams.has('add-device')) {
-			if (!url.searchParams.has('devices')) {
-				url.searchParams.set('devices', 'true');
-			}
-			url.searchParams.delete('add-device');
-		}
-		router.replace(url.toString());
+		setAddDevice(false);
+		setDevices(true);
 	};
 
 	const onDeviceAdded = useCallback(() => {
-		const url = new URL((window as any).location);
-		if (url.searchParams.has('add-device')) {
-			if (!url.searchParams.has('devices')) {
-				url.searchParams.set('devices', 'true');
-			}
-			url.searchParams.delete('add-device');
-		}
-		router.replace(url.toString());
-	}, [router]);
+		setAddDevice(false);
+		setDevices(true);
+	}, [setAddDevice, setDevices]);
 
 	const handleSave = useCallback(async () => {
 		setLoading.on();

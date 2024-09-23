@@ -1,6 +1,7 @@
 'use client';
 
 import Show from '@/components/containers/show';
+import { useSettingDialogState } from '@/components/context/settingState';
 import { useUserDetails, useUserDetailsSetter } from '@/components/context/user-details';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,23 +15,18 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AuthService from '@/services/auth.service';
 import { Separator } from '@radix-ui/react-menubar';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import toast from 'react-hot-toast';
 
 export default function SettingsDialog() {
-	const router = useRouter();
-	const searchParams = useSearchParams();
+	const { setting, setSetting } = useSettingDialogState();
 
 	const closeSettings = () => {
-		const url = new URL((window as any).location);
-		if (url.searchParams.has('settings')) {
-			url.searchParams.delete('settings');
-		}
-		router.replace(url.toString());
+		setSetting(false);
 	};
 
-	if (searchParams.has('settings')) {
+	if (setting) {
 		return <SettingsForm onClose={closeSettings} />;
 	} else {
 		return null;
