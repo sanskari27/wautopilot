@@ -185,7 +185,12 @@ export default class ConversationService extends WhatsappLinkService {
 									unreadCount: 1,
 								},
 						  }
-						: {}),
+						: {
+								$set: {
+									last_message_at: details.received_at || DateUtils.getMomentNow().toDate(),
+									unreadCount: 0,
+								},
+						  }),
 				}
 			);
 
