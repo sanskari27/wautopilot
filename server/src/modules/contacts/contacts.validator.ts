@@ -65,7 +65,7 @@ export function CreateContactValidator(req: Request, res: Response, next: NextFu
 		emails: z
 			.object({
 				email: z.string().trim().default(''),
-				type: z.string().trim().default(''),
+				type: z.string().trim().default('HOME'),
 			})
 			.array()
 			.default([]),
@@ -87,14 +87,14 @@ export function CreateContactValidator(req: Request, res: Response, next: NextFu
 			.object({
 				phone: z.string().trim().default(''),
 				wa_id: z.string().trim().default(''),
-				type: z.string().trim().default(''),
+				type: z.string().trim().default('HOME'),
 			})
 			.array()
 			.default([]),
 		urls: z
 			.object({
 				url: z.string().trim().default(''),
-				type: z.string().trim().default(''),
+				type: z.string().trim().default('HOME'),
 			})
 			.array()
 			.default([]),

@@ -6,6 +6,10 @@ export function extractTemplateHeader(
 	components: Record<string, any>[],
 	componentsMsg: Record<string, any>[]
 ) {
+	if (!components || !componentsMsg) {
+		return;
+	}
+
 	const header = components.find((component) => component.type === 'HEADER');
 	const headerMsg = componentsMsg.find((component) => component.type === 'HEADER');
 	if (!header) {
