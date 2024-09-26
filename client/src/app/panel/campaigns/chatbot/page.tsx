@@ -1,4 +1,5 @@
 import Each from '@/components/containers/each';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
 	Table,
@@ -30,6 +31,7 @@ export default async function ChatbotPage({ params: { panel } }: { params: { pan
 							<TableHead>Message</TableHead>
 							<TableHead>Condition</TableHead>
 							<TableHead>Delay</TableHead>
+							<TableHead>Status</TableHead>
 							<TableHead className='text-center'>Action</TableHead>
 						</TableRow>
 					</TableHeader>
@@ -43,6 +45,11 @@ export default async function ChatbotPage({ params: { panel } }: { params: { pan
 									<TableCell>{chatbot.options.split('_').join(' ')}</TableCell>
 									<TableCell className='capitalize'>
 										{chatbot.response_delay_time} {chatbot.response_delay_type}
+									</TableCell>
+									<TableCell>
+										<Badge variant={chatbot.isActive ? 'default' : 'destructive'}>
+											{chatbot.isActive ? 'Active' : 'Inactive'}
+										</Badge>
 									</TableCell>
 									<TableCell className='text-center'>
 										<ChatbotContextMenu panel={panel} chatbot={chatbot}>
