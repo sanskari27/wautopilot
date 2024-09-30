@@ -23,7 +23,7 @@ export default async function Phonebook({
 	const { data } = await api.get(`/phonebook`, {
 		params: {
 			page: searchParams.page || '1',
-			limit: searchParams.limit || '20',
+			limit: searchParams.limit || '5000',
 			search: search || [],
 			labels: searchParams.tags || [],
 		},
