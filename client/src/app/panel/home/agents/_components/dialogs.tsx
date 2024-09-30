@@ -67,7 +67,7 @@ export function DetailsDialog() {
 			name: `${values.firstName} ${values.lastName}`.trim(),
 			phone: values.phone,
 			email: values.email,
-			password: '000000',
+			password: '00000000',
 		};
 		if (id) {
 			toast.promise(AgentService.updateAgent({ ...details, id }), {

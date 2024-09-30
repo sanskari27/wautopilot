@@ -65,7 +65,7 @@ export async function RegisterAccountValidator(req: Request, res: Response, next
 		name: z.string().trim(),
 		phone: z.string().trim(),
 		email: z.string().trim().email(),
-		password: z.string().trim().min(6),
+		password: z.string().trim().min(8),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
