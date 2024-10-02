@@ -169,7 +169,14 @@ export default class SchedulerService extends WhatsappLinkService {
 					new_id: addedMessage._id,
 				});
 			}
-			msg.remove();
+			if (status !== MESSAGE_STATUS.FAILED) {
+				msg.remove();
+			} else {
+				msg.failed_at = failed_at || DateUtils.getMomentNow().toDate();
+				msg.failed_reason = failed_reason || 'Unknown error';
+				msg.status = MESSAGE_STATUS.FAILED;
+				msg.save();
+			}
 		});
 	}
 
@@ -280,7 +287,14 @@ export default class SchedulerService extends WhatsappLinkService {
 					meta_message_id: message_id,
 				});
 			}
-			msg.remove();
+			if (status !== MESSAGE_STATUS.FAILED) {
+				msg.remove();
+			} else {
+				msg.failed_at = failed_at || DateUtils.getMomentNow().toDate();
+				msg.failed_reason = failed_reason || 'Unknown error';
+				msg.status = MESSAGE_STATUS.FAILED;
+				msg.save();
+			}
 		});
 	}
 
@@ -378,7 +392,14 @@ export default class SchedulerService extends WhatsappLinkService {
 					meta_message_id: message_id,
 				});
 			}
-			msg.remove();
+			if (status !== MESSAGE_STATUS.FAILED) {
+				msg.remove();
+			} else {
+				msg.failed_at = failed_at || DateUtils.getMomentNow().toDate();
+				msg.failed_reason = failed_reason || 'Unknown error';
+				msg.status = MESSAGE_STATUS.FAILED;
+				msg.save();
+			}
 		});
 	}
 
