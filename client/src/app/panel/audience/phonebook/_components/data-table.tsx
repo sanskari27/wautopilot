@@ -252,11 +252,11 @@ export function DataTable({
 	const [rowSelection, setRowSelection] = React.useState({});
 	const searchParams = useSearchParams();
 	const router = useRouter();
-	const limit = searchParams.get('limit') || '5000';
+	const limit = searchParams.get('limit') || '20';
 	const maxPage = Math.ceil(maxRecord / parseInt(limit, 10));
 	const page = Math.min(parseInt(searchParams.get('page') || '1', 10), maxPage);
 
-	console.log(limit, 'limit')
+	console.log(limit, 'limit');
 
 	React.useEffect(() => {
 		if (parseInt(searchParams.get('page') || '1', 5000) > maxPage) {
@@ -420,7 +420,7 @@ export function DataTable({
 									<SelectValue placeholder={limit} />
 								</SelectTrigger>
 								<SelectContent side='top'>
-									{[5000, 10000, 50000].map((pageSize) => (
+									{[20, 50, 100, 500, 1000, 5000, 10000, 50000].map((pageSize) => (
 										<SelectItem key={pageSize} value={`${pageSize}`}>
 											{pageSize}
 										</SelectItem>
