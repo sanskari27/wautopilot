@@ -70,6 +70,7 @@ router
 
 router
 	.route('/message-tags')
+	.all(VerifyMinLevel(UserLevel.Master))
 	.get(Controller.messageTags)
 	.post(CreateMessageTagsValidator, Controller.saveMessageTags);
 
