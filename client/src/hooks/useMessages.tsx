@@ -5,7 +5,7 @@ import { socket } from '@/socket';
 import { Message } from '@/types/recipient';
 import { useEffect, useRef, useState } from 'react';
 
-export default function useMessages(id: string) {
+export default function useMes(id: string) {
 	const { markRead } = useRecipient();
 	const [loading, setLoading] = useState(true);
 	const [messages, setMessages] = useState<Message[]>([]);

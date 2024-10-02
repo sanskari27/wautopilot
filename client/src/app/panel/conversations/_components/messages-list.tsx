@@ -6,20 +6,28 @@ import { useInView } from 'react-intersection-observer';
 import { Message } from './message-template';
 
 const MessagesList = memo(
-	({ list, onLastReached }: { list: IMessage[]; onLastReached: () => void }) => {
+	({
+		list,
+		onLastReached,
+		id: _id,
+	}: {
+		list: IMessage[];
+		onLastReached: (id: string) => void;
+		id: string;
+	}) => {
 		const { ref: inViewRef, inView } = useInView({ triggerOnce: true });
 
 		useEffect(() => {
 			let id: NodeJS.Timeout;
 			if (inView) {
 				id = setTimeout(() => {
-					onLastReached();
+					onLastReached(_id);
 				}, 1000);
 			}
 			return () => {
 				clearTimeout(id);
 			};
-		}, [inView, onLastReached]);
+		}, [_id, inView, onLastReached]);
 
 		return (
 			<Each

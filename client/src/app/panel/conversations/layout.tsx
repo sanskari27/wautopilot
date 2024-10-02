@@ -1,6 +1,7 @@
 import { ChatListExpandedProvider } from '@/components/context/chat-list-expanded';
 import { ContactsProvider } from '@/components/context/contact';
 import { MediaProvider } from '@/components/context/media';
+import { MessagesProvider } from '@/components/context/message-store-provider';
 import { QuickReplyProvider } from '@/components/context/quick-replies';
 import { RecipientProvider } from '@/components/context/recipients';
 import { TemplatesProvider } from '@/components/context/templates';
@@ -41,7 +42,9 @@ export default async function Layout({
 							<ContactsProvider data={contacts}>
 								<QuickReplyProvider data={quickReplies}>
 									<RecipientProvider data={conversations}>
-										<ChatListExpandedProvider>{children}</ChatListExpandedProvider>
+										<MessagesProvider>
+											<ChatListExpandedProvider>{children}</ChatListExpandedProvider>
+										</MessagesProvider>
 									</RecipientProvider>
 								</QuickReplyProvider>
 							</ContactsProvider>

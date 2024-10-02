@@ -22,6 +22,7 @@ export default function ComboboxMultiselect({
 	disabled,
 	onChange,
 	buttonVariant = 'outline',
+	children,
 }: {
 	placeholder: string;
 	items: { value: string; label: string }[];
@@ -29,6 +30,7 @@ export default function ComboboxMultiselect({
 	onChange: (value: string[]) => void;
 	disabled?: boolean;
 	buttonVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+	children?: React.ReactNode;
 }) {
 	const [open, setOpen] = React.useState(false);
 
@@ -83,6 +85,7 @@ export default function ComboboxMultiselect({
 									{framework.label.split('_').join(' ')}
 								</CommandItem>
 							))}
+							{children}
 						</CommandGroup>
 					</CommandList>
 				</Command>

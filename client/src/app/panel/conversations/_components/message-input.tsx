@@ -1,5 +1,6 @@
 'use client';
 import Each from '@/components/containers/each';
+import { useMessages } from '@/components/context/message-store-provider';
 import { useQuickReplies } from '@/components/context/quick-replies';
 import { useRecipient } from '@/components/context/recipients';
 import ContactSelectorDialog from '@/components/elements/dialogs/contact-selector';
@@ -40,6 +41,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { IoClose } from 'react-icons/io5';
 import { MdSmartButton } from 'react-icons/md';
 import { TbTemplate } from 'react-icons/tb';
 import QuickReplyDialog from './add-quick-reply-dialog';
@@ -60,6 +62,8 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 	const { textTemplates } = useQuickReplies();
 	const [selectedQuickReply, setSelectedQuickReply] = useState('');
 
+	const { replyMessageId, setReplyMessageId } = useMessages();
+
 	const handleTextMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setTextMessage(e.target.value);
 		setSelectedQuickReply('');
@@ -71,10 +75,11 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 		MessagesService.sendConversationMessage(selected_recipient!.id, {
 			type: 'text',
 			text: textMessage,
+			context: { message_id: replyMessageId },
 		}).then((data) => {
 			setNotSending();
 			setSelectedQuickReply('');
-
+			setReplyMessageId('');
 			if (!data) {
 				return toast.error('Failed to send message');
 			}
@@ -94,6 +99,7 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 			MessagesService.sendConversationMessage(selected_recipient!.id, {
 				type: _type as 'image' | 'video' | 'document' | 'audio',
 				media_id: attachments[i],
+				context: { message_id: replyMessageId },
 			}).then((data) => {
 				if (!data) {
 					return toast.error('Failed to send message');
@@ -106,6 +112,7 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 		MessagesService.sendConversationMessage(selected_recipient!.id, {
 			type: 'contacts',
 			contacts: contact,
+			context: { message_id: replyMessageId },
 		}).then((data) => {
 			if (!data) {
 				toast.error('Failed to send message');
@@ -133,7 +140,9 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 		MessagesService.sendQuickTemplateMessage({
 			recipientId: selected_recipient!.id,
 			quickReply: id,
+			context:{ message_id: replyMessageId }
 		}).then((data) => {
+			setReplyMessageId('');
 			if (!data) {
 				toast.error('Failed to send message');
 			}
@@ -169,8 +178,43 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 		});
 	}
 
+	const scrollToContext = () => {
+		if (!replyMessageId) return;
+		const context = document.getElementById(replyMessageId);
+		if (!context) {
+			toast.error('Message might have been deleted or not found in the conversation');
+			return;
+		}
+		context?.scrollIntoView({ behavior: 'smooth' });
+	};
+
 	return (
 		<>
+			<div
+				className={`${
+					!replyMessageId ? 'h-0 p-0' : 'p-2 h-[60px]'
+				} overflow-hidden flex w-full bg-white border-b border-b-gray-200 gap-x-2 transition-[1s]`}
+			>
+				{replyMessageId ? (
+					<div
+						className={
+							'cursor-pointer flex pl-2 py-1 border-l-2 border-primary w-full items-center justify-between'
+						}
+					>
+						<p onClick={scrollToContext} className='text-sm text-gray-500'>
+							Show context
+						</p>
+						<Button
+							onClick={() => setReplyMessageId('')}
+							size={'sm'}
+							className='rounded-full p-1'
+							variant={'destructive'}
+						>
+							<IoClose className='w-6 h-6' />
+						</Button>
+					</div>
+				) : null}
+			</div>
 			<div
 				className={`${
 					quickReply ? 'h-0 p-0' : 'p-2 h-[60px]'

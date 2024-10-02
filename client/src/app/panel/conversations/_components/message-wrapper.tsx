@@ -1,10 +1,12 @@
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
+import { useMessages } from '@/components/context/message-store-provider';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
@@ -41,6 +43,8 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 		}
 		context?.scrollIntoView({ behavior: 'smooth' });
 	};
+
+	const { setReplyMessageId } = useMessages();
 
 	return (
 		<>
@@ -79,6 +83,12 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 										<span className='mr-auto'>Assign Tags</span>
 									</Button>
 								</AssignMessageLabelDialog>
+								<DropdownMenuItem
+									onClick={() => setReplyMessageId(message.message_id)}
+									className='w-full p-2 font-normal'
+								>
+									Reply
+								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
 						{message.context.id ? (

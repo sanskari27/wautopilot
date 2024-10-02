@@ -11,7 +11,7 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import useBoolean from '@/hooks/useBoolean';
-import useMessages from '@/hooks/useMessages';
+import { useMessages } from '@/components/context/message-store-provider';
 import { getInitials } from '@/lib/utils';
 import MessagesService from '@/services/messages.service';
 import { ChevronLeft, EllipsisVertical } from 'lucide-react';
@@ -34,7 +34,7 @@ export default function ConversationScreen() {
 		off: closeConversationNoteDialog,
 	} = useBoolean(false);
 	const { expand, isExpanded } = useChatListExpanded();
-	const { loading, expiry, messages, loadMore } = useMessages(recipient?.id ?? '');
+	const { loading, expiry, messages, loadMoreMessages } = useMessages();
 
 	useEffect(() => {
 		if (recipient?.id) {
@@ -94,7 +94,7 @@ export default function ConversationScreen() {
 			<div className='flex w-full h-[calc(100vh-140px)] bg-[#ece5dd] items-end flex-col'>
 				{loading && <p className='text-gray-500 text-center text-lg w-full'>loading...</p>}
 				<div className='flex flex-col-reverse w-full overflow-y-auto p-4 h-full'>
-					<MessagesList list={messages} onLastReached={loadMore} />
+					<MessagesList list={messages} onLastReached={loadMoreMessages} id={recipient.id} />
 				</div>
 				<MessageBox isExpired={expiry === 'EXPIRED' ? true : false} />
 			</div>

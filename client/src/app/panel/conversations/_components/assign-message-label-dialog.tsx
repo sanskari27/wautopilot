@@ -1,9 +1,8 @@
 import Each from '@/components/containers/each';
-import Show from '@/components/containers/show';
 import { useRecipient } from '@/components/context/recipients';
-import TagsSelector from '@/components/elements/popover/tags';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import ComboboxMultiselect from '@/components/ui/combobox-multiselect';
 import {
 	Dialog,
 	DialogContent,
@@ -14,10 +13,10 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import MessagesService from '@/services/messages.service';
-import { ListFilter } from 'lucide-react';
+import UserService from '@/services/users.service';
+import { Plus } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { FaSpinner } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 
 export default function AssignMessageLabelDialog({
@@ -48,17 +47,27 @@ export default function AssignMessageLabelDialog({
 			return;
 		}
 		setLoading(true);
-		MessagesService.fetchConversationMessages(recipient?.id, {
-			page: 1,
-			limit: 1,
-		})
+		UserService.listMessageTags()
 			.then((data) => {
-				setMessageLabels(data.messageLabels);
+				setMessageLabels(data);
+			})
+			.catch(() => {
+				toast.error('Failed to fetch message labels');
 			})
 			.finally(() => {
 				setLoading(false);
 			});
 	}, [recipient?.id]);
+
+	const handleAddRemoveTags = (tags: string[]) => {
+		const _tags = tags.filter((tag) => {
+			if (selectedTags.includes(tag)) {
+				return false;
+			}
+			return true;
+		});
+		setSelectedTags([...selectedTags, ..._tags]);
+	};
 
 	const handleAddTags = (tags: string[]) => {
 		const _tags = tags.filter((tag) => {
@@ -99,6 +108,19 @@ export default function AssignMessageLabelDialog({
 		);
 	};
 
+	const handleAddNewTags = () => {
+		const newMessageTags = newTags.split(',').map((tag) => tag.trim());
+		toast.promise(UserService.createMessageTags([...selectedTags, ...newMessageTags]), {
+			loading: 'Adding new tags...',
+			success: (data) => {
+				setMessageLabels(data);
+				setNewTags('');
+				return 'Tags added successfully';
+			},
+			error: 'Failed to add tags',
+		});
+	};
+
 	return (
 		<Dialog>
 			<DialogTrigger ref={buttonRef} asChild>
@@ -106,7 +128,7 @@ export default function AssignMessageLabelDialog({
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Assign Tags</DialogTitle>
+					<DialogTitle>Assign Message Tags</DialogTitle>
 				</DialogHeader>
 				<div className='flex flex-wrap border-2 p-2 rounded-lg'>
 					<Each
@@ -121,13 +143,32 @@ export default function AssignMessageLabelDialog({
 				</div>
 				<div className='flex gap-2'>
 					<div className='flex-1'>
-						<Input
-							value={newTags}
-							onChange={(e) => setNewTags(e.target.value)}
-							placeholder='eg. Customer'
-						/>
+						<ComboboxMultiselect
+							items={messageLabels.map((tag) => {
+								return {
+									value: tag,
+									label: tag,
+								};
+							})}
+							onChange={(tags) => handleAddRemoveTags(tags as string[])}
+							value={selectedTags}
+							placeholder='Select message tags'
+						>
+							<div className='flex gap-2'>
+								<div className='flex-1'>
+									<Input
+										value={newTags}
+										onChange={(e) => setNewTags(e.target.value)}
+										placeholder='Add new tags'
+									/>
+								</div>
+								<Button onClick={handleAddNewTags}>
+									<Plus />
+								</Button>
+							</div>
+						</ComboboxMultiselect>
 					</div>
-					<TagsSelector labels={messageLabels} onChange={handleAddTags}>
+					{/* <TagsSelector labels={messageLabels} onChange={handleAddTags}>
 						<Button variant='secondary' size={'icon'} disabled={loading}>
 							<Show>
 								<Show.When condition={loading}>
@@ -138,7 +179,7 @@ export default function AssignMessageLabelDialog({
 								</Show.Else>
 							</Show>
 						</Button>
-					</TagsSelector>
+					</TagsSelector> */}
 				</div>
 				<DialogFooter>
 					<Button onClick={handleSave}>Save</Button>
