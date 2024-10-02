@@ -140,7 +140,7 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 		MessagesService.sendQuickTemplateMessage({
 			recipientId: selected_recipient!.id,
 			quickReply: id,
-			context:{ message_id: replyMessageId }
+			context: { message_id: replyMessageId },
 		}).then((data) => {
 			setReplyMessageId('');
 			if (!data) {
@@ -171,7 +171,9 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 			body: template_body,
 			header: template_header,
 			type: 'template',
+			context: { message_id: replyMessageId },
 		}).then((data) => {
+			setReplyMessageId('');
 			if (!data) {
 				toast.error('Failed to send message');
 			}

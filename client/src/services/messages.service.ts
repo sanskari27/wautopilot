@@ -215,7 +215,7 @@ export default class MessagesService {
 			media_id?: string;
 			link?: string;
 		};
-		context?:{message_id:string}
+		context?: { message_id: string };
 	}) {
 		if (details.header?.type === '') {
 			delete details.header;
