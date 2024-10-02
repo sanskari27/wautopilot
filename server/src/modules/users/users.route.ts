@@ -5,6 +5,7 @@ import Controller from './users.controller';
 import {
 	AssignTaskValidator,
 	CreateAgentValidator,
+	CreateMessageTagsValidator,
 	CreateQuickReplyValidator,
 	PasswordValidator,
 	PermissionsValidator,
@@ -66,6 +67,11 @@ router
 	.route('/quick-replies')
 	.get(Controller.quickReplies)
 	.post(CreateQuickReplyValidator, Controller.saveQuickReply);
+
+router
+	.route('/message-tags')
+	.get(Controller.messageTags)
+	.post(CreateMessageTagsValidator, Controller.saveMessageTags);
 
 router.route('/tasks/:id').all(IDValidator).patch(Controller.hideAssignedTask);
 

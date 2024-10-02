@@ -12,5 +12,7 @@ export default interface IAccount extends Document {
 	markupPrice: number;
 	walletBalance: number;
 
+	messageTags: string[];
+
 	verifyPassword(password: string): Promise<boolean>;
 }

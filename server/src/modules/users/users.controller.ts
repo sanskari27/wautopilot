@@ -383,6 +383,33 @@ async function hideAssignedTask(req: Request, res: Response, next: NextFunction)
 	});
 }
 
+async function messageTags(req: Request, res: Response, next: NextFunction) {
+	const { serviceUser } = req.locals;
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			tags: serviceUser.messageTags(),
+		},
+	});
+}
+
+async function saveMessageTags(req: Request, res: Response, next: NextFunction) {
+	const { serviceUser } = req.locals;
+	const tags = req.locals.data as string[];
+
+	serviceUser.addMessageTags(tags);
+
+	return Respond({
+		res,
+		status: 200,
+		data: {
+			tags: [...serviceUser.messageTags(), ...tags],
+		},
+	});
+}
+
 const Controller = {
 	getAdmins,
 	extendSubscription,
@@ -402,6 +429,8 @@ const Controller = {
 	assignTask,
 	hideAssignedTask,
 	getAssignedTask,
+	messageTags,
+	saveMessageTags,
 };
 
 export default Controller;

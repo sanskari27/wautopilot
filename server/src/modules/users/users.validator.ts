@@ -341,6 +341,28 @@ export async function CreateQuickReplyValidator(req: Request, res: Response, nex
 	);
 }
 
+export async function CreateMessageTagsValidator(req: Request, res: Response, next: NextFunction) {
+	const reqValidator = z.object({
+		tags: z.array(z.string().trim().min(1).max(20)),
+	});
+
+	const reqValidatorResult = reqValidator.safeParse(req.body);
+
+	if (reqValidatorResult.success) {
+		req.locals.data = reqValidatorResult.data.tags;
+		return next();
+	}
+
+	return next(
+		new CustomError({
+			STATUS: 400,
+			TITLE: 'INVALID_FIELDS',
+			MESSAGE: "Invalid fields in the request's body.",
+			OBJECT: reqValidatorResult.error.flatten(),
+		})
+	);
+}
+
 export async function AssignTaskValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
 		message: z.string().trim(),

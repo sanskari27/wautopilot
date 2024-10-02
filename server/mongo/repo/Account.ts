@@ -37,6 +37,9 @@ const schema = new mongoose.Schema<IAccount>({
 		type: Number,
 		default: 0,
 	},
+	messageTags: {
+		type: [String],
+	},
 });
 
 schema.pre('save', async function (next) {

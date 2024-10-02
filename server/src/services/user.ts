@@ -86,6 +86,25 @@ export default class UserService {
 		return this._account;
 	}
 
+	messageTags() {
+		return this._account.messageTags;
+	}
+
+	async addMessageTags(tags: string[]) {
+		await AccountDB.updateOne(
+			{
+				_id: this._user_id,
+			},
+			{
+				$addToSet: {
+					messageTags: {
+						$each: tags,
+					},
+				},
+			}
+		);
+	}
+
 	async updateDetails(opts: { name?: string; email?: string; phone?: string }) {
 		const update: any = filterUndefinedKeys(opts);
 
