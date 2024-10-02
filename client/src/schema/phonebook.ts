@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const contactSchema = z.object({
 	addresses: z.array(
 		z.object({
-			type: z.string(),
+			type: z.string().default('WORK'),
 			street: z.string(),
 			city: z.string(),
 			state: z.string(),
@@ -16,7 +16,7 @@ export const contactSchema = z.object({
 	emails: z.array(
 		z.object({
 			email: z.string().email('Invalid email address'),
-			type: z.string().default('HOME'),
+			type: z.string().default('WORK'),
 		})
 	),
 	name: z.object({
@@ -36,13 +36,13 @@ export const contactSchema = z.object({
 		z.object({
 			phone: z.string(),
 			wa_id: z.string(),
-			type: z.string(),
+			type: z.string().default('WORK'),
 		})
 	),
 	urls: z.array(
 		z.object({
 			url: z.string().url('Invalid URL'),
-			type: z.string(),
+			type: z.string().default('WORK'),
 		})
 	),
 });

@@ -17,24 +17,24 @@ const formatContact = (contact: any) => {
 			return {
 				phone: phone.phone ?? '',
 				wa_id: phone.wa_id ?? '',
-				type: phone.type ?? '',
+				type: phone.type ?? 'WORK',
 			};
 		}),
 		emails: (contact.emails ?? []).map((email: any) => {
 			return {
 				email: email.email ?? '',
-				type: email.type ?? 'HOME',
+				type: email.type ?? 'WORK',
 			};
 		}),
 		urls: (contact.urls ?? []).map((url: any) => {
 			return {
 				url: url.url ?? '',
-				type: url.type ?? '',
+				type: url.type ?? 'WORK',
 			};
 		}),
 		addresses: (contact.addresses ?? []).map((address: any) => {
 			return {
-				type: address.type ?? '',
+				type: address.type ?? 'WORK',
 				street: address.street ?? '',
 				city: address.city ?? '',
 				state: address.state ?? '',

@@ -120,7 +120,34 @@ function ContactForm({
 	const addresses = form.watch('addresses');
 
 	function handleSave(data: z.infer<typeof contactSchema>) {
-		onSave(data);
+		const contact_data = {
+			...data,
+			phones: data.phones.map((phone) => {
+				return {
+					...phone,
+					type: 'WORK',
+				};
+			}),
+			addresses: data.addresses.map((address) => {
+				return {
+					...address,
+					type: 'WORK',
+				};
+			}),
+			emails: data.emails.map((email) => {
+				return {
+					...email,
+					type: 'WORK',
+				};
+			}),
+			urls: data.urls.map((url) => {
+				return {
+					...url,
+					type: 'WORK',
+				};
+			}),
+		};
+		onSave(contact_data);
 	}
 
 	return (
@@ -281,7 +308,7 @@ function ContactForm({
 								form.setValue('phones', [
 									...form.getValues('phones'),
 									{
-										type: 'work',
+										type: 'WORK',
 										phone: '',
 										wa_id: '',
 									},
@@ -304,7 +331,14 @@ function ContactForm({
 											<div className='flex items-center w-full'>
 												<div className='flex-1'>
 													<FormControl>
-														<Input placeholder='eg. 919XXXXXXX87' {...field} />
+														<Input
+															placeholder='eg. 919XXXXXXX87'
+															onChange={(e) => {
+																field.onChange(e);
+																form.setValue(`phones.${index}.wa_id`, e.target.value);
+															}}
+															value={field.value}
+														/>
 													</FormControl>
 												</div>
 												<Button
@@ -342,7 +376,7 @@ function ContactForm({
 								form.setValue('emails', [
 									...form.getValues('emails'),
 									{
-										type: 'work',
+										type: 'WORK',
 										email: '',
 									},
 								]);
@@ -402,7 +436,7 @@ function ContactForm({
 								form.setValue('urls', [
 									...form.getValues('urls'),
 									{
-										type: 'work',
+										type: 'WORK',
 										url: '',
 									},
 								]);
@@ -462,7 +496,7 @@ function ContactForm({
 								form.setValue('addresses', [
 									...form.getValues('addresses'),
 									{
-										type: 'work',
+										type: 'WORK',
 										street: '',
 										city: '',
 										state: '',
