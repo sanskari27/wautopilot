@@ -59,6 +59,13 @@ export type ButtonsTemplate = {
 	buttons: ButtonsType[];
 };
 
+export type CarouselTemplate = {
+	type: 'CAROUSEL';
+	cards: {
+		components: (HeaderTemplate | BodyTemplate | ButtonsTemplate)[];
+	}[];
+};
+
 export type Template = {
 	name: string;
 	category: 'AUTHENTICATION' | 'MARKETING' | 'UTILITY';

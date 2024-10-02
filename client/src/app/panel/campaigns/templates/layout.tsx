@@ -13,12 +13,12 @@ export default async function Layout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const templates = (await TemplateService.listTemplates())!;
+	// const templates = (await TemplateService.listTemplates())!;
 
 	return (
 		<Suspense fallback={<Loading />}>
 			<section>
-				<TemplatesProvider data={templates}>{children}</TemplatesProvider>
+				<TemplatesProvider data={[]}>{children}</TemplatesProvider>
 			</section>
 		</Suspense>
 	);

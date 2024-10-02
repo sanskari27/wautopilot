@@ -40,11 +40,21 @@ const buttonsSchema = z.object({
 	),
 });
 
+const carouselSchema = z.object({
+	type: z.literal('CAROUSEL'),
+	cards: z.array(
+		z.object({
+			components: z.discriminatedUnion('type', [headerSchema, bodySchema, buttonsSchema]),
+		})
+	),
+});
+
 const componentSchema = z.discriminatedUnion('type', [
 	headerSchema,
 	bodySchema,
 	footerSchema,
 	buttonsSchema,
+	carouselSchema,
 ]);
 
 export const templateSchema = z.object({

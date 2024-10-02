@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn, countOccurrences } from '@/lib/utils';
@@ -68,6 +69,9 @@ export default function DataForm({
 	const footer = footers.length > 0 ? (footers[0] as { type: 'FOOTER'; text: '' }) : null;
 	const buttons =
 		components.filter((component) => component.type === 'BUTTONS')?.[0]?.buttons ?? [];
+
+	const carousel = components.filter((component) => component.type === 'CAROUSEL')?.[0];
+	console.log(carousel);
 
 	const saveTemplate = async (data: Template, handle?: string) => {
 		const buttons =
@@ -233,7 +237,7 @@ export default function DataForm({
 
 						<Separator />
 
-						<div>
+						<div className='inline-flex justify-between w-full items-end'>
 							<FormField
 								control={form.control}
 								name='category'
@@ -261,6 +265,29 @@ export default function DataForm({
 									</FormItem>
 								)}
 							/>
+
+							<FormItem className='space-y-0 items-center justify-center inline-flex gap-3'>
+								<FormLabel className='text-primary'>Carousel Template</FormLabel>
+								<FormControl>
+									<Switch
+										checked={!!carousel}
+										onCheckedChange={(val) => {
+											if (val) {
+												form.setValue('components', [
+													...components,
+													{ type: 'CAROUSEL', cards: [] },
+												]);
+											} else {
+												form.setValue(
+													'components',
+													components.filter((component) => component.type !== 'CAROUSEL')
+												);
+											}
+										}}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
 						</div>
 
 						<Separator />
@@ -434,35 +461,46 @@ export default function DataForm({
 
 						<Separator />
 
-						<div className='flex flex-col gap-3'>
-							<FormItem className='space-y-0 flex-1'>
-								<FormLabel className='text-primary'>Footer Text (Optional)</FormLabel>
-								<FormControl>
-									<Input
-										placeholder='Footer Text'
-										value={footer?.text ?? ''}
-										onChange={(e) => {
-											if (!footer) {
-												form.setValue('components', [
-													...components,
-													{ type: 'FOOTER', text: e.target.value },
-												]);
-											} else {
-												form.setValue(
-													'components',
-													components.map((component) => {
-														if (component.type === 'FOOTER') {
-															return { ...component, text: e.target.value };
-														}
-														return component;
-													})
-												);
-											}
-										}}
-									/>
-								</FormControl>
-							</FormItem>
-						</div>
+						<Show>
+							<Show.When condition={!!carousel}>
+								<div className={'flex flex-col gap-3'}>
+									<div className='flex flex-col'>
+										<Button>Customize Carousel Cards</Button>
+									</div>
+								</div>
+							</Show.When>
+							<Show.Else>
+								<div className={'flex flex-col gap-3'}>
+									<FormItem className='space-y-0 flex-1'>
+										<FormLabel className='text-primary'>Footer Text (Optional)</FormLabel>
+										<FormControl>
+											<Input
+												placeholder='Footer Text'
+												value={footer?.text ?? ''}
+												onChange={(e) => {
+													if (!footer) {
+														form.setValue('components', [
+															...components,
+															{ type: 'FOOTER', text: e.target.value },
+														]);
+													} else {
+														form.setValue(
+															'components',
+															components.map((component) => {
+																if (component.type === 'FOOTER') {
+																	return { ...component, text: e.target.value };
+																}
+																return component;
+															})
+														);
+													}
+												}}
+											/>
+										</FormControl>
+									</FormItem>
+								</div>
+							</Show.Else>
+						</Show>
 
 						<Separator />
 

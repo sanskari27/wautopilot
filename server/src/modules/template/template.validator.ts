@@ -70,11 +70,21 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 		),
 	});
 
+	const carouselSchema = z.object({
+		type: z.literal('CAROUSEL'),
+		cards: z.array(
+			z.object({
+				components: z.discriminatedUnion('type', [headerSchema, bodySchema, buttonsSchema]),
+			})
+		),
+	});
+
 	const componentSchema = z.discriminatedUnion('type', [
 		headerSchema,
 		bodySchema,
 		footerSchema,
 		buttonsSchema,
+		carouselSchema,
 	]);
 
 	const reqValidator = z.object({
