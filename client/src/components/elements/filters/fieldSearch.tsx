@@ -90,7 +90,7 @@ export default function FieldSearch() {
 	const handleSearch = () => {
 		if (search && fieldName) {
 			addToSearchParams(fieldName, search);
-			setFieldName('');
+			setFieldName('all');
 			setSearch('');
 		}
 	};
