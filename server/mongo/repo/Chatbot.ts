@@ -123,6 +123,10 @@ const schema = new mongoose.Schema<IChatBot>(
 			type: Boolean,
 			default: true,
 		},
+		reply_to_message: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	{
 		timestamps: { createdAt: true },

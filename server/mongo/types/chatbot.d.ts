@@ -56,4 +56,5 @@ export default interface IChatBot extends Document {
 	}[];
 	forward: { number: string; message: string };
 	active: boolean;
+	reply_to_message: boolean;
 }

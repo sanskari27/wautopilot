@@ -236,9 +236,14 @@ export function parseVariables(text: string, variables: { [key: string]: string 
 	});
 }
 
-export function generateTextMessageObject(recipient: string, msg: string) {
+export function generateTextMessageObject(
+	recipient: string,
+	msg: string,
+	opts: { meta_message_id?: string } = {} as any
+) {
 	return {
 		messaging_product: 'whatsapp',
+		...(opts.meta_message_id ? { context: { message_id: opts.meta_message_id } } : {}),
 		to: recipient,
 		type: 'text',
 		text: {
@@ -249,11 +254,13 @@ export function generateTextMessageObject(recipient: string, msg: string) {
 
 export function generateMediaMessageObject(
 	recipient: string,
-	details: { type: string; media_id: string }
+	details: { type: string; media_id: string },
+	opts: { meta_message_id?: string } = {} as any
 ) {
 	return {
 		messaging_product: 'whatsapp',
 		to: recipient,
+		...(opts.meta_message_id ? { context: { message_id: opts.meta_message_id } } : {}),
 		type: details.type,
 		[details.type]: {
 			id: details.media_id,
@@ -261,9 +268,14 @@ export function generateMediaMessageObject(
 	};
 }
 
-export function generateContactMessageObject(recipient: string, card: IContact) {
+export function generateContactMessageObject(
+	recipient: string,
+	card: IContact,
+	opts: { meta_message_id?: string } = {} as any
+) {
 	return {
 		messaging_product: 'whatsapp',
+		...(opts.meta_message_id ? { context: { message_id: opts.meta_message_id } } : {}),
 		to: recipient,
 		type: 'contacts',
 		contacts: [
@@ -305,7 +317,8 @@ export function generateTemplateMessageObject(
 			fallback_value: string;
 		}[];
 		contact?: IPhoneBook;
-	}
+	},
+	opts: { meta_message_id?: string } = {} as any
 ) {
 	const bodyParametersList = [
 		'first_name',
@@ -378,6 +391,7 @@ export function generateTemplateMessageObject(
 	};
 	return {
 		template_name: details.template_name,
+		...(opts.meta_message_id ? { context: { message_id: opts.meta_message_id } } : {}),
 		to: recipient,
 		template: {
 			components: [...headers, body],

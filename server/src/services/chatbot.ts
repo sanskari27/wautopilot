@@ -629,39 +629,65 @@ export default class ChatBotService extends WhatsappLinkService {
 				if (msg) {
 					msg = parseVariables(msg, contact as unknown as Record<string, string>);
 
-					const msgObj = generateTextMessageObject(recipient, msg);
+					const msgObj = generateTextMessageObject(recipient, msg, {
+						meta_message_id: bot.reply_to_message ? meta_message_id : undefined,
+					});
 					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 				}
 
 				for (const mediaObject of bot.images) {
-					const msgObj = generateMediaMessageObject(recipient, {
-						media_id: mediaObject.media_id,
-						type: 'image',
-					});
+					const msgObj = generateMediaMessageObject(
+						recipient,
+						{
+							media_id: mediaObject.media_id,
+							type: 'image',
+						},
+						{
+							meta_message_id: bot.reply_to_message ? meta_message_id : undefined,
+						}
+					);
 					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 				}
 
 				for (const mediaObject of bot.videos) {
-					const msgObj = generateMediaMessageObject(recipient, {
-						media_id: mediaObject.media_id,
-						type: 'video',
-					});
+					const msgObj = generateMediaMessageObject(
+						recipient,
+						{
+							media_id: mediaObject.media_id,
+							type: 'video',
+						},
+						{
+							meta_message_id: bot.reply_to_message ? meta_message_id : undefined,
+						}
+					);
 					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 				}
 
 				for (const mediaObject of bot.audios) {
-					const msgObj = generateMediaMessageObject(recipient, {
-						media_id: mediaObject.media_id,
-						type: 'audio',
-					});
+					const msgObj = generateMediaMessageObject(
+						recipient,
+						{
+							media_id: mediaObject.media_id,
+							type: 'audio',
+						},
+						{
+							meta_message_id: bot.reply_to_message ? meta_message_id : undefined,
+						}
+					);
 					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 				}
 
 				for (const mediaObject of bot.documents) {
-					const msgObj = generateMediaMessageObject(recipient, {
-						media_id: mediaObject.media_id,
-						type: 'document',
-					});
+					const msgObj = generateMediaMessageObject(
+						recipient,
+						{
+							media_id: mediaObject.media_id,
+							type: 'document',
+						},
+						{
+							meta_message_id: bot.reply_to_message ? meta_message_id : undefined,
+						}
+					);
 					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 				}
 
@@ -670,12 +696,18 @@ export default class ChatBotService extends WhatsappLinkService {
 					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 				});
 			} else if (bot.respond_type === 'template' && bot.template_id) {
-				const msgObj = generateTemplateMessageObject(recipient, {
-					template_name: bot.template_name,
-					header: bot.template_header,
-					body: bot.template_body,
-					contact: contact as unknown as IPhoneBook,
-				});
+				const msgObj = generateTemplateMessageObject(
+					recipient,
+					{
+						template_name: bot.template_name,
+						header: bot.template_header,
+						body: bot.template_body,
+						contact: contact as unknown as IPhoneBook,
+					},
+					{
+						meta_message_id: bot.reply_to_message ? meta_message_id : undefined,
+					}
+				);
 				await schedulerService.schedule(recipient, msgObj, schedulerOptions);
 			}
 
