@@ -51,6 +51,7 @@ export type CreateBotValidationResult = {
 		};
 	}[];
 	forward: { number: string; message: string };
+	reply_to_message: boolean;
 };
 
 export type CreateFlowValidationResult = {
@@ -259,6 +260,7 @@ export async function CreateBotValidator(req: Request, res: Response, next: Next
 			number: z.string().trim().default(''),
 			message: z.string().trim().default(''),
 		}),
+		reply_to_message: z.boolean().default(false),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
