@@ -391,7 +391,7 @@ export default class SchedulerService extends WhatsappLinkService {
 				failed_at,
 				failed_reason,
 				status,
-				message_type: 'interactive',\
+				message_type: 'interactive',
 				...(msg.messageObject.context
 					? { context: { id: msg.messageObject.context.message_id } }
 					: {}),
