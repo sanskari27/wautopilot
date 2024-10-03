@@ -68,6 +68,7 @@ const tagsVariableMessage = [
 
 const DEFAULT_DATA: ChatBot = {
 	id: '',
+	reply_to_message: false,
 	trigger: [],
 	options: 'INCLUDES_IGNORE_CASE',
 	trigger_gap_time: '1',
@@ -215,11 +216,17 @@ export default function ChatbotForm() {
 
 		toast.promise(promise, {
 			loading: 'Saving Chatbot...',
-			success: () => {
+			success: (res) => {
+				if (!res) {
+					return 'Error saving chatbot. Please try agin.';
+				}
 				router.push(`/panel/campaigns/chatbot`);
 				return 'Successfully saved chatbot.';
 			},
-			error: 'Error saving chatbot. Please try agin.',
+			error: (err) => {
+				console.log(err);
+				return 'Error saving chatbot. Please try agin.';
+			},
 		});
 	};
 
@@ -262,6 +269,23 @@ export default function ChatbotForm() {
 										</FormItem>
 									)}
 								/>
+								<div>
+									<FormField
+										control={form.control}
+										name='reply_to_message'
+										render={({ field }) => (
+											<FormItem className='space-y-0 flex-1 inline-flex items-center gap-2'>
+												<FormControl>
+													<Checkbox
+														checked={field.value}
+														onCheckedChange={(checked) => field.onChange(checked)}
+													/>
+												</FormControl>
+												<div className='text-sm'>Reply</div>
+											</FormItem>
+										)}
+									/>
+								</div>
 								<Button type='button' size={'sm'} onClick={addEmptyTrigger}>
 									<Plus className='w-4 h-4' />
 									<span>Add Trigger</span>

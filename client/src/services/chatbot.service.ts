@@ -5,6 +5,7 @@ import { TWhatsappFlow } from '@/schema/whatsapp-flow';
 const validateChatBot = (bot: any) => {
 	return {
 		id: bot.bot_id ?? '',
+		reply_to_message: bot.reply_to_message ?? false,
 		respond_to: bot.respond_to ?? 'ALL',
 		trigger: bot.trigger ?? '',
 		trigger_gap_time: (bot.trigger_gap_seconds % 3600 === 0
@@ -108,6 +109,7 @@ export default class ChatBotService {
 	}
 
 	static async createBot(details: {
+		reply_to_message: boolean;
 		trigger: string[];
 		trigger_gap_seconds: number;
 		response_delay_seconds: number;
@@ -222,6 +224,7 @@ export default class ChatBotService {
 	}: {
 		botId: string;
 		details: {
+			reply_to_message: boolean;
 			trigger: string[];
 			trigger_gap_seconds: number;
 			response_delay_seconds: number;
@@ -281,7 +284,7 @@ export default class ChatBotService {
 			}
 		}
 		const { data } = await api.patch(`/chatbot/${botId}`, details);
-		return validateChatBot(data.bot);
+		return data.success;
 	}
 
 	static async exportWhatsappFlowData(id: string) {

@@ -72,6 +72,7 @@ export const nurturingSchema = z.array(
 export const chatbotSchema = z
 	.object({
 		id: z.string(),
+		reply_to_message: z.boolean().default(false),
 		trigger: z.array(z.string()),
 		options: z.union([
 			z.literal('INCLUDES_IGNORE_CASE'),
