@@ -1,5 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
 	Dialog,
 	DialogClose,
@@ -23,17 +24,18 @@ import { parseToSeconds } from '@/lib/utils';
 import { useState } from 'react';
 
 export type TextMessageProps = {
-	onTextMessageAdded: (text: string, delay: number) => void;
+	onTextMessageAdded: (text: string, delay: number, reply_to_message: boolean) => void;
 	children: React.ReactNode;
 };
 
 const TextMessage = ({ onTextMessageAdded, children }: TextMessageProps) => {
+	const [reply_to_message, setReplyToMessage] = useState(false);
 	const [message, setMessage] = useState('');
 	const [delay, setDelay] = useState(0);
 	const [delayType, setDelayType] = useState<'sec' | 'min' | 'hour'>('sec');
 
 	const handleSave = () => {
-		onTextMessageAdded(message, parseToSeconds(delay, delayType));
+		onTextMessageAdded(message, parseToSeconds(delay, delayType), reply_to_message);
 	};
 
 	return (
@@ -45,7 +47,16 @@ const TextMessage = ({ onTextMessageAdded, children }: TextMessageProps) => {
 				</DialogTitle>
 				<div className='max-h-[70vh] grid gap-2 overflow-y-auto px-0'>
 					<div>
-						<p className='text-sm mt-2'>Use text message to show final output of the flow.</p>
+						<div className='flex items-center justify-between'>
+							<p className='text-sm mt-2'>Use text message to show final output of the flow.</p>
+							<div className='space-y-0 inline-flex items-center gap-2'>
+								<Checkbox
+									checked={reply_to_message}
+									onCheckedChange={(checked) => setReplyToMessage(checked.valueOf() as boolean)}
+								/>
+								<div className='text-sm'>Reply</div>
+							</div>
+						</div>
 						<Textarea
 							className='w-full h-[100px] resize-none !ring-0'
 							placeholder={'Enter caption here. \nex. This is a beautiful image.'}

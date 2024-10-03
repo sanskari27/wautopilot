@@ -59,19 +59,26 @@ type Button = {
 export default function CreateNodeDrawer({ addNode }: Props) {
 	const { value: isOpen, on: onOpen, set: setSheetOpen } = useBoolean();
 
-	const handleTextElement = (text: string, delay: number) => {
+	const handleTextElement = (text: string, delay: number, reply_to_message: boolean) => {
 		addNode({
 			type: 'TEXT',
 			data: {
+				reply_to_message,
 				label: text,
 				delay,
 			},
 		});
 	};
-	const handleButtonElement = (text: string, buttons: Button[], delay: number) => {
+	const handleButtonElement = (
+		text: string,
+		buttons: Button[],
+		delay: number,
+		reply_to_message: boolean
+	) => {
 		addNode({
 			type: 'BUTTON',
 			data: {
+				reply_to_message,
 				text,
 				buttons,
 				delay,
@@ -79,6 +86,7 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 		});
 	};
 	const handleListElement = (details: {
+		reply_to_message: boolean;
 		header: string;
 		body: string;
 		footer: string;
@@ -102,11 +110,13 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 		id: string,
 		caption: string,
 		buttons: Button[],
-		delay: number
+		delay: number,
+		reply_to_message: boolean
 	) => {
 		addNode({
 			type: type,
 			data: {
+				reply_to_message,
 				id,
 				caption,
 				buttons,
@@ -125,6 +135,7 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 			text: string;
 		};
 		delay: number;
+		reply_to_message: boolean;
 	}) => {
 		addNode({
 			type: 'WHATSAPP_FLOW',
@@ -136,6 +147,7 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 		text: string;
 		delay: number;
 		button_id: string;
+		reply_to_message: boolean;
 	}) => {
 		addNode({
 			type: 'LOCATION_REQUEST',
@@ -145,14 +157,16 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 				button: {
 					id: details.button_id,
 				},
+				reply_to_message: details.reply_to_message,
 			},
 		});
 	};
 
-	const handleContactElement = (contact: Contact, delay: number) => {
+	const handleContactElement = (contact: Contact, delay: number, reply_to_message:boolean) => {
 		addNode({
 			type: 'CONTACT',
 			data: {
+				reply_to_message,
 				contact,
 				delay,
 			},
@@ -189,8 +203,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</TextMessage>
 						<ImageMessage
-							onImageMessageAdded={(id, cap, buttons, delay) =>
-								handleDocumentElement('IMAGE', id, cap, buttons, delay)
+							onImageMessageAdded={(id, cap, buttons, delay, reply_to_message) =>
+								handleDocumentElement('IMAGE', id, cap, buttons, delay, reply_to_message)
 							}
 						>
 							<MessageType
@@ -200,8 +214,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</ImageMessage>
 						<AudioMessage
-							onAudioMessageAdded={(id, cap, buttons, delay) =>
-								handleDocumentElement('AUDIO', id, cap, buttons, delay)
+							onAudioMessageAdded={(id, cap, buttons, delay, reply_to_message) =>
+								handleDocumentElement('AUDIO', id, cap, buttons, delay, reply_to_message)
 							}
 						>
 							<MessageType
@@ -211,8 +225,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</AudioMessage>
 						<VideoMessage
-							onVideoMessageAdded={(id, cap, buttons, delay) =>
-								handleDocumentElement('VIDEO', id, cap, buttons, delay)
+							onVideoMessageAdded={(id, cap, buttons, delay, reply_to_message) =>
+								handleDocumentElement('VIDEO', id, cap, buttons, delay, reply_to_message)
 							}
 						>
 							<MessageType
@@ -223,8 +237,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 						</VideoMessage>
 
 						<DocumentMessage
-							onDocumentMessageAdded={(id, cap, buttons, delay) =>
-								handleDocumentElement('DOCUMENT', id, cap, buttons, delay)
+							onDocumentMessageAdded={(id, cap, buttons, delay, reply_to_message) =>
+								handleDocumentElement('DOCUMENT', id, cap, buttons, delay, reply_to_message)
 							}
 						>
 							<MessageType

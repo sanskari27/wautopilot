@@ -48,6 +48,7 @@ export type EndNodeDetails = {
 export type TextNodeDetails = {
 	type: 'TEXT';
 	data: {
+		reply_to_message: boolean;
 		label: string;
 		delay: number;
 	};
@@ -55,6 +56,7 @@ export type TextNodeDetails = {
 export type ContactNodeDetails = {
 	type: 'CONTACT';
 	data: {
+		reply_to_message: boolean;
 		contact: Contact;
 		delay: number;
 	};
@@ -62,6 +64,7 @@ export type ContactNodeDetails = {
 export type DocumentNodeDetails = {
 	type: 'IMAGE' | 'AUDIO' | 'VIDEO' | 'DOCUMENT';
 	data: {
+		reply_to_message: boolean;
 		id: string;
 		caption: string;
 		buttons: {
@@ -74,6 +77,7 @@ export type DocumentNodeDetails = {
 export type ButtonNodeDetails = {
 	type: 'BUTTON';
 	data: {
+		reply_to_message: boolean;
 		text: string;
 		buttons: {
 			id: string;
@@ -85,6 +89,7 @@ export type ButtonNodeDetails = {
 export type ListNodeDetails = {
 	type: 'LIST';
 	data: {
+		reply_to_message: boolean;
 		header: string;
 		body: string;
 		footer: string;
@@ -101,6 +106,7 @@ export type ListNodeDetails = {
 export type FlowNodeDetails = {
 	type: 'WHATSAPP_FLOW';
 	data: {
+		reply_to_message: boolean;
 		header: string;
 		body: string;
 		footer: string;
@@ -115,6 +121,7 @@ export type FlowNodeDetails = {
 export type LocationRequestNodeDetails = {
 	type: 'LOCATION_REQUEST';
 	data: {
+		reply_to_message: boolean;
 		label: string;
 		delay: number;
 		button: {

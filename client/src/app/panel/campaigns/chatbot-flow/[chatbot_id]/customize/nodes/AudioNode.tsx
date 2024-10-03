@@ -9,10 +9,11 @@ import { Handle, Position, useNodeId } from '@xyflow/react';
 const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
 
 export default function AudioNode({
-	data: { id, caption, buttons, delay },
+	data: { id,reply_to_message, caption, buttons, delay },
 }: {
 	data: {
 		id: string;
+		reply_to_message:boolean;
 		caption: string;
 		buttons: {
 			id: string;

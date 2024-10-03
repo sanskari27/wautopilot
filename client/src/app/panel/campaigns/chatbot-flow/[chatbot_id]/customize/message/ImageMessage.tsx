@@ -2,6 +2,7 @@
 import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
 import AbsoluteCenter from '@/components/ui/absolute-center';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
 	Dialog,
 	DialogClose,
@@ -22,9 +23,9 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { parseToSeconds } from '@/lib/utils';
 import { useState } from 'react';
 import { AddButton, ListButtons } from '../_components/buttons';
-import { parseToSeconds } from '@/lib/utils';
 
 export type ImageMessageProps = {
 	onImageMessageAdded: (
@@ -34,7 +35,8 @@ export type ImageMessageProps = {
 			id: string;
 			text: string;
 		}[],
-		delay: number
+		delay: number,
+		reply_to_message: boolean
 	) => void;
 	children: React.ReactNode;
 };
@@ -50,9 +52,16 @@ const ImageMessage = ({ onImageMessageAdded, children }: ImageMessageProps) => {
 			text: string;
 		}[]
 	>([]);
+	const [reply_to_message, setReplyToMessage] = useState(false);
 
 	const handleSave = () => {
-		onImageMessageAdded(attachment, caption, buttons, parseToSeconds(delay, delayType));
+		onImageMessageAdded(
+			attachment,
+			caption,
+			buttons,
+			parseToSeconds(delay, delayType),
+			reply_to_message
+		);
 	};
 
 	return (
@@ -72,7 +81,16 @@ const ImageMessage = ({ onImageMessageAdded, children }: ImageMessageProps) => {
 						<Button variant={'secondary'}>Select Image</Button>
 					</MediaSelectorDialog>
 					<div>
-						<p className='text-sm mt-2'>Enter Caption.</p>
+						<div className='flex items-center justify-between w-full'>
+							<p className='text-sm mt-2'>Enter Caption.</p>
+							<div className='space-y-0 inline-flex items-center gap-2'>
+								<Checkbox
+									checked={reply_to_message}
+									onCheckedChange={(checked) => setReplyToMessage(checked.valueOf() as boolean)}
+								/>
+								<div className='text-sm'>Reply</div>
+							</div>
+						</div>
 						<Textarea
 							className='w-full h-[100px] resize-none !ring-0'
 							placeholder={'Enter caption here. \nex. This is a beautiful image.'}

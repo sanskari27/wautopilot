@@ -6,11 +6,12 @@ import { Handle, Position, useNodeId } from '@xyflow/react';
 const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
 
 export default function ContactNode({
-	data: { contact, delay },
+	data: { contact, delay, reply_to_message },
 }: {
 	data: {
 		contact: Contact;
 		delay: number;
+		reply_to_message: boolean;
 	};
 }) {
 	const nodeId = useNodeId();
@@ -39,6 +40,7 @@ export default function ContactNode({
 				) : (
 					<div className='p-1 text-center text-sm '>Send immediately</div>
 				)}
+				{reply_to_message && <div className='p-1 text-center text-sm '>Reply to the message</div>}
 				<div className='p-2'>
 					<div className='p-2 rounded-lg border border-black'>{contact.name.formatted_name}</div>
 				</div>

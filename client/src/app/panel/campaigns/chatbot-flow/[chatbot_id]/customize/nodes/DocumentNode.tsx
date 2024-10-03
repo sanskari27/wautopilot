@@ -8,7 +8,7 @@ import { Handle, Position, useNodeId } from '@xyflow/react';
 const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
 
 export default function DocumentNode({
-	data: { caption, buttons, delay },
+	data: { caption, buttons, delay, reply_to_message },
 }: {
 	data: {
 		id: string;
@@ -18,6 +18,7 @@ export default function DocumentNode({
 			text: string;
 		}[];
 		delay: number;
+		reply_to_message: boolean;
 	};
 }) {
 	const nodeId = useNodeId();
@@ -68,6 +69,7 @@ export default function DocumentNode({
 				) : (
 					<div className='p-1 text-center text-sm '>Send immediately</div>
 				)}
+				{reply_to_message && <div className='p-1 text-center text-sm'>Reply to message</div>}
 				<div className='p-2'>
 					<div className='rounded-lg border border-black p-2 max-h-[400px] max-w-[400px]'>
 						<PreviewFile

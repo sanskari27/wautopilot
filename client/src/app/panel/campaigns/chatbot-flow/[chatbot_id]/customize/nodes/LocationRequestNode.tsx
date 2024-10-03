@@ -5,12 +5,13 @@ import { Handle, Position, useNodeId } from '@xyflow/react';
 const dotStyle = { background: '#555', top: 80, width: '0.75rem', height: '0.75rem' };
 
 export default function LocationRequestNode({
-	data: { label, delay, button },
+	data: { label, delay, button, reply_to_message },
 }: {
 	data: {
 		label: string;
 		delay: number;
 		button: { id: string };
+		reply_to_message: boolean;
 	};
 }) {
 	const nodeId = useNodeId();
@@ -38,6 +39,7 @@ export default function LocationRequestNode({
 				) : (
 					<div className='p-1 text-center text-sm '>Send immediately</div>
 				)}
+				{reply_to_message && <div className='p-1 text-center text-sm '>Reply to the message</div>}
 				<div className='p-2'>
 					<div className='rounded-lg border border-black p-2 max-h-[400px] max-w-[400px]'>
 						{label}

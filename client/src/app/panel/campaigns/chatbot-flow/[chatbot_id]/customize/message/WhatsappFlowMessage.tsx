@@ -1,6 +1,7 @@
 'use client';
 import WhatsappFlowSelector from '@/components/elements/wa-flow-selector';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
 	Dialog,
 	DialogClose,
@@ -35,6 +36,7 @@ export type WhatsappFlowMessageProps = {
 			text: string;
 		};
 		delay: number;
+		reply_to_message: boolean;
 	}) => void;
 	children: React.ReactNode;
 };
@@ -43,6 +45,7 @@ const WhatsappFlowMessage = ({
 	onWhatsappFlowMessageAdded,
 	children,
 }: WhatsappFlowMessageProps) => {
+	const [reply_to_message, setReplyToMessage] = useState(false);
 	const [header, setHeader] = useState('');
 	const [body, setBody] = useState('');
 	const [footer, setFooter] = useState('');
@@ -63,6 +66,7 @@ const WhatsappFlowMessage = ({
 				text: button_text,
 			},
 			delay: parseToSeconds(delay, delayType),
+			reply_to_message,
 		});
 	};
 
@@ -75,7 +79,16 @@ const WhatsappFlowMessage = ({
 				</DialogHeader>
 				<div className='max-h-[70vh] grid gap-2 overflow-y-auto px-0'>
 					<div>
-						<p className='text-sm mt-2'>Enter Header Text</p>
+						<div className='flex items-center justify-between w-full'>
+							<p className='text-sm mt-2'>Enter Header text.</p>
+							<div className='space-y-0 inline-flex items-center gap-2'>
+								<Checkbox
+									checked={reply_to_message}
+									onCheckedChange={(checked) => setReplyToMessage(checked.valueOf() as boolean)}
+								/>
+								<div className='text-sm'>Reply</div>
+							</div>
+						</div>
 						<Input
 							placeholder={'Enter your header text here.'}
 							value={header}

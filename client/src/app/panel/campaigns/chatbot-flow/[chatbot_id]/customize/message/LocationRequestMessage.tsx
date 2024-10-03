@@ -1,5 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
 	Dialog,
 	DialogClose,
@@ -27,6 +28,7 @@ export type LocationRequestMessageProps = {
 		text: string;
 		delay: number;
 		button_id: string;
+		reply_to_message: boolean;
 	}) => void;
 	children: React.ReactNode;
 };
@@ -35,6 +37,7 @@ const LocationRequestMessage = ({
 	onLocationRequestMessageAdded,
 	children,
 }: LocationRequestMessageProps) => {
+	const [reply_to_message, setReplyToMessage] = useState(false);
 	const [message, setMessage] = useState('');
 	const [delay, setDelay] = useState(0);
 	const [delayType, setDelayType] = useState<'sec' | 'min' | 'hour'>('sec');
@@ -43,6 +46,7 @@ const LocationRequestMessage = ({
 			text: message,
 			delay: parseToSeconds(delay, delayType),
 			button_id: randomString(),
+			reply_to_message,
 		});
 	};
 
@@ -55,7 +59,16 @@ const LocationRequestMessage = ({
 				</DialogTitle>
 				<div className='max-h-[70vh] grid gap-2 overflow-y-auto px-0'>
 					<div>
-						<p className='text-sm mt-2'>Body</p>
+						<div className='flex items-center justify-between w-full'>
+							<p className='text-sm mt-2'>Body.</p>
+							<div className='space-y-0 inline-flex items-center gap-2'>
+								<Checkbox
+									checked={reply_to_message}
+									onCheckedChange={(checked) => setReplyToMessage(checked.valueOf() as boolean)}
+								/>
+								<div className='text-sm'>Reply</div>
+							</div>
+						</div>
 						<Textarea
 							className='w-full h-[100px] resize-none !ring-0'
 							placeholder={'Enter caption here. \nex. We need your location.'}

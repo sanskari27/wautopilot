@@ -5,9 +5,9 @@ import { Handle, Position, useNodeId } from '@xyflow/react';
 const dotStyle = { background: '#555', top: 80, width: '0.75rem', height: '0.75rem' };
 
 export default function TextNode({
-	data: { label, delay },
+	data: { label, delay, reply_to_message },
 }: {
-	data: { label: string; delay: number };
+	data: { label: string; delay: number; reply_to_message: boolean };
 }) {
 	const nodeId = useNodeId();
 	return (
@@ -34,6 +34,7 @@ export default function TextNode({
 				) : (
 					<div className='p-1 text-center text-sm '>Send immediately</div>
 				)}
+				{reply_to_message && <div className='p-1 text-center text-sm '>Reply to message</div>}
 				<div className='p-2'>
 					<div className='rounded-lg border border-black p-2 max-h-[400px] max-w-[400px]'>
 						{label}

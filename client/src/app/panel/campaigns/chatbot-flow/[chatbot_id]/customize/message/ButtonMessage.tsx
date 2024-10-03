@@ -1,6 +1,7 @@
 'use client';
 import AbsoluteCenter from '@/components/ui/absolute-center';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
 	Dialog,
 	DialogClose,
@@ -32,12 +33,14 @@ export type ButtonMessageProps = {
 			id: string;
 			text: string;
 		}[],
-		delay: number
+		delay: number,
+		reply_to_message: boolean
 	) => void;
 	children: React.ReactNode;
 };
 
 const ButtonMessage = ({ onButtonMessageAdded, children }: ButtonMessageProps) => {
+	const [reply_to_message, setReplyToMessage] = useState(false);
 	const [text, setText] = useState('');
 	const [delay, setDelay] = useState(0);
 	const [delayType, setDelayType] = useState<'sec' | 'min' | 'hour'>('sec');
@@ -49,7 +52,7 @@ const ButtonMessage = ({ onButtonMessageAdded, children }: ButtonMessageProps) =
 	>([]);
 
 	const handleSave = () => {
-		onButtonMessageAdded(text, buttons, parseToSeconds(delay, delayType));
+		onButtonMessageAdded(text, buttons, parseToSeconds(delay, delayType), reply_to_message);
 	};
 
 	return (
@@ -62,7 +65,16 @@ const ButtonMessage = ({ onButtonMessageAdded, children }: ButtonMessageProps) =
 				</DialogHeader>
 				<div className='max-h-[70vh] grid gap-2 overflow-y-auto px-0'>
 					<div>
-						<p className='text-sm mt-2'>Enter Text.</p>
+						<div className='flex items-center justify-between w-full'>
+							<p className='text-sm mt-2'>Enter Text.</p>
+							<div className='space-y-0 inline-flex items-center gap-2'>
+								<Checkbox
+									checked={reply_to_message}
+									onCheckedChange={(checked) => setReplyToMessage(checked.valueOf() as boolean)}
+								/>
+								<div className='text-sm'>Reply</div>
+							</div>
+						</div>
 						<Textarea
 							className='w-full h-[100px] resize-none !ring-0'
 							placeholder={'Enter your message here. \nex. Hello, how can I help you?'}

@@ -2,6 +2,7 @@
 import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
 import AbsoluteCenter from '@/components/ui/absolute-center';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
 	Dialog,
 	DialogClose,
@@ -34,12 +35,14 @@ export type AudioMessageProps = {
 			id: string;
 			text: string;
 		}[],
-		delay: number
+		delay: number,
+		reply_to_message: boolean
 	) => void;
 	children: React.ReactNode;
 };
 
 const AudioMessage = ({ onAudioMessageAdded, children }: AudioMessageProps) => {
+	const [reply_to_message, setReplyToMessage] = useState(false);
 	const [attachment, setAttachment] = useState('');
 	const [caption, setCaption] = useState('');
 	const [delay, setDelay] = useState(0);
@@ -52,7 +55,7 @@ const AudioMessage = ({ onAudioMessageAdded, children }: AudioMessageProps) => {
 	>([]);
 
 	const handleSave = () => {
-		onAudioMessageAdded(attachment, caption, buttons, parseToSeconds(delay, delayType));
+		onAudioMessageAdded(attachment, caption, buttons, parseToSeconds(delay, delayType), reply_to_message);
 	};
 
 	return (
@@ -60,7 +63,9 @@ const AudioMessage = ({ onAudioMessageAdded, children }: AudioMessageProps) => {
 			<DialogTrigger asChild>{children}</DialogTrigger>
 			<DialogContent className='sm:max-w-[425px] md:max-w-lg lg:max-w-2xl'>
 				<DialogHeader>
-					<DialogTitle>Audio Message</DialogTitle>
+					<DialogTitle>
+						<div>Audio Message</div>
+					</DialogTitle>
 				</DialogHeader>
 				<div className='max-h-[70vh] grid gap-2 overflow-y-auto px-0'>
 					<MediaSelectorDialog
@@ -72,7 +77,16 @@ const AudioMessage = ({ onAudioMessageAdded, children }: AudioMessageProps) => {
 						<Button variant={'secondary'}>Select Audio</Button>
 					</MediaSelectorDialog>
 					<div>
-						<p className='text-sm mt-2'>Enter Caption.</p>
+						<div className='flex items-center justify-between w-full'>
+							<p className='text-sm mt-2'>Enter Caption.</p>
+							<div className='space-y-0 inline-flex items-center gap-2'>
+								<Checkbox
+									checked={reply_to_message}
+									onCheckedChange={(checked) => setReplyToMessage(checked.valueOf() as boolean)}
+								/>
+								<div className='text-sm'>Reply</div>
+							</div>
+						</div>
 						<Textarea
 							className='w-full h-[100px] resize-none !ring-0'
 							placeholder={'Enter caption here. \nex. This is a beautiful image.'}

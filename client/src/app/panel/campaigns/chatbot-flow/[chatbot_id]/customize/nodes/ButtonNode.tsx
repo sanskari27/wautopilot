@@ -7,7 +7,7 @@ import { Handle, Position, useNodeId } from '@xyflow/react';
 const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
 
 export default function ButtonNode({
-	data: { text, buttons, delay },
+	data: { text, buttons, delay, reply_to_message },
 }: {
 	data: {
 		text: string;
@@ -16,6 +16,7 @@ export default function ButtonNode({
 			text: string;
 		}[];
 		delay: number;
+		reply_to_message: boolean;
 	};
 }) {
 	const nodeId = useNodeId();
@@ -66,6 +67,7 @@ export default function ButtonNode({
 				) : (
 					<div className='p-1 text-center text-sm '>Send immediately</div>
 				)}
+				{reply_to_message && <div className='p-1 text-center text-sm '>Reply to the message</div>}
 				<div className='p-2'>
 					<div className='p-2 rounded-lg border border-black' hidden={!text}>
 						{text}

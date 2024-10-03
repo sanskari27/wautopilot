@@ -2,6 +2,7 @@
 import ContactDialog from '@/components/elements/dialogs/contact';
 import ContactSelectorDialog from '@/components/elements/dialogs/contact-selector';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
 	Dialog,
 	DialogClose,
@@ -27,7 +28,7 @@ import { Contact } from '@/schema/phonebook';
 import { useState } from 'react';
 
 export type ContactMessageProps = {
-	onContactAdded: (contact: Contact, delay: number) => void;
+	onContactAdded: (contact: Contact, delay: number, reply_to_message: boolean) => void;
 	children: React.ReactNode;
 };
 
@@ -37,14 +38,14 @@ const ContactMessage = ({ onContactAdded, children }: ContactMessageProps) => {
 		on: openContactDialog,
 		off: closeContactDialog,
 	} = useBoolean();
-
+	const [reply_to_message, setReplyToMessage] = useState(false);
 	const [contact, setContact] = useState<Contact | null>(null);
 	const [delay, setDelay] = useState(0);
 	const [delayType, setDelayType] = useState<'sec' | 'min' | 'hour'>('sec');
 
 	const handleSave = () => {
 		if (!contact) return;
-		onContactAdded(contact, parseToSeconds(delay, delayType));
+		onContactAdded(contact, parseToSeconds(delay, delayType), reply_to_message);
 	};
 
 	return (
@@ -55,6 +56,15 @@ const ContactMessage = ({ onContactAdded, children }: ContactMessageProps) => {
 					<DialogTitle>Contact Message</DialogTitle>
 				</DialogHeader>
 				<div className='max-h-[70vh] grid gap-2 overflow-y-auto px-0'>
+					<div className='flex items-center justify-end w-full'>
+						<div className='space-y-0 inline-flex items-center gap-2'>
+							<Checkbox
+								checked={reply_to_message}
+								onCheckedChange={(checked) => setReplyToMessage(checked.valueOf() as boolean)}
+							/>
+							<div className='text-sm'>Reply</div>
+						</div>
+					</div>
 					<ContactSelectorDialog onConfirm={(c) => setContact(c[0])} newEntryAllowed singleSelect>
 						<Button variant={'secondary'}>
 							{contact ? contact.name.formatted_name ?? 'No name' : 'Select Contact'}
