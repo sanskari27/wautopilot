@@ -161,9 +161,9 @@ export default class SchedulerService extends WhatsappLinkService {
 				failed_at,
 				failed_reason,
 				status,
-				context: {
-					id: msg.messageObject.context.message_id,
-				},
+				...(msg.messageObject.context
+					? { context: { id: msg.messageObject.context.message_id } }
+					: {}),
 				message_type: 'template',
 			});
 
@@ -273,9 +273,10 @@ export default class SchedulerService extends WhatsappLinkService {
 					id: msg.scheduler_id,
 					name: msg.scheduler_type,
 				},
-				context: {
-					id: msg.messageObject.context.message_id,
-				},
+
+				...(msg.messageObject.context
+					? { context: { id: msg.messageObject.context.message_id } }
+					: {}),
 				failed_at,
 				failed_reason,
 				status,
@@ -390,10 +391,10 @@ export default class SchedulerService extends WhatsappLinkService {
 				failed_at,
 				failed_reason,
 				status,
-				message_type: 'interactive',
-				context: {
-					id: msg.messageObject.context.message_id,
-				},
+				message_type: 'interactive',\
+				...(msg.messageObject.context
+					? { context: { id: msg.messageObject.context.message_id } }
+					: {}),
 			});
 
 			if (addedMessage && msg.scheduler_type === ChatBotFlowDB_name) {
