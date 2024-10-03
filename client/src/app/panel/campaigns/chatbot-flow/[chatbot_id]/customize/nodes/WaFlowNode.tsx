@@ -6,7 +6,7 @@ import { Handle, Position, useNodeId } from '@xyflow/react';
 const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
 
 export default function WaFlowNode({
-	data: { body, footer, header, button, flow_id, delay },
+	data: { body, footer, header, button, flow_id, delay, reply_to_message },
 }: {
 	data: {
 		header: string;
@@ -18,6 +18,7 @@ export default function WaFlowNode({
 			text: string;
 		};
 		delay: number;
+		reply_to_message: boolean;
 	};
 }) {
 	const nodeId = useNodeId();
@@ -48,6 +49,7 @@ export default function WaFlowNode({
 				) : (
 					<div className='p-1 text-center text-sm '>Send immediately</div>
 				)}
+				{reply_to_message && <div className='p-1 text-center text-sm '>Reply to the message</div>}
 				<div className='p-2'>
 					<div className='rounded-lg border border-black p-2 max-h-[400px] max-w-[400px]'>
 						<div className='font-medium' hidden={!header}>
