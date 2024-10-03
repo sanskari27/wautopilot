@@ -177,6 +177,7 @@ function processDocs(docs: IChatBot[]) {
 				message: '',
 			},
 			isActive: bot.active,
+			reply_to_message: bot.reply_to_message,
 		};
 	});
 }
