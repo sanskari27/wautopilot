@@ -171,10 +171,11 @@ export default function AssignMessageLabelDialog({
 									<Plus className='w-4 h-4' />
 								</Button>
 							</div>
+							<div className='text-destructive px-2'>
+								Tag once created cannot be edited or deleted
+							</div>
 						</ComboboxMultiselect>
 					</div>
-
-					<div className='text-destructive px-2'>Tag once created cannot be edited or deleted</div>
 				</div>
 				<DialogFooter>
 					<Button onClick={handleSave}>Save</Button>
