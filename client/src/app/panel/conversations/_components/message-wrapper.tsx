@@ -41,13 +41,18 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 			toast.error('Message might have been deleted or not found in the conversation');
 			return;
 		}
-		context?.scrollIntoView({ behavior: 'smooth' });
+
+		context.parentElement?.style.setProperty('background-color', '#80808030');
+		setTimeout(() => {
+			context.parentElement?.style.removeProperty('background-color');
+		}, 2000);
+		context.scrollIntoView({ behavior: 'smooth' });
 	};
 
 	const { setReplyMessageId } = useMessages();
 
 	return (
-		<>
+		<div className={cn('w-full flex flex-row rounded-xl', isMe ? 'justify-start' : 'justify-end')}>
 			<div
 				className={cn(
 					'max-w-xs md:max-w-lg lg:max-w-2xl flex flex-col mb-4 ',
@@ -170,7 +175,7 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 					) : null}
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 

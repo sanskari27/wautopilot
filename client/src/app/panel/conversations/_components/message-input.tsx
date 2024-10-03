@@ -187,6 +187,10 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 			toast.error('Message might have been deleted or not found in the conversation');
 			return;
 		}
+		context.parentElement?.style.setProperty('background-color', '#80808030');
+		setTimeout(() => {
+			context.parentElement?.style.removeProperty('background-color');
+		}, 2000);
 		context?.scrollIntoView({ behavior: 'smooth' });
 	};
 
