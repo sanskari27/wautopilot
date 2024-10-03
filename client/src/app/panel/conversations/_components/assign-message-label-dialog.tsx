@@ -173,18 +173,8 @@ export default function AssignMessageLabelDialog({
 							</div>
 						</ComboboxMultiselect>
 					</div>
-					{/* <TagsSelector labels={messageLabels} onChange={handleAddTags}>
-						<Button variant='secondary' size={'icon'} disabled={loading}>
-							<Show>
-								<Show.When condition={loading}>
-									<FaSpinner />
-								</Show.When>
-								<Show.Else>
-									<ListFilter className='w-4 h-4' strokeWidth={3} />
-								</Show.Else>
-							</Show>
-						</Button>
-					</TagsSelector> */}
+
+					<div className='text-destructive px-2'>Tag once created cannot be edited or deleted</div>
 				</div>
 				<DialogFooter>
 					<Button onClick={handleSave}>Save</Button>
