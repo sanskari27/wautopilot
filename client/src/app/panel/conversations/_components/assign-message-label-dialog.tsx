@@ -110,6 +110,10 @@ export default function AssignMessageLabelDialog({
 
 	const handleAddNewTags = () => {
 		const newMessageTags = newTags.split(',').map((tag) => tag.trim());
+		if (newMessageTags.length === 0) {
+			toast.error('Please enter tags to add');
+			return;
+		}
 		toast.promise(UserService.createMessageTags([...selectedTags, ...newMessageTags]), {
 			loading: 'Adding new tags...',
 			success: (data) => {
@@ -160,10 +164,11 @@ export default function AssignMessageLabelDialog({
 										value={newTags}
 										onChange={(e) => setNewTags(e.target.value)}
 										placeholder='Add new tags'
+										className='h-8'
 									/>
 								</div>
-								<Button onClick={handleAddNewTags}>
-									<Plus />
+								<Button onClick={handleAddNewTags} className='p-2 h-8'>
+									<Plus className='w-4 h-4' />
 								</Button>
 							</div>
 						</ComboboxMultiselect>
