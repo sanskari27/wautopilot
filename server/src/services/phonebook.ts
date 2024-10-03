@@ -7,7 +7,7 @@ import COMMON_ERRORS from '../errors/common-errors';
 import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import UserService from './user';
 
-type IPhonebookRecord = {
+export type IPhonebookRecord = {
 	salutation: string;
 	first_name: string;
 	last_name: string;

@@ -52,22 +52,25 @@ async function updateBot(req: Request, res: Response, next: NextFunction) {
 	} = req.locals;
 
 	const data = req.locals.data as CreateBotValidationResult;
+	try {
+		const bot = await new ChatBotService(account, device).modifyBot(id, data);
 
-	const bot = await new ChatBotService(account, device).modifyBot(id, data);
-
-	agentLogService?.addLog({
-		text: `Create bot with trigger ${bot.trigger}`,
-		data: {
-			id: bot.bot_id,
-		},
-	});
-	return Respond({
-		res,
-		status: 200,
-		data: {
-			bot,
-		},
-	});
+		agentLogService?.addLog({
+			text: `Create bot with trigger ${data.trigger}`,
+			data: {
+				id: id,
+			},
+		});
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				bot,
+			},
+		});
+	} catch (e) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
 }
 
 async function listBots(req: Request, res: Response, next: NextFunction) {
@@ -174,9 +177,9 @@ async function updateFlow(req: Request, res: Response, next: NextFunction) {
 	const flow = await new ChatBotService(account, device).modifyFlow(id, data);
 
 	agentLogService?.addLog({
-		text: `Create flow with id ${flow.bot_id}`,
+		text: `Create flow with id ${id}`,
 		data: {
-			id: flow.bot_id,
+			id: id,
 		},
 	});
 
@@ -234,8 +237,16 @@ async function toggleActive(req: Request, res: Response, next: NextFunction) {
 		id,
 		agentLogService,
 	} = req.locals;
+	const query = req.query as { chatbot: string; chatbotflow: string };
+	const updateType =
+		query.chatbot === 'true' ? 'chatbot' : query.chatbotflow === 'true' ? 'chatbotflow' : null;
+
+	if (!updateType) {
+		return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
+	}
+
 	try {
-		await new ChatBotService(account, device).toggleActive(id);
+		await new ChatBotService(account, device).toggleActive(id, updateType);
 
 		agentLogService?.addLog({
 			text: `Toggle active flow with id ${id}`,
