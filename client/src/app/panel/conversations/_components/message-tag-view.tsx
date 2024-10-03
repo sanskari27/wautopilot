@@ -2,8 +2,10 @@ import Each from '@/components/containers/each';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import MessagesService from '@/services/messages.service';
+import UserService from '@/services/users.service';
 import { Message as TMessage } from '@/types/recipient';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { Message } from './message-template';
 
 export default function MessageTagsView({
@@ -27,12 +29,19 @@ export default function MessageTagsView({
 		if (!id || !isOpen) {
 			return;
 		}
+		UserService.listMessageTags()
+			.then((data) => {
+				setMessageLabels(data);
+			})
+			.catch(() => {
+				toast.error('Failed to fetch message labels');
+			});
+
 		MessagesService.fetchConversationMessages(id, {
 			page: 1,
 			limit: 1000000,
 		}).then((data) => {
 			setMessages(data.messages);
-			setMessageLabels(data.messageLabels);
 		});
 	}, [id, isOpen]);
 
