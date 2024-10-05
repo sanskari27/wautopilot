@@ -154,7 +154,7 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 			.optional(),
 		context: z
 			.object({
-				message_id: z.string().trim(),
+				message_id: z.string().trim().min(1),
 			})
 			.optional(),
 	});

@@ -75,7 +75,7 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 		MessagesService.sendConversationMessage(selected_recipient!.id, {
 			type: 'text',
 			text: textMessage,
-			context: { message_id: replyMessageId },
+			...(replyMessageId && { context: { message_id: replyMessageId } }),
 		}).then((data) => {
 			setNotSending();
 			setSelectedQuickReply('');
