@@ -257,6 +257,7 @@ export function CarouselTemplateDialog({
 		form.setValue('cards', [
 			...form.getValues('cards'),
 			{
+				card_index: form.getValues('cards').length,
 				components: [
 					{
 						type: 'HEADER',

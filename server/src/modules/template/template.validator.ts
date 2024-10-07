@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import Logger from 'n23-logger';
 import { z } from 'zod';
 import { CustomError } from '../../errors';
 
@@ -70,11 +71,22 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 		),
 	});
 
+	const headerCarouselSchema = z.object({
+		type: z.literal('HEADER'),
+		format: z.enum(['IMAGE', 'VIDEO']),
+		example: z.object({
+			header_handle: z.array(z.string().trim()).default([]),
+		}),
+	});
+
 	const carouselSchema = z.object({
 		type: z.literal('CAROUSEL'),
 		cards: z.array(
 			z.object({
-				components: z.discriminatedUnion('type', [headerSchema, bodySchema, buttonsSchema]).array(),
+				// card_index: z.number(),
+				components: z.array(
+					z.discriminatedUnion('type', [headerCarouselSchema, bodySchema, buttonsSchema])
+				),
 			})
 		),
 	});
@@ -98,6 +110,7 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 	const reqValidatorResult = reqValidator.safeParse(req.body);
 
 	if (reqValidatorResult.success) {
+		Logger.debug(reqValidatorResult.data);
 		req.locals.data = reqValidatorResult.data;
 		return next();
 	}

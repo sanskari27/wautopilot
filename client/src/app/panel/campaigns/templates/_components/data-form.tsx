@@ -93,6 +93,48 @@ export default function DataForm({
 				return component;
 			});
 		}
+
+		const carousel = data.components.filter((component) => component.type === 'CAROUSEL')?.[0];
+
+		if (carousel) {
+			const components: any = data.components
+				.filter((component) => component.type !== 'HEADER' && component.type !== 'FOOTER')
+				.map((component) => {
+					if (component.type === 'CAROUSEL') {
+						return {
+							type: 'CAROUSEL',
+							cards: component.cards.map((card, index) => {
+								let header = card.components.find((c) => c.type === 'HEADER')!;
+								const body = card.components.find((c) => c.type === 'BODY');
+								const buttons = card.components.find((c) => c.type === 'BUTTONS');
+
+								header = {
+									type: 'HEADER',
+									format: header.format,
+									example: {
+										header_handle: header.example?.header_handle,
+									},
+								};
+
+								return {
+									card_index: index,
+									components: [
+										header,
+										...(body ? [body] : []),
+										...(buttons && buttons.buttons.length > 0 ? [buttons] : []),
+									],
+								};
+							}),
+						};
+					}
+					return component;
+				});
+
+			console.log(data);
+			onSave({ ...data, components });
+			return;
+		}
+
 		onSave(data);
 	};
 
@@ -294,10 +336,12 @@ export default function DataForm({
 													{ type: 'CAROUSEL', cards: [] },
 												]);
 											} else {
-												form.setValue(
-													'components',
-													components.filter((component) => component.type !== 'CAROUSEL')
-												);
+												form.setValue('components', [
+													...components.filter((component) => component.type !== 'CAROUSEL'),
+													{ type: 'HEADER', format: 'TEXT' },
+													{ type: 'BODY', text: '' },
+													{ type: 'FOOTER', text: '' },
+												]);
 											}
 										}}
 									/>
