@@ -50,23 +50,27 @@ export default async function AgentPage({
 							<TableHead className=''>Name</TableHead>
 							<TableHead className='w-[40%]'>Email</TableHead>
 							<TableHead className='text-right'>Phone</TableHead>
+							<TableHead className='text-center'>Action</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						<Each
 							items={agents}
 							render={(agent) => (
-								<AgentContextMenu id={agent.id} disabled={isAgent} agent={agent}>
-									<TableRow className='cursor-context-menu'>
-										<TableCell className='font-medium'>{agent.name}</TableCell>
-										<TableCell className='w-[40%]'>
-											<a href={`mailto:${agent.email}`}>{agent.email}</a>
-										</TableCell>
-										<TableCell className='text-right'>
-											<a href={`tel:${agent.phone}`}>+{agent.phone}</a>
-										</TableCell>
-									</TableRow>
-								</AgentContextMenu>
+								<TableRow className='cursor-context-menu'>
+									<TableCell className='font-medium'>{agent.name}</TableCell>
+									<TableCell className='w-[40%]'>
+										<a href={`mailto:${agent.email}`}>{agent.email}</a>
+									</TableCell>
+									<TableCell className='text-right'>
+										<a href={`tel:${agent.phone}`}>+{agent.phone}</a>
+									</TableCell>
+									<TableCell className='text-center'>
+										<AgentContextMenu id={agent.id} disabled={isAgent} agent={agent}>
+											<Button>Edit</Button>
+										</AgentContextMenu>
+									</TableCell>
+								</TableRow>
 							)}
 						/>
 					</TableBody>

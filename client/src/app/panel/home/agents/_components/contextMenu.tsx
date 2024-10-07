@@ -1,21 +1,24 @@
 'use client';
 import DeleteDialog from '@/components/elements/dialogs/delete';
 import NumberInputDialog from '@/components/elements/dialogs/numberInput';
+import { ContextMenuContent, ContextMenuLabel } from '@/components/ui/context-menu';
 import {
-	ContextMenu,
-	ContextMenuContent,
-	ContextMenuLabel,
-	ContextMenuLink,
-	ContextMenuSeparator,
-	ContextMenuSub,
-	ContextMenuSubContent,
-	ContextMenuSubTrigger,
-	ContextMenuTrigger,
-} from '@/components/ui/context-menu';
-import { Agent } from '@/types/agent';
-import { toast } from 'react-hot-toast';
-import { assignConversationsToAgent, deleteAgent, switchServiceAccount } from '../action';
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuPortal,
+	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import AuthService from '@/services/auth.service';
+import { Agent } from '@/types/agent';
+import Link from 'next/link';
+import { toast } from 'react-hot-toast';
+import { assignConversationsToAgent, deleteAgent } from '../action';
 
 export function AgentContextMenu({
 	children,
@@ -67,42 +70,49 @@ export function AgentContextMenu({
 	}
 
 	return (
-		<ContextMenu>
-			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-			<ContextMenuContent className='w-64'>
-				<ContextMenuLink href={`agents/${id}/logs`} inset>
-					View Logs
-				</ContextMenuLink>
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+			<DropdownMenuContent className='w-64'>
+				<DropdownMenuItem inset asChild>
+					<Link href={`agents/logs/${id}`}>View Logs</Link>
+				</DropdownMenuItem>
 				<NumberInputDialog onSubmit={handleAssignChats}>
-					<ContextMenuLabel className='font-normal' inset>
+					<DropdownMenuLabel className='font-normal' inset>
 						Assign Chats
-					</ContextMenuLabel>
+					</DropdownMenuLabel>
 				</NumberInputDialog>
-				<ContextMenuLink
-					href={`?permissions=${id}&data=${JSON.stringify(agent.permissions)}`}
-					inset
-				>
-					Permissions
-				</ContextMenuLink>
-				<ContextMenuSub>
-					<ContextMenuSubTrigger inset>More</ContextMenuSubTrigger>
-					<ContextMenuSubContent className='w-48'>
-						<ContextMenuLink
-							href={`?edit=${id}&name=${agent.name}&email=${agent.email}&phone=${agent.phone}`}
-						>
-							Edit
-						</ContextMenuLink>
-						<ContextMenuLink href={`?update_password=${id}`}>Change Password</ContextMenuLink>
-						<ContextMenuLink onClick={openServiceAccount}>Service Account</ContextMenuLink>
-						<ContextMenuSeparator />
-						<DeleteDialog onDelete={handleDelete}>
-							<ContextMenuLabel className='hover:text-red-400 cursor-pointer hover:bg-accent font-normal'>
-								Delete
-							</ContextMenuLabel>
-						</DeleteDialog>
-					</ContextMenuSubContent>
-				</ContextMenuSub>
-			</ContextMenuContent>
-		</ContextMenu>
+				<DropdownMenuItem asChild inset>
+					<Link href={`?permissions=${id}&data=${JSON.stringify(agent.permissions)}`}>
+						Permissions
+					</Link>
+				</DropdownMenuItem>
+				<DropdownMenuSub>
+					<DropdownMenuSubTrigger inset>More</DropdownMenuSubTrigger>
+					<DropdownMenuPortal>
+						<DropdownMenuSubContent className='w-48'>
+							<DropdownMenuItem asChild>
+								<Link
+									href={`?edit=${id}&name=${agent.name}&email=${agent.email}&phone=${agent.phone}`}
+								>
+									Edit
+								</Link>
+							</DropdownMenuItem>
+							<DropdownMenuItem asChild>
+								<Link href={`?update_password=${id}`}>Change Password</Link>
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={openServiceAccount} asChild>
+								Service Account
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DeleteDialog onDelete={handleDelete}>
+								<DropdownMenuLabel className='hover:text-red-400 cursor-pointer hover:bg-accent font-normal'>
+									Delete
+								</DropdownMenuLabel>
+							</DeleteDialog>
+						</DropdownMenuSubContent>
+					</DropdownMenuPortal>
+				</DropdownMenuSub>
+			</DropdownMenuContent>
+		</DropdownMenu>
 	);
 }
