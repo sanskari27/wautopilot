@@ -57,7 +57,7 @@ export default async function AgentPage({
 						<Each
 							items={agents}
 							render={(agent) => (
-								<TableRow className='cursor-context-menu'>
+								<TableRow>
 									<TableCell className='font-medium'>{agent.name}</TableCell>
 									<TableCell className='w-[40%]'>
 										<a href={`mailto:${agent.email}`}>{agent.email}</a>
@@ -67,7 +67,9 @@ export default async function AgentPage({
 									</TableCell>
 									<TableCell className='text-center'>
 										<AgentContextMenu id={agent.id} disabled={isAgent} agent={agent}>
-											<Button>Edit</Button>
+											<Button size={'sm'} variant={'outline'}>
+												Edit
+											</Button>
 										</AgentContextMenu>
 									</TableCell>
 								</TableRow>
