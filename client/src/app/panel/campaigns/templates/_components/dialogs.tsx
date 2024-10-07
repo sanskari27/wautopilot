@@ -329,7 +329,6 @@ export function CarouselTemplateDialog({
 			return newFiles;
 		});
 	};
-
 	const handleSave = (data: Carousel) => {
 		if (data.cards.length < 2) {
 			return toast.error('At least 2 cards are required');
@@ -719,8 +718,9 @@ export function CarouselTemplateDialog({
 								e.stopPropagation();
 							}}
 							disabled={form.watch('cards').length < 2}
+							className='mt-4'
 						>
-							Submit
+							Save
 						</Button>
 					</form>
 				</ScrollArea>

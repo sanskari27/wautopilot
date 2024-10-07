@@ -482,7 +482,7 @@ export default function DataForm({
 								<div className={'flex flex-col gap-3'}>
 									<div className='flex flex-col'>
 										<CarouselTemplateDialog carousel={carousel} onSubmit={handleAddCarousel}>
-											<Button>Customize Carousel Cards</Button>
+											<Button type='button'>Customize Carousel Cards</Button>
 										</CarouselTemplateDialog>
 									</div>
 								</div>
