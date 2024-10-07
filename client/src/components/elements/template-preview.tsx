@@ -17,7 +17,7 @@ export default function TemplatePreview({ components }: Props) {
 	const body = components.find((component) => component.type === 'BODY');
 	const footer = components.find((component) => component.type === 'FOOTER');
 	const buttons = components.find((component) => component.type === 'BUTTONS')?.buttons ?? [];
-	const carousels = components.find((component) => component.type === 'CAROUSEL')?.cards ?? [];
+	// const carousels = components.find((component) => component.type === 'CAROUSEL')?.cards ?? [];
 
 	return (
 		<div className='shadow-lg drop-shadow-lg min-w-[200px] max-w-lg min-h-fit w-[95%] mx-auto my-1rem bg-white rounded-2xl p-2'>
@@ -50,7 +50,7 @@ export default function TemplatePreview({ components }: Props) {
 						<div className='mt-2' hidden={!body}>
 							{body && body.text ? <p className='whitespace-pre-line'>{body.text}</p> : null}
 						</div>
-						<div className='mt-2  flex gap-4 w-full overflow-X-scroll' hidden={!carousels}>
+						{/* <div className='mt-2  flex gap-4 w-full overflow-X-scroll' hidden={!carousels}>
 							<Each
 								items={carousels}
 								render={(carousel, index) => (
@@ -120,7 +120,7 @@ export default function TemplatePreview({ components }: Props) {
 									</div>
 								)}
 							/>
-						</div>
+						</div> */}
 						<div className='mt-2' hidden={!footer}>
 							{footer && footer.text ? (
 								<p className='text-xs text-gray-500'>{footer.text}</p>
