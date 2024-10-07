@@ -21,14 +21,14 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn, countOccurrences } from '@/lib/utils';
-import { Template, templateSchema } from '@/schema/template';
+import { Carousel, Template, templateSchema } from '@/schema/template';
 import UploadService from '@/services/upload.service';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleMinus, Trash } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { AddQuickReply, PhoneNumberButton, URLButton } from './dialogs';
+import { AddQuickReply, CarouselTemplateDialog, PhoneNumberButton, URLButton } from './dialogs';
 
 export default function DataForm({
 	onSave,
@@ -71,7 +71,6 @@ export default function DataForm({
 		components.filter((component) => component.type === 'BUTTONS')?.[0]?.buttons ?? [];
 
 	const carousel = components.filter((component) => component.type === 'CAROUSEL')?.[0];
-	console.log(carousel);
 
 	const saveTemplate = async (data: Template, handle?: string) => {
 		const buttons =
@@ -211,6 +210,20 @@ export default function DataForm({
 
 	const hasError = templateSchema.safeParse(form.getValues()).success === false;
 
+	const handleAddCarousel = (data: Carousel) => {
+		console.log(data);
+		form.setValue(
+			'components',
+
+			components.map((component) => {
+				if (component.type === 'CAROUSEL') {
+					return data;
+				}
+				return component;
+			})
+		);
+	};
+
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSave)} className='w-full space-y-2'>
@@ -274,7 +287,10 @@ export default function DataForm({
 										onCheckedChange={(val) => {
 											if (val) {
 												form.setValue('components', [
-													...components,
+													...components.filter(
+														(component) =>
+															component.type !== 'HEADER' && component.type !== 'FOOTER'
+													),
 													{ type: 'CAROUSEL', cards: [] },
 												]);
 											} else {
@@ -292,7 +308,7 @@ export default function DataForm({
 
 						<Separator />
 
-						<div>
+						<Show.ShowIf condition={!carousel}>
 							<FormItem className='space-y-0 flex-1'>
 								<FormLabel className='text-primary'>
 									Template Header<span className='ml-[0.2rem] text-red-800'>*</span>
@@ -391,7 +407,7 @@ export default function DataForm({
 									</FormControl>
 								</FormItem>
 							</Show.ShowIf>
-						</div>
+						</Show.ShowIf>
 
 						<Separator />
 
@@ -465,7 +481,9 @@ export default function DataForm({
 							<Show.When condition={!!carousel}>
 								<div className={'flex flex-col gap-3'}>
 									<div className='flex flex-col'>
-										<Button>Customize Carousel Cards</Button>
+										<CarouselTemplateDialog carousel={carousel} onSubmit={handleAddCarousel}>
+											<Button>Customize Carousel Cards</Button>
+										</CarouselTemplateDialog>
 									</div>
 								</div>
 							</Show.When>

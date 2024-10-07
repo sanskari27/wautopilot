@@ -7,6 +7,7 @@ import { MdOutlinePermMedia } from 'react-icons/md';
 import Each from '../containers/each';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Separator } from '../ui/separator';
+import { Carousel } from '@/schema/template';
 
 type Props = {
 	components: Record<string, any>[];
@@ -16,6 +17,7 @@ export default function TemplatePreview({ components }: Props) {
 	const body = components.find((component) => component.type === 'BODY');
 	const footer = components.find((component) => component.type === 'FOOTER');
 	const buttons = components.find((component) => component.type === 'BUTTONS')?.buttons ?? [];
+	const carousels = components.find((component) => component.type === 'CAROUSEL')?.cards ?? [];
 
 	return (
 		<div className='shadow-lg drop-shadow-lg min-w-[200px] max-w-lg min-h-fit w-[95%] mx-auto my-1rem bg-white rounded-2xl p-2'>
@@ -47,6 +49,77 @@ export default function TemplatePreview({ components }: Props) {
 						</div>
 						<div className='mt-2' hidden={!body}>
 							{body && body.text ? <p className='whitespace-pre-line'>{body.text}</p> : null}
+						</div>
+						<div className='mt-2  flex gap-4 w-full overflow-X-scroll' hidden={!carousels}>
+							<Each
+								items={carousels}
+								render={(carousel, index) => (
+									<div key={index} className='mt-2 w-[500px]'>
+										<Each
+											items={carousel.components!}
+											render={(component) => {
+												if (component.type === 'HEADER') {
+													return (
+														<div>
+															{component.format === 'TEXT' && (
+																<p className='font-medium'>{component.text}</p>
+															)}
+															{component.format !== 'TEXT' && (
+																<div className='flex justify-center items-center bg-gray-200 w-full aspect-video rounded-xl'>
+																	{component.format === 'IMAGE' && (
+																		<MdOutlinePermMedia size={'2.5rem'} color='white' />
+																	)}
+																	{component.format === 'VIDEO' && (
+																		<FaVideo size={'2.5rem'} color='white' />
+																	)}
+																	{component.format === 'DOCUMENT' && (
+																		<IoDocumentText size={'2.5rem'} color='white' />
+																	)}
+																</div>
+															)}
+														</div>
+													);
+												}
+												if (component.type === 'BODY') {
+													return (
+														<div className='mt-2'>
+															{component.text ? (
+																<p className='whitespace-pre-line'>{component.text}</p>
+															) : null}
+														</div>
+													);
+												}
+												if (component.type === 'BUTTONS') {
+													return (
+														<div className='mt-2'>
+															<Each
+																items={component.buttons}
+																render={(button: { text: string; type: string }) => (
+																	<div
+																		className='flex justify-center items-center text-teal-500  rounded-md border border-teal-500 p-1 gap-2 my-1'
+																		hidden={!button.text}
+																	>
+																		{button.type === 'QUICK_REPLY' && (
+																			<MessageCircleReply className='w-4 h-4 text-teal-500' />
+																		)}
+																		{button.type === 'PHONE_NUMBER' && (
+																			<PhoneCall className='w-4 h-4 text-teal-500' />
+																		)}
+																		{button.type === 'URL' && (
+																			<Link className='w-4 h-4 text-teal-500' />
+																		)}
+																		<p className='text-sm'>{button.text}</p>
+																	</div>
+																)}
+															/>
+														</div>
+													);
+												}
+											}}
+										/>
+									</div>
+								)}
+							/>
 						</div>
 						<div className='mt-2' hidden={!footer}>
 							{footer && footer.text ? (

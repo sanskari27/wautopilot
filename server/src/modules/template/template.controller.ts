@@ -18,6 +18,8 @@ async function addTemplate(req: Request, res: Response, next: NextFunction) {
 		const templateService = new TemplateService(account, device);
 		const error = await templateService.addTemplate(data as Template);
 
+		console.log(error	)
+
 		if (error) {
 			return Respond({
 				res,

@@ -1,4 +1,12 @@
 'use client';
+import Each from '@/components/containers/each';
+import Show from '@/components/containers/show';
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from '@/components/ui/accordion';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -9,13 +17,24 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
+import { FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { cn, countOccurrences } from '@/lib/utils';
+import { Carousel, carouselSchema } from '@/schema/template';
+import UploadService from '@/services/upload.service';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {} from '@radix-ui/react-alert-dialog';
-import { Link, MessageCircleReply, PhoneCall } from 'lucide-react';
-import { useState } from 'react';
+import { CircleMinus, Link, MessageCircleReply, PhoneCall, Trash } from 'lucide-react';
+import React, { ReactNode, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
 export function AddQuickReply({
 	onSubmit,
@@ -185,5 +204,527 @@ export function URLButton({
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>
+	);
+}
+
+export function CarouselTemplateDialog({
+	children,
+	carousel,
+	onSubmit,
+}: {
+	children: ReactNode;
+	carousel: Carousel;
+	onSubmit: (data: Carousel) => void;
+}) {
+	const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+	const [file, setFile] = React.useState<
+		{
+			index: number;
+			file: File | null;
+		}[]
+	>([]);
+
+	const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+	const form = useForm<Carousel>({
+		resolver: zodResolver(carouselSchema),
+		defaultValues: carousel,
+	});
+
+	function handleBodyTextChange(index: number, componentIndex: number, value: string) {
+		if (value.length > 160) return;
+		form.setValue(`cards.${index}.components.${componentIndex}.text`, value);
+
+		const body_variables = countOccurrences(value);
+
+		if (
+			body_variables === 0 &&
+			form.getValues(`cards.${index}.components.${componentIndex}.example`)
+		) {
+			return form.setValue(`cards.${index}.components.${componentIndex}.example`, undefined);
+		}
+
+		form.setValue(`cards.${index}.components.${componentIndex}.example`, {
+			body_text: [Array.from({ length: body_variables }).map(() => '')],
+		});
+	}
+
+	const addBlankCard = () => {
+		if (form.getValues('cards').length >= 10) {
+			return;
+		}
+		form.setValue('cards', [
+			...form.getValues('cards'),
+			{
+				components: [
+					{
+						type: 'HEADER',
+						format: 'IMAGE',
+						example: {
+							header_handle: [''],
+						},
+					},
+					{
+						type: 'BODY',
+						text: '',
+					},
+					{
+						type: 'BUTTONS',
+						buttons: [],
+					},
+				],
+			},
+		]);
+		setFile((prev) => {
+			return [...prev, { index: form.getValues('cards').length - 1, file: null }];
+		});
+	};
+
+	function removeButtonComponent(index: number, componentIndex: number, buttonIndex: number) {
+		const buttons = form.getValues(`cards.${index}.components.${componentIndex}.buttons`);
+		buttons.splice(buttonIndex, 1);
+		form.setValue(`cards.${index}.components.${componentIndex}.buttons`, buttons);
+	}
+
+	function addQuickReply(index: number, componentIndex: number, text: string) {
+		const buttons = form.getValues(`cards.${index}.components.${componentIndex}.buttons`);
+		buttons.push({ type: 'QUICK_REPLY', text });
+		form.setValue(`cards.${index}.components.${componentIndex}.buttons`, buttons);
+	}
+
+	function addPhoneNumberButton(
+		index: number,
+		componentIndex: number,
+		text: {
+			phone_number: string;
+			text: string;
+		}
+	) {
+		const buttons = form.getValues(`cards.${index}.components.${componentIndex}.buttons`);
+		buttons.push({ type: 'PHONE_NUMBER', text: text.text, phone_number: text.phone_number });
+		form.setValue(`cards.${index}.components.${componentIndex}.buttons`, buttons);
+	}
+
+	function addURLButton(
+		index: number,
+		componentIndex: number,
+		text: {
+			url: string;
+			text: string;
+		}
+	) {
+		const buttons = form.getValues(`cards.${index}.components.${componentIndex}.buttons`);
+		buttons.push({ type: 'URL', text: text.text, url: text.url });
+		form.setValue(`cards.${index}.components.${componentIndex}.buttons`, buttons);
+	}
+
+	const handleDeleteCard = (index: number) => {
+		const cards = form.getValues('cards');
+		cards.splice(index, 1);
+		form.setValue('cards', cards);
+		setFile((prev) => {
+			const newFiles = [...prev];
+			newFiles.splice(index, 1);
+			return newFiles;
+		});
+	};
+
+	const handleSave = (data: Carousel) => {
+		if (data.cards.length < 2) {
+			return toast.error('At least 2 cards are required');
+		}
+		if (data.cards.length > 10) {
+			return toast.error('Maximum 10 cards are allowed');
+		}
+		const buttonLength = new Set();
+		data.cards.forEach((card, index) => {
+			return card.components.forEach((component) => {
+				if (component.type === 'BODY') {
+					if (component.text.length === 0) {
+						return toast.error(`Card ${index + 1} has empty body`);
+					}
+					if (
+						countOccurrences(component.text) < 0 &&
+						component.example?.body_text?.[0].length === 0
+					) {
+						return toast.error(`Card ${index + 1} has no variables`);
+					}
+				}
+				if (component.type === 'BUTTONS') {
+					buttonLength.add(component.buttons.length);
+				}
+			});
+		});
+		if (buttonLength.size > 1) {
+			return toast.error('All cards should have same number of buttons');
+		}
+		for (const ele of file) {
+			if (ele.file === null) {
+				return toast.error('Please select media for all cards');
+			}
+		}
+		handleFileUpload(data);
+	};
+
+	const handleFileInput = (index: number, e: File | null) => {
+		setFile((prev) => {
+			const newFiles = [...prev];
+			newFiles[index] = { index, file: e };
+			return newFiles;
+		});
+	};
+
+	const handleFileUpload = async (data: Carousel) => {
+		const promises = file.map((ele) => {
+			return UploadService.generateMetaHandle(ele.file as File);
+		});
+
+		toast.promise(Promise.all(promises), {
+			loading: 'Uploading Media',
+			success: (res) => {
+				handleSubmit(data, res);
+				return 'Media uploaded successfully';
+			},
+			error: 'Failed to upload media',
+		});
+	};
+
+	const handleSubmit = (data: Carousel, handle: string[]) => {
+		data = {
+			...data,
+			cards: data.cards.map((card, index) => {
+				return {
+					...card,
+					components: card.components.map((component) => {
+						if (component.type === 'HEADER') {
+							return {
+								...component,
+								example: {
+									header_handle: [handle[index]],
+								},
+							};
+						}
+						return component;
+					}),
+				};
+			}),
+		};
+		onSubmit(data);
+		buttonRef.current?.click();
+	};
+
+	return (
+		<Dialog>
+			<DialogTrigger ref={buttonRef} asChild>
+				{children}
+			</DialogTrigger>
+			<DialogContent className='sm:max-w-[425px] md:max-w-xl lg:max-w-3xl'>
+				<DialogHeader>Carousel Template</DialogHeader>
+				<Button onClick={addBlankCard}>Add Card</Button>
+				<ScrollArea className='max-h-[800px]'>
+					<form onSubmit={form.handleSubmit(handleSave)}>
+						<FormField
+							control={form.control}
+							name='cards'
+							render={({ field }) => (
+								<Each
+									items={field.value}
+									render={(item, index) => (
+										<Accordion type='single' collapsible key={index}>
+											<AccordionItem value={`${index}`}>
+												<AccordionTrigger>Card {index + 1}</AccordionTrigger>
+												<AccordionContent>
+													<FormItem>
+														<FormLabel>Components</FormLabel>
+														<FormField
+															control={form.control}
+															name={`cards.${index}.components`}
+															render={({ field }) => (
+																<Each
+																	items={field.value}
+																	render={(component, componentIndex) => {
+																		if (component.type === 'HEADER') {
+																			return (
+																				<>
+																					<FormField
+																						control={form.control}
+																						name={`cards.${index}.components.${componentIndex}.format`}
+																						render={({ field }) => (
+																							<FormItem className='space-y-0 flex-1'>
+																								<FormLabel className='text-primary'>
+																									Template Header
+																									<span className='ml-[0.2rem] text-red-800'>
+																										*
+																									</span>
+																								</FormLabel>
+																								<FormControl>
+																									<ToggleGroup
+																										className='justify-start'
+																										type='single'
+																										value={component.format ?? 'IMAGE'}
+																										onValueChange={(format: 'IMAGE' | 'VIDEO') => {
+																											form.setValue(
+																												`cards.${index}.components.${componentIndex}.format`,
+																												format
+																											);
+																										}}
+																									>
+																										<ToggleGroupItem
+																											value='IMAGE'
+																											aria-label='Image'
+																										>
+																											Image
+																										</ToggleGroupItem>
+																										<ToggleGroupItem
+																											value='VIDEO'
+																											aria-label='Video'
+																										>
+																											Video
+																										</ToggleGroupItem>
+																									</ToggleGroup>
+																								</FormControl>
+																							</FormItem>
+																						)}
+																					/>
+																					<FormField
+																						control={form.control}
+																						name={`cards.${index}.components.${componentIndex}.text`}
+																						render={({ field }) => (
+																							<FormItem className='space-y-0 flex-1'>
+																								<FormLabel className='text-primary'>
+																									Header Media
+																								</FormLabel>
+																								<FormControl>
+																									<Input
+																										type='file'
+																										ref={fileInputRef}
+																										accept={
+																											component.format === 'IMAGE'
+																												? 'image/*'
+																												: 'video/*'
+																										}
+																										onChange={(e) =>
+																											handleFileInput(
+																												index,
+																												e.target.files?.[0] ?? null
+																											)
+																										}
+																									/>
+																								</FormControl>
+																							</FormItem>
+																						)}
+																					/>
+																				</>
+																			);
+																		} else if (component.type === 'BODY') {
+																			return (
+																				<>
+																					<FormField
+																						control={form.control}
+																						name={`cards.${index}.components.${componentIndex}.text`}
+																						render={({ field }) => (
+																							<FormItem className='space-y-0 flex-1'>
+																								<FormLabel className='text-primary'>
+																									Template Body
+																									<span className='ml-[0.2rem] text-red-800'>
+																										*
+																									</span>
+																								</FormLabel>
+																								<FormDescription className='text-xs pb-2'>
+																									{`Use dynamic variable like {{1}} {{2}} and so on`}
+																									. (Limit {field.value?.length ?? 0} / 160)
+																								</FormDescription>
+																								<FormControl>
+																									<Textarea
+																										placeholder='Body Text'
+																										value={field.value ?? ''}
+																										className='h-[300px]'
+																										onChange={(e) =>
+																											handleBodyTextChange(
+																												index,
+																												componentIndex,
+																												e.target.value
+																											)
+																										}
+																									/>
+																								</FormControl>
+																							</FormItem>
+																						)}
+																					/>
+																					<Show.ShowIf
+																						condition={countOccurrences(component.text ?? '') > 0}
+																					>
+																						<FormItem className='space-y-0 flex-1'>
+																							<FormLabel className='text-primary'>
+																								Example Values (Total:-{' '}
+																								{countOccurrences(component.text ?? '')})
+																								<span className='ml-[0.2rem] text-red-800'>*</span>
+																							</FormLabel>
+																							<FormDescription className='text-xs'>
+																								(
+																								{component?.example?.body_text?.[0].filter(
+																									(v) => v.trim().length > 0
+																								).length ?? 0}{' '}
+																								of {countOccurrences(component.text ?? '')}{' '}
+																								provided)
+																							</FormDescription>
+																							<Each
+																								items={Array.from({
+																									length: countOccurrences(component.text ?? ''),
+																								})}
+																								render={(variable, variableIndex) => (
+																									<FormControl>
+																										<Input
+																											key={variableIndex}
+																											placeholder={`Example Value ${
+																												variableIndex + 1
+																											}`}
+																											isInvalid={
+																												(
+																													component?.example?.body_text?.[0]?.[
+																														variableIndex
+																													] ?? ''
+																												).length === 0
+																											}
+																											value={
+																												(component?.example?.body_text?.[0] ?? [])[
+																													variableIndex
+																												] ?? ''
+																											}
+																											onChange={(e) => {
+																												if (!component.example) {
+																													component.example = {
+																														body_text: [
+																															Array.from({
+																																length: countOccurrences(
+																																	component.text ?? ''
+																																),
+																															}).map(() => ''),
+																														],
+																													};
+																												}
+
+																												form.setValue(
+																													`cards.${index}.components.${componentIndex}.example.body_text.0.${variableIndex}`,
+																													e.target.value as never // TODO: Fix this
+																												);
+																											}}
+																										/>
+																									</FormControl>
+																								)}
+																							/>
+																						</FormItem>
+																					</Show.ShowIf>
+																				</>
+																			);
+																		} else {
+																			return (
+																				<FormField
+																					control={form.control}
+																					name={`cards.${index}.components.${componentIndex}.buttons`}
+																					render={({ field }) => (
+																						<div className='flex flex-col gap-3'>
+																							<FormLabel className='text-primary'>
+																								Buttons
+																							</FormLabel>
+																							<FormDescription className='text-xs pb-2'>
+																								Insert buttons so your customers can take action and
+																								engage with your message!
+																							</FormDescription>
+
+																							<div
+																								className={cn(
+																									' gap-3 border border-dashed p-3',
+																									field.value.length > 0 ? 'inline-flex' : 'hidden'
+																								)}
+																							>
+																								<Each
+																									items={field.value}
+																									render={(
+																										button: { type: string },
+																										buttonIndex
+																									) => (
+																										<Badge>
+																											<span className='text-sm font-medium'>
+																												{button.type.replaceAll('_', ' ')}
+																											</span>
+																											<CircleMinus
+																												className='w-3 h-3 ml-2 cursor-pointer'
+																												onClick={() =>
+																													removeButtonComponent(
+																														index,
+																														componentIndex,
+																														buttonIndex
+																													)
+																												}
+																											/>
+																										</Badge>
+																									)}
+																								/>
+																							</div>
+																							<div className='flex justify-between'>
+																								<div className='flex flex-col md:flex-row gap-3'>
+																									<AddQuickReply
+																										disabled={field.value.length >= 2}
+																										onSubmit={(text) =>
+																											addQuickReply(index, componentIndex, text)
+																										}
+																									/>
+																									<PhoneNumberButton
+																										disabled={field.value.length >= 2}
+																										onSubmit={(text) =>
+																											addPhoneNumberButton(
+																												index,
+																												componentIndex,
+																												text
+																											)
+																										}
+																									/>
+																									<URLButton
+																										disabled={field.value.length >= 2}
+																										onSubmit={(text) =>
+																											addURLButton(index, componentIndex, text)
+																										}
+																									/>
+																								</div>
+																								<Button
+																									variant={'destructive'}
+																									size={'icon'}
+																									type='button'
+																									onClick={() => handleDeleteCard(index)}
+																								>
+																									<Trash />
+																								</Button>
+																							</div>
+																						</div>
+																					)}
+																				/>
+																			);
+																		}
+																	}}
+																/>
+															)}
+														/>
+													</FormItem>
+												</AccordionContent>
+											</AccordionItem>
+										</Accordion>
+									)}
+								/>
+							)}
+						/>
+						<Button
+							onClick={(e) => {
+								e.stopPropagation();
+							}}
+							disabled={form.watch('cards').length < 2}
+						>
+							Submit
+						</Button>
+					</form>
+				</ScrollArea>
+			</DialogContent>
+		</Dialog>
 	);
 }

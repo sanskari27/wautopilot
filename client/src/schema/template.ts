@@ -40,11 +40,11 @@ const buttonsSchema = z.object({
 	),
 });
 
-const carouselSchema = z.object({
+export const carouselSchema = z.object({
 	type: z.literal('CAROUSEL'),
 	cards: z.array(
 		z.object({
-			components: z.discriminatedUnion('type', [headerSchema, bodySchema, buttonsSchema]),
+			components: z.discriminatedUnion('type', [headerSchema, bodySchema, buttonsSchema]).array(),
 		})
 	),
 });
@@ -84,9 +84,42 @@ export const templateSchema = z.object({
 				return false;
 			}
 		}
+		const carousel = values.find((v) => v.type === 'CAROUSEL');
+
+		if (carousel) {
+			const cards = carousel.cards;
+			if (cards.length === 0) {
+				return false;
+			}
+			for (const card of cards) {
+				const header = card.components.find((c) => c.type === 'HEADER');
+				if (!header) {
+					return false;
+				}
+				if (header.example?.header_handle?.length === 0) {
+					return false;
+				}
+				const body = card.components.find((c) => c.type === 'BODY');
+				if (!body) {
+					return false;
+				}
+				if (body.text.length === 0) {
+					return false;
+				}
+				const bodyVariablesCount = countOccurrences(body?.text ?? '');
+				if (bodyVariablesCount !== (body.example?.body_text[0].length ?? 0)) {
+					return false;
+				}
+				const buttons = card.components.find((c) => c.type === 'BUTTONS');
+				if (!buttons) {
+					return false;
+				}
+			}
+		}
 		return true;
 	}),
 });
 
 export type Template = z.infer<typeof templateSchema>;
 export type TemplateWithID = Template & { id: string; status: string };
+export type Carousel = z.infer<typeof carouselSchema>;

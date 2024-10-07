@@ -74,7 +74,7 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 		type: z.literal('CAROUSEL'),
 		cards: z.array(
 			z.object({
-				components: z.discriminatedUnion('type', [headerSchema, bodySchema, buttonsSchema]),
+				components: z.discriminatedUnion('type', [headerSchema, bodySchema, buttonsSchema]).array(),
 			})
 		),
 	});
