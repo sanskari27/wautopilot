@@ -70,7 +70,7 @@ export function AddFields() {
 
 					<div className='grid gap-2'>
 						<Label className='text-primary' htmlFor='first-name'>
-							Field Name<span className='ml-[0.2rem] text-red-800'>*</span>
+							Default
 						</Label>
 						<Input
 							id='field-value'
