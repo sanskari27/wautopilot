@@ -190,7 +190,7 @@ export function PasswordDialog() {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const pathname = usePathname();
-	const id = searchParams.get('update-password');
+	const id = searchParams.get('update_password');
 
 	const {
 		handleSubmit,

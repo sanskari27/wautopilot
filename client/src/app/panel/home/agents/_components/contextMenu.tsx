@@ -15,6 +15,7 @@ import {
 import { Agent } from '@/types/agent';
 import { toast } from 'react-hot-toast';
 import { assignConversationsToAgent, deleteAgent, switchServiceAccount } from '../action';
+import AuthService from '@/services/auth.service';
 
 export function AgentContextMenu({
 	children,
@@ -29,10 +30,20 @@ export function AgentContextMenu({
 }) {
 	// const pathname = usePathname();
 	const openServiceAccount = async () => {
-		toast.loading('Switching account...', {
-			duration: 5000,
+		// toast.loading('Switching account...', {
+		// 	duration: 5000,
+		// });
+		// await switchServiceAccount(id);
+		toast.promise(AuthService.serviceAccount(id), {
+			loading: 'Switching account...',
+			success: () => {
+				window.location.href = '/panel/home/dashboard';
+				return 'Please wait while we switch your account';
+			},
+			error: (err) => {
+				return 'Failed to switch account';
+			},
 		});
-		await switchServiceAccount(id);
 	};
 
 	const handleDelete = () => {
@@ -81,7 +92,7 @@ export function AgentContextMenu({
 						>
 							Edit
 						</ContextMenuLink>
-						<ContextMenuLink href={`?update-password=${id}`}>Change Password</ContextMenuLink>
+						<ContextMenuLink href={`?update_password=${id}`}>Change Password</ContextMenuLink>
 						<ContextMenuLink onClick={openServiceAccount}>Service Account</ContextMenuLink>
 						<ContextMenuSeparator />
 						<DeleteDialog onDelete={handleDelete}>
