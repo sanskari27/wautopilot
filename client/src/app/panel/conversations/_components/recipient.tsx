@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn, getInitials } from '@/lib/utils';
 import { Recipient as TRecipient } from '@/types/recipient';
 import { Check, Pin } from 'lucide-react';
+import { MdSupportAgent } from 'react-icons/md';
 import { RecipientContextMenu } from './contextMenu';
 
 export default function Recipient({
@@ -89,6 +90,12 @@ export default function Recipient({
 				</div>
 
 				<div className='flex justify-start w-full overflow-x-auto mt-2 gap-1'>
+					<Badge className='min-w-max bg-gray-200 text-gray-700 font-normal'>
+						<Show.ShowIf condition={recipient.assigned_to !== 'Unassigned'}>
+							<MdSupportAgent className='w-4 h-4 mr-1' />
+						</Show.ShowIf>
+						{recipient.assigned_to}
+					</Badge>
 					<Each
 						items={recipient.labels}
 						render={(label) => (

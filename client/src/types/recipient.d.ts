@@ -8,6 +8,7 @@ export type Recipient = {
 	archived: boolean;
 	last_message_at: string;
 	active: boolean;
+	assigned_to: string;
 };
 
 export type Message = {

@@ -21,6 +21,7 @@ export default class MessagesService {
 					unreadCount: conversation.unreadCount ?? 0,
 					last_message_at: conversation.last_message_at ?? '',
 					active: conversation.active ?? false,
+					assigned_to: conversation.assigned_to ?? '',
 				};
 			});
 		} catch (err) {

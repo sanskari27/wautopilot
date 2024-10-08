@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { ConversationDB, ConversationMessageDB, PhoneBookDB } from '../../mongo';
+import { AccountDB, ConversationDB, ConversationMessageDB, PhoneBookDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import IConversation from '../../mongo/types/conversation';
 import IConversationMessage from '../../mongo/types/conversationMessage';
@@ -17,6 +17,7 @@ import WhatsappLinkService from './whatsappLink';
 function processConversationDocs(
 	docs: (IConversation & {
 		labels: string[];
+		assigned_to: IAccount;
 	})[]
 ) {
 	return docs.map((doc) => {
@@ -32,6 +33,7 @@ function processConversationDocs(
 			pinned: doc.pinned,
 			archived: doc.archived,
 			unreadCount: doc.unreadCount,
+			assigned_to: doc.assigned_to?.name ?? 'Unassigned',
 		};
 	});
 }
@@ -341,6 +343,20 @@ export default class ConversationService extends WhatsappLinkService {
 					preserveNullAndEmptyArrays: true,
 				},
 			},
+			{
+				$lookup: {
+					from: AccountDB.collection.name,
+					localField: 'assigned_to',
+					foreignField: '_id',
+					as: 'assigned_to_user',
+				},
+			},
+			{
+				$unwind: {
+					path: '$assigned_to_user',
+					preserveNullAndEmptyArrays: true,
+				},
+			},
 			// if recipientDetails is not empty array,  get labels from first element of recipientDetails or set it to empty array
 			{
 				$addFields: {
@@ -398,6 +414,7 @@ export default class ConversationService extends WhatsappLinkService {
 					saved_name: { $first: '$saved_name' },
 					labels: { $first: '$labels' },
 					last_message_at: { $first: '$last_message_at' },
+					assigned_to: { $first: '$assigned_to_user' },
 					pinned: { $first: '$pinned' },
 					archived: { $first: '$archived' },
 					unreadCount: { $first: '$unreadCount' },
