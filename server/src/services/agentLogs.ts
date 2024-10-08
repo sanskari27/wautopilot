@@ -28,7 +28,7 @@ export default class AgentLogService extends UserService {
 	}
 
 	async getLogs() {
-		const logs = await AgentLogDB.find({ linked_to: this.userId });
+		const logs = await AgentLogDB.find({ linked_to: this.userId, agent_id: this._agent_id }).sort({ createdAt: -1 });
 		return logs.map((log) => ({
 			_id: log._id,
 			agent_id: log.agent_id,
