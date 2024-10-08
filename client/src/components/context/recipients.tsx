@@ -10,6 +10,7 @@ const RecipientsContext = React.createContext<{
 	pinnedConversations: Recipient[];
 	unpinnedConversations: Recipient[];
 	selectedConversations: string[];
+	agentFilter: string[];
 	selected_recipient: Recipient | null;
 	showArchived: boolean;
 	showUnread: boolean;
@@ -20,11 +21,13 @@ const RecipientsContext = React.createContext<{
 	setSelectedRecipient: (recipient: Recipient) => void;
 	toggleShowArchived: () => void;
 	toggleShowUnread: () => void;
+	setAgentFilter: (agents: string[]) => void;
 }>({
 	list: [],
 	pinnedConversations: [],
 	unpinnedConversations: [],
 	selectedConversations: [],
+	agentFilter: [],
 	selected_recipient: null,
 	showArchived: false,
 	showUnread: false,
@@ -35,6 +38,7 @@ const RecipientsContext = React.createContext<{
 	setLabelFilter: () => {},
 	setSearchText: () => {},
 	setSelectedRecipient: () => {},
+	setAgentFilter: () => {},
 });
 
 export function RecipientProvider({
@@ -46,6 +50,7 @@ export function RecipientProvider({
 }) {
 	const [searchText, setSearchText] = React.useState('');
 	const [label_filter, setLabelFilter] = React.useState<string[]>([]);
+	const [agent_filter, setAgentFilter] = React.useState<string[]>([]);
 	const [list, setList] = React.useState<Recipient[]>(data);
 	const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
 	const [selected_recipient, setSelectedRecipient] = React.useState<Recipient | null>(null);
@@ -59,10 +64,11 @@ export function RecipientProvider({
 				item.recipient.includes(searchText);
 			const cond2 = (showArchived && item.archived) || (!showArchived && !item.archived);
 			const cond3 = label_filter.every((label) => item.labels.includes(label));
-			const cond4 = showUnread ? item.unreadCount > 0 : true;
-			return cond1 && cond2 && cond3 && cond4;
+			const cond4 = agent_filter.every((agent) => item.assigned_to === agent);
+			const cond5 = showUnread ? item.unreadCount > 0 : true;
+			return cond1 && cond2 && cond3 && cond4 && cond5;
 		});
-	}, [list, searchText, showArchived, label_filter, showUnread]);
+	}, [list, searchText, showArchived, label_filter, agent_filter, showUnread]);
 
 	const { pinnedConversations, unpinnedConversations } = React.useMemo(
 		() =>
@@ -173,6 +179,7 @@ export function RecipientProvider({
 		<RecipientsContext.Provider
 			value={{
 				list: list,
+				agentFilter: agent_filter,
 				pinnedConversations,
 				unpinnedConversations,
 				selectedConversations: selectedIds,
@@ -186,6 +193,7 @@ export function RecipientProvider({
 				setLabelFilter,
 				setSearchText,
 				setSelectedRecipient,
+				setAgentFilter,
 			}}
 		>
 			{children}

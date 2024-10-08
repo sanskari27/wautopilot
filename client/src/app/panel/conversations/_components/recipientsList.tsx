@@ -6,12 +6,15 @@ import AgentSelector from '@/components/elements/popover/agents';
 import TagsSelector from '@/components/elements/popover/tags';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import AgentService from '@/services/agent.service';
 import { Recipient as TRecipient } from '@/types/recipient';
 import { ArchiveRestore, BellDot, Headset, ListFilter } from 'lucide-react';
 import toast from 'react-hot-toast';
+import AgentFilter from './agent-selector';
 import Recipient from './recipient';
+import { PopoverAnchor } from '@radix-ui/react-popover';
 
 export default function RecipientsList() {
 	const { isExpanded, collapse } = useChatListExpanded();
@@ -27,6 +30,8 @@ export default function RecipientsList() {
 		toggleShowArchived,
 		toggleShowUnread,
 		selected_recipient,
+		agentFilter,
+		setAgentFilter,
 	} = useRecipient();
 
 	const handleRecipientClick = (item: TRecipient) => {
@@ -104,11 +109,27 @@ export default function RecipientsList() {
 					/>
 				</div>
 				{/* <SearchBar placeholders={['Search here']} onChange={setSearchText} /> */}
-				<TagsSelector onChange={setLabelFilter}>
-					<Button variant='secondary' size={'icon'}>
-						<ListFilter className='w-4 h-4' strokeWidth={3} />
-					</Button>
-				</TagsSelector>
+				<Popover>
+					<PopoverTrigger asChild>
+						<Button variant='secondary' size={'icon'}>
+							<ListFilter className='w-4 h-4' strokeWidth={3} />
+						</Button>
+					</PopoverTrigger>
+					<PopoverContent  side='right' className='p-1 w-fit'>
+						<div className='flex gap-1'>
+							<TagsSelector onChange={setLabelFilter}>
+								<Button variant='outline' size={'sm'}>
+									Tag Filter
+								</Button>
+							</TagsSelector>
+							<AgentFilter onConfirm={setAgentFilter} selected={agentFilter}>
+								<Button variant='outline' size={'sm'}>
+									Agent Filter
+								</Button>
+							</AgentFilter>
+						</div>
+					</PopoverContent>
+				</Popover>
 				{selectedConversations.length > 0 && (
 					<AgentSelector onSubmit={([id]) => handleAssignAgent(id)}>
 						<Button variant='secondary' size={'icon'}>
