@@ -2,6 +2,7 @@ import PageLayout from '@/components/containers/page-layout';
 import { AgentProvider } from '@/components/context/agents';
 import { DeviceAlertProvider } from '@/components/context/device-alert';
 import { DevicesStateProvider } from '@/components/context/devicesState';
+import { SettingStateProvider } from '@/components/context/settingState';
 import { FieldsContextProvider, TagsProvider } from '@/components/context/tags';
 import { UserDetailsProvider } from '@/components/context/user-details';
 import DevicesDialog from '@/components/elements/dialogs/devices';
@@ -14,7 +15,6 @@ import PhoneBookService from '@/services/phonebook.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import DevicesAlertDialog from '../../components/elements/dialogs/devices-alert';
-import { SettingStateProvider } from '@/components/context/settingState';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,9 +36,9 @@ export default async function Layout({
 	return (
 		<Suspense fallback={<Loading />}>
 			<main className='w-full h-full '>
-				<DevicesStateProvider>
-					<SettingStateProvider>
-						<UserDetailsProvider data={userDetails!}>
+				<SettingStateProvider>
+					<UserDetailsProvider data={userDetails!}>
+						<DevicesStateProvider>
 							<DeviceAlertProvider data={userDetails?.no_of_devices!}>
 								<DevicesAlertDialog />
 								<Navbar />
@@ -52,9 +52,9 @@ export default async function Layout({
 									<DevicesDialog />
 								</PageLayout>
 							</DeviceAlertProvider>
-						</UserDetailsProvider>
-					</SettingStateProvider>
-				</DevicesStateProvider>
+						</DevicesStateProvider>
+					</UserDetailsProvider>
+				</SettingStateProvider>
 			</main>
 		</Suspense>
 	);

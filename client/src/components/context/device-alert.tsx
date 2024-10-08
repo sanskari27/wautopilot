@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import { useUserDetails } from './user-details';
 
 const DeviceAlertContext = React.createContext<{
 	deviceAlert: boolean;
@@ -17,13 +18,14 @@ export function DeviceAlertProvider({
 	data: number;
 }) {
 	const [showAlert, setShowAlert] = React.useState(false);
+	const { isAgent } = useUserDetails();
 	React.useEffect(() => {
-		if (data <= 0) {
+		if (!isAgent && data <= 0) {
 			setShowAlert(true);
 		} else {
 			setShowAlert(false);
 		}
-	}, [data]);
+	}, [data, isAgent]);
 	return (
 		<DeviceAlertContext.Provider
 			value={{
