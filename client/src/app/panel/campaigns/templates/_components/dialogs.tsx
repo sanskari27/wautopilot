@@ -19,7 +19,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTrigger,
+} from '@/components/ui/dialog';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -269,9 +275,9 @@ export function CarouselTemplateDialog({
 					{
 						type: 'BODY',
 						text: '',
-						example:{
-							body_text: [['']]
-						}
+						example: {
+							body_text: [['']],
+						},
 					},
 					{
 						type: 'BUTTONS',
@@ -363,6 +369,12 @@ export function CarouselTemplateDialog({
 		if (buttonLength.size > 1) {
 			return toast.error('All cards should have same number of buttons');
 		}
+		if (buttonLength.size === 1 && buttonLength.values().next().value === 0) {
+			return toast.error('At least 1 button is required');
+		}
+		if (buttonLength.size === 1 && buttonLength.values().next().value > 2) {
+			return toast.error('Maximum 2 buttons are allowed');
+		}
 		for (const ele of file) {
 			if (ele.file === null) {
 				return toast.error('Please select media for all cards');
@@ -429,317 +441,303 @@ export function CarouselTemplateDialog({
 					Add Card
 				</Button>
 				<ScrollArea className='max-h-[60vh] min-h-[500px] p-4'>
-					<form onSubmit={form.handleSubmit(handleSave)}>
-						<FormField
-							control={form.control}
-							name='cards'
-							render={({ field }) => (
-								<Each
-									items={field.value}
-									render={(item, index) => (
-										<Accordion type='single' collapsible key={index}>
-											<AccordionItem
-												className='border-2 border-dashed rounded-lg px-2'
-												value={`${index}`}
-											>
-												<AccordionTrigger className='border-b-2 border-dashed'>
-													Card {index + 1}
-												</AccordionTrigger>
-												<AccordionContent>
-													<FormItem>
-														<FormField
-															control={form.control}
-															name={`cards.${index}.components`}
-															render={({ field }) => (
-																<Each
-																	items={field.value}
-																	render={(component, componentIndex) => {
-																		if (component.type === 'HEADER') {
-																			return (
-																				<>
-																					<FormField
-																						control={form.control}
-																						name={`cards.${index}.components.${componentIndex}.format`}
-																						render={({ field }) => (
+					<FormField
+						control={form.control}
+						name='cards'
+						render={({ field }) => (
+							<Each
+								items={field.value}
+								render={(item, index) => (
+									<Accordion type='single' collapsible key={index}>
+										<AccordionItem
+											className='border-2 border-dashed rounded-lg px-2'
+											value={`${index}`}
+										>
+											<AccordionTrigger className='border-b-2 border-dashed'>
+												Card {index + 1}
+											</AccordionTrigger>
+											<AccordionContent>
+												<FormItem>
+													<FormField
+														control={form.control}
+														name={`cards.${index}.components`}
+														render={({ field }) => (
+															<Each
+																items={field.value}
+																render={(component, componentIndex) => {
+																	if (component.type === 'HEADER') {
+																		return (
+																			<>
+																				<FormField
+																					control={form.control}
+																					name={`cards.${index}.components.${componentIndex}.format`}
+																					render={({ field }) => (
+																						<FormItem className='space-y-0 flex-1'>
+																							<FormLabel className='text-primary'>
+																								Template Header
+																								<span className='ml-[0.2rem] text-red-800'>*</span>
+																							</FormLabel>
+																							<FormControl>
+																								<ToggleGroup
+																									className='justify-start'
+																									type='single'
+																									value={component.format ?? 'IMAGE'}
+																									onValueChange={(format: 'IMAGE' | 'VIDEO') => {
+																										form.setValue(
+																											`cards.${index}.components.${componentIndex}.format`,
+																											format
+																										);
+																									}}
+																								>
+																									<ToggleGroupItem value='IMAGE' aria-label='Image'>
+																										Image
+																									</ToggleGroupItem>
+																									<ToggleGroupItem value='VIDEO' aria-label='Video'>
+																										Video
+																									</ToggleGroupItem>
+																								</ToggleGroup>
+																							</FormControl>
+																						</FormItem>
+																					)}
+																				/>
+																				<FormField
+																					control={form.control}
+																					name={`cards.${index}.components.${componentIndex}.example.header_handle.0`}
+																					render={({ field }) => {
+																						if (file[index].file) {
+																							return <div>File selected</div>;
+																						}
+																						return (
 																							<FormItem className='space-y-0 flex-1'>
 																								<FormLabel className='text-primary'>
-																									Template Header
-																									<span className='ml-[0.2rem] text-red-800'>
-																										*
-																									</span>
+																									Header Media
 																								</FormLabel>
 																								<FormControl>
-																									<ToggleGroup
-																										className='justify-start'
-																										type='single'
-																										value={component.format ?? 'IMAGE'}
-																										onValueChange={(format: 'IMAGE' | 'VIDEO') => {
-																											form.setValue(
-																												`cards.${index}.components.${componentIndex}.format`,
-																												format
-																											);
-																										}}
-																									>
-																										<ToggleGroupItem
-																											value='IMAGE'
-																											aria-label='Image'
-																										>
-																											Image
-																										</ToggleGroupItem>
-																										<ToggleGroupItem
-																											value='VIDEO'
-																											aria-label='Video'
-																										>
-																											Video
-																										</ToggleGroupItem>
-																									</ToggleGroup>
+																									<Input
+																										type='file'
+																										ref={fileInputRef}
+																										accept={
+																											component.format === 'IMAGE'
+																												? 'image/*'
+																												: 'video/*'
+																										}
+																										onChange={(e) =>
+																											handleFileInput(
+																												index,
+																												e.target.files?.[0] ?? null
+																											)
+																										}
+																									/>
 																								</FormControl>
 																							</FormItem>
-																						)}
-																					/>
-																					<FormField
-																						control={form.control}
-																						name={`cards.${index}.components.${componentIndex}.example.header_handle.0`}
-																						render={({ field }) => {
-																							if (file[index].file) {
-																								return <div>File selected</div>;
-																							}
-																							return (
-																								<FormItem className='space-y-0 flex-1'>
-																									<FormLabel className='text-primary'>
-																										Header Media
-																									</FormLabel>
-																									<FormControl>
-																										<Input
-																											type='file'
-																											ref={fileInputRef}
-																											accept={
-																												component.format === 'IMAGE'
-																													? 'image/*'
-																													: 'video/*'
+																						);
+																					}}
+																				/>
+																			</>
+																		);
+																	} else if (component.type === 'BODY') {
+																		return (
+																			<>
+																				<FormField
+																					control={form.control}
+																					name={`cards.${index}.components.${componentIndex}.text`}
+																					render={({ field }) => (
+																						<FormItem className='space-y-0 flex-1'>
+																							<FormLabel className='text-primary'>
+																								Template Body
+																								<span className='ml-[0.2rem] text-red-800'>*</span>
+																							</FormLabel>
+																							<FormDescription className='text-xs pb-2'>
+																								{`Use dynamic variable like {{1}} {{2}} and so on`}.
+																								(Limit {field.value?.length ?? 0} / 160)
+																							</FormDescription>
+																							<FormControl>
+																								<Textarea
+																									placeholder='Body Text'
+																									value={field.value ?? ''}
+																									className='h-[300px]'
+																									onChange={(e) =>
+																										handleBodyTextChange(
+																											index,
+																											componentIndex,
+																											e.target.value
+																										)
+																									}
+																								/>
+																							</FormControl>
+																						</FormItem>
+																					)}
+																				/>
+																				<Show.ShowIf
+																					condition={countOccurrences(component.text ?? '') > 0}
+																				>
+																					<FormItem className='space-y-0 flex-1'>
+																						<FormLabel className='text-primary'>
+																							Example Values (Total:-{' '}
+																							{countOccurrences(component.text ?? '')})
+																							<span className='ml-[0.2rem] text-red-800'>*</span>
+																						</FormLabel>
+																						<FormDescription className='text-xs'>
+																							(
+																							{component?.example?.body_text?.[0].filter(
+																								(v) => v.trim().length > 0
+																							).length ?? 0}{' '}
+																							of {countOccurrences(component.text ?? '')} provided)
+																						</FormDescription>
+																						<Each
+																							items={Array.from({
+																								length: countOccurrences(component.text ?? ''),
+																							})}
+																							render={(variable, variableIndex) => (
+																								<FormControl>
+																									<Input
+																										key={variableIndex}
+																										placeholder={`Example Value ${
+																											variableIndex + 1
+																										}`}
+																										isInvalid={
+																											(
+																												component?.example?.body_text?.[0]?.[
+																													variableIndex
+																												] ?? ''
+																											).length === 0
+																										}
+																										value={
+																											(component?.example?.body_text?.[0] ?? [])[
+																												variableIndex
+																											] ?? ''
+																										}
+																										onChange={(e) => {
+																											if (!component.example) {
+																												component.example = {
+																													body_text: [
+																														Array.from({
+																															length: countOccurrences(
+																																component.text ?? ''
+																															),
+																														}).map(() => ''),
+																													],
+																												};
 																											}
-																											onChange={(e) =>
-																												handleFileInput(
+
+																											form.setValue(
+																												`cards.${index}.components.${componentIndex}.example.body_text.0.${variableIndex}`,
+																												e.target.value as never // TODO: Fix this
+																											);
+																										}}
+																									/>
+																								</FormControl>
+																							)}
+																						/>
+																					</FormItem>
+																				</Show.ShowIf>
+																			</>
+																		);
+																	} else {
+																		return (
+																			<FormField
+																				control={form.control}
+																				name={`cards.${index}.components.${componentIndex}.buttons`}
+																				render={({ field }) => (
+																					<div className='flex flex-col gap-3'>
+																						<FormLabel className='text-primary'>Buttons</FormLabel>
+																						<FormDescription className='text-xs pb-2'>
+																							Insert buttons so your customers can take action and
+																							engage with your message!
+																						</FormDescription>
+
+																						<div
+																							className={cn(
+																								' gap-3 border border-dashed p-3',
+																								field.value.length > 0 ? 'inline-flex' : 'hidden'
+																							)}
+																						>
+																							<Each
+																								items={field.value}
+																								render={(button: { type: string }, buttonIndex) => (
+																									<Badge>
+																										<span className='text-sm font-medium'>
+																											{button.type.replaceAll('_', ' ')}
+																										</span>
+																										<CircleMinus
+																											className='w-3 h-3 ml-2 cursor-pointer'
+																											onClick={() =>
+																												removeButtonComponent(
 																													index,
-																													e.target.files?.[0] ?? null
+																													componentIndex,
+																													buttonIndex
 																												)
 																											}
 																										/>
-																									</FormControl>
-																								</FormItem>
-																							);
-																						}}
-																					/>
-																				</>
-																			);
-																		} else if (component.type === 'BODY') {
-																			return (
-																				<>
-																					<FormField
-																						control={form.control}
-																						name={`cards.${index}.components.${componentIndex}.text`}
-																						render={({ field }) => (
-																							<FormItem className='space-y-0 flex-1'>
-																								<FormLabel className='text-primary'>
-																									Template Body
-																									<span className='ml-[0.2rem] text-red-800'>
-																										*
-																									</span>
-																								</FormLabel>
-																								<FormDescription className='text-xs pb-2'>
-																									{`Use dynamic variable like {{1}} {{2}} and so on`}
-																									. (Limit {field.value?.length ?? 0} / 160)
-																								</FormDescription>
-																								<FormControl>
-																									<Textarea
-																										placeholder='Body Text'
-																										value={field.value ?? ''}
-																										className='h-[300px]'
-																										onChange={(e) =>
-																											handleBodyTextChange(
-																												index,
-																												componentIndex,
-																												e.target.value
-																											)
-																										}
-																									/>
-																								</FormControl>
-																							</FormItem>
-																						)}
-																					/>
-																					<Show.ShowIf
-																						condition={countOccurrences(component.text ?? '') > 0}
-																					>
-																						<FormItem className='space-y-0 flex-1'>
-																							<FormLabel className='text-primary'>
-																								Example Values (Total:-{' '}
-																								{countOccurrences(component.text ?? '')})
-																								<span className='ml-[0.2rem] text-red-800'>*</span>
-																							</FormLabel>
-																							<FormDescription className='text-xs'>
-																								(
-																								{component?.example?.body_text?.[0].filter(
-																									(v) => v.trim().length > 0
-																								).length ?? 0}{' '}
-																								of {countOccurrences(component.text ?? '')}{' '}
-																								provided)
-																							</FormDescription>
-																							<Each
-																								items={Array.from({
-																									length: countOccurrences(component.text ?? ''),
-																								})}
-																								render={(variable, variableIndex) => (
-																									<FormControl>
-																										<Input
-																											key={variableIndex}
-																											placeholder={`Example Value ${
-																												variableIndex + 1
-																											}`}
-																											isInvalid={
-																												(
-																													component?.example?.body_text?.[0]?.[
-																														variableIndex
-																													] ?? ''
-																												).length === 0
-																											}
-																											value={
-																												(component?.example?.body_text?.[0] ?? [])[
-																													variableIndex
-																												] ?? ''
-																											}
-																											onChange={(e) => {
-																												if (!component.example) {
-																													component.example = {
-																														body_text: [
-																															Array.from({
-																																length: countOccurrences(
-																																	component.text ?? ''
-																																),
-																															}).map(() => ''),
-																														],
-																													};
-																												}
-
-																												form.setValue(
-																													`cards.${index}.components.${componentIndex}.example.body_text.0.${variableIndex}`,
-																													e.target.value as never // TODO: Fix this
-																												);
-																											}}
-																										/>
-																									</FormControl>
+																									</Badge>
 																								)}
 																							/>
-																						</FormItem>
-																					</Show.ShowIf>
-																				</>
-																			);
-																		} else {
-																			return (
-																				<FormField
-																					control={form.control}
-																					name={`cards.${index}.components.${componentIndex}.buttons`}
-																					render={({ field }) => (
-																						<div className='flex flex-col gap-3'>
-																							<FormLabel className='text-primary'>
-																								Buttons
-																							</FormLabel>
-																							<FormDescription className='text-xs pb-2'>
-																								Insert buttons so your customers can take action and
-																								engage with your message!
-																							</FormDescription>
-
-																							<div
-																								className={cn(
-																									' gap-3 border border-dashed p-3',
-																									field.value.length > 0 ? 'inline-flex' : 'hidden'
-																								)}
-																							>
-																								<Each
-																									items={field.value}
-																									render={(
-																										button: { type: string },
-																										buttonIndex
-																									) => (
-																										<Badge>
-																											<span className='text-sm font-medium'>
-																												{button.type.replaceAll('_', ' ')}
-																											</span>
-																											<CircleMinus
-																												className='w-3 h-3 ml-2 cursor-pointer'
-																												onClick={() =>
-																													removeButtonComponent(
-																														index,
-																														componentIndex,
-																														buttonIndex
-																													)
-																												}
-																											/>
-																										</Badge>
-																									)}
+																						</div>
+																						<div className='flex justify-between'>
+																							<div className='flex flex-col md:flex-row gap-3'>
+																								<AddQuickReply
+																									disabled={field.value.length >= 2}
+																									onSubmit={(text) =>
+																										addQuickReply(index, componentIndex, text)
+																									}
+																								/>
+																								<PhoneNumberButton
+																									disabled={field.value.length >= 2}
+																									onSubmit={(text) =>
+																										addPhoneNumberButton(
+																											index,
+																											componentIndex,
+																											text
+																										)
+																									}
+																								/>
+																								<URLButton
+																									disabled={field.value.length >= 2}
+																									onSubmit={(text) =>
+																										addURLButton(index, componentIndex, text)
+																									}
 																								/>
 																							</div>
-																							<div className='flex justify-between'>
-																								<div className='flex flex-col md:flex-row gap-3'>
-																									<AddQuickReply
-																										disabled={field.value.length >= 2}
-																										onSubmit={(text) =>
-																											addQuickReply(index, componentIndex, text)
-																										}
-																									/>
-																									<PhoneNumberButton
-																										disabled={field.value.length >= 2}
-																										onSubmit={(text) =>
-																											addPhoneNumberButton(
-																												index,
-																												componentIndex,
-																												text
-																											)
-																										}
-																									/>
-																									<URLButton
-																										disabled={field.value.length >= 2}
-																										onSubmit={(text) =>
-																											addURLButton(index, componentIndex, text)
-																										}
-																									/>
-																								</div>
-																								<Button
-																									variant={'destructive'}
-																									size={'icon'}
-																									type='button'
-																									onClick={() => handleDeleteCard(index)}
-																								>
-																									<Trash />
-																								</Button>
-																							</div>
+																							<Button
+																								variant={'destructive'}
+																								size={'icon'}
+																								type='button'
+																								onClick={() => handleDeleteCard(index)}
+																							>
+																								<Trash />
+																							</Button>
 																						</div>
-																					)}
-																				/>
-																			);
-																		}
-																	}}
-																/>
-															)}
-														/>
-													</FormItem>
-												</AccordionContent>
-											</AccordionItem>
-										</Accordion>
-									)}
-								/>
-							)}
-						/>
-						<Button
-							onClick={(e) => {
-								e.stopPropagation();
-							}}
-							disabled={form.watch('cards').length < 2}
-							className='mt-4'
-						>
-							Submit
-						</Button>
-					</form>
+																					</div>
+																				)}
+																			/>
+																		);
+																	}
+																}}
+															/>
+														)}
+													/>
+												</FormItem>
+											</AccordionContent>
+										</AccordionItem>
+									</Accordion>
+								)}
+							/>
+						)}
+					/>
 				</ScrollArea>
+				<DialogFooter className='p-4'>
+					<Button
+						onClick={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							handleSave(form.getValues());
+						}}
+						disabled={form.watch('cards').length < 2}
+						className='mt-4'
+					>
+						Submit
+					</Button>
+				</DialogFooter>
 			</DialogContent>
 		</Dialog>
 	);

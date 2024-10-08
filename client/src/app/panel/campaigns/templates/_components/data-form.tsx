@@ -339,7 +339,6 @@ export default function DataForm({
 												form.setValue('components', [
 													...components.filter((component) => component.type !== 'CAROUSEL'),
 													{ type: 'HEADER', format: 'TEXT' },
-													{ type: 'BODY', text: '' },
 													{ type: 'FOOTER', text: '' },
 												]);
 											}

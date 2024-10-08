@@ -527,3 +527,75 @@ export default async function Layout({
 		</Suspense>
 	);
 }
+
+const sentData = {
+	name: 'sample_carousel_template',
+	category: 'MARKETING',
+	allow_category_change: true,
+	language: 'en_US',
+	components: [
+		{
+			type: 'CAROUSEL',
+			cards: [
+				{
+					card_index: 0,
+					components: [
+						{
+							type: 'HEADER',
+							format: 'IMAGE',
+							example: {
+								header_handle: [
+									'4::aW1hZ2UvanBlZw==:ARbMVMx_zPA5nstXzXAwcdLny0lg70MQK3xq2HNu_sAbovHH5L4uXKMgtCe0hnbZQ1vJqVVgoCQPnf6QACWl-JnyV1twV6mYDLHEzjgqZnkdgQ:e:1728743558:909424327447265:61559904154551:ARa-xInUsY05GYb6C64',
+								],
+							},
+						},
+						{
+							type: 'BODY',
+							text: 'sample body 1',
+						},
+					],
+				},
+				{
+					card_index: 1,
+					components: [
+						{
+							type: 'HEADER',
+							format: 'IMAGE',
+							example: {
+								header_handle: [
+									'4::aW1hZ2UvanBlZw==:ARZASMm6rmCNASJSXT_eMxgit6ZL4nyCn_QUe9FycDScpC5Ha2AUqtJzhar8hA67D_HmmR6l88W9kHq5TCjNdtfwyxbib64Akqhwtb9t1cq0pA:e:1728743559:909424327447265:61559904154551:ARYnm_YBqgE7Ybups3g\n4::aW1hZ2UvanBlZw==:ARYuVwxc90PchokbTVVuiNy1CDwiSQYLsaD6q5_QS24d2oHZNa_bXSAz2bvfxeO0_NC0E14yNjEMPZoEAhZfyxbl9LYwkLdetiM7dyA6Ds4WMw:e:1728743560:909424327447265:61559904154551:ARYm8TId9v5PxZCCxcI\n4::aW1hZ2UvanBlZw==:ARaClJBNi1gK6uUV-huXRR-Pn0xakDu4ttWwdNJ4MlG3NYwLpW-Hb_W5yuwSBSDDPaDQVMqZptfKpfkWRSv0kKpeSNoFaOXde6gEzsC0CWU_KQ:e:1728743560:909424327447265:61559904154551:ARZiVLsC4PKXHB9R1Uk',
+								],
+							},
+						},
+						{
+							type: 'BODY',
+							text: 'sample body 2',
+						},
+					],
+				},
+				{
+					card_index: 2,
+					components: [
+						{
+							type: 'HEADER',
+							format: 'IMAGE',
+							example: {
+								header_handle: [
+									'4::aW1hZ2UvcG5n:ARZgPe-K-57tUAaeC_MmGukmQ19OIf10sM9JGOoKuAtV5IHPA9YTZoWsi3_1w2xikmrEjVWupQp_imvolSPMUfEP0ANHg2TLulhImDjhM75oSg:e:1728743557:909424327447265:61559904154551:ARaR4868qOt_nH1BLzw',
+								],
+							},
+						},
+						{
+							type: 'BODY',
+							text: 'sample body 3',
+						},
+					],
+				},
+			],
+		},
+		{
+			type: 'BODY',
+			text: 'sample template body',
+		},
+	],
+};
