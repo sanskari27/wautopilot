@@ -100,8 +100,8 @@ export function AgentContextMenu({
 							<DropdownMenuItem asChild>
 								<Link href={`?update_password=${id}`}>Change Password</Link>
 							</DropdownMenuItem>
-							<DropdownMenuItem onClick={openServiceAccount} asChild>
-								Service Account
+							<DropdownMenuItem onClick={openServiceAccount}>
+								Login as {agent.name}
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
 							<DeleteDialog onDelete={handleDelete}>

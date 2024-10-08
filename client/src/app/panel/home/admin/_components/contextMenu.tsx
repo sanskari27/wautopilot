@@ -59,7 +59,7 @@ export function AdminContextMenu({
 					Set markup price
 				</ContextMenuLink>
 				<ContextMenuItem onClick={openServiceAccount} inset>
-					Service account
+					Login as {admin.name}
 				</ContextMenuItem>
 			</ContextMenuContent>
 		</ContextMenu>
