@@ -117,7 +117,6 @@ export default function DataForm({
 								};
 
 								return {
-									card_index: index,
 									components: [
 										header,
 										...(body ? [body] : []),
@@ -251,6 +250,8 @@ export default function DataForm({
 	}
 
 	const hasError = templateSchema.safeParse(form.getValues()).success === false;
+
+	console.log(templateSchema.safeParse(form.getValues()));
 
 	const handleAddCarousel = (data: Carousel) => {
 		console.log(data);

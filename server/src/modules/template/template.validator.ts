@@ -165,17 +165,33 @@ export async function TemplateEditValidator(req: Request, res: Response, next: N
 		),
 	});
 
+	const headerCarouselSchema = z.object({
+		type: z.literal('HEADER'),
+		format: z.enum(['IMAGE', 'VIDEO']),
+		example: z.object({
+			header_handle: z.array(z.string().trim()).default([]),
+		}),
+	});
+
+	const carouselSchema = z.object({
+		type: z.literal('CAROUSEL'),
+		cards: z.array(
+			z.object({
+				// card_index: z.number(),
+				components: z.array(
+					z.discriminatedUnion('type', [headerCarouselSchema, bodySchema, buttonsSchema])
+				),
+			})
+		),
+	});
+
 	const componentSchema = z.discriminatedUnion('type', [
 		headerSchema,
 		bodySchema,
 		footerSchema,
 		buttonsSchema,
+		carouselSchema,
 	]);
-
-	const _res = componentSchema.safeParse(req.body);
-	if (_res.success) {
-		_res.data;
-	}
 
 	const reqValidator = z.object({
 		id: z.string().trim(),

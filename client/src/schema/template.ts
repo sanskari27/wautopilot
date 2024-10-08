@@ -44,7 +44,7 @@ export const carouselSchema = z.object({
 	type: z.literal('CAROUSEL'),
 	cards: z.array(
 		z.object({
-			card_index: z.number(),
+			// card_index: z.number(),
 			components: z.discriminatedUnion('type', [headerSchema, bodySchema, buttonsSchema]).array(),
 		})
 	),

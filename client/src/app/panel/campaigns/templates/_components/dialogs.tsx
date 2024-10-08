@@ -229,7 +229,7 @@ export function CarouselTemplateDialog({
 			index: number;
 			file: File | null;
 		}[]
-	>([]);
+	>(Array.from({ length: carousel.cards.length }).map((_, index) => ({ index, file: null })));
 
 	const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -244,16 +244,13 @@ export function CarouselTemplateDialog({
 
 		const body_variables = countOccurrences(value);
 
-		if (
-			body_variables === 0 &&
-			form.getValues(`cards.${index}.components.${componentIndex}.example`)
-		) {
+		if (body_variables === 0) {
 			return form.setValue(`cards.${index}.components.${componentIndex}.example`, undefined);
+		} else {
+			form.setValue(`cards.${index}.components.${componentIndex}.example`, {
+				body_text: [Array.from({ length: body_variables }).map(() => '')],
+			});
 		}
-
-		form.setValue(`cards.${index}.components.${componentIndex}.example`, {
-			body_text: [Array.from({ length: body_variables }).map(() => '')],
-		});
 	}
 
 	const addBlankCard = () => {
@@ -263,7 +260,6 @@ export function CarouselTemplateDialog({
 		form.setValue('cards', [
 			...form.getValues('cards'),
 			{
-				card_index: form.getValues('cards').length,
 				components: [
 					{
 						type: 'HEADER',
@@ -275,9 +271,6 @@ export function CarouselTemplateDialog({
 					{
 						type: 'BODY',
 						text: '',
-						example: {
-							body_text: [['']],
-						},
 					},
 					{
 						type: 'BUTTONS',
@@ -348,6 +341,7 @@ export function CarouselTemplateDialog({
 			return toast.error('Maximum 10 cards are allowed');
 		}
 		const buttonLength = new Set();
+		const buttonType = new Set();
 		data.cards.forEach((card, index) => {
 			return card.components.forEach((component) => {
 				if (component.type === 'BODY') {
@@ -363,6 +357,9 @@ export function CarouselTemplateDialog({
 				}
 				if (component.type === 'BUTTONS') {
 					buttonLength.add(component.buttons.length);
+					component.buttons.forEach((button) => {
+						buttonType.add(button.type);
+					});
 				}
 			});
 		});
@@ -374,6 +371,9 @@ export function CarouselTemplateDialog({
 		}
 		if (buttonLength.size === 1 && buttonLength.values().next().value > 2) {
 			return toast.error('Maximum 2 buttons are allowed');
+		}
+		if (buttonType.size > 1) {
+			return toast.error('All buttons should be of same type');
 		}
 		for (const ele of file) {
 			if (ele.file === null) {
