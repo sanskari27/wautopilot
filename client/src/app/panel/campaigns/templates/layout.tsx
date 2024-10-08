@@ -519,7 +519,6 @@ export default async function Layout({
 }>) {
 	// const templates = (await TemplateService.listTemplates())!;
 
-
 	return (
 		<Suspense fallback={<Loading />}>
 			<section>

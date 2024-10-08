@@ -1,5 +1,6 @@
 import { PRASHANT_VARMA } from '@/lib/consts';
 import { cn } from '@/lib/utils';
+import { Carousel } from '@/schema/template';
 import { Link, MessageCircleReply, PhoneCall } from 'lucide-react';
 import { FaVideo } from 'react-icons/fa';
 import { IoDocumentText } from 'react-icons/io5';
@@ -7,7 +8,6 @@ import { MdOutlinePermMedia } from 'react-icons/md';
 import Each from '../containers/each';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Separator } from '../ui/separator';
-import { Carousel } from '@/schema/template';
 
 type Props = {
 	components: Record<string, any>[];
@@ -17,7 +17,8 @@ export default function TemplatePreview({ components }: Props) {
 	const body = components.find((component) => component.type === 'BODY');
 	const footer = components.find((component) => component.type === 'FOOTER');
 	const buttons = components.find((component) => component.type === 'BUTTONS')?.buttons ?? [];
-	const carousels = components.find((component) => component.type === 'CAROUSEL')?.cards ?? [];
+	const carousels: Carousel['cards'] =
+		components.find((component) => component.type === 'CAROUSEL')?.cards ?? [];
 
 	return (
 		<div className='shadow-lg drop-shadow-lg min-w-[200px] max-w-lg min-h-fit w-[95%] mx-auto my-1rem bg-white rounded-2xl p-2'>
@@ -50,13 +51,51 @@ export default function TemplatePreview({ components }: Props) {
 						<div className='mt-2' hidden={!body}>
 							{body && body.text ? <p className='whitespace-pre-line'>{body.text}</p> : null}
 						</div>
-						<div className='mt-2  flex gap-4 w-full overflow-X-scroll' hidden={!carousels}>
+
+						<div className='mt-2' hidden={!footer}>
+							{footer && footer.text ? (
+								<p className='text-xs text-gray-500'>{footer.text}</p>
+							) : null}
+						</div>
+						<Separator
+							className={cn('my-2 bg-gray-400', buttons.length === 0 ? 'hidden' : 'block')}
+						/>
+						<Each
+							items={buttons}
+							render={(button: { text: string; type: string }) => (
+								<div
+									className='flex justify-center items-center text-teal-500  rounded-md border border-teal-500 p-1 gap-2 my-1'
+									hidden={!button.text}
+								>
+									{button.type === 'QUICK_REPLY' && (
+										<MessageCircleReply className='w-4 h-4 text-teal-500' />
+									)}
+									{button.type === 'PHONE_NUMBER' && (
+										<PhoneCall className='w-4 h-4 text-teal-500' />
+									)}
+									{button.type === 'URL' && <Link className='w-4 h-4 text-teal-500' />}
+									<p className='text-sm'>{button.text}</p>
+								</div>
+							)}
+						/>
+
+						<div className='flex justify-end text-xs mt-1'>
+							<p className='font-medium'>
+								{new Date().toLocaleTimeString('en-US', {
+									hour: '2-digit',
+									minute: '2-digit',
+								})}
+							</p>
+						</div>
+					</div>
+					<div className='w-full overflow-x-scroll flex' hidden={components.length === 0}>
+						<div className='rounded-2xl flex gap-2 overflow-X-scroll w-[700px]' hidden={!carousels}>
 							<Each
 								items={carousels}
 								render={(carousel, index) => (
-									<div key={index} className='mt-2 w-[500px]'>
+									<div key={index} className='mt-2 w-[500px] bg-white p-2 rounded-2xl'>
 										<Each
-											items={carousel.components!}
+											items={carousel.components}
 											render={(component) => {
 												if (component.type === 'HEADER') {
 													return (
@@ -115,46 +154,12 @@ export default function TemplatePreview({ components }: Props) {
 														</div>
 													);
 												}
+												return <></>;
 											}}
 										/>
 									</div>
 								)}
 							/>
-						</div>
-						<div className='mt-2' hidden={!footer}>
-							{footer && footer.text ? (
-								<p className='text-xs text-gray-500'>{footer.text}</p>
-							) : null}
-						</div>
-						<Separator
-							className={cn('my-2 bg-gray-400', buttons.length === 0 ? 'hidden' : 'block')}
-						/>
-						<Each
-							items={buttons}
-							render={(button: { text: string; type: string }) => (
-								<div
-									className='flex justify-center items-center text-teal-500  rounded-md border border-teal-500 p-1 gap-2 my-1'
-									hidden={!button.text}
-								>
-									{button.type === 'QUICK_REPLY' && (
-										<MessageCircleReply className='w-4 h-4 text-teal-500' />
-									)}
-									{button.type === 'PHONE_NUMBER' && (
-										<PhoneCall className='w-4 h-4 text-teal-500' />
-									)}
-									{button.type === 'URL' && <Link className='w-4 h-4 text-teal-500' />}
-									<p className='text-sm'>{button.text}</p>
-								</div>
-							)}
-						/>
-
-						<div className='flex justify-end text-xs mt-1'>
-							<p className='font-medium'>
-								{new Date().toLocaleTimeString('en-US', {
-									hour: '2-digit',
-									minute: '2-digit',
-								})}
-							</p>
 						</div>
 					</div>
 				</div>

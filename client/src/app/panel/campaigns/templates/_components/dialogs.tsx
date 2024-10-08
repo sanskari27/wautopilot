@@ -269,6 +269,9 @@ export function CarouselTemplateDialog({
 					{
 						type: 'BODY',
 						text: '',
+						example:{
+							body_text: [['']]
+						}
 					},
 					{
 						type: 'BUTTONS',
@@ -420,10 +423,12 @@ export function CarouselTemplateDialog({
 			<DialogTrigger ref={buttonRef} asChild>
 				{children}
 			</DialogTrigger>
-			<DialogContent className='sm:max-w-[425px] md:max-w-xl lg:max-w-3xl'>
-				<DialogHeader>Carousel Template</DialogHeader>
-				<Button onClick={addBlankCard}>Add Card</Button>
-				<ScrollArea className='max-h-[800px]'>
+			<DialogContent className='sm:max-w-[425px] md:max-w-xl lg:max-w-3xl p-0'>
+				<DialogHeader className='p-4'>Carousel Template</DialogHeader>
+				<Button className='mx-4' onClick={addBlankCard}>
+					Add Card
+				</Button>
+				<ScrollArea className='max-h-[60vh] min-h-[500px] p-4'>
 					<form onSubmit={form.handleSubmit(handleSave)}>
 						<FormField
 							control={form.control}
@@ -433,11 +438,15 @@ export function CarouselTemplateDialog({
 									items={field.value}
 									render={(item, index) => (
 										<Accordion type='single' collapsible key={index}>
-											<AccordionItem value={`${index}`}>
-												<AccordionTrigger>Card {index + 1}</AccordionTrigger>
+											<AccordionItem
+												className='border-2 border-dashed rounded-lg px-2'
+												value={`${index}`}
+											>
+												<AccordionTrigger className='border-b-2 border-dashed'>
+													Card {index + 1}
+												</AccordionTrigger>
 												<AccordionContent>
 													<FormItem>
-														<FormLabel>Components</FormLabel>
 														<FormField
 															control={form.control}
 															name={`cards.${index}.components`}
@@ -490,31 +499,36 @@ export function CarouselTemplateDialog({
 																					/>
 																					<FormField
 																						control={form.control}
-																						name={`cards.${index}.components.${componentIndex}.text`}
-																						render={({ field }) => (
-																							<FormItem className='space-y-0 flex-1'>
-																								<FormLabel className='text-primary'>
-																									Header Media
-																								</FormLabel>
-																								<FormControl>
-																									<Input
-																										type='file'
-																										ref={fileInputRef}
-																										accept={
-																											component.format === 'IMAGE'
-																												? 'image/*'
-																												: 'video/*'
-																										}
-																										onChange={(e) =>
-																											handleFileInput(
-																												index,
-																												e.target.files?.[0] ?? null
-																											)
-																										}
-																									/>
-																								</FormControl>
-																							</FormItem>
-																						)}
+																						name={`cards.${index}.components.${componentIndex}.example.header_handle.0`}
+																						render={({ field }) => {
+																							if (file[index].file) {
+																								return <div>File selected</div>;
+																							}
+																							return (
+																								<FormItem className='space-y-0 flex-1'>
+																									<FormLabel className='text-primary'>
+																										Header Media
+																									</FormLabel>
+																									<FormControl>
+																										<Input
+																											type='file'
+																											ref={fileInputRef}
+																											accept={
+																												component.format === 'IMAGE'
+																													? 'image/*'
+																													: 'video/*'
+																											}
+																											onChange={(e) =>
+																												handleFileInput(
+																													index,
+																													e.target.files?.[0] ?? null
+																												)
+																											}
+																										/>
+																									</FormControl>
+																								</FormItem>
+																							);
+																						}}
 																					/>
 																				</>
 																			);
@@ -720,6 +734,7 @@ export function CarouselTemplateDialog({
 								e.stopPropagation();
 							}}
 							disabled={form.watch('cards').length < 2}
+							className='mt-4'
 						>
 							Submit
 						</Button>
