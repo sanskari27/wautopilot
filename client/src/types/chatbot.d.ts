@@ -29,5 +29,17 @@ export type ChatbotFlow = {
 			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | 'AUDIO' | '';
 			media_id: string;
 		};
+		template_carousel: {
+			header: {
+				type: 'IMAGE' | 'VIDEO';
+				media_id: string;
+			};
+			body: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
+		}[];
 	}[];
 };

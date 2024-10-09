@@ -1451,6 +1451,18 @@ export function QuickTemplateMessage({
 			phonebook_data: string;
 			variable_from: 'custom_text' | 'phonebook_data';
 			fallback_value: string;
+		}[],
+		template_carousel: {
+			header: {
+				type: 'IMAGE' | 'VIDEO';
+				media_id: string;
+			};
+			body: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
 		}[]
 	) => void;
 }) {
@@ -1477,6 +1489,21 @@ export function QuickTemplateMessage({
 		}[]
 	>([]);
 	const [template_id, setTemplateId] = useState<string>('');
+	const [template_carousel, setTemplateCarousel] = useState<
+		{
+			header: {
+				type: 'IMAGE' | 'VIDEO';
+				media_id: string;
+			};
+			body: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
+		}[]
+	>([]);
+
 	let phonebook_fields = useFields();
 	phonebook_fields = phonebook_fields.filter((field) => field.value !== 'all');
 
@@ -1510,7 +1537,47 @@ export function QuickTemplateMessage({
 				return toast.error('Please provide a value for all variables');
 			}
 		}
-		onConfirm(template_id, template_name, template_header, template_body);
+		if (template_carousel.length > 0) {
+			if (
+				template_carousel.some(
+					(card, index) =>
+						!card.header.media_id
+				)
+			) {
+				return toast.error('Please select a media for the header of all carousel cards');
+			}
+			if (
+				template_carousel.some((card) =>
+					card.body.some(
+						(body) =>
+							body.variable_from === 'phonebook_data' && !body.phonebook_data
+					)
+				)
+			) {
+				return toast.error('Please select a phonebook field for all variables in carousel cards');
+			}
+			if (
+				template_carousel.some((card) =>
+					card.body.some(
+						(body) =>
+							body.variable_from === 'phonebook_data' && !body.fallback_value
+					)
+				)
+			) {
+				return toast.error('Please provide a fallback value for all variables in carousel cards');
+			}
+			if (
+				template_carousel.some((card) =>
+					card.body.some(
+						(body) =>
+							body.variable_from === 'custom_text' && !body.custom_text
+					)
+				)
+			) {
+				return toast.error('Please provide a value for all variables in carousel cards');
+			}
+		}
+		onConfirm(template_id, template_name, template_header, template_body, template_carousel);
 		buttonRef.current?.click();
 		setTemplateName('');
 		setTemplateHeader({
@@ -1548,6 +1615,30 @@ export function QuickTemplateMessage({
 			link: '',
 			media_id: '',
 		});
+
+		const carousel = selectedTemplate?.components.filter((c) => c.type === 'CAROUSEL')[0].cards;
+		if (carousel) {
+			setTemplateCarousel(
+				(carousel ?? []).map((card, index) => ({
+					header: {
+						type: card.components.filter((c) => c.type === 'HEADER')[0].format as 'IMAGE' | 'VIDEO',
+						media_id: '',
+					},
+					body: Array.from({
+						length: countOccurrences(
+							card.components.filter((c) => c.type === 'BODY')[0].text ?? ''
+						),
+					}).map(() => ({
+						custom_text: '',
+						phonebook_data: '',
+						variable_from: 'custom_text',
+						fallback_value: '',
+					})),
+				}))
+			);
+		} else {
+			setTemplateCarousel([]);
+		}
 	};
 
 	return (
@@ -1687,6 +1778,136 @@ export function QuickTemplateMessage({
 													/>
 												</Show.ShowIf>
 											</div>
+										</div>
+									)}
+								/>
+							</Show.ShowIf>
+							<Show.ShowIf condition={template_carousel.length > 0}>
+								<Each
+									items={template_carousel}
+									render={(card, cardIndex) => (
+										<div className='border-2 border-dashed p-2 rounded-xl'>
+											<Label className='mb-4'>Card {cardIndex + 1}</Label>
+											<div className='my-4'>
+												<p className='font-medium'>Header Media:- </p>
+												<MediaSelectorDialog
+													singleSelect
+													selectedValue={
+														template_carousel[cardIndex].header.media_id
+															? [template_carousel[cardIndex].header.media_id]
+															: []
+													}
+													onConfirm={(media) =>
+														// form.setValue(
+														// 	`nurturing.${index}.template_carousel.${cardIndex}.header.media_id`,
+														// 	media[0]
+														// )
+														setTemplateCarousel((prev) => {
+															const newCarousel = [...prev];
+															newCarousel[cardIndex].header.media_id = media[0];
+															return newCarousel;
+														})
+													}
+													returnType='media_id'
+												>
+													<Button variant={'outline'}>Select Media</Button>
+												</MediaSelectorDialog>
+
+												<span>
+													{template_carousel[cardIndex].header.media_id
+														? 'Media selected'
+														: 'No media selected'}
+												</span>
+											</div>
+											<Each
+												items={template_carousel[cardIndex].body}
+												render={(body, bodyIndex) => (
+													<div className='flex flex-col'>
+														<Label>Variable value {bodyIndex + 1}</Label>
+														<div className='flex gap-3 flex-col md:flex-row'>
+															<div className='space-y-0 flex-1 max-w-xs'>
+																<Select
+																	onValueChange={(value) =>
+																		setTemplateCarousel((prev) => {
+																			const newCarousel = [...prev];
+																			newCarousel[cardIndex].body[bodyIndex].variable_from =
+																				value as typeof body.variable_from;
+																			return newCarousel;
+																		})
+																	}
+																	defaultValue={body.variable_from}
+																>
+																		<SelectTrigger>
+																			<SelectValue placeholder='Data From' />
+																		</SelectTrigger>
+																	<SelectContent>
+																		<SelectItem value='phonebook_data'>Phonebook Data</SelectItem>
+																		<SelectItem value='custom_text'>Custom Text</SelectItem>
+																	</SelectContent>
+																</Select>
+															</div>
+															<Show.ShowIf condition={body.variable_from === 'phonebook_data'}>
+																<div className='space-y-0 flex-1 max-w-xs'>
+																	<Select
+																		onValueChange={(value) =>
+																			setTemplateCarousel((prev) => {
+																				const newCarousel = [...prev];
+																				newCarousel[cardIndex].body[bodyIndex].phonebook_data =
+																					value as string;
+																				return newCarousel;
+																			})
+																		}
+																		defaultValue={body.phonebook_data}
+																	>
+																			<SelectTrigger>
+																				<SelectValue placeholder='Select Fields' />
+																			</SelectTrigger>
+																		<SelectContent>
+																			<Each
+																				items={phonebook_fields}
+																				render={(field) => (
+																					<SelectItem value={field.value}>{field.label}</SelectItem>
+																				)}
+																			/>
+																		</SelectContent>
+																	</Select>
+																</div>
+																<div className='space-y-0 flex-1'>
+																	<Input
+																		placeholder='Fallback Value'
+																		value={body.fallback_value}
+																		onChange={(e) =>
+																			setTemplateCarousel((prev) => {
+																				const newCarousel = [...prev];
+																				newCarousel[cardIndex].body[bodyIndex].fallback_value =
+																					e.target.value;
+																				return newCarousel;
+																			})
+																		}
+																	/>
+																</div>
+															</Show.ShowIf>
+
+															<Show.ShowIf condition={body.variable_from === 'custom_text'}>
+																<div className='space-y-0 flex-1 max-w-lg'>
+																	<Input
+																		placeholder='Value'
+																		value={body.custom_text}
+																		onChange={(e) =>
+																			setTemplateCarousel((prev) => {
+																				const newCarousel = [...prev];
+																				newCarousel[cardIndex].body[bodyIndex].custom_text =
+																					e.target.value;
+																				return newCarousel;
+																			})
+																		}
+																	/>
+																</div>
+															</Show.ShowIf>
+														</div>
+													</div>
+												)}
+											/>
 										</div>
 									)}
 								/>

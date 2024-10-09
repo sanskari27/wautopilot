@@ -162,7 +162,19 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 			type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | '';
 			media_id: string;
 			link?: string;
-		}
+		},
+		template_carousel: {
+			header: {
+				type: 'IMAGE' | 'VIDEO';
+				media_id: string;
+			};
+			body: {
+				variable_from: 'custom_text' | 'phonebook_data';
+				custom_text: string;
+				phonebook_data: string;
+				fallback_value: string;
+			}[];
+		}[]
 	) {
 		MessagesService.sendQuickTemplateMessage({
 			recipientId: selected_recipient!.id,
@@ -171,7 +183,9 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 			body: template_body,
 			header: template_header,
 			type: 'template',
+			carousel: template_carousel,
 			context: { message_id: replyMessageId },
+
 		}).then((data) => {
 			setReplyMessageId('');
 			if (!data) {
@@ -407,8 +421,8 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 							</Button>
 						</QuickLocationTemplateMessage>
 						<QuickTemplateMessage
-							onConfirm={(template_id, template_name, template_header, template_body) =>
-								sendQuickTemplateMessage(template_id, template_name, template_body, template_header)
+							onConfirm={(template_id, template_name, template_header, template_body, template_carousel) =>
+								sendQuickTemplateMessage(template_id, template_name, template_body, template_header, template_carousel)
 							}
 						>
 							<Button variant={'ghost'} size={'sm'} className='w-full justify-start'>

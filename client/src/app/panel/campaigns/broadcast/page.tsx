@@ -70,8 +70,6 @@ export default function BroadcastPage() {
 	const header = template?.components.find((component) => component.type === 'HEADER');
 	const carousels = template?.components.filter((component) => component.type === 'CAROUSEL');
 
-	console.log(carousels);
-
 	const validationResult = broadcastSchema.safeParse(fields);
 	if (!validationResult.success) {
 		console.error(validationResult.error.errors);
@@ -95,6 +93,11 @@ export default function BroadcastPage() {
 							link: data.header?.link,
 							type: header.format,
 						},
+				  }
+				: {}),
+			...(carousels
+				? {
+						carousels: [...carousels],
 				  }
 				: {}),
 		});
@@ -157,8 +160,6 @@ export default function BroadcastPage() {
 			}))
 		);
 	}
-
-	console.log(form.getValues('carousel'));
 
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>

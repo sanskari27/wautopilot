@@ -215,6 +215,18 @@ export default class MessagesService {
 			media_id?: string;
 			link?: string;
 		};
+		carousel?:{
+			header: {
+				type: 'IMAGE' | 'VIDEO';
+				media_id?: string;
+			};
+			body: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
+		}[];
 		context?: { message_id: string };
 	}) {
 		if (details.header?.type === '') {

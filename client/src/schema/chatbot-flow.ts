@@ -51,7 +51,7 @@ export const ChatbotFlowSchema = z.object({
 						z.object({
 							header: z.object({
 								type: z.enum(['IMAGE', 'VIDEO']),
-								media_id: z.string().optional(),
+								media_id: z.string(),
 							}),
 							body: z
 								.array(
