@@ -231,6 +231,8 @@ export function CarouselTemplateDialog({
 		}[]
 	>(Array.from({ length: carousel.cards.length }).map((_, index) => ({ index, file: null })));
 
+	const [isMediaUploading, setIsMediaUploading] = React.useState(false);
+
 	const fileInputRef = React.useRef<HTMLInputElement>(null);
 
 	const form = useForm<Carousel>({
@@ -392,6 +394,7 @@ export function CarouselTemplateDialog({
 	};
 
 	const handleFileUpload = async (data: Carousel) => {
+		setIsMediaUploading(true);
 		const promises = file.map((ele) => {
 			return UploadService.generateMetaHandle(ele.file as File);
 		});
@@ -399,10 +402,14 @@ export function CarouselTemplateDialog({
 		toast.promise(Promise.all(promises), {
 			loading: 'Uploading Media',
 			success: (res) => {
+				setIsMediaUploading(false);
 				handleSubmit(data, res);
 				return 'Media uploaded successfully';
 			},
-			error: 'Failed to upload media',
+			error: () => {
+				setIsMediaUploading(false);
+				return 'Failed to upload media';
+			},
 		});
 	};
 
@@ -505,7 +512,18 @@ export function CarouselTemplateDialog({
 																					name={`cards.${index}.components.${componentIndex}.example.header_handle.0`}
 																					render={({ field }) => {
 																						if (file[index].file) {
-																							return <div>File selected</div>;
+																							return (
+																								<FormLabel className='flex items-center'>
+																									<div>Media selected</div>
+																									<Button onClick={()=>{
+																										setFile((prev) => {
+																											const newFiles = [...prev];
+																											newFiles[index] = { index, file: null };
+																											return newFiles;
+																										})
+																									}} variant={'link'}>Reset?</Button>
+																								</FormLabel>
+																							);
 																						}
 																						return (
 																							<FormItem className='space-y-0 flex-1'>
@@ -732,7 +750,7 @@ export function CarouselTemplateDialog({
 							e.stopPropagation();
 							handleSave(form.getValues());
 						}}
-						disabled={form.watch('cards').length < 2}
+						disabled={form.watch('cards').length < 2 || isMediaUploading}
 						className='mt-4'
 					>
 						Submit

@@ -592,7 +592,7 @@ export default async function Layout({
 }>) {
 	// const templates = (await TemplateService.listTemplates())!;
 
-	console.log(JSON.stringify(templates));
+	// console.log(JSON.stringify(templates));
 
 	return (
 		<Suspense fallback={<Loading />}>

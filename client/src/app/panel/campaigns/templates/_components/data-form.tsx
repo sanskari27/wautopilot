@@ -129,7 +129,6 @@ export default function DataForm({
 					return component;
 				});
 
-			console.log(data);
 			onSave({ ...data, components });
 			return;
 		}
