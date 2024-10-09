@@ -103,7 +103,7 @@ export default class SchedulerService extends WhatsappLinkService {
 			const c_id = await conversationService.createConversation(msg.to);
 			const header = extractTemplateHeader(
 				template.components,
-				msg.messageObject.template.components
+				msg.messageObject.components || msg.messageObject.template?.components
 			);
 			const body = extractTemplateBody(template.components, msg.messageObject.template.components);
 			const footer = extractTemplateFooter(template.components);
