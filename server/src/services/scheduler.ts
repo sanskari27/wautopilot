@@ -105,7 +105,10 @@ export default class SchedulerService extends WhatsappLinkService {
 				template.components,
 				msg.messageObject.components || msg.messageObject.template?.components
 			);
-			const body = extractTemplateBody(template.components, msg.messageObject.template.components);
+			const body = extractTemplateBody(
+				template.components,
+				msg.messageObject.components || msg.messageObject.template?.components
+			);
 			const footer = extractTemplateFooter(template.components);
 			const buttons = extractTemplateButtons(template.components);
 
