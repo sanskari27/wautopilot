@@ -151,20 +151,14 @@ export default class ChatbotFlowService {
 		return validateChatBot(data.flow);
 	}
 	static async updateNodesAndEdges(botId: string, details: { nodes: any[]; edges: any[] }) {
-			await api.patch(`/chatbot/flows/${botId}`, details);
+		await api.patch(`/chatbot/flows/${botId}`, details);
 	}
 	static async deleteChatbotFlow(botId: string) {
 		await api.delete(`/chatbot/flows/${botId}`);
 	}
 
 	static async toggleChatbotFlow(botId: string) {
-		try {
-			const { data } = await api.put(`/chatbot/flows/${botId}`);
-
-			return validateChatBot(data.flow);
-		} catch (err) {
-			return [];
-		}
+		await api.put(`/chatbot/flows/${botId}?chatbotflow=true`);
 	}
 
 	static async getNodesAndEdges(botId: string) {

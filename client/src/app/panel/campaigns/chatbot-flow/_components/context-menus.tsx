@@ -34,7 +34,10 @@ export function MainContextMenu({
 		toast.promise(toggleChatbotFlow(details.id), {
 			loading: 'Updating...',
 			success: 'Updated successfully',
-			error: 'Failed to update',
+			error: (err) => {
+				console.log(err);
+				return 'Failed to update';
+			},
 		});
 	};
 

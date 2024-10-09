@@ -248,7 +248,9 @@ export function CarouselTemplateDialog({
 
 		if (body_variables === 0) {
 			return form.setValue(`cards.${index}.components.${componentIndex}.example`, undefined);
-		} else {
+		} else if (
+			form.getValues(`cards.${index}.components.${componentIndex}.example`) === undefined
+		) {
 			form.setValue(`cards.${index}.components.${componentIndex}.example`, {
 				body_text: [Array.from({ length: body_variables }).map(() => '')],
 			});
@@ -515,13 +517,18 @@ export function CarouselTemplateDialog({
 																							return (
 																								<FormLabel className='flex items-center'>
 																									<div>Media selected</div>
-																									<Button onClick={()=>{
-																										setFile((prev) => {
-																											const newFiles = [...prev];
-																											newFiles[index] = { index, file: null };
-																											return newFiles;
-																										})
-																									}} variant={'link'}>Reset?</Button>
+																									<Button
+																										onClick={() => {
+																											setFile((prev) => {
+																												const newFiles = [...prev];
+																												newFiles[index] = { index, file: null };
+																												return newFiles;
+																											});
+																										}}
+																										variant={'link'}
+																									>
+																										Reset?
+																									</Button>
 																								</FormLabel>
 																							);
 																						}

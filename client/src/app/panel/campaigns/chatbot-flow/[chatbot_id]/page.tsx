@@ -162,6 +162,7 @@ export default function CreateChatbotFlow() {
 
 		const body = selectedTemplate?.components.find((c) => c.type === 'BODY');
 		const variables = countOccurrences(body?.text ?? '');
+		const carousels = selectedTemplate?.components.filter((c) => c.type === 'CAROUSEL')[0].cards;
 
 		form.setValue(
 			`nurturing.${index}.template_body`,
@@ -170,6 +171,28 @@ export default function CreateChatbotFlow() {
 				phonebook_data: '',
 				variable_from: 'custom_text' as 'custom_text' | 'phonebook_data',
 				fallback_value: '',
+			}))
+		);
+
+		form.setValue(
+			`nurturing.${index}.template_carousel`,
+			Array.from({ length: carousels?.length ?? 0 }).map((_, index) => ({
+				header: {
+					type: carousels?.[index].components.filter((component) => component.type === 'HEADER')[0]
+						.format as 'IMAGE' | 'VIDEO',
+					media_id: '',
+				},
+				body: Array.from({
+					length: countOccurrences(
+						carousels?.[index].components.filter((component) => component.type === 'BODY')[0]
+							.text ?? ''
+					),
+				}).map(() => ({
+					custom_text: '',
+					phonebook_data: '',
+					variable_from: 'custom_text' as 'custom_text' | 'phonebook_data',
+					fallback_value: '',
+				})),
 			}))
 		);
 
@@ -206,6 +229,7 @@ export default function CreateChatbotFlow() {
 					type: '',
 					media_id: '',
 				},
+				template_carousel:[],
 			},
 		]);
 	};
@@ -734,6 +758,164 @@ export default function CreateChatbotFlow() {
 																					/>
 																				</Show.ShowIf>
 																			</div>
+																		</div>
+																	)}
+																/>
+															</Show.ShowIf>
+															<Show.ShowIf
+																condition={
+																	nurturing[index].template_carousel &&
+																	nurturing[index].template_carousel.length > 0
+																}
+															>
+																<Each
+																	items={nurturing[index].template_carousel}
+																	render={(card, cardIndex) => (
+																		<div className='border-2 border-dashed p-2 rounded-xl'>
+																			<FormLabel className='mb-4'>Card {cardIndex + 1}</FormLabel>
+																			<div className='my-4'>
+																				<p className='font-medium'>Header Media:- </p>
+																				<MediaSelectorDialog
+																					singleSelect
+																					selectedValue={
+																						nurturing[index].template_carousel[cardIndex].header
+																							.media_id
+																							? [
+																									nurturing[index].template_carousel[cardIndex]
+																										.header.media_id,
+																							  ]
+																							: []
+																					}
+																					onConfirm={(media) =>
+																						form.setValue(
+																							`nurturing.${index}.template_carousel.${cardIndex}.header.media_id`,
+																							media[0]
+																						)
+																					}
+																					returnType='media_id'
+																				>
+																					<Button variant={'outline'}>Select Media</Button>
+																				</MediaSelectorDialog>
+
+																				<span>
+																					{nurturing[index].template_carousel[cardIndex].header
+																						.media_id
+																						? 'Media selected'
+																						: 'No media selected'}
+																				</span>
+																			</div>
+																			<FormField
+																				control={form.control}
+																				name={`nurturing.${index}.template_carousel.${cardIndex}`}
+																				render={({ field }) => (
+																					<Each
+																						items={field.value.body}
+																						render={(body, bodyIndex) => (
+																							<div className='flex flex-col'>
+																								<FormLabel>
+																									Variable value {bodyIndex + 1}
+																								</FormLabel>
+																								<div className='flex gap-3 flex-col md:flex-row'>
+																									<FormField
+																										control={form.control}
+																										name={`nurturing.${index}.template_carousel.${cardIndex}.body.${bodyIndex}.variable_from`}
+																										render={({ field }) => (
+																											<FormItem className='space-y-0 flex-1 max-w-xs'>
+																												<FormControl>
+																													<Select
+																														onValueChange={field.onChange}
+																														defaultValue={field.value}
+																													>
+																														<FormControl>
+																															<SelectTrigger>
+																																<SelectValue placeholder='Data From' />
+																															</SelectTrigger>
+																														</FormControl>
+																														<SelectContent>
+																															<SelectItem value='phonebook_data'>
+																																Phonebook Data
+																															</SelectItem>
+																															<SelectItem value='custom_text'>
+																																Custom Text
+																															</SelectItem>
+																														</SelectContent>
+																													</Select>
+																												</FormControl>
+																											</FormItem>
+																										)}
+																									/>
+																									<Show.ShowIf
+																										condition={
+																											body.variable_from === 'phonebook_data'
+																										}
+																									>
+																										<FormField
+																											control={form.control}
+																											name={`nurturing.${index}.template_carousel.${cardIndex}.body.${bodyIndex}.phonebook_data`}
+																											render={({ field }) => (
+																												<FormItem className='space-y-0 flex-1 max-w-xs'>
+																													<FormControl>
+																														<Select
+																															onValueChange={field.onChange}
+																															defaultValue={field.value}
+																														>
+																															<FormControl>
+																																<SelectTrigger>
+																																	<SelectValue placeholder='Select Fields' />
+																																</SelectTrigger>
+																															</FormControl>
+																															<SelectContent>
+																																<Each
+																																	items={phonebook_fields}
+																																	render={(field) => (
+																																		<SelectItem value={field.value}>
+																																			{field.label}
+																																		</SelectItem>
+																																	)}
+																																/>
+																															</SelectContent>
+																														</Select>
+																													</FormControl>
+																												</FormItem>
+																											)}
+																										/>
+																										<FormField
+																											control={form.control}
+																											name={`nurturing.${index}.template_carousel.${cardIndex}.body.${bodyIndex}.fallback_value`}
+																											render={({ field }) => (
+																												<FormItem className='space-y-0 flex-1'>
+																													<FormControl>
+																														<Input
+																															placeholder='Fallback Value'
+																															{...field}
+																														/>
+																													</FormControl>
+																												</FormItem>
+																											)}
+																										/>
+																									</Show.ShowIf>
+
+																									<Show.ShowIf
+																										condition={body.variable_from === 'custom_text'}
+																									>
+																										<FormField
+																											control={form.control}
+																											name={`nurturing.${index}.template_carousel.${cardIndex}.body.${bodyIndex}.custom_text`}
+																											render={({ field }) => (
+																												<FormItem className='space-y-0 flex-1 max-w-lg'>
+																													<FormControl>
+																														<Input placeholder='Value' {...field} />
+																													</FormControl>
+																												</FormItem>
+																											)}
+																										/>
+																									</Show.ShowIf>
+																								</div>
+																							</div>
+																						)}
+																					/>
+																				)}
+																			/>
 																		</div>
 																	)}
 																/>

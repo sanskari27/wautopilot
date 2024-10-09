@@ -49,6 +49,35 @@ export const broadcastSchema = z.object({
 			link: z.string().optional(),
 		})
 		.optional(),
+	carousel: z.array(
+		z.object({
+			header: z.object({
+				type: z.enum(['IMAGE', 'VIDEO']),
+				media_id: z.string().optional(),
+			}),
+			body: z
+				.array(
+					z.object({
+						custom_text: z.string(),
+						phonebook_data: z.string(),
+						variable_from: z.enum(['custom_text', 'phonebook_data']),
+						fallback_value: z.string(),
+					})
+				)
+				.default([])
+				.refine((arr) => {
+					if (arr.length === 0) {
+						return true;
+					}
+					return arr.every((item) => {
+						return (
+							(item.variable_from === 'custom_text' && item.custom_text !== '') ||
+							(item.variable_from === 'phonebook_data' && item.phonebook_data !== '')
+						);
+					});
+				}, 'All body parameters must have a value'),
+		})
+	),
 });
 
 export type Broadcast = z.infer<typeof broadcastSchema>;
@@ -92,7 +121,7 @@ export const recurringSchema = z.object({
 		}, 'All body parameters must have a value'),
 	template_header: z
 		.object({
-			type: z.enum(['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT' ,'']),
+			type: z.enum(['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT', '']),
 			media_id: z.string().optional(),
 			link: z.string().optional(),
 		})

@@ -46,6 +46,36 @@ export const ChatbotFlowSchema = z.object({
 					]),
 					media_id: z.string(),
 				}),
+				template_carousel: z
+					.array(
+						z.object({
+							header: z.object({
+								type: z.enum(['IMAGE', 'VIDEO']),
+								media_id: z.string().optional(),
+							}),
+							body: z
+								.array(
+									z.object({
+										custom_text: z.string(),
+										phonebook_data: z.string(),
+										variable_from: z.enum(['custom_text', 'phonebook_data']),
+										fallback_value: z.string(),
+									})
+								)
+								.default([])
+								.refine((arr) => {
+									if (arr.length === 0) {
+										return true;
+									}
+									return arr.every((item) => {
+										return (
+											(item.variable_from === 'custom_text' && item.custom_text !== '') ||
+											(item.variable_from === 'phonebook_data' && item.phonebook_data !== '')
+										);
+									});
+								}, 'All body parameters must have a value'),
+						})
+					),
 			})
 			.refine((nurturing) => {
 				if (nurturing.respond_type === 'template') {
