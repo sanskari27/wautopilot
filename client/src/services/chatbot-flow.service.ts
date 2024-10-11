@@ -96,6 +96,7 @@ export default class ChatbotFlowService {
 			}
 		});
 		const { data } = await api.post(`/chatbot/flows`, details);
+		console.log(data.flow)
 		return validateChatBot(data.flow);
 	}
 	static async updateChatbotFlow({
@@ -148,7 +149,8 @@ export default class ChatbotFlowService {
 			}
 		});
 		const { data } = await api.patch(`/chatbot/flows/${bot_id}`, details);
-		return validateChatBot(data.flow);
+		console.log(data)
+		// return validateChatBot(data.flow);
 	}
 	static async updateNodesAndEdges(botId: string, details: { nodes: any[]; edges: any[] }) {
 			await api.patch(`/chatbot/flows/${botId}`, details);

@@ -124,10 +124,11 @@ export default function CreateChatbotFlow() {
 		toast.promise(promise, {
 			loading: 'Saving...',
 			success: (res) => {
-				router.replace(`/panel/campaigns/chatbot-flow/${res}/customize`);
+				router.replace(`/panel/campaigns/chatbot-flow/${data.id}/customize`);
 				return 'Saved';
 			},
 			error: (err) => {
+				console.log(err)
 				return 'Failed to save';
 			},
 		});

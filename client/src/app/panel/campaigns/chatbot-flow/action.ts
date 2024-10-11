@@ -19,13 +19,11 @@ export async function updateNodesAndEdges(id: string, details: { nodes: any[]; e
 }
 
 export async function createChatbotFlow(chatbotFlow: ChatbotFlow) {
-	const data = await ChatbotFlowService.createChatbotFlow(chatbotFlow);
+	await ChatbotFlowService.createChatbotFlow(chatbotFlow);
 	revalidatePath('panel/campaigns/chatbot-flow', 'page');
-	return data.id;
 }
 
 export async function editChatbotFlow(id: string, details: ChatbotFlow) {
-	const data = await ChatbotFlowService.updateChatbotFlow({ bot_id: id, details });
+	await ChatbotFlowService.updateChatbotFlow({ bot_id: id, details });
 	revalidatePath('panel/campaigns/chatbot-flow', 'page');
-	return data.id;
 }
