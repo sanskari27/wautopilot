@@ -7,7 +7,6 @@ import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import ConversationService from '../../services/conversation';
 import PhoneBookService from '../../services/phonebook';
-import TemplateService from '../../services/templates';
 import WhatsappFlowService from '../../services/wa_flow';
 import CSVHelper from '../../utils/CSVHelper';
 import DateUtils from '../../utils/DateUtils';
@@ -17,10 +16,6 @@ import {
 	extractInteractiveButtons,
 	extractInteractiveFooter,
 	extractInteractiveHeader,
-	extractTemplateBody,
-	extractTemplateButtons,
-	extractTemplateFooter,
-	extractTemplateHeader,
 	generateBodyText,
 	generateButtons,
 	generateListBody,
@@ -322,12 +317,14 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 	} else if (data.type === 'template') {
 		const { header, body, template_name } = data;
 		const phoneBookService = new PhoneBookService(serviceAccount);
-		const templateService = new TemplateService(serviceAccount, device);
-		const template = await templateService.fetchTemplateByName(template_name);
+		// const template = await TemplateFactory.findByName(device, template_name);
 
-		if (!template) {
-			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
-		}
+		// const templateService = new TemplateService(serviceAccount, device);
+		// const template = await templateService.fetchTemplateByName(template_name);
+
+		// if (!template) {
+		// 	return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+		// }
 
 		const fields = await phoneBookService.findRecordByPhone(recipient);
 
@@ -409,19 +406,19 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 				`/${device.phoneNumberId}/messages`,
 				msgObj
 			);
-
-			const header = extractTemplateHeader(template.components, msgObj.template.components);
-			const body = extractTemplateBody(template.components, msgObj.template.components);
-			const footer = extractTemplateFooter(template.components);
-			const buttons = extractTemplateButtons(template.components);
+			//TODO: Fix this
+			// const header = extractTemplateHeader(template.components, msgObj.template.components);
+			// const body = extractTemplateBody(template.components, msgObj.template.components);
+			// const footer = extractTemplateFooter(template.components);
+			// const buttons = extractTemplateButtons(template.components);
 
 			await conversationService.addMessageToConversation(id, {
 				message_id: res.messages[0].id,
 				recipient: recipient,
-				...(header ? { ...header } : {}),
-				...(body ? { body: { body_type: 'TEXT', text: body } } : {}),
-				...(footer ? { footer_content: footer } : {}),
-				...(buttons ? { buttons } : {}),
+				// ...(header ? { ...header } : {}),
+				// ...(body ? { body: { body_type: 'TEXT', text: body } } : {}),
+				// ...(footer ? { footer_content: footer } : {}),
+				// ...(buttons ? { buttons } : {}),
 				sender: {
 					id: user.userId,
 					name: user.account.name,

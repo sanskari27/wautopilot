@@ -86,37 +86,37 @@ export default class TemplateService extends WhatsappLinkService {
 	}
 
 	public async fetchTemplateByName(name: string) {
-		try {
-			const { data: res } = await MetaAPI(this.accessToken).get(
-				`/${this.waid}/message_templates?name=${name}`
-			);
-			let data;
+			try {
+				const { data: res } = await MetaAPI(this.accessToken).get(
+					`/${this.waid}/message_templates?name=${name}`
+				);
+				let data;
 
-			for (const template of res.data) {
-				if (template.name === name) {
-					data = template;
-					break;
+				for (const template of res.data) {
+					if (template.name === name) {
+						data = template;
+						break;
+					}
 				}
-			}
 
-			return {
-				id: data.id,
-				name: data.name,
-				status: data.status as 'APPROVED' | 'PENDING' | 'REJECTED',
-				category: data.category as 'AUTHENTICATION' | 'MARKETING' | 'UTILITY',
-				components: data.components as (
-					| HeaderTemplate
-					| BodyTemplate
-					| FooterTemplate
-					| ButtonsTemplate
-				)[],
-			} as Template & {
-				id: string;
-				status: 'APPROVED' | 'PENDING' | 'REJECTED';
-			};
-		} catch (err) {
-			return null;
-		}
+				return {
+					id: data.id,
+					name: data.name,
+					status: data.status as 'APPROVED' | 'PENDING' | 'REJECTED',
+					category: data.category as 'AUTHENTICATION' | 'MARKETING' | 'UTILITY',
+					components: data.components as (
+						| HeaderTemplate
+						| BodyTemplate
+						| FooterTemplate
+						| ButtonsTemplate
+					)[],
+				} as Template & {
+					id: string;
+					status: 'APPROVED' | 'PENDING' | 'REJECTED';
+				};
+			} catch (err) {
+				return null;
+			}
 	}
 
 	public async deleteTemplate(template_id: string, name: string) {
