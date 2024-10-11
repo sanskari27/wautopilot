@@ -16,16 +16,61 @@ export default class TemplateFactory {
 		for (const component of data.components) {
 			switch (component.type) {
 				case 'HEADER':
-					template.setHeader(component);
+					const header = {
+						format: component.format,
+						example:
+							component.format === 'TEXT'
+								? component.example?.header_text ?? []
+								: component.example?.header_handle[0] ?? '',
+					};
+					template.setHeader(header);
 					break;
 				case 'BODY':
-					template.setBody(component);
+					const body = {
+						text: component.text,
+						example: component.example?.body_text[0] || [],
+					};
+					template.setBody(body);
 					break;
 				case 'FOOTER':
-					template.setFooter(component);
+					const footer = {
+						text: component.text,
+					};
+					template.setFooter(footer);
 					break;
 				case 'CAROUSEL':
-					template.setCarousel(component);
+					const carousel = component.cards.map((card: any) => {
+						let header = {};
+						let body = {};
+						let buttons = {};
+						for (const component of card.components) {
+							switch (component.type) {
+								case 'HEADER':
+									header = {
+										format: component.format,
+										example: component.example?.header_handle[0] ?? '',
+									};
+									break;
+								case 'BODY':
+									body = {
+										text: component.text,
+										example: component.example?.body_text[0] ?? [],
+									};
+									break;
+
+								case 'BUTTONS':
+									buttons = component.buttons;
+									break;
+							}
+						}
+						return {
+							header,
+							body,
+							buttons,
+						};
+					});
+
+					template.setCarousel(carousel);
 					break;
 				case 'BUTTONS':
 					template.setButtons(component.buttons);
@@ -43,8 +88,10 @@ export default class TemplateFactory {
 				`/${whatsappLinkService.waid}/message_templates`
 			);
 
-			return data.map((template: any) => TemplateFactory.convertToTemplate(data));
+			return data.map((template: any) => TemplateFactory.convertToTemplate(template));
 		} catch (err) {
+			console.log(err);
+
 			return [];
 		}
 	}

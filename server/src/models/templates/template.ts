@@ -74,6 +74,30 @@ export default class Template {
 	private footer?: Footer;
 	private buttons?: ButtonsTemplate;
 
+	constructor(data?: {
+		id: string;
+		name: string;
+		status: 'APPROVED' | 'PENDING' | 'REJECTED';
+		category: 'AUTHENTICATION' | 'MARKETING' | 'UTILITY';
+		header: HeaderTemplate;
+		body: Body;
+		footer: Footer;
+		buttons: ButtonsTemplate;
+		carousel: Carousel;
+	}) {
+		if (data) {
+			this._id = data.id;
+			this.name = data.name;
+			this.status = data.status;
+			this.category = data.category;
+			this.header = data.header;
+			this.body = data.body;
+			this.footer = data.footer;
+			this.buttons = data.buttons;
+			this.carousel = data.carousel;
+		}
+	}
+
 	get id() {
 		return this._id;
 	}
