@@ -186,6 +186,9 @@ export default class MessagesService {
 			};
 		}
 	) {
+		if (message.context?.message_id === '') {
+			delete message.context;
+		}
 		try {
 			await api.post(`/conversation/${recipientId}/send-message`, message);
 			return true;
