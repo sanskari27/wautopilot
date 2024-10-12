@@ -71,7 +71,9 @@ export default class TemplateFactory {
 						};
 					});
 
-					template.setCarousel(carousel);
+					template.setCarousel({
+						cards: carousel,
+					});
 					break;
 				case 'BUTTONS':
 					template.setButtons(component.buttons);
