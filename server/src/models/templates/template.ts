@@ -184,6 +184,7 @@ export default class Template {
 				const exampleLength = this.header.example.length;
 				header = {
 					type: 'HEADER',
+					format: this.header.format,
 					text: this.header.text,
 					...(exampleLength > 0 && {
 						example: {
@@ -194,6 +195,7 @@ export default class Template {
 			} else {
 				header = {
 					type: 'HEADER',
+					format: this.header.format,
 					[this.header.format.toLowerCase()]: {
 						header_handle: [this.header.example],
 					},
