@@ -18,6 +18,7 @@ export default class TemplateFactory {
 				case 'HEADER':
 					const header = {
 						format: component.format,
+						text: component.text,
 						example:
 							component.format === 'TEXT'
 								? component.example?.header_text ?? []
