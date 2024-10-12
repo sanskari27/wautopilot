@@ -7,9 +7,7 @@ export default interface IScheduledMessage extends Document {
 	device_id: Types.ObjectId;
 	scheduler_id: Types.ObjectId;
 	scheduler_type: string;
-
 	to: string;
-
 	status: MESSAGE_STATUS;
 
 	message_id: string;
@@ -26,4 +24,5 @@ export default interface IScheduledMessage extends Document {
 	messageObject: {
 		[key: string]: any;
 	};
+	formattedMessage: Object;
 }

@@ -4,7 +4,6 @@ import { IDValidator } from '../../middleware';
 import VerifyPermissions from '../../middleware/VerifyPermissions';
 import Controller from './chatbot.controller';
 import {
-	CreateBotValidator,
 	CreateFlowValidator,
 	UpdateFlowValidator,
 	UpdateWhatsappFlowValidator,
@@ -46,7 +45,6 @@ router
 		Controller.createWhatsappFlow
 	);
 
-
 router
 	.route('/flows/:id/download-response')
 	.all(VerifyPermissions(Permissions.chatbot_flow.export), IDValidator)
@@ -81,13 +79,6 @@ router
 router
 	.route('/:id')
 	.all(IDValidator)
-	.delete(VerifyPermissions(Permissions.chatbot.delete), Controller.deleteBot)
-	.put(VerifyPermissions(Permissions.chatbot.update), Controller.toggleActive)
-	.patch(VerifyPermissions(Permissions.chatbot.update), CreateBotValidator, Controller.updateBot);
-
-router
-	.route('/')
-	.get(Controller.listBots)
-	.post(VerifyPermissions(Permissions.chatbot.create), CreateBotValidator, Controller.createBot);
+	.delete(VerifyPermissions(Permissions.chatbot.delete), Controller.deleteBot);
 
 export default router;

@@ -486,7 +486,7 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 						.default([]),
 				})
 			)
-			.default([]),
+			.optional(),
 		forward: z
 			.object({
 				number: z.string().trim().default(''),

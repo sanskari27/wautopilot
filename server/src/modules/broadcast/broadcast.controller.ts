@@ -2,25 +2,18 @@ import { NextFunction, Request, Response } from 'express';
 import { UserLevel } from '../../config/const';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
+import { TemplateMessage } from '../../models/message';
+import TemplateFactory from '../../models/templates/templateFactory';
 import BroadcastService from '../../services/broadcast';
 import ButtonResponseService from '../../services/buttonResponse';
-import PhoneBookService from '../../services/phonebook';
+import PhoneBookService, { IPhonebookRecord } from '../../services/phonebook';
 import CSVHelper from '../../utils/CSVHelper';
 import { Respond, RespondCSV } from '../../utils/ExpressUtils';
+import { parseToBodyVariables } from '../../utils/MessageHelper';
 import {
 	CreateBroadcastValidationResult,
 	CreateRecurringValidationResult,
 } from './broadcast.validator';
-
-const bodyParametersList = [
-	'first_name',
-	'last_name',
-	'middle_name',
-	'phone_number',
-	'email',
-	'birthday',
-	'anniversary',
-];
 
 async function broadcastReport(req: Request, res: Response, next: NextFunction) {
 	const {
@@ -218,78 +211,29 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 			return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
 		}
 
+		const template = await TemplateFactory.findById(device, template_id);
+		if (!template) {
+			return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
+		}
+
+		const tHeader = template.getHeader();
+
 		const messages = _to.map(async (number) => {
-			const fields = await phoneBookService.findRecordByPhone(number);
+			const msg = new TemplateMessage(number, template);
 
-			let headers = [] as Record<string, unknown>[];
-
-			if (header) {
-				const object = {
-					...(header.media_id ? { id: header.media_id } : header.link ? { link: header.link } : {}),
-				};
-
-				headers = [
-					{
-						type: 'HEADER',
-						parameters:
-							header.type !== 'TEXT'
-								? [
-										{
-											type: header.type,
-											[header.type.toLowerCase()]: object,
-										},
-								  ]
-								: [],
-					},
-				];
+			if (header && tHeader && tHeader.format !== 'TEXT') {
+				msg.setMediaHeader(header as any);
 			}
 
-			return {
-				to: number,
-				messageObject: {
-					template_name,
-					to: number,
-					components: [
-						{
-							type: 'BODY',
-							parameters: body.map((b) => {
-								if (b.variable_from === 'custom_text') {
-									return {
-										type: 'text',
-										text: b.custom_text,
-									};
-								} else {
-									if (!fields) {
-										return {
-											type: 'text',
-											text: b.fallback_value,
-										};
-									}
+			const fields = await phoneBookService.findRecordByPhone(number);
+			const bodyVariables = parseToBodyVariables({
+				variables: body,
+				fields: fields || ({} as IPhonebookRecord),
+			});
 
-									const fieldVal = (
-										bodyParametersList.includes(b.phonebook_data)
-											? fields[b.phonebook_data as keyof typeof fields]
-											: fields.others[b.phonebook_data]
-									) as string;
+			msg.setBody(bodyVariables);
 
-									if (typeof fieldVal === 'string') {
-										return {
-											type: 'text',
-											text: fieldVal || b.fallback_value,
-										};
-									}
-									// const field = fields[]
-									return {
-										type: 'text',
-										text: b.fallback_value,
-									};
-								}
-							}),
-						},
-						...headers,
-					],
-				},
-			};
+			return msg;
 		});
 
 		await broadcastService.startBroadcast(

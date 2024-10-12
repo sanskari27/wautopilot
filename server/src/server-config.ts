@@ -11,7 +11,7 @@ import { IS_PRODUCTION, IS_WINDOWS, Path } from './config/const';
 import { CustomError } from './errors';
 import BroadcastService from './services/broadcast';
 import MediaService from './services/media';
-import SchedulerService from './services/scheduler';
+import MessageScheduler from './services/messageScheduler';
 
 const allowlist = ['http://localhost:3001', 'https://wautopilot.com'];
 
@@ -114,9 +114,7 @@ export default function (app: Express) {
 		next();
 	});
 	cron.schedule('*/2 * * * * *', () => {
-		SchedulerService.sendScheduledTemplateMessages();
-		SchedulerService.sendScheduledNormalMessages();
-		SchedulerService.sendScheduledInteractiveMessages();
+		MessageScheduler.sendScheduledMessages();
 	});
 
 	//0 0 * * *

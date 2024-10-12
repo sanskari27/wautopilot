@@ -40,7 +40,7 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 
 	const devices = await WhatsappLinkService.fetchRecords(userId);
 
-	if (devices.length >= userDetails.no_of_devices) {
+	if (devices.length >= userDetails.max_devices) {
 		return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
 	}
 

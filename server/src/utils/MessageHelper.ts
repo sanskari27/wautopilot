@@ -1,8 +1,9 @@
 import IContact from '../../mongo/types/contact';
 import IPhoneBook from '../../mongo/types/phonebook';
+import { IPhonebookRecord } from '../services/phonebook';
 import { generateText } from './ExpressUtils';
 
-export function extractTemplateHeader(
+function extractTemplateHeader(
 	components: Record<string, any>[],
 	componentsMsg: Record<string, any>[]
 ) {
@@ -45,7 +46,7 @@ export function extractTemplateHeader(
 	return null;
 }
 
-export function extractTemplateBody(
+function extractTemplateBody(
 	components: Record<string, any>[],
 	componentsMsg: Record<string, any>[]
 ) {
@@ -64,7 +65,7 @@ export function extractTemplateBody(
 	}, (body.text as string) ?? '');
 }
 
-export function extractTemplateFooter(components: Record<string, any>[]) {
+function extractTemplateFooter(components: Record<string, any>[]) {
 	const footer = components.find((component) => component.type === 'FOOTER');
 	if (!footer) {
 		return null;
@@ -72,7 +73,7 @@ export function extractTemplateFooter(components: Record<string, any>[]) {
 	return footer.text;
 }
 
-export function extractTemplateButtons(components: Record<string, any>[]) {
+function extractTemplateButtons(components: Record<string, any>[]) {
 	const buttons = components.find((component) => component.type === 'BUTTONS');
 	if (!buttons || buttons.buttons.length === 0) {
 		return null;
@@ -84,7 +85,7 @@ export function extractTemplateButtons(components: Record<string, any>[]) {
 	}));
 }
 
-export function extractInteractiveHeader(components: Record<string, any>) {
+function extractInteractiveHeader(components: Record<string, any>) {
 	const header = components.header;
 	if (!header) {
 		return null;
@@ -104,7 +105,7 @@ export function extractInteractiveHeader(components: Record<string, any>) {
 	};
 }
 
-export function extractInteractiveBody(components: Record<string, any>) {
+function extractInteractiveBody(components: Record<string, any>) {
 	const body = components.body;
 	if (!body) {
 		return null;
@@ -113,7 +114,7 @@ export function extractInteractiveBody(components: Record<string, any>) {
 	return body.text;
 }
 
-export function extractInteractiveFooter(components: Record<string, any>) {
+function extractInteractiveFooter(components: Record<string, any>) {
 	const footer = components.footer;
 	if (!footer) {
 		return null;
@@ -122,7 +123,7 @@ export function extractInteractiveFooter(components: Record<string, any>) {
 	return footer.text;
 }
 
-export function extractInteractiveButtons(components: Record<string, any>): {
+function extractInteractiveButtons(components: Record<string, any>): {
 	button_type: 'QUICK_REPLY' | 'URL' | 'PHONE_NUMBER' | 'CTA';
 	button_content: string;
 	button_data: string;
@@ -204,7 +205,7 @@ export function generateButtons(
 	}[]
 ) {
 	return buttons.map((button) => ({
-		type: 'reply',
+		type: 'reply' as 'reply',
 		reply: {
 			id: button.id,
 			title: button.text,
@@ -233,6 +234,51 @@ export function objectToMessageBody(object: { [key: string]: string }, separator
 export function parseVariables(text: string, variables: { [key: string]: string }) {
 	return text.replace(/{{(.*?)}}/g, (match, variable) => {
 		return variables[variable] ?? `{{${variable}}}`;
+	});
+}
+
+export function parseToBodyVariables({
+	variables,
+	fields,
+}: {
+	variables: {
+		custom_text: string;
+		phonebook_data: string;
+		variable_from: 'custom_text' | 'phonebook_data';
+		fallback_value: string;
+	}[];
+	fields: IPhonebookRecord;
+}) {
+	const bodyParametersList = [
+		'first_name',
+		'last_name',
+		'middle_name',
+		'phone_number',
+		'email',
+		'birthday',
+		'anniversary',
+	];
+
+	return variables.map((b) => {
+		if (b.variable_from === 'custom_text') {
+			return b.custom_text;
+		} else {
+			if (!fields) {
+				return b.fallback_value;
+			}
+
+			const fieldVal = (
+				bodyParametersList.includes(b.phonebook_data)
+					? fields[b.phonebook_data as keyof typeof fields]
+					: fields.others[b.phonebook_data]
+			) as string;
+
+			if (typeof fieldVal === 'string') {
+				return fieldVal || b.fallback_value;
+			}
+			// const field = fields[]
+			return b.fallback_value;
+		}
 	});
 }
 
@@ -398,3 +444,94 @@ export function generateTemplateMessageObject(
 		},
 	};
 }
+
+export function extractFormattedMessage(
+	messageObject: any,
+	opts?: {
+		template?: any;
+	}
+): {
+	header: {
+		header_type: string;
+		header_content_source: string;
+		header_content: string;
+	} | null;
+	body: {
+		body_type: 'TEXT' | 'MEDIA' | 'CONTACT' | 'LOCATION';
+		text?: string;
+		media_id?: string;
+		contacts?: IContact[];
+		location?: {
+			latitude: string;
+			longitude: string;
+			name: string;
+			address: string;
+		};
+	} | null;
+	footer: string | null;
+	buttons:
+		| {
+				button_type: 'URL' | 'PHONE_NUMBER' | 'QUICK_REPLY' | 'VOICE_CALL' | 'CTA';
+				button_content: string;
+				button_data: string;
+		  }[]
+		| null;
+} {
+	if (messageObject.type === 'template') {
+		return {
+			header: extractTemplateHeader(opts?.template.components, messageObject.components),
+			body: {
+				body_type: 'TEXT',
+				text: extractTemplateBody(opts?.template.components, messageObject.components) ?? '',
+			},
+			footer: extractTemplateFooter(opts?.template.components),
+			buttons: extractTemplateButtons(opts?.template.components),
+		};
+	} else if (messageObject.type === 'interactive') {
+		return {
+			header: extractInteractiveHeader(messageObject.components),
+			body: {
+				body_type: 'TEXT',
+				text: extractInteractiveBody(messageObject.components),
+			},
+			footer: extractInteractiveFooter(messageObject.components),
+			buttons: extractInteractiveButtons(messageObject.components),
+		};
+	} else {
+		const body = {
+			body_type:
+				messageObject.type === 'text'
+					? 'TEXT'
+					: messageObject.type === 'contacts'
+					? 'CONTACT'
+					: messageObject.type === 'location'
+					? 'LOCATION'
+					: 'MEDIA',
+			media_id: ['image', 'video', 'document', 'audio', 'MEDIA'].includes(messageObject.type)
+				? messageObject[messageObject.type]?.id
+				: undefined,
+			text: messageObject.text?.body,
+			contacts: messageObject.contacts,
+			location: messageObject.location,
+		} as {
+			body_type: 'TEXT' | 'MEDIA' | 'CONTACT' | 'LOCATION';
+			text: string;
+			media_id: string;
+			contacts: IContact[];
+			location: {
+				latitude: string;
+				longitude: string;
+				name: string;
+				address: string;
+			};
+		};
+		return {
+			header: null,
+			body,
+			footer: null,
+			buttons: null,
+		};
+	}
+}
+
+export type FormattedMessage = ReturnType<typeof extractFormattedMessage>;

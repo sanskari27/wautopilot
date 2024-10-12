@@ -72,5 +72,8 @@ export default interface IChatBotFlow extends Document {
 			fallback_value: string;
 		}[];
 	}[];
+	startAt: string;
+	endAt: string;
+	trigger_gap_seconds: number;
 	forward: { number: string; message: string };
 }

@@ -102,6 +102,10 @@ export default class Template {
 		return this._id;
 	}
 
+	getName() {
+		return this.name;
+	}
+
 	setId(id: string) {
 		this._id = id;
 		return this;

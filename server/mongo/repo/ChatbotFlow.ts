@@ -140,6 +140,18 @@ const schema = new mongoose.Schema<IChatBotFlow>(
 			number: String,
 			message: String,
 		},
+		startAt: {
+			type: String,
+			default: '10:00',
+		},
+		endAt: {
+			type: String,
+			default: '18:00',
+		},
+		trigger_gap_seconds: {
+			type: Number,
+			default: 0,
+		},
 	},
 	{
 		timestamps: { createdAt: true },
