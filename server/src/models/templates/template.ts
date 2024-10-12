@@ -216,7 +216,7 @@ export default class Template {
 			};
 		}
 
-		if (this.footer?.text.) {
+		if (this.footer?.text) {
 			footer = {
 				type: 'FOOTER',
 				text: this.footer.text,
