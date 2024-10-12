@@ -63,7 +63,7 @@ export type ButtonsTemplate = (ReplyButton | URLButton | PhoneButton | FlowButto
 
 export const DEFAULT_TEMPLATE_LANGUAGE = 'en_US';
 export default class Template {
-	private _id?: string;
+	private id?: string;
 	private name?: string;
 	private status?: 'APPROVED' | 'PENDING' | 'REJECTED';
 	private category?: 'AUTHENTICATION' | 'MARKETING' | 'UTILITY';
@@ -86,7 +86,7 @@ export default class Template {
 		carousel: Carousel;
 	}) {
 		if (data) {
-			this._id = data.id;
+			this.id = data.id;
 			this.name = data.name;
 			this.status = data.status;
 			this.category = data.category;
@@ -98,8 +98,8 @@ export default class Template {
 		}
 	}
 
-	get id() {
-		return this._id;
+	getId() {
+		return this.id;
 	}
 
 	getName() {
@@ -107,7 +107,7 @@ export default class Template {
 	}
 
 	setId(id: string) {
-		this._id = id;
+		this.id = id;
 		return this;
 	}
 
@@ -152,7 +152,7 @@ export default class Template {
 
 	toObject() {
 		return {
-			id: this._id,
+			id: this.id,
 			name: this.name,
 			status: this.status,
 			category: this.category,
@@ -262,7 +262,7 @@ export default class Template {
 		}
 
 		return {
-			...(this._id ? { id: this._id } : {}),
+			...(this.id ? { id: this.id } : {}),
 			name: this.name,
 			category: this.category,
 			allow_category_change: true,
