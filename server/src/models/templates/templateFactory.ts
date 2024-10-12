@@ -119,11 +119,10 @@ export default class TemplateFactory {
 
 	public static async saveTemplate(device: WhatsappDevice, template: Template) {
 		const details = template.buildToSave();
-		const promise = template.getId()
-			? MetaAPI(device.accessToken).post(`/${template.getId()}`, details)
-			: MetaAPI(device.accessToken).post(`/${device.waid}/message_templates`, details);
 		try {
-			await promise;
+			template.getId()
+				? await MetaAPI(device.accessToken).post(`/${template.getId()}`, details)
+				: await MetaAPI(device.accessToken).post(`/${device.waid}/message_templates`, details);
 		} catch (err) {
 			if (axios.isAxiosError(err)) {
 				return (err.response as any).data.error.error_user_msg;

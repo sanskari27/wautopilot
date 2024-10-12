@@ -272,7 +272,7 @@ export default class Template {
 			components: [
 				...(this.header ? [header] : []),
 				...(this.body ? [body] : []),
-				...(this.footer ? [footer] : []),
+				...(this.footer?.text ? [footer] : []),
 				...(this.carousel ? [carousel] : []),
 
 				...(this.buttons ? [buttons] : []),
