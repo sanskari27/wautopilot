@@ -48,6 +48,9 @@ export default class FlowMessage extends Message {
 	}
 
 	setTextHeader(text: string) {
+		if (!text) {
+			return this;
+		}
 		this.header = {
 			type: 'text',
 			text,
@@ -67,6 +70,9 @@ export default class FlowMessage extends Message {
 	// }
 
 	setBody(text: string) {
+		if (!text) {
+			return this;
+		}
 		this.body = {
 			type: 'body',
 			text,
@@ -75,6 +81,9 @@ export default class FlowMessage extends Message {
 	}
 
 	setFooter(text: string) {
+		if (!text) {
+			return this;
+		}
 		this.footer = {
 			type: 'footer',
 			text,
@@ -83,6 +92,9 @@ export default class FlowMessage extends Message {
 	}
 
 	setFlowToken(token: string) {
+		if (!token) {
+			return this;
+		}
 		this.flow_token = token;
 		return this;
 	}

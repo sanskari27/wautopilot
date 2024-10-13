@@ -58,6 +58,9 @@ export default class MediaMessage extends Message {
 	}
 
 	setTextHeader(text: string) {
+		if (!text) {
+			return this;
+		}
 		this.header = {
 			type: 'text',
 			text,
@@ -68,6 +71,8 @@ export default class MediaMessage extends Message {
 	setMediaHeader(media: { media_id: string } | { link: string }) {
 		if (this.media_type === 'none') {
 			return this;
+		} else if (!('link' in media) && !('media_id' in media)) {
+			return this;
 		}
 		this.header = {
 			type: this.media_type,
@@ -77,6 +82,9 @@ export default class MediaMessage extends Message {
 	}
 
 	setBody(text: string) {
+		if (!text) {
+			return this;
+		}
 		this.body = {
 			type: 'body',
 			text,
@@ -85,6 +93,9 @@ export default class MediaMessage extends Message {
 	}
 
 	setFooter(text: string) {
+		if (!text) {
+			return this;
+		}
 		this.footer = {
 			type: 'footer',
 			text,
@@ -92,16 +103,25 @@ export default class MediaMessage extends Message {
 	}
 
 	setButtons(buttons: ReplyButton[]) {
+		if (buttons.length === 0) {
+			return this;
+		}
 		this.buttons = buttons;
 		return this;
 	}
 
 	setSections(sections: Section[]) {
+		if (sections.length === 0) {
+			return this;
+		}
 		this.sections = sections;
 		return this;
 	}
 
 	setInteractiveType(type: string) {
+		if (!type) {
+			return this;
+		}
 		this.interactiveType = type;
 		return this;
 	}

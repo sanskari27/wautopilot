@@ -60,6 +60,9 @@ export default class TemplateMessage extends Message {
 	}
 
 	setTextHeader(variables: string[]) {
+		if (variables.length === 0) {
+			return this;
+		}
 		this.header = {
 			type: 'header',
 			parameters: variables.map((text) => ({
@@ -71,6 +74,10 @@ export default class TemplateMessage extends Message {
 	}
 
 	setMediaHeader(media: { media_id: string } | { link: string }) {
+		if (!('media_id' in media) && !('link' in media)) {
+			return this;
+		}
+
 		const format = this.template.getHeader()?.format;
 		if (!format || format === 'TEXT') {
 			throw new Error('Header is already a text header');
@@ -88,6 +95,9 @@ export default class TemplateMessage extends Message {
 	}
 
 	setBody(variables: string[]) {
+		if (variables.length === 0) {
+			return this;
+		}
 		this.body = {
 			type: 'body',
 			parameters: variables,
@@ -96,6 +106,9 @@ export default class TemplateMessage extends Message {
 	}
 
 	setButtons(buttons: string[][]) {
+		if (buttons.length === 0) {
+			return this;
+		}
 		this.buttons = buttons.map((button, index) => ({
 			type: 'button',
 			sub_type: 'url',

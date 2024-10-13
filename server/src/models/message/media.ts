@@ -8,18 +8,23 @@ export default class MediaMessage extends Message {
 	private caption?: string;
 	private filename?: string;
 
-	
 	constructor(recipient: string, media_type: MediaType) {
 		super(recipient);
 		this.media_type = media_type;
 	}
 
 	setMediaId(media_id: string) {
+		if (!media_id) {
+			return this;
+		}
 		this.media_id = media_id;
 		return this;
 	}
 
 	setCaption(caption: string) {
+		if (!caption) {
+			return this;
+		}
 		this.caption = caption;
 		return this;
 	}

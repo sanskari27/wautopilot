@@ -9,6 +9,9 @@ export default class TextMessage extends Message {
 	}
 
 	setMessage(message: string) {
+		if (!message) {
+			return this;
+		}
 		this.message = message;
 		return this;
 	}

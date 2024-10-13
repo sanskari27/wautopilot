@@ -8,6 +8,9 @@ export default class LocationRequestMessage extends Message {
 	}
 
 	setBody(body: string) {
+		if (!body) {
+			return this;
+		}
 		this.body = body;
 		return this;
 	}

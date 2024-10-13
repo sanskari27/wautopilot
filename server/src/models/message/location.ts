@@ -15,11 +15,17 @@ export default class LocationMessage extends Message {
 	}
 
 	setName(name: string) {
+		if (!name) {
+			return this;
+		}
 		this.name = name;
 		return this;
 	}
 
 	setAddress(address: string) {
+		if (!address) {
+			return this;
+		}
 		this.address = address;
 		return this;
 	}
