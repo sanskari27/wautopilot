@@ -1,4 +1,6 @@
+import { AdminProvider } from '@/components/context/admin';
 import Loading from '@/components/elements/loading';
+import AdminsService from '@/services/admin.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 
@@ -11,5 +13,11 @@ export default async function Layout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	return <Suspense fallback={<Loading />}>{children}</Suspense>;
+	const list = await AdminsService.listAdmins()!;
+
+	return (
+		<Suspense fallback={<Loading />}>
+			<AdminProvider data={list}>{children}</AdminProvider>
+		</Suspense>
+	);
 }
