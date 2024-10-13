@@ -186,15 +186,23 @@ export function generateBodyText(text: string) {
 export function generateSections(
 	sections: {
 		title: string;
-		buttons: { id: string; text: string }[];
+		buttons: ({ id: string; text: string } | string)[];
 	}[]
 ) {
 	return sections.map((section) => ({
 		title: section.title,
-		rows: section.buttons.map((button: { id: string; text: string }) => ({
-			id: button.id ?? generateText(2),
-			title: button.text,
-		})),
+		rows: section.buttons.map((button) => {
+			if (typeof button === 'string') {
+				return {
+					id: generateText(2),
+					title: button,
+				};
+			}
+			return {
+				id: button.id ?? generateText(2),
+				title: button.text,
+			};
+		}),
 	}));
 }
 
