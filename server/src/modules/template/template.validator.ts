@@ -112,7 +112,7 @@ export async function TemplateCreateValidator(req: Request, res: Response, next:
 		header: headerSchema.optional(),
 		body: bodySchema,
 		footer: footerSchema.optional(),
-		buttonsSchema: buttonsSchema.optional(),
+		buttons: buttonsSchema.optional(),
 		carousel: carouselSchema.optional(),
 	});
 
@@ -216,7 +216,7 @@ export async function TemplateEditValidator(req: Request, res: Response, next: N
 		header: headerSchema.optional(),
 		body: bodySchema,
 		footer: footerSchema.optional(),
-		buttonsSchema: buttonsSchema.optional(),
+		buttons: buttonsSchema.optional(),
 		carousel: carouselSchema.optional(),
 	});
 

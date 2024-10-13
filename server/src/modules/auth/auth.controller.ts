@@ -15,8 +15,8 @@ import {
 	UpdateAccountValidationResult,
 	UpdatePasswordValidationResult,
 } from './auth.validator';
-export const JWT_EXPIRE_TIME = 3 * 60 * 1000;
-export const SESSION_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
+export const JWT_EXPIRE_TIME = 28 * 24 * 60 * 60 * 1000;
+export const SESSION_EXPIRE_TIME = 365 * 24 * 60 * 60 * 1000;
 
 async function login(req: Request, res: Response, next: NextFunction) {
 	const { email, password, latitude, longitude } = req.locals.data as LoginValidationResult;
