@@ -16,7 +16,7 @@ type MediaHeader = {
 type Header = TextHeader | MediaHeader;
 
 type Body = {
-	type: 'body';
+	type: 'text';
 	text: string;
 };
 
@@ -86,7 +86,7 @@ export default class MediaMessage extends Message {
 			return this;
 		}
 		this.body = {
-			type: 'body',
+			type: 'text',
 			text,
 		};
 		return this;
