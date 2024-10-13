@@ -67,6 +67,21 @@ export type CreateFlowValidationResult = {
 			variable_from: 'custom_text' | 'phonebook_data';
 			fallback_value: string;
 		}[];
+		template_buttons: string[][];
+		template_carousel?: {
+			cards: {
+				header: {
+					media_id: string;
+				};
+				body: {
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value: string;
+				}[];
+				buttons: string[][];
+			}[];
+		};
 	}[];
 	forward: { number: string; message: string };
 };
@@ -236,6 +251,29 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 							})
 						)
 						.default([]),
+					template_buttons: z.array(z.array(z.string().trim())).default([]),
+					template_carousel: z
+						.object({
+							cards: z.array(
+								z.object({
+									header: z.object({
+										media_id: z.string().trim(),
+									}),
+									body: z
+										.array(
+											z.object({
+												custom_text: z.string().trim(),
+												phonebook_data: z.string().trim(),
+												variable_from: z.enum(['custom_text', 'phonebook_data']),
+												fallback_value: z.string().trim(),
+											})
+										)
+										.default([]),
+									buttons: z.array(z.array(z.string().trim())).default([]),
+								})
+							),
+						})
+						.optional(),
 				})
 			)
 			.default([]),
@@ -363,6 +401,29 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 							})
 						)
 						.default([]),
+					template_buttons: z.array(z.array(z.string().trim())).default([]),
+					template_carousel: z
+						.object({
+							cards: z.array(
+								z.object({
+									header: z.object({
+										media_id: z.string().trim(),
+									}),
+									body: z
+										.array(
+											z.object({
+												custom_text: z.string().trim(),
+												phonebook_data: z.string().trim(),
+												variable_from: z.enum(['custom_text', 'phonebook_data']),
+												fallback_value: z.string().trim(),
+											})
+										)
+										.default([]),
+									buttons: z.array(z.array(z.string().trim())).default([]),
+								})
+							),
+						})
+						.optional(),
 				})
 			)
 			.optional(),
