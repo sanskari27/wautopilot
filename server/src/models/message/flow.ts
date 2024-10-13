@@ -98,6 +98,7 @@ export default class FlowMessage extends Message {
 	toObject(): any {
 		return {
 			to: this.getRecipient(),
+			messaging_product: 'whatsapp',
 			type: 'interactive',
 			interactive: {
 				type: 'flow',
