@@ -55,6 +55,8 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 				messaging_product: 'whatsapp',
 				pin: '000000',
 			});
+
+			await MetaAPI(accessToken, 'v19.0').post(`/${waid}/subscribed_apps`);
 		} catch (err) {
 			return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
 		}
