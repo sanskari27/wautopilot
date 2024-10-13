@@ -1442,7 +1442,7 @@ export function QuickTemplateMessage({
 		template_id: string,
 		template_name: string,
 		template_header: {
-			type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | '';
+			type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE';
 			link: string;
 			media_id: string;
 		},
@@ -1460,13 +1460,20 @@ export function QuickTemplateMessage({
 
 	const [template_name, setTemplateName] = useState<string>('');
 	const [template_header, setTemplateHeader] = useState<{
-		type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | '';
+		type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE';
 		link: string;
 		media_id: string;
+		text: {
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
+		}[];
 	}>({
 		type: 'TEXT',
 		link: '',
 		media_id: '',
+		text: [],
 	});
 	const [template_body, setTemplateBody] = useState<
 		{
@@ -1486,7 +1493,7 @@ export function QuickTemplateMessage({
 		}
 		if (
 			template_header.type !== 'TEXT' &&
-			template_header.type !== '' &&
+			template_header.type !== 'NONE' &&
 			!template_header.media_id
 		) {
 			return toast.error('Please select a media for the header');
@@ -1517,6 +1524,7 @@ export function QuickTemplateMessage({
 			type: 'TEXT',
 			link: '',
 			media_id: '',
+			text: [],
 		});
 		setTemplateBody([]);
 		setTemplateId('');
@@ -1528,26 +1536,40 @@ export function QuickTemplateMessage({
 		if (!details) return;
 		setTemplateName(details.name);
 		const selectedTemplate = templates.find((template) => template.id === details.id);
+		console.log(selectedTemplate);
 		setTemplateId(details.id);
-
-		const body = selectedTemplate?.components.find((c) => c.type === 'BODY');
-		const variables = countOccurrences(body?.text ?? '');
+		const body_variables = countOccurrences(selectedTemplate?.body?.text ?? '');
+		if (selectedTemplate?.header && selectedTemplate?.header?.format === 'TEXT') {
+			const header_variables = countOccurrences(selectedTemplate?.header.text ?? '');
+			console.log(header_variables);
+			setTemplateHeader({
+				type: selectedTemplate?.header?.format ?? '',
+				link: '',
+				media_id: '',
+				text: Array.from({ length: header_variables }).map(() => ({
+					custom_text: '',
+					phonebook_data: '',
+					variable_from: 'custom_text',
+					fallback_value: '',
+				})),
+			});
+		} else {
+			setTemplateHeader({
+				type: selectedTemplate?.header?.format as 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE',
+				media_id: '',
+				link:'',
+				text: [],
+			});
+		}
 
 		setTemplateBody(
-			Array.from({ length: variables }).map(() => ({
+			Array.from({ length: body_variables }).map(() => ({
 				custom_text: '',
 				phonebook_data: '',
 				variable_from: 'custom_text',
 				fallback_value: '',
 			}))
 		);
-
-		const header = selectedTemplate?.components.find((c) => c.type === 'HEADER');
-		setTemplateHeader({
-			type: header?.format ?? '',
-			link: '',
-			media_id: '',
-		});
 	};
 
 	return (
@@ -1574,7 +1596,7 @@ export function QuickTemplateMessage({
 									!(
 										(!!template_header &&
 											template_header.type !== 'TEXT' &&
-											template_header.type !== '') ||
+											template_header.type !== 'NONE') ||
 										template_body.length > 0
 									)
 								}
@@ -1585,7 +1607,7 @@ export function QuickTemplateMessage({
 								condition={
 									!!template_header &&
 									template_header.type !== 'TEXT' &&
-									template_header.type !== ''
+									template_header.type !== 'NONE'
 								}
 							>
 								<div className='flex items-center gap-6'>
@@ -1609,92 +1631,181 @@ export function QuickTemplateMessage({
 									<span>{template_header?.media_id ? 'Media selected' : 'No media selected'}</span>
 								</div>
 							</Show.ShowIf>
+							<Show.ShowIf condition={template_header.text.length > 0}>
+								<div className='border-2 p-2 rounded-lg border-dashed'>
+									<Label className='text-md text-center'>Header Variables</Label>
+									<Each
+										items={template_header.text}
+										render={(item, index) => (
+											<div className='flex flex-col'>
+												<Label>
+													Variable value {index + 1}
+													<span className='ml-[0.2rem] text-red-800'>*</span>
+												</Label>
+												<div className='flex gap-3 flex-col md:flex-row'>
+													<Select
+														onValueChange={(value) =>
+															setTemplateHeader((prev) => {
+																const newHeader = { ...prev };
+																newHeader.text[index].variable_from =
+																	value as typeof item.variable_from;
+																return newHeader;
+															})
+														}
+														defaultValue={item.variable_from}
+													>
+														<SelectTrigger>
+															<SelectValue placeholder='Data From' />
+														</SelectTrigger>
+														<SelectContent>
+															<SelectItem value='phonebook_data'>Phonebook Data</SelectItem>
+															<SelectItem value='custom_text'>Custom Text</SelectItem>
+														</SelectContent>
+													</Select>
+													<Show.ShowIf condition={item.variable_from === 'phonebook_data'}>
+														<Select
+															onValueChange={(value) =>
+																setTemplateHeader((prev) => {
+																	const newHeader = { ...prev };
+																	newHeader.text[index].phonebook_data = value as string;
+																	return newHeader;
+																})
+															}
+															defaultValue={item.phonebook_data}
+														>
+															<SelectTrigger>
+																<SelectValue placeholder='Select Fields' />
+															</SelectTrigger>
+															<SelectContent>
+																<Each
+																	items={phonebook_fields}
+																	render={(field) => (
+																		<SelectItem value={field.value}>{field.label}</SelectItem>
+																	)}
+																/>
+															</SelectContent>
+														</Select>
+														<Input
+															placeholder='Fallback Value'
+															value={item.fallback_value}
+															onChange={(e) =>
+																setTemplateHeader((prev) => {
+																	const newHeader = { ...prev };
+																	newHeader.text[index].fallback_value = e.target.value;
+																	return newHeader;
+																})
+															}
+														/>
+													</Show.ShowIf>
+
+													<Show.ShowIf condition={item.variable_from === 'custom_text'}>
+														<Input
+															placeholder='Value'
+															value={item.custom_text}
+															onChange={(e) =>
+																setTemplateBody((prev) => {
+																	const newBody = [...prev];
+																	newBody[index].custom_text = e.target.value;
+																	return newBody;
+																})
+															}
+														/>
+													</Show.ShowIf>
+												</div>
+											</div>
+										)}
+									/>
+								</div>
+							</Show.ShowIf>
 							<Show.ShowIf condition={template_body.length > 0}>
-								<Each
-									items={template_body}
-									render={(item, index) => (
-										<div className='flex flex-col'>
-											<Label>
-												Variable value {index + 1}
-												<span className='ml-[0.2rem] text-red-800'>*</span>
-											</Label>
-											<div className='flex gap-3 flex-col md:flex-row'>
-												<Select
-													onValueChange={(value) =>
-														setTemplateBody((prev) => {
-															const newBody = [...prev];
-															newBody[index].variable_from = value as typeof item.variable_from;
-															return newBody;
-														})
-													}
-													defaultValue={item.variable_from}
-												>
-													<SelectTrigger>
-														<SelectValue placeholder='Data From' />
-													</SelectTrigger>
-													<SelectContent>
-														<SelectItem value='phonebook_data'>Phonebook Data</SelectItem>
-														<SelectItem value='custom_text'>Custom Text</SelectItem>
-													</SelectContent>
-												</Select>
-												<Show.ShowIf condition={item.variable_from === 'phonebook_data'}>
+								<div className='border-2 p-2 rounded-lg border-dashed'>
+									<Label className='text-md text-center'>Body Variables</Label>
+									<Each
+										items={template_body}
+										render={(item, index) => (
+											<div className='flex flex-col'>
+												<Label>
+													Variable value {index + 1}
+													<span className='ml-[0.2rem] text-red-800'>*</span>
+												</Label>
+												<div className='flex gap-3 flex-col md:flex-row'>
 													<Select
 														onValueChange={(value) =>
 															setTemplateBody((prev) => {
 																const newBody = [...prev];
-																newBody[index].phonebook_data = value as string;
+																newBody[index].variable_from = value as typeof item.variable_from;
 																return newBody;
 															})
 														}
-														defaultValue={item.phonebook_data}
+														defaultValue={item.variable_from}
 													>
 														<SelectTrigger>
-															<SelectValue placeholder='Select Fields' />
+															<SelectValue placeholder='Data From' />
 														</SelectTrigger>
 														<SelectContent>
-															<Each
-																items={phonebook_fields}
-																render={(field) => (
-																	<SelectItem value={field.value}>{field.label}</SelectItem>
-																)}
-															/>
+															<SelectItem value='phonebook_data'>Phonebook Data</SelectItem>
+															<SelectItem value='custom_text'>Custom Text</SelectItem>
 														</SelectContent>
 													</Select>
-													<Input
-														placeholder='Fallback Value'
-														value={item.fallback_value}
-														onChange={(e) =>
-															setTemplateBody((prev) => {
-																const newBody = [...prev];
-																newBody[index].fallback_value = e.target.value;
-																return newBody;
-															})
-														}
-													/>
-												</Show.ShowIf>
+													<Show.ShowIf condition={item.variable_from === 'phonebook_data'}>
+														<Select
+															onValueChange={(value) =>
+																setTemplateBody((prev) => {
+																	const newBody = [...prev];
+																	newBody[index].phonebook_data = value as string;
+																	return newBody;
+																})
+															}
+															defaultValue={item.phonebook_data}
+														>
+															<SelectTrigger>
+																<SelectValue placeholder='Select Fields' />
+															</SelectTrigger>
+															<SelectContent>
+																<Each
+																	items={phonebook_fields}
+																	render={(field) => (
+																		<SelectItem value={field.value}>{field.label}</SelectItem>
+																	)}
+																/>
+															</SelectContent>
+														</Select>
+														<Input
+															placeholder='Fallback Value'
+															value={item.fallback_value}
+															onChange={(e) =>
+																setTemplateBody((prev) => {
+																	const newBody = [...prev];
+																	newBody[index].fallback_value = e.target.value;
+																	return newBody;
+																})
+															}
+														/>
+													</Show.ShowIf>
 
-												<Show.ShowIf condition={item.variable_from === 'custom_text'}>
-													<Input
-														placeholder='Value'
-														value={item.custom_text}
-														onChange={(e) =>
-															setTemplateBody((prev) => {
-																const newBody = [...prev];
-																newBody[index].custom_text = e.target.value;
-																return newBody;
-															})
-														}
-													/>
-												</Show.ShowIf>
+													<Show.ShowIf condition={item.variable_from === 'custom_text'}>
+														<Input
+															placeholder='Value'
+															value={item.custom_text}
+															onChange={(e) =>
+																setTemplateBody((prev) => {
+																	const newBody = [...prev];
+																	newBody[index].custom_text = e.target.value;
+																	return newBody;
+																})
+															}
+														/>
+													</Show.ShowIf>
+												</div>
 											</div>
-										</div>
-									)}
-								/>
+										)}
+									/>
+								</div>
 							</Show.ShowIf>
 						</div>
 						<div className='w-full lg:w-[30%] flex flex-col justify-start items-start gap-3'>
 							<Show.ShowIf condition={!!template}>
-								<TemplatePreview components={template?.components ?? []} />
+								<TemplatePreview template={template} />
 							</Show.ShowIf>
 						</div>
 					</div>

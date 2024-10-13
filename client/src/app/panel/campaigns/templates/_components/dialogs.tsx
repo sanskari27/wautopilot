@@ -1,6 +1,5 @@
 'use client';
 import Each from '@/components/containers/each';
-import Show from '@/components/containers/show';
 import {
 	Accordion,
 	AccordionContent,
@@ -19,14 +18,28 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { cn, countOccurrences } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { Carousel, carouselSchema } from '@/schema/template';
 import UploadService from '@/services/upload.service';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,6 +48,7 @@ import { CircleMinus, Link, MessageCircleReply, PhoneCall, Trash } from 'lucide-
 import React, { ReactNode, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import BodyWithVariables from './body-with-variables';
 
 export function AddQuickReply({
 	onSubmit,
@@ -151,20 +165,34 @@ export function URLButton({
 	disabled,
 }: {
 	disabled?: boolean;
-	onSubmit: (details: { url: string; text: string }) => void;
+	onSubmit: (details: { url: string; text: string; example: string[] }) => void;
 }) {
 	const [text, setText] = useState('');
 	const [link, setLink] = useState('');
+	const [example, setExamples] = useState<string[]>([]);
+
+	const buttonRef = React.useRef<HTMLButtonElement>(null);
 
 	function submit() {
-		onSubmit({ text, url: link });
+		if (!text) {
+			return toast.error('Please enter text to be displayed');
+		}
+		if (!link) {
+			return toast.error('Please enter a link');
+		}
+		if (example.some((example) => example.length === 0)) {
+			return toast.error('Please enter example values');
+		}
+		buttonRef.current?.click();
+		onSubmit({ text, url: link, example });
 		setText('');
 		setLink('');
+		setExamples([]);
 	}
 
 	return (
 		<AlertDialog>
-			<AlertDialogTrigger asChild disabled={disabled}>
+			<AlertDialogTrigger ref={buttonRef} asChild disabled={disabled}>
 				<Button size={'sm'} variant={'outline'} className='border-primary text-primary'>
 					<Link className='w-4 h-4 mr-2' />
 					URL
@@ -187,20 +215,22 @@ export function URLButton({
 						/>
 					</div>
 					<div className='grid gap-2'>
-						<Label className='text-primary' htmlFor='link'>
-							Link
-						</Label>
-						<Input
-							id='link'
-							value={link}
-							placeholder='enter your link'
-							onChange={(e) => setLink(e.target.value)}
+						<BodyWithVariables
+							headerTextChange={(text, example) => {
+								setLink(text);
+								setExamples(example);
+							}}
+							label='Link'
+							limit='100000'
+							placeholder='enter you link '
+							text={link}
+							text_variables={example}
 						/>
 					</div>
 				</div>
 				<AlertDialogFooter className='mt-2'>
 					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction onClick={submit}>Save</AlertDialogAction>
+					<Button onClick={submit}>Save</Button>
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>
@@ -213,7 +243,7 @@ export function CarouselTemplateDialog({
 	onSubmit,
 }: {
 	children: ReactNode;
-	carousel: Carousel;
+	carousel: Carousel | undefined;
 	onSubmit: (data: Carousel) => void;
 }) {
 	const buttonRef = React.useRef<HTMLButtonElement>(null);
@@ -232,23 +262,7 @@ export function CarouselTemplateDialog({
 		defaultValues: carousel,
 	});
 
-	function handleBodyTextChange(index: number, componentIndex: number, value: string) {
-		if (value.length > 160) return;
-		form.setValue(`cards.${index}.components.${componentIndex}.text`, value);
-
-		const body_variables = countOccurrences(value);
-
-		if (
-			body_variables === 0 &&
-			form.getValues(`cards.${index}.components.${componentIndex}.example`)
-		) {
-			return form.setValue(`cards.${index}.components.${componentIndex}.example`, undefined);
-		}
-
-		form.setValue(`cards.${index}.components.${componentIndex}.example`, {
-			body_text: [Array.from({ length: body_variables }).map(() => '')],
-		});
-	}
+	const cards = form.watch('cards');
 
 	const addBlankCard = () => {
 		if (form.getValues('cards').length >= 10) {
@@ -257,23 +271,15 @@ export function CarouselTemplateDialog({
 		form.setValue('cards', [
 			...form.getValues('cards'),
 			{
-				components: [
-					{
-						type: 'HEADER',
-						format: 'IMAGE',
-						example: {
-							header_handle: [''],
-						},
-					},
-					{
-						type: 'BODY',
-						text: '',
-					},
-					{
-						type: 'BUTTONS',
-						buttons: [],
-					},
-				],
+				header: {
+					format: 'IMAGE',
+					example: '',
+				},
+				body: {
+					text: '',
+					example: [],
+				},
+				buttons: [],
 			},
 		]);
 		setFile((prev) => {
@@ -281,90 +287,109 @@ export function CarouselTemplateDialog({
 		});
 	};
 
-	function removeButtonComponent(index: number, componentIndex: number, buttonIndex: number) {
-		const buttons = form.getValues(`cards.${index}.components.${componentIndex}.buttons`);
-		buttons.splice(buttonIndex, 1);
-		form.setValue(`cards.${index}.components.${componentIndex}.buttons`, buttons);
+	function removeButtonComponent(index: number, buttonIndex: number) {
+		form.setValue(
+			`cards.${index}.buttons`,
+			form.getValues(`cards.${index}.buttons`).splice(buttonIndex, 1)
+		);
 	}
 
-	function addQuickReply(index: number, componentIndex: number, text: string) {
-		const buttons = form.getValues(`cards.${index}.components.${componentIndex}.buttons`);
-		buttons.push({ type: 'QUICK_REPLY', text });
-		form.setValue(`cards.${index}.components.${componentIndex}.buttons`, buttons);
+	function addQuickReply(index: number, text: string) {
+		form.setValue(`cards.${index}.buttons`, [
+			...form.getValues(`cards.${index}.buttons`),
+			{
+				type: 'QUICK_REPLY',
+				text,
+			},
+		]);
 	}
 
 	function addPhoneNumberButton(
 		index: number,
-		componentIndex: number,
-		text: {
+		payload: {
 			phone_number: string;
 			text: string;
 		}
 	) {
-		const buttons = form.getValues(`cards.${index}.components.${componentIndex}.buttons`);
-		buttons.push({ type: 'PHONE_NUMBER', text: text.text, phone_number: text.phone_number });
-		form.setValue(`cards.${index}.components.${componentIndex}.buttons`, buttons);
+		form.setValue(`cards.${index}.buttons`, [
+			...form.getValues(`cards.${index}.buttons`),
+			{
+				type: 'PHONE_NUMBER',
+				...payload,
+			},
+		]);
 	}
 
 	function addURLButton(
 		index: number,
-		componentIndex: number,
-		text: {
+		payload: {
 			url: string;
 			text: string;
+			example: string[];
 		}
 	) {
-		const buttons = form.getValues(`cards.${index}.components.${componentIndex}.buttons`);
-		buttons.push({ type: 'URL', text: text.text, url: text.url });
-		form.setValue(`cards.${index}.components.${componentIndex}.buttons`, buttons);
+		form.setValue(`cards.${index}.buttons`, [
+			...form.getValues(`cards.${index}.buttons`),
+			{
+				type: 'URL',
+				...payload,
+			},
+		]);
 	}
 
 	const handleDeleteCard = (index: number) => {
-		const cards = form.getValues('cards');
-		cards.splice(index, 1);
-		form.setValue('cards', cards);
-		setFile((prev) => {
-			const newFiles = [...prev];
-			newFiles.splice(index, 1);
-			return newFiles;
-		});
+		form.setValue(
+			`cards`,
+			form.getValues('cards').filter((_, i) => i !== index)
+		);
 	};
 
 	const handleSave = (data: Carousel) => {
+		let hasError = false;
 		if (data.cards.length < 2) {
+			hasError = true;
 			return toast.error('At least 2 cards are required');
 		}
 		if (data.cards.length > 10) {
+			hasError = true;
 			return toast.error('Maximum 10 cards are allowed');
 		}
 		const buttonLength = new Set();
-		data.cards.forEach((card, index) => {
-			return card.components.forEach((component) => {
-				if (component.type === 'BODY') {
-					if (component.text.length === 0) {
-						return toast.error(`Card ${index + 1} has empty body`);
-					}
-					if (
-						countOccurrences(component.text) < 0 &&
-						component.example?.body_text?.[0].length === 0
-					) {
-						return toast.error(`Card ${index + 1} has no variables`);
-					}
+		const buttonType = new Set();
+		data.cards.some((card, index) => {
+			if (card.body.text.length === 0) {
+				hasError = true;
+
+				return toast.error(`Card ${index + 1} has empty body`);
+			}
+			if (card.body.text.includes('\n')) {
+				hasError = true;
+				return toast.error(`Card ${index + 1} body should not contain new line`);
+			}
+			card.body.example.some((variable, index) => {
+				if (variable.length === 0) {
+					hasError = true;
+					return toast.error(`Card ${index + 1} has no variables`);
 				}
-				if (component.type === 'BUTTONS') {
-					buttonLength.add(component.buttons.length);
-				}
+			});
+			buttonLength.add(card.buttons.length);
+			card.buttons.some((button) => {
+				buttonType.add(button.type);
 			});
 		});
 		if (buttonLength.size > 1) {
+			hasError = true;
 			return toast.error('All cards should have same number of buttons');
 		}
 		for (const ele of file) {
 			if (ele.file === null) {
+				hasError = true;
 				return toast.error('Please select media for all cards');
 			}
 		}
-		handleFileUpload(data);
+		if (!hasError) {
+			handleFileUpload(data);
+		}
 	};
 
 	const handleFileInput = (index: number, e: File | null) => {
@@ -391,28 +416,15 @@ export function CarouselTemplateDialog({
 	};
 
 	const handleSubmit = (data: Carousel, handle: string[]) => {
-		data = {
-			...data,
-			cards: data.cards.map((card, index) => {
-				return {
-					...card,
-					components: card.components.map((component) => {
-						if (component.type === 'HEADER') {
-							return {
-								...component,
-								example: {
-									header_handle: [handle[index]],
-								},
-							};
-						}
-						return component;
-					}),
-				};
-			}),
-		};
+		data.cards.forEach((card, index) => {
+			card.header.example = handle[index];
+		});
+		// console.log(data)
 		onSubmit(data);
 		buttonRef.current?.click();
 	};
+
+	console.log(carouselSchema.safeParse({cards}));
 
 	return (
 		<Dialog>
@@ -420,9 +432,11 @@ export function CarouselTemplateDialog({
 				{children}
 			</DialogTrigger>
 			<DialogContent className='sm:max-w-[425px] md:max-w-xl lg:max-w-3xl'>
-				<DialogHeader>Carousel Template</DialogHeader>
+				<DialogHeader>
+					<DialogTitle>Carousel Template</DialogTitle>
+				</DialogHeader>
 				<Button onClick={addBlankCard}>Add Card</Button>
-				<ScrollArea className='max-h-[800px]'>
+				<ScrollArea className='max-h-[800px] px-1'>
 					<form onSubmit={form.handleSubmit(handleSave)}>
 						<FormField
 							control={form.control}
@@ -439,271 +453,143 @@ export function CarouselTemplateDialog({
 														<FormLabel>Components</FormLabel>
 														<FormField
 															control={form.control}
-															name={`cards.${index}.components`}
+															name={`cards.${index}.header`}
 															render={({ field }) => (
-																<Each
-																	items={field.value}
-																	render={(component, componentIndex) => {
-																		if (component.type === 'HEADER') {
-																			return (
-																				<>
-																					<FormField
-																						control={form.control}
-																						name={`cards.${index}.components.${componentIndex}.format`}
-																						render={({ field }) => (
-																							<FormItem className='space-y-0 flex-1'>
-																								<FormLabel className='text-primary'>
-																									Template Header
-																									<span className='ml-[0.2rem] text-red-800'>
-																										*
-																									</span>
-																								</FormLabel>
-																								<FormControl>
-																									<ToggleGroup
-																										className='justify-start'
-																										type='single'
-																										value={component.format ?? 'IMAGE'}
-																										onValueChange={(format: 'IMAGE' | 'VIDEO') => {
-																											form.setValue(
-																												`cards.${index}.components.${componentIndex}.format`,
-																												format
-																											);
-																										}}
-																									>
-																										<ToggleGroupItem
-																											value='IMAGE'
-																											aria-label='Image'
-																										>
-																											Image
-																										</ToggleGroupItem>
-																										<ToggleGroupItem
-																											value='VIDEO'
-																											aria-label='Video'
-																										>
-																											Video
-																										</ToggleGroupItem>
-																									</ToggleGroup>
-																								</FormControl>
-																							</FormItem>
-																						)}
-																					/>
-																					<FormField
-																						control={form.control}
-																						name={`cards.${index}.components.${componentIndex}.text`}
-																						render={({ field }) => (
-																							<FormItem className='space-y-0 flex-1'>
-																								<FormLabel className='text-primary'>
-																									Header Media
-																								</FormLabel>
-																								<FormControl>
-																									<Input
-																										type='file'
-																										ref={fileInputRef}
-																										accept={
-																											component.format === 'IMAGE'
-																												? 'image/*'
-																												: 'video/*'
-																										}
-																										onChange={(e) =>
-																											handleFileInput(
-																												index,
-																												e.target.files?.[0] ?? null
-																											)
-																										}
-																									/>
-																								</FormControl>
-																							</FormItem>
-																						)}
-																					/>
-																				</>
-																			);
-																		} else if (component.type === 'BODY') {
-																			return (
-																				<>
-																					<FormField
-																						control={form.control}
-																						name={`cards.${index}.components.${componentIndex}.text`}
-																						render={({ field }) => (
-																							<FormItem className='space-y-0 flex-1'>
-																								<FormLabel className='text-primary'>
-																									Template Body
-																									<span className='ml-[0.2rem] text-red-800'>
-																										*
-																									</span>
-																								</FormLabel>
-																								<FormDescription className='text-xs pb-2'>
-																									{`Use dynamic variable like {{1}} {{2}} and so on`}
-																									. (Limit {field.value?.length ?? 0} / 160)
-																								</FormDescription>
-																								<FormControl>
-																									<Textarea
-																										placeholder='Body Text'
-																										value={field.value ?? ''}
-																										className='h-[300px]'
-																										onChange={(e) =>
-																											handleBodyTextChange(
-																												index,
-																												componentIndex,
-																												e.target.value
-																											)
-																										}
-																									/>
-																								</FormControl>
-																							</FormItem>
-																						)}
-																					/>
-																					<Show.ShowIf
-																						condition={countOccurrences(component.text ?? '') > 0}
-																					>
-																						<FormItem className='space-y-0 flex-1'>
-																							<FormLabel className='text-primary'>
-																								Example Values (Total:-{' '}
-																								{countOccurrences(component.text ?? '')})
-																								<span className='ml-[0.2rem] text-red-800'>*</span>
-																							</FormLabel>
-																							<FormDescription className='text-xs'>
-																								(
-																								{component?.example?.body_text?.[0].filter(
-																									(v) => v.trim().length > 0
-																								).length ?? 0}{' '}
-																								of {countOccurrences(component.text ?? '')}{' '}
-																								provided)
-																							</FormDescription>
-																							<Each
-																								items={Array.from({
-																									length: countOccurrences(component.text ?? ''),
-																								})}
-																								render={(variable, variableIndex) => (
-																									<FormControl>
-																										<Input
-																											key={variableIndex}
-																											placeholder={`Example Value ${
-																												variableIndex + 1
-																											}`}
-																											isInvalid={
-																												(
-																													component?.example?.body_text?.[0]?.[
-																														variableIndex
-																													] ?? ''
-																												).length === 0
-																											}
-																											value={
-																												(component?.example?.body_text?.[0] ?? [])[
-																													variableIndex
-																												] ?? ''
-																											}
-																											onChange={(e) => {
-																												if (!component.example) {
-																													component.example = {
-																														body_text: [
-																															Array.from({
-																																length: countOccurrences(
-																																	component.text ?? ''
-																																),
-																															}).map(() => ''),
-																														],
-																													};
-																												}
+																<>
+																	<FormItem className='space-y-0 flex-1'>
+																		<FormLabel className='text-primary'>
+																			Template Header Type
+																			<span className='ml-[0.2rem] text-red-800'>*</span>
+																		</FormLabel>
+																		<FormControl>
+																			<Select
+																				value={field.value?.format}
+																				onValueChange={(format) => {
+																					form.setValue(`cards.${index}.header`, {
+																						format: format as 'IMAGE' | 'VIDEO',
+																						example: '',
+																					});
+																				}}
+																			>
+																				<SelectTrigger className='w-[180px]'>
+																					<SelectValue placeholder='Select header type' />
+																				</SelectTrigger>
+																				<SelectContent>
+																					<SelectGroup>
+																						<SelectItem value='IMAGE'>Image</SelectItem>
+																						<SelectItem value='VIDEO'>Video</SelectItem>
+																					</SelectGroup>
+																				</SelectContent>
+																			</Select>
+																		</FormControl>
+																	</FormItem>
+																	<FormItem className='space-y-0 flex-1'>
+																		<FormLabel className='text-primary'>
+																			Header Media
+																			<span className='ml-[0.2rem] text-red-800'>*</span>
+																		</FormLabel>
+																		<FormControl>
+																			<Input
+																				type='file'
+																				ref={fileInputRef}
+																				accept={
+																					field.value.format === 'IMAGE'
+																						? 'image/*'
+																						: field.value.format === 'VIDEO'
+																						? 'video/*'
+																						: field.value.format === 'DOCUMENT'
+																						? 'application/pdf'
+																						: ''
+																				}
+																				onChange={(e) =>
+																					handleFileInput(index, e.target.files?.[0] ?? null)
+																				}
+																			/>
+																		</FormControl>
+																	</FormItem>
+																</>
+															)}
+														/>
+														<FormField
+															control={form.control}
+															name={`cards.${index}.body`}
+															render={({ field }) => (
+																<FormItem className='space-y-0 flex-1'>
+																	<FormControl>
+																		<BodyWithVariables
+																			label='Body Text'
+																			limit='160'
+																			placeholder='enter body text'
+																			text={field.value.text}
+																			text_variables={field.value.example}
+																			headerTextChange={(text, example) => {
+																				form.setValue(`cards.${index}.body.text`, text);
+																				form.setValue(`cards.${index}.body.example`, example);
+																			}}
+																		/>
+																	</FormControl>
+																</FormItem>
+															)}
+														/>
+														<FormField
+															control={form.control}
+															name={`cards.${index}.buttons`}
+															render={({ field }) => (
+																<div className='flex flex-col gap-3'>
+																	<FormLabel className='text-primary'>Buttons</FormLabel>
+																	<FormDescription className='text-xs pb-2'>
+																		Insert buttons so your customers can take action and engage with
+																		your message!
+																	</FormDescription>
 
-																												form.setValue(
-																													`cards.${index}.components.${componentIndex}.example.body_text.0.${variableIndex}`,
-																													e.target.value as never // TODO: Fix this
-																												);
-																											}}
-																										/>
-																									</FormControl>
-																								)}
-																							/>
-																						</FormItem>
-																					</Show.ShowIf>
-																				</>
-																			);
-																		} else {
-																			return (
-																				<FormField
-																					control={form.control}
-																					name={`cards.${index}.components.${componentIndex}.buttons`}
-																					render={({ field }) => (
-																						<div className='flex flex-col gap-3'>
-																							<FormLabel className='text-primary'>
-																								Buttons
-																							</FormLabel>
-																							<FormDescription className='text-xs pb-2'>
-																								Insert buttons so your customers can take action and
-																								engage with your message!
-																							</FormDescription>
-
-																							<div
-																								className={cn(
-																									' gap-3 border border-dashed p-3',
-																									field.value.length > 0 ? 'inline-flex' : 'hidden'
-																								)}
-																							>
-																								<Each
-																									items={field.value}
-																									render={(
-																										button: { type: string },
-																										buttonIndex
-																									) => (
-																										<Badge>
-																											<span className='text-sm font-medium'>
-																												{button.type.replaceAll('_', ' ')}
-																											</span>
-																											<CircleMinus
-																												className='w-3 h-3 ml-2 cursor-pointer'
-																												onClick={() =>
-																													removeButtonComponent(
-																														index,
-																														componentIndex,
-																														buttonIndex
-																													)
-																												}
-																											/>
-																										</Badge>
-																									)}
-																								/>
-																							</div>
-																							<div className='flex justify-between'>
-																								<div className='flex flex-col md:flex-row gap-3'>
-																									<AddQuickReply
-																										disabled={field.value.length >= 2}
-																										onSubmit={(text) =>
-																											addQuickReply(index, componentIndex, text)
-																										}
-																									/>
-																									<PhoneNumberButton
-																										disabled={field.value.length >= 2}
-																										onSubmit={(text) =>
-																											addPhoneNumberButton(
-																												index,
-																												componentIndex,
-																												text
-																											)
-																										}
-																									/>
-																									<URLButton
-																										disabled={field.value.length >= 2}
-																										onSubmit={(text) =>
-																											addURLButton(index, componentIndex, text)
-																										}
-																									/>
-																								</div>
-																								<Button
-																									variant={'destructive'}
-																									size={'icon'}
-																									type='button'
-																									onClick={() => handleDeleteCard(index)}
-																								>
-																									<Trash />
-																								</Button>
-																							</div>
-																						</div>
-																					)}
-																				/>
-																			);
-																		}
-																	}}
-																/>
+																	<div
+																		className={cn(
+																			' gap-3 border border-dashed p-3',
+																			(field.value ?? []).length > 0 ? 'inline-flex' : 'hidden'
+																		)}
+																	>
+																		<Each
+																			items={field.value ?? []}
+																			render={(button: { type: string }, buttonIndex) => (
+																				<Badge>
+																					<span className='text-sm font-medium'>
+																						{button.type.replaceAll('_', ' ')}
+																					</span>
+																					<CircleMinus
+																						className='w-3 h-3 ml-2 cursor-pointer'
+																						onClick={() =>
+																							removeButtonComponent(index, buttonIndex)
+																						}
+																					/>
+																				</Badge>
+																			)}
+																		/>
+																	</div>
+																	<div className='flex justify-between'>
+																		<div className='flex flex-col md:flex-row gap-3'>
+																			<AddQuickReply
+																				disabled={(field.value ?? []).length >= 3}
+																				onSubmit={(text) => addQuickReply(index, text)}
+																			/>
+																			<PhoneNumberButton
+																				disabled={(field.value ?? []).length >= 3}
+																				onSubmit={(payload) => addPhoneNumberButton(index, payload)}
+																			/>
+																			<URLButton
+																				disabled={(field.value ?? []).length >= 3}
+																				onSubmit={(payload) => addURLButton(index, payload)}
+																			/>
+																		</div>
+																		<Button
+																			onClick={() => handleDeleteCard(index)}
+																			type='button'
+																			variant={'destructive'}
+																			size={'icon'}
+																		>
+																			<Trash />
+																		</Button>
+																	</div>
+																</div>
 															)}
 														/>
 													</FormItem>
@@ -714,15 +600,18 @@ export function CarouselTemplateDialog({
 								/>
 							)}
 						/>
+					</form>
+					<DialogClose>
 						<Button
 							onClick={(e) => {
 								e.stopPropagation();
+								e.preventDefault();
 							}}
-							disabled={form.watch('cards').length < 2}
+							disabled={!form.formState.errors}
 						>
 							Submit
 						</Button>
-					</form>
+					</DialogClose>
 				</ScrollArea>
 			</DialogContent>
 		</Dialog>

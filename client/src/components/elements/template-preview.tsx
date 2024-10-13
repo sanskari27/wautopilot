@@ -1,5 +1,6 @@
 import { PRASHANT_VARMA } from '@/lib/consts';
-import { cn } from '@/lib/utils';
+import { cn, replaceTextWithVariables } from '@/lib/utils';
+import { Template } from '@/schema/template';
 import { Link, MessageCircleReply, PhoneCall } from 'lucide-react';
 import { FaVideo } from 'react-icons/fa';
 import { IoDocumentText } from 'react-icons/io5';
@@ -7,17 +8,12 @@ import { MdOutlinePermMedia } from 'react-icons/md';
 import Each from '../containers/each';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Separator } from '../ui/separator';
-import { Carousel } from '@/schema/template';
+export default function TemplatePreview({ template }: { template: Template | undefined }) {
 
-type Props = {
-	components: Record<string, any>[];
-};
-export default function TemplatePreview({ components }: Props) {
-	const header = components.find((component) => component.type === 'HEADER');
-	const body = components.find((component) => component.type === 'BODY');
-	const footer = components.find((component) => component.type === 'FOOTER');
-	const buttons = components.find((component) => component.type === 'BUTTONS')?.buttons ?? [];
-	// const carousels = components.find((component) => component.type === 'CAROUSEL')?.cards ?? [];
+	console.log(template)
+	if(!template){
+		return <></>
+	}
 
 	return (
 		<div className='shadow-lg drop-shadow-lg min-w-[200px] max-w-lg min-h-fit w-[95%] mx-auto my-1rem bg-white rounded-2xl p-2'>
@@ -32,105 +28,46 @@ export default function TemplatePreview({ components }: Props) {
 					<p className='text-white text-lg font-medium'>Prashant Varma</p>
 				</div>
 				<div className='p-4 max-h-[700px] min-h-[500px] pb-24 bg-[#ece9e2]'>
-					<div className='bg-white rounded-2xl p-2' hidden={components.length === 0}>
-						<div hidden={!header}>
-							{header?.format === 'TEXT' && <p className='font-medium'>{header.text}</p>}
-							{header?.format !== 'TEXT' && (
+					<div className='bg-white rounded-2xl p-2'>
+						<div hidden={!template?.header}>
+							{template.header?.format === 'TEXT' && (
+								<p className='font-medium'>
+									{replaceTextWithVariables(template.header.text, template.header.example)}
+								</p>
+							)}
+							{template.header?.format !== 'TEXT' && (
 								<div className='flex justify-center items-center bg-gray-200 w-full aspect-video rounded-xl'>
-									{header?.format === 'IMAGE' && (
+									{template.header?.format === 'IMAGE' && (
 										<MdOutlinePermMedia size={'2.5rem'} color='white' />
 									)}
-									{header?.format === 'VIDEO' && <FaVideo size={'2.5rem'} color='white' />}
-									{header?.format === 'DOCUMENT' && (
+									{template.header?.format === 'VIDEO' && <FaVideo size={'2.5rem'} color='white' />}
+									{template.header?.format === 'DOCUMENT' && (
 										<IoDocumentText size={'2.5rem'} color='white' />
 									)}
 								</div>
 							)}
 						</div>
-						<div className='mt-2' hidden={!body}>
-							{body && body.text ? <p className='whitespace-pre-line'>{body.text}</p> : null}
+						<div className='mt-2' hidden={!template.body}>
+							{template.body && template.body.text ? (
+								<p className='whitespace-pre-line'>
+									{replaceTextWithVariables(template.body.text, template.body.example)}
+								</p>
+							) : null}
 						</div>
-						{/* <div className='mt-2  flex gap-4 w-full overflow-X-scroll' hidden={!carousels}>
-							<Each
-								items={carousels}
-								render={(carousel, index) => (
-									<div key={index} className='mt-2 w-[500px]'>
-										<Each
-											items={carousel.components!}
-											render={(component) => {
-												if (component.type === 'HEADER') {
-													return (
-														<div>
-															{component.format === 'TEXT' && (
-																<p className='font-medium'>{component.text}</p>
-															)}
-															{component.format !== 'TEXT' && (
-																<div className='flex justify-center items-center bg-gray-200 w-full aspect-video rounded-xl'>
-																	{component.format === 'IMAGE' && (
-																		<MdOutlinePermMedia size={'2.5rem'} color='white' />
-																	)}
-																	{component.format === 'VIDEO' && (
-																		<FaVideo size={'2.5rem'} color='white' />
-																	)}
-																	{component.format === 'DOCUMENT' && (
-																		<IoDocumentText size={'2.5rem'} color='white' />
-																	)}
-																</div>
-															)}
-														</div>
-													);
-												}
-												if (component.type === 'BODY') {
-													return (
-														<div className='mt-2'>
-															{component.text ? (
-																<p className='whitespace-pre-line'>{component.text}</p>
-															) : null}
-														</div>
-													);
-												}
-												if (component.type === 'BUTTONS') {
-													return (
-														<div className='mt-2'>
-															<Each
-																items={component.buttons}
-																render={(button: { text: string; type: string }) => (
-																	<div
-																		className='flex justify-center items-center text-teal-500  rounded-md border border-teal-500 p-1 gap-2 my-1'
-																		hidden={!button.text}
-																	>
-																		{button.type === 'QUICK_REPLY' && (
-																			<MessageCircleReply className='w-4 h-4 text-teal-500' />
-																		)}
-																		{button.type === 'PHONE_NUMBER' && (
-																			<PhoneCall className='w-4 h-4 text-teal-500' />
-																		)}
-																		{button.type === 'URL' && (
-																			<Link className='w-4 h-4 text-teal-500' />
-																		)}
-																		<p className='text-sm'>{button.text}</p>
-																	</div>
-																)}
-															/>
-														</div>
-													);
-												}
-											}}
-										/>
-									</div>
-								)}
-							/>
-						</div> */}
-						<div className='mt-2' hidden={!footer}>
-							{footer && footer.text ? (
-								<p className='text-xs text-gray-500'>{footer.text}</p>
+
+						<div className='mt-2' hidden={!template.footer}>
+							{template.footer && template.footer.text ? (
+								<p className='text-xs text-gray-500'>{template.footer.text}</p>
 							) : null}
 						</div>
 						<Separator
-							className={cn('my-2 bg-gray-400', buttons.length === 0 ? 'hidden' : 'block')}
+							className={cn(
+								'my-2 bg-gray-400',
+								(template.buttons ?? []).length === 0 ? 'hidden' : 'block'
+							)}
 						/>
 						<Each
-							items={buttons}
+							items={template.buttons ?? []}
 							render={(button: { text: string; type: string }) => (
 								<div
 									className='flex justify-center items-center text-teal-500  rounded-md border border-teal-500 p-1 gap-2 my-1'
@@ -156,6 +93,48 @@ export default function TemplatePreview({ components }: Props) {
 								})}
 							</p>
 						</div>
+					</div>
+					<div className='mt-2 flex gap-4 overflow-X-scroll' hidden={!template.carousel}>
+						<Each
+							items={template.carousel?.cards ?? []}
+							render={(card, index) => (
+								<div key={index} className='mt-2 w-[500px] min-w-[300px]  bg-white p-2 rounded-2xl'>
+									<div className='flex justify-center items-center bg-gray-200 w-full aspect-video rounded-xl'>
+										{card.header.format === 'IMAGE' && (
+											<MdOutlinePermMedia size={'2.5rem'} color='white' />
+										)}
+										{card.header.format === 'VIDEO' && <FaVideo size={'2.5rem'} color='white' />}
+									</div>
+									<div className='mt-2'>
+										{card.body.text ? (
+											<p className='whitespace-pre-line'>
+												{replaceTextWithVariables(card.body.text, card.body.example)}
+											</p>
+										) : null}
+									</div>
+									<div className='mt-2'>
+										<Each
+											items={card.buttons}
+											render={(button) => (
+												<div
+													className='flex justify-center items-center text-teal-500  rounded-md border border-teal-500 p-1 gap-2 my-1'
+													hidden={!button.text}
+												>
+													{button.type === 'QUICK_REPLY' && (
+														<MessageCircleReply className='w-4 h-4 text-teal-500' />
+													)}
+													{button.type === 'PHONE_NUMBER' && (
+														<PhoneCall className='w-4 h-4 text-teal-500' />
+													)}
+													{button.type === 'URL' && <Link className='w-4 h-4 text-teal-500' />}
+													<p className='text-sm'>{button.text}</p>
+												</div>
+											)}
+										/>
+									</div>
+								</div>
+							)}
+						/>
 					</div>
 				</div>
 			</div>

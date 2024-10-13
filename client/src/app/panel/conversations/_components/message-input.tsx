@@ -159,7 +159,7 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 			fallback_value: string;
 		}[],
 		template_header: {
-			type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | '';
+			type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE';
 			media_id: string;
 			link?: string;
 		}

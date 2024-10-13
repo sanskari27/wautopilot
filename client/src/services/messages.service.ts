@@ -186,6 +186,9 @@ export default class MessagesService {
 			};
 		}
 	) {
+		if(!message.context?.message_id) {
+			delete message.context;
+		}
 		try {
 			await api.post(`/conversation/${recipientId}/send-message`, message);
 			return true;
@@ -212,14 +215,17 @@ export default class MessagesService {
 			fallback_value: string;
 		}[];
 		header?: {
-			type?: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | '';
+			type?: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE';
 			media_id?: string;
 			link?: string;
 		};
 		context?: { message_id: string };
 	}) {
-		if (details.header?.type === '') {
+		if (details.header?.type === 'NONE') {
 			delete details.header;
+		}
+		if(!details.context?.message_id) {
+			delete details.context;
 		}
 		try {
 			await api.post(`/conversation/${recipientId}/send-quick-message`, {
