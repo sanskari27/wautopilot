@@ -144,10 +144,10 @@ export default class MediaMessage extends Message {
 			type: 'interactive',
 			interactive: {
 				type: this.interactiveType,
-				header: this.header,
-				body: this.body,
-				footer: this.footer,
-				action: action,
+				...(this.header ? { header: this.header } : {}),
+				...(this.body ? { body: this.body } : {}),
+				...(this.footer ? { footer: this.footer } : {}),
+				...(action ? { action } : {}),
 			},
 			context: this.context,
 		};

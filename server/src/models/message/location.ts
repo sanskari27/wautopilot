@@ -37,8 +37,8 @@ export default class LocationMessage extends Message {
 			location: {
 				latitude: this.location.latitude,
 				longitude: this.location.longitude,
-				name: this.name,
-				address: this.address,
+				...(this.name && { name: this.name }),
+				...(this.address && { address: this.address }),
 			},
 			context: this.context,
 		};

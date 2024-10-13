@@ -49,8 +49,8 @@ export default class MediaMessage extends Message {
 			type: this.media_type,
 			[this.media_type]: {
 				id: this.media_id,
-				caption: this.caption,
-				filename: this.filename,
+				...(this.caption && { caption: this.caption }),
+				...(this.filename && { filename: this.filename }),
 			},
 			context: this.context,
 		};

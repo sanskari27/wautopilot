@@ -22,7 +22,7 @@ export default class LocationRequestMessage extends Message {
 			interactive: {
 				type: 'location_request_message',
 				body: {
-					text: this.body,
+					text: this.body ?? 'Please share your location with us',
 				},
 				action: {
 					name: 'send_location',
