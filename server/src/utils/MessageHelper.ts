@@ -489,13 +489,13 @@ export function extractFormattedMessage(
 		};
 	} else if (messageObject.type === 'interactive') {
 		return {
-			header: extractInteractiveHeader(messageObject.components),
+			header: extractInteractiveHeader(messageObject.interactive),
 			body: {
 				body_type: 'TEXT',
-				text: extractInteractiveBody(messageObject.components),
+				text: extractInteractiveBody(messageObject.interactive),
 			},
-			footer: extractInteractiveFooter(messageObject.components),
-			buttons: extractInteractiveButtons(messageObject.components),
+			footer: extractInteractiveFooter(messageObject.interactive),
+			buttons: extractInteractiveButtons(messageObject.interactive),
 		};
 	} else {
 		const body = {
