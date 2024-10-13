@@ -90,6 +90,7 @@ export type SendQuickReplyValidationResult =
 				media_id?: string | undefined;
 				link?: string | undefined;
 			};
+			buttons: string[][];
 	  };
 
 export type NumbersValidationResult = {
@@ -230,6 +231,7 @@ export async function SendQuickReplyValidator(req: Request, res: Response, next:
 				link: z.string().trim().optional(),
 			})
 			.optional(),
+		buttons: z.array(z.array(z.string().trim())).default([]),
 	});
 
 	const reqValidator = z.union([quickReplyValidator, templateValidator]);

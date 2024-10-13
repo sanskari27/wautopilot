@@ -172,6 +172,15 @@ export default class Template {
 		return this.header;
 	}
 
+	getURLButtons() {
+		return (this.buttons?.filter((button) => button.type === 'URL') as URLButton[]) ?? [];
+	}
+
+	getURLButtonsWithVariable() {
+		const buttons = (this.buttons?.filter((button) => button.type === 'URL') as URLButton[]) ?? [];
+		return buttons.filter((button) => button.example.length > 0);
+	}
+
 	buildToSave() {
 		let header = {};
 		let body = {};

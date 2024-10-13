@@ -250,7 +250,7 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 		}
 	} else if (data.type === 'template') {
 		const phoneBookService = new PhoneBookService(serviceAccount);
-		const { header, body, template_name } = data;
+		const { header, body, template_name, buttons } = data;
 		const template = await TemplateFactory.findByName(device, template_name);
 
 		if (!template) {
@@ -258,6 +258,7 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 		}
 
 		const tHeader = template.getHeader();
+		const tButtons = template.getURLButtonsWithVariable();
 
 		const msg = new TemplateMessage(recipient, template);
 
@@ -281,6 +282,10 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 		});
 
 		msg.setBody(bodyVariables);
+
+		if (tButtons.length > 0) {
+			msg.setButtons(buttons);
+		}
 
 		message = msg;
 	}

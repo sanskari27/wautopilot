@@ -72,6 +72,8 @@ const schema = new mongoose.Schema<IRecurringBroadcast>(
 				fallback_value: String,
 			},
 		],
+
+		template_buttons: [[String]],
 	},
 	{
 		timestamps: { createdAt: true },

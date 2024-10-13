@@ -60,7 +60,7 @@ export default class TemplateMessage extends Message {
 	}
 
 	setTextHeader(variables: string[]) {
-		if (variables.length === 0) {
+		if (!variables || variables.length === 0) {
 			return this;
 		}
 		this.header = {
@@ -74,7 +74,7 @@ export default class TemplateMessage extends Message {
 	}
 
 	setMediaHeader(media: { media_id: string } | { link: string }) {
-		if (!('media_id' in media) && !('link' in media)) {
+		if (!media || (!('media_id' in media) && !('link' in media))) {
 			return this;
 		}
 
@@ -96,7 +96,7 @@ export default class TemplateMessage extends Message {
 	}
 
 	setBody(variables: string[]) {
-		if (variables.length === 0) {
+		if (!variables || variables.length === 0) {
 			return this;
 		}
 		this.body = {
@@ -107,7 +107,7 @@ export default class TemplateMessage extends Message {
 	}
 
 	setButtons(buttons: string[][]) {
-		if (buttons.length === 0) {
+		if (!buttons || buttons.length === 0) {
 			return this;
 		}
 		this.buttons = buttons.map((button, index) => ({

@@ -85,6 +85,7 @@ function processRecurringDocs(docs: IRecurringBroadcast[]) {
 		template_name: doc.template_name,
 		template_header: doc.template_header?.type ? doc.template_header : undefined,
 		template_body: doc.template_body,
+		template_buttons: doc.template_buttons,
 		delay: doc.delay,
 		startTime: doc.startTime,
 		endTime: doc.endTime,
@@ -189,6 +190,7 @@ export default class BroadcastService extends WhatsappLinkService {
 		}
 
 		const header = template.getHeader();
+		const tButtons = template.getURLButtonsWithVariable();
 		const recipients = (
 			await phoneBook.fetchRecords({
 				page: 1,
@@ -240,6 +242,10 @@ export default class BroadcastService extends WhatsappLinkService {
 
 			const bodyVariables = parseToBodyVariables({ variables: broadcast.template_body, fields });
 			msg.setBody(bodyVariables);
+
+			if (tButtons.length > 0) {
+				msg.setButtons(broadcast.template_buttons);
+			}
 
 			return msg;
 		});
@@ -751,6 +757,7 @@ export default class BroadcastService extends WhatsappLinkService {
 			}
 
 			const header = template.getHeader();
+			const tButtons = template.getURLButtonsWithVariable();
 			const recipients = (
 				await phoneBook.fetchRecords({
 					page: 1,
@@ -803,6 +810,10 @@ export default class BroadcastService extends WhatsappLinkService {
 					fields,
 				});
 				msg.setBody(bodyVariables);
+
+				if (tButtons.length > 0) {
+					msg.setButtons(broadcast.template_buttons);
+				}
 
 				return msg;
 			});

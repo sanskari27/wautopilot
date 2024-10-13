@@ -110,6 +110,7 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 		}
 
 		const header = template.getHeader();
+		const tButtons = template.getURLButtonsWithVariable();
 		const phonebookService = new PhoneBookService(serviceAccount);
 
 		const fields = await phonebookService.findRecordByPhone(data.recipient);
@@ -122,6 +123,14 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 				('link' in data.message.template_header || 'media_id' in data.message.template_header)
 			) {
 				msg.setMediaHeader(data.message.template_header as any);
+			} else if (header.format === 'TEXT' && data.message.template_header.text) {
+				if (header?.example.length > 0) {
+					const headerVariables = parseToBodyVariables({
+						variables: data.message.template_header.text,
+						fields: fields || ({} as IPhonebookRecord),
+					});
+					msg.setTextHeader(headerVariables);
+				}
 			}
 		}
 
@@ -130,6 +139,10 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 			fields: fields ?? ({} as IPhonebookRecord),
 		});
 		msg.setBody(bodyVariables);
+		if (tButtons.length > 0) {
+			msg.setButtons(data.message.template_buttons);
+		}
+
 		messageInst = msg;
 	} else if (type === 'text') {
 		const msg = new TextMessage(data.recipient, data.message.text);

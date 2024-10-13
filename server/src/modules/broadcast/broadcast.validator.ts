@@ -26,6 +26,7 @@ export type CreateBroadcastValidationResult = {
 		variable_from: 'custom_text' | 'phonebook_data';
 		fallback_value: string;
 	}[];
+	buttons: string[][];
 
 	broadcast_options:
 		| {
@@ -65,6 +66,7 @@ export type CreateRecurringValidationResult = {
 		variable_from: 'custom_text' | 'phonebook_data';
 		fallback_value: string;
 	}[];
+	template_buttons: string[][];
 	delay: number;
 	startTime: string;
 	endTime: string;
@@ -119,6 +121,7 @@ export async function CreateBroadcastValidator(req: Request, res: Response, next
 				link: z.string().trim().optional(),
 			})
 			.optional(),
+		buttons: z.array(z.array(z.string().trim())).default([]),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);
@@ -174,6 +177,8 @@ export async function CreateRecurringValidator(req: Request, res: Response, next
 				})
 			)
 			.default([]),
+		template_buttons: z.array(z.array(z.string().trim())).default([]),
+
 		delay: z.number().default(0),
 		startTime: z.string().trim().trim().default('00:01'),
 		endTime: z.string().trim().trim().default('23:59'),

@@ -182,6 +182,7 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 		broadcast_options,
 		labels,
 		header,
+		buttons,
 	} = req.locals.data as CreateBroadcastValidationResult;
 
 	const {
@@ -217,6 +218,7 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 		}
 
 		const tHeader = template.getHeader();
+		const tButtons = template.getURLButtonsWithVariable();
 
 		const messages = _to.map(async (number) => {
 			const msg = new TemplateMessage(number, template);
@@ -240,6 +242,10 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 			});
 
 			msg.setBody(bodyVariables);
+
+			if (tButtons.length > 0) {
+				msg.setButtons(buttons);
+			}
 
 			return msg;
 		});

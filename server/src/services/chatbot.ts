@@ -161,6 +161,7 @@ type IChatBotFlowPopulated = Omit<IChatBotFlow, 'nurturing'> & {
 			variable_from: 'custom_text' | 'phonebook_data';
 			fallback_value: string;
 		}[];
+		template_buttons?: string[][];
 	}[];
 };
 
@@ -593,6 +594,7 @@ export default class ChatBotService extends WhatsappLinkService {
 					}
 
 					const header = template.getHeader();
+					const tButtons = template.getURLButtonsWithVariable();
 
 					const msg = new TemplateMessage(recipient, template);
 
@@ -616,6 +618,10 @@ export default class ChatBotService extends WhatsappLinkService {
 						fields: contact,
 					});
 					msg.setBody(bodyVariables);
+
+					if (tButtons.length > 0) {
+						msg.setButtons(el?.template_buttons ?? []);
+					}
 
 					schedulerService.scheduleMessage(msg, {
 						...schedulerOptions,

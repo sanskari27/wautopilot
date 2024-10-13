@@ -35,4 +35,5 @@ export default interface IRecurringBroadcast extends Document {
 		variable_from: 'custom_text' | 'phonebook_data';
 		fallback_value: string;
 	}[];
+	template_buttons: string[][];
 }
