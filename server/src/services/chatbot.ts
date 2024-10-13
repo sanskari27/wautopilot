@@ -717,7 +717,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		} else if (node.node_type === 'listNode') {
 			const msg = new InteractiveMediaMessage(recipient, 'none');
 			msg.setTextHeader(node.data.header);
-			msg.setBody(node.data.text);
+			msg.setBody(node.data.body);
 			msg.setFooter(node.data.footer);
 			msg.setSections(generateSections(node.data.sections));
 			msg.setInteractiveType('list');

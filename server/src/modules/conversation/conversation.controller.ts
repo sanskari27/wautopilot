@@ -237,7 +237,7 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 		} else if (quickReply.type === 'list') {
 			const msg = new InteractiveMediaMessage(recipient, 'none');
 			msg.setTextHeader(quickReply.data.header);
-			msg.setBody(quickReply.data.text);
+			msg.setBody(quickReply.data.body);
 			msg.setFooter(quickReply.data.footer);
 			msg.setSections(generateSections(quickReply.data.sections));
 			msg.setInteractiveType('list');
