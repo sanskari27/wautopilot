@@ -29,7 +29,7 @@ import DeviceService from '@/services/device.service';
 import { Facebook, ShieldCheck, Trash } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import DeleteDialog from './delete';
 
@@ -183,12 +183,12 @@ function AddDeviceDialog() {
 	const { value: loading, ...setLoading } = useBoolean();
 	const { value: facebookSignupLoading, ...setFacebookSignupLoading } = useBoolean();
 	const { setAddDevice, setDevices } = useDevicesDialogState();
+	const code = useRef<string>('');
 
 	const [details, setDetails] = useState({
 		phoneNumberId: '',
 		waid: '',
 		accessToken: '',
-		code: '',
 	});
 
 	const closeAddDevice = () => {
@@ -201,7 +201,12 @@ function AddDeviceDialog() {
 		setDevices(true);
 	}, [setAddDevice, setDevices]);
 
-	const handleSave = useCallback(async () => {
+	const handleSave = async (details: {
+		phoneNumberId: string;
+		waid: string;
+		accessToken?: string;
+		code?: string;
+	}) => {
 		setLoading.on();
 		const success = await DeviceService.addDevice(details);
 
@@ -213,13 +218,13 @@ function AddDeviceDialog() {
 			toast.error('Entry already exists or invalid details. Please check and try again.');
 		}
 		setIsOpen.off();
-	}, [setLoading, details, setIsOpen, onDeviceAdded]);
-
-	const onClose = () => {
-		setIsOpen.off();
+		setFacebookSignupLoading.off();
 	};
 
+	
+
 	// --------------------------------------------- META REGISTRATION SCRIPTS ---------------------------------------------
+
 	useEffect(() => {
 		(window as any).fbAsyncInit = () => {
 			(window as any).FB.init({
@@ -240,30 +245,41 @@ function AddDeviceDialog() {
 			(js as any).src = 'https://connect.facebook.net/en_US/sdk.js';
 			fjs.parentNode?.insertBefore(js, fjs);
 		})(document, 'script', 'facebook-jssdk');
+	}, []);
 
+	useEffect(() => {
 		const sessionInfoListener = (event: any) => {
 			try {
 				const data = JSON.parse(event.data);
-				if (data.type === 'WA_EMBEDDED_SIGNUP') {
-					// if user finishes the Embedded Signup flow
-					if (data.event === 'FINISH') {
-						const { phone_number_id, waba_id } = data.data;
-						setDetails((prev) => ({
-							...prev,
-							phoneNumberId: phone_number_id,
-							waid: waba_id,
-						}));
-					} else {
-						toast.error('Error signing up with facebook. Please try again.');
-					}
+				if (data.type !== 'WA_EMBEDDED_SIGNUP') {
+					return;
 				}
+				// if user finishes the Embedded Signup flow
+				if (data.event !== 'FINISH') {
+					return toast.error('Error signing up with facebook. Please try again.');
+				}
+				const { phone_number_id, waba_id } = data.data;
+				DeviceService.addDevice({
+					phoneNumberId: phone_number_id,
+					waid: waba_id,
+					code: code.current,
+				}).then((success) => {
+					setLoading.off();
+					if (success) {
+						toast.success('Device added successfully.');
+						onDeviceAdded();
+					} else {
+						toast.error('Entry already exists or invalid details. Please check and try again.');
+					}
+					setIsOpen.off();
+				});
 			} catch (err) {
 				//ignore
 			}
 		};
 
 		window.addEventListener('message', sessionInfoListener);
-	}, []);
+	}, [onDeviceAdded, setIsOpen, setLoading]);
 
 	async function launchWhatsAppSignup() {
 		// Launch Facebook login
@@ -275,12 +291,7 @@ function AddDeviceDialog() {
 					toast.error('Login cancelled or did not fully authorize.');
 					return;
 				}
-
-				const code = data.authResponse.code;
-				setDetails((prev) => ({
-					...prev,
-					code,
-				}));
+				code.current = data.authResponse.code;
 			},
 			{
 				config_id: META_CONFIG_ID,
@@ -293,15 +304,6 @@ function AddDeviceDialog() {
 			}
 		);
 	}
-
-	useEffect(() => {
-		if (!details.code || !details.phoneNumberId) {
-			return;
-		}
-		handleSave().then(() => {
-			setFacebookSignupLoading.off();
-		});
-	}, [details, handleSave, setFacebookSignupLoading]);
 
 	// --------------------------------------------- META REGISTRATION SCRIPTS  END ---------------------------------------------
 
@@ -375,7 +377,7 @@ function AddDeviceDialog() {
 							/>
 						</div>
 
-						<Button onClick={handleSave} disabled={loading} className='w-full'>
+						<Button onClick={() => handleSave(details)} disabled={loading} className='w-full'>
 							<ShieldCheck className='w-4 h-4 mr-2' />
 							Save
 						</Button>

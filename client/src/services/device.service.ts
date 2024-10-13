@@ -28,8 +28,8 @@ export default class DeviceService {
 	static async addDevice(details: {
 		phoneNumberId: string;
 		waid: string;
-		accessToken: string;
-		code: string;
+		accessToken?: string;
+		code?: string;
 	}) {
 		try {
 			await api.post(`/whatsapp-link/link-device`, {
