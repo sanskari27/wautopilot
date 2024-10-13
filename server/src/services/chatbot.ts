@@ -148,6 +148,12 @@ type IChatBotFlowPopulated = Omit<IChatBotFlow, 'nurturing'> & {
 			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
 			media_id?: string;
 			link?: string;
+			text?: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
 		};
 		template_body: {
 			custom_text: string;
@@ -596,6 +602,12 @@ export default class ChatBotService extends WhatsappLinkService {
 							('link' in el.template_header || 'media_id' in el.template_header)
 						) {
 							msg.setMediaHeader(el.template_header as any);
+						} else if (el.template_header.text && header?.example.length > 0) {
+							const headerVariables = parseToBodyVariables({
+								variables: el.template_header.text,
+								fields: contact,
+							});
+							msg.setTextHeader(headerVariables);
 						}
 					}
 

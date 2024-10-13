@@ -42,7 +42,13 @@ type RecurringBroadcast = {
 		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
 		link?: string | undefined;
 		media_id?: string | undefined;
-		text?: string | undefined;
+		text?:
+			| {
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value: string;
+			  }[];
 	};
 	template_body: {
 		custom_text: string;
@@ -223,6 +229,12 @@ export default class BroadcastService extends WhatsappLinkService {
 					('link' in broadcast.template_header || 'media_id' in broadcast.template_header)
 				) {
 					msg.setMediaHeader(broadcast.template_header as any);
+				} else if (broadcast.template_header.text && header?.example.length > 0) {
+					const headerVariables = parseToBodyVariables({
+						variables: broadcast.template_header.text,
+						fields,
+					});
+					msg.setTextHeader(headerVariables);
 				}
 			}
 

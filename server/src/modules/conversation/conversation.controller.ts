@@ -261,11 +261,19 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 
 		const msg = new TemplateMessage(recipient, template);
 
+		const fields = await phoneBookService.findRecordByPhone(recipient);
+
 		if (header && tHeader && tHeader.format !== 'TEXT') {
 			msg.setMediaHeader(header as any);
+		} else if (header?.text && tHeader && tHeader.format === 'TEXT') {
+			if (tHeader?.example.length > 0) {
+				const headerVariables = parseToBodyVariables({
+					variables: header.text,
+					fields: fields || ({} as IPhonebookRecord),
+				});
+				msg.setTextHeader(headerVariables);
+			}
 		}
-
-		const fields = await phoneBookService.findRecordByPhone(recipient);
 
 		const bodyVariables = parseToBodyVariables({
 			variables: body,

@@ -11,6 +11,12 @@ export type CreateBroadcastValidationResult = {
 	labels: string[];
 	header?: {
 		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+		text?: {
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
+		}[];
 		media_id?: string;
 		link?: string;
 	};
@@ -44,9 +50,14 @@ export type CreateRecurringValidationResult = {
 
 	template_header?: {
 		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+		text?: {
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
+		}[];
 		link?: string | undefined;
 		media_id?: string | undefined;
-		text?: string | undefined;
 	};
 	template_body: {
 		custom_text: string;
@@ -94,6 +105,16 @@ export async function CreateBroadcastValidator(req: Request, res: Response, next
 		header: z
 			.object({
 				type: z.enum(['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT']),
+				text: z
+					.array(
+						z.object({
+							custom_text: z.string().trim(),
+							phonebook_data: z.string().trim(),
+							variable_from: z.enum(['custom_text', 'phonebook_data']),
+							fallback_value: z.string().trim(),
+						})
+					)
+					.optional(),
 				media_id: z.string().trim().optional(),
 				link: z.string().trim().optional(),
 			})
@@ -129,9 +150,18 @@ export async function CreateRecurringValidator(req: Request, res: Response, next
 		template_header: z
 			.object({
 				type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']).optional(),
+				text: z
+					.array(
+						z.object({
+							custom_text: z.string().trim(),
+							phonebook_data: z.string().trim(),
+							variable_from: z.enum(['custom_text', 'phonebook_data']),
+							fallback_value: z.string().trim(),
+						})
+					)
+					.optional(),
 				media_id: z.string().trim().optional(),
 				link: z.string().trim().optional(),
-				text: z.string().trim().optional(),
 			})
 			.optional(),
 		template_body: z

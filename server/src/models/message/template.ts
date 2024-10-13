@@ -82,12 +82,13 @@ export default class TemplateMessage extends Message {
 		if (!format || format === 'TEXT') {
 			throw new Error('Header is already a text header');
 		}
+		const mediaObj = 'media_id' in media ? { media_id: media.media_id } : { link: media.link };
 		this.header = {
 			type: 'header',
 			parameters: [
 				{
 					type: format.toLowerCase() as MediaType,
-					[format]: media,
+					[format]: mediaObj,
 				},
 			],
 		};

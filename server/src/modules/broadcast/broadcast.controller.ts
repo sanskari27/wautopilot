@@ -220,12 +220,20 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 
 		const messages = _to.map(async (number) => {
 			const msg = new TemplateMessage(number, template);
+			const fields = await phoneBookService.findRecordByPhone(number);
 
 			if (header && tHeader && tHeader.format !== 'TEXT') {
 				msg.setMediaHeader(header as any);
+			} else if (header?.text && tHeader && tHeader.format === 'TEXT') {
+				if (tHeader?.example.length > 0) {
+					const headerVariables = parseToBodyVariables({
+						variables: header.text,
+						fields: fields || ({} as IPhonebookRecord),
+					});
+					msg.setTextHeader(headerVariables);
+				}
 			}
 
-			const fields = await phoneBookService.findRecordByPhone(number);
 			const bodyVariables = parseToBodyVariables({
 				variables: body,
 				fields: fields || ({} as IPhonebookRecord),

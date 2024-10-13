@@ -5,55 +5,6 @@ import { BOT_TRIGGER_OPTIONS } from '../../config/const';
 import { CustomError } from '../../errors';
 import { idsArray } from '../../utils/schema';
 
-export type CreateBotValidationResult = {
-	trigger: string[];
-	trigger_gap_seconds: number;
-	response_delay_seconds: number;
-	options: BOT_TRIGGER_OPTIONS;
-	startAt: string;
-	endAt: string;
-	respond_type: 'template' | 'normal';
-	message: string;
-	images: Types.ObjectId[];
-	videos: Types.ObjectId[];
-	audios: Types.ObjectId[];
-	documents: Types.ObjectId[];
-	contacts: Types.ObjectId[];
-	template_id: string;
-	template_name: string;
-	template_body: {
-		custom_text: string;
-		phonebook_data: string;
-		variable_from: 'custom_text' | 'phonebook_data';
-		fallback_value: string;
-	}[];
-	template_header?: {
-		type?: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
-		link?: string | undefined;
-		media_id?: string | undefined;
-	};
-	nurturing: {
-		after: number;
-		start_from: string;
-		end_at: string;
-		template_id: string;
-		template_name: string;
-		template_body: {
-			custom_text: string;
-			phonebook_data: string;
-			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
-		}[];
-		template_header?: {
-			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
-			link?: string | undefined;
-			media_id?: string | undefined;
-		};
-	}[];
-	forward: { number: string; message: string };
-	reply_to_message: boolean;
-};
-
 export type CreateFlowValidationResult = {
 	name: string;
 	options: BOT_TRIGGER_OPTIONS;
@@ -186,100 +137,6 @@ export type UpdateWhatsappFlowValidationResult = {
 	}[];
 };
 
-export async function CreateBotValidator(req: Request, res: Response, next: NextFunction) {
-	const reqValidator = z.object({
-		trigger: z.array(z.string().trim().min(1)).default([]),
-		trigger_gap_seconds: z.number().positive().default(1),
-		response_delay_seconds: z.number().nonnegative().default(0),
-		options: z.enum([
-			BOT_TRIGGER_OPTIONS.EXACT_IGNORE_CASE,
-			BOT_TRIGGER_OPTIONS.EXACT_MATCH_CASE,
-			BOT_TRIGGER_OPTIONS.INCLUDES_IGNORE_CASE,
-			BOT_TRIGGER_OPTIONS.INCLUDES_MATCH_CASE,
-		]),
-		startAt: z.string().trim().default('00:01'),
-		endAt: z.string().trim().default('23:59'),
-
-		respond_type: z.enum(['template', 'normal']),
-		message: z.string().trim().trim().default(''),
-		images: idsArray.default([]),
-		videos: idsArray.default([]),
-		audios: idsArray.default([]),
-		documents: idsArray.default([]),
-		contacts: idsArray.default([]),
-
-		template_id: z.string().trim().default(''),
-		template_name: z.string().trim().default(''),
-		template_header: z
-			.object({
-				type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']).optional(),
-				media_id: z.string().trim().optional(),
-				link: z.string().trim().optional(),
-			})
-			.optional(),
-		template_body: z
-			.array(
-				z.object({
-					custom_text: z.string().trim(),
-					phonebook_data: z.string().trim(),
-					variable_from: z.enum(['custom_text', 'phonebook_data']),
-					fallback_value: z.string().trim(),
-				})
-			)
-			.default([]),
-
-		nurturing: z
-			.object({
-				after: z.number(),
-				start_from: z.string().trim().trim().default('00:01'),
-				end_at: z.string().trim().trim().default('23:59'),
-				template_id: z.string().trim().default(''),
-				template_name: z.string().trim().default(''),
-				template_header: z
-					.object({
-						type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
-						media_id: z.string().trim().optional(),
-						link: z.string().trim().optional(),
-					})
-					.optional(),
-				template_body: z
-					.array(
-						z.object({
-							custom_text: z.string().trim(),
-							phonebook_data: z.string().trim(),
-							variable_from: z.enum(['custom_text', 'phonebook_data']),
-							fallback_value: z.string().trim(),
-						})
-					)
-					.default([]),
-			})
-			.array()
-			.default([]),
-
-		forward: z.object({
-			number: z.string().trim().default(''),
-			message: z.string().trim().default(''),
-		}),
-		reply_to_message: z.boolean().default(false),
-	});
-
-	const reqValidatorResult = reqValidator.safeParse(req.body);
-
-	if (reqValidatorResult.success) {
-		req.locals.data = reqValidatorResult.data;
-		return next();
-	}
-
-	return next(
-		new CustomError({
-			STATUS: 400,
-			TITLE: 'INVALID_FIELDS',
-			MESSAGE: "Invalid fields in the request's body.",
-			OBJECT: reqValidatorResult.error.flatten(),
-		})
-	);
-}
-
 export async function CreateFlowValidator(req: Request, res: Response, next: NextFunction) {
 	const reqValidator = z.object({
 		trigger: z.array(z.string().trim().min(1)).default([]),
@@ -355,7 +212,18 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 					template_header: z
 						.object({
 							type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
+							text: z
+								.array(
+									z.object({
+										custom_text: z.string().trim(),
+										phonebook_data: z.string().trim(),
+										variable_from: z.enum(['custom_text', 'phonebook_data']),
+										fallback_value: z.string().trim(),
+									})
+								)
+								.optional(),
 							media_id: z.string().trim().optional(),
+							link: z.string().trim().optional(),
 						})
 						.optional(),
 					template_body: z
@@ -471,7 +339,18 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 					template_header: z
 						.object({
 							type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT']),
+							text: z
+								.array(
+									z.object({
+										custom_text: z.string().trim(),
+										phonebook_data: z.string().trim(),
+										variable_from: z.enum(['custom_text', 'phonebook_data']),
+										fallback_value: z.string().trim(),
+									})
+								)
+								.optional(),
 							media_id: z.string().trim().optional(),
+							link: z.string().trim().optional(),
 						})
 						.optional(),
 					template_body: z
