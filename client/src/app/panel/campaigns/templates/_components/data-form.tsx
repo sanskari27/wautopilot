@@ -105,7 +105,6 @@ export default function DataForm({
 				example: handle,
 			};
 		}
-		console.log(data);
 		onSave(data);
 	};
 
@@ -173,13 +172,10 @@ export default function DataForm({
 	}
 
 	function handleAddCarousels(carousels: Carousel) {
-		console.log(carousels);
 		form.setValue('carousel', carousels);
 	}
 
 	const hasError = templateSchema.safeParse(form.getValues()).success === false;
-
-	console.log(templateSchema.safeParse(form.getValues()));
 
 	return (
 		<Form {...form}>

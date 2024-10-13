@@ -133,7 +133,6 @@ export const templateSchema = z
 				}
 				data.header.example.some((value) => {
 					if (!value) {
-						console.log(value);
 						isValidate = false;
 					}
 				});

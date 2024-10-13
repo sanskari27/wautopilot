@@ -256,8 +256,6 @@ export function DataTable({
 	const maxPage = Math.ceil(maxRecord / parseInt(limit, 10));
 	const page = Math.min(parseInt(searchParams.get('page') || '1', 10), maxPage);
 
-	console.log(limit, 'limit');
-
 	React.useEffect(() => {
 		if (parseInt(searchParams.get('page') || '1', 5000) > maxPage) {
 			const url = new URL((window as any).location);

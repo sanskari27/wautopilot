@@ -29,13 +29,15 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { countOccurrences } from '@/lib/utils';
 import { Carousel } from '@/schema/template';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function TemplateDialog({
 	children,
 	onConfirm,
+	template: _template,
 }: {
+	template?: QuickTemplateMessageProps;
 	children: React.ReactNode;
 	onConfirm: (details: QuickTemplateMessageProps) => void;
 }) {
@@ -46,9 +48,9 @@ export default function TemplateDialog({
 	const [template_name, setTemplateName] = useState<string>('');
 	const [template_header, setTemplateHeader] = useState<{
 		type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE';
-		link: string;
-		media_id: string;
-		text: {
+		link?: string;
+		media_id?: string;
+		text?: {
 			custom_text: string;
 			phonebook_data: string;
 			variable_from: 'custom_text' | 'phonebook_data';
@@ -84,6 +86,26 @@ export default function TemplateDialog({
 		}[];
 	}>({ cards: [] });
 	const [template_buttons, setTemplateButton] = useState<string[][]>([]);
+
+	useEffect(() => {
+		if (_template) {
+			setTemplateName(_template.template_name);
+			setTemplateId(_template.template_id);
+			if (_template.header) {
+				setTemplateHeader(_template.header);
+			}
+			if (_template.body) {
+				setTemplateBody(_template.body);
+			}
+			if (_template.buttons) {
+				setTemplateButton(_template.buttons);
+			}
+			if (_template.carousel) {
+				setTemplateCarousel(_template.carousel);
+			}
+		}
+	}, [_template]);
+
 	let phonebook_fields = useFields();
 	phonebook_fields = phonebook_fields.filter((field) => field.value !== 'all');
 
@@ -100,26 +122,28 @@ export default function TemplateDialog({
 			return toast.error('No media for header');
 		}
 		if (template_header.type === 'TEXT') {
-			if (
-				template_header.text.some(
-					(text) => text.variable_from === 'custom_text' && !text.custom_text
-				)
-			) {
-				return toast.error('Empty variables in template header');
-			}
-			if (
-				template_header.text.some(
-					(text) => text.variable_from === 'phonebook_data' && !text.phonebook_data
-				)
-			) {
-				return toast.error('Phonebook field not selected in template header');
-			}
-			if (
-				template_header.text.some(
-					(text) => text.variable_from === 'phonebook_data' && !text.fallback_value
-				)
-			) {
-				return toast.error('Empty fallback value in template header');
+			if (template_header.text) {
+				if (
+					template_header.text.some(
+						(text) => text.variable_from === 'custom_text' && !text.custom_text
+					)
+				) {
+					return toast.error('Empty variables in template header');
+				}
+				if (
+					template_header.text.some(
+						(text) => text.variable_from === 'phonebook_data' && !text.phonebook_data
+					)
+				) {
+					return toast.error('Phonebook field not selected in template header');
+				}
+				if (
+					template_header.text.some(
+						(text) => text.variable_from === 'phonebook_data' && !text.fallback_value
+					)
+				) {
+					return toast.error('Empty fallback value in template header');
+				}
 			}
 		}
 		if (template_body.length > 0) {
@@ -356,11 +380,11 @@ export default function TemplateDialog({
 									<span>{template_header?.media_id ? 'Media selected' : 'No media selected'}</span>
 								</div>
 							</Show.ShowIf>
-							<Show.ShowIf condition={template_header.text.length > 0}>
+							<Show.ShowIf condition={(template_header.text ?? []).length > 0}>
 								<div className='border-2 p-2 rounded-lg border-dashed'>
 									<div className='text-md text-center font-bold'>Header Variables</div>
 									<Each
-										items={template_header.text}
+										items={(template_header.text ?? [])}
 										render={(item, index) => (
 											<div className='flex flex-col'>
 												<Label>
@@ -372,10 +396,18 @@ export default function TemplateDialog({
 														<Select
 															onValueChange={(value) =>
 																setTemplateHeader((prev) => {
-																	const newHeader = { ...prev };
-																	newHeader.text[index].variable_from =
-																		value as typeof item.variable_from;
-																	return newHeader;
+																	return{
+																		...prev,
+																		text: (prev.text ?? []).map((text, i) => {
+																			if (i === index) {
+																				return {
+																					...text,
+																					variable_from: value as typeof text.variable_from,
+																				};
+																			}
+																			return text;
+																		}),
+																	}
 																})
 															}
 															defaultValue={item.variable_from}
@@ -393,9 +425,18 @@ export default function TemplateDialog({
 														<Select
 															onValueChange={(value) =>
 																setTemplateHeader((prev) => {
-																	const newHeader = { ...prev };
-																	newHeader.text[index].phonebook_data = value as string;
-																	return newHeader;
+																	return {
+																		...prev,
+																		text: (prev.text ?? []).map((text, i) => {
+																			if (i === index) {
+																				return {
+																					...text,
+																					phonebook_data: value as string,
+																				};
+																			}
+																			return text;
+																		}),
+																	};
 																})
 															}
 															defaultValue={item.phonebook_data}
@@ -417,9 +458,18 @@ export default function TemplateDialog({
 															value={item.fallback_value}
 															onChange={(e) =>
 																setTemplateHeader((prev) => {
-																	const newHeader = { ...prev };
-																	newHeader.text[index].fallback_value = e.target.value;
-																	return newHeader;
+																	return{
+																		...prev,
+																		text: (prev.text ?? []).map((text, i) => {
+																			if (i === index) {
+																				return {
+																					...text,
+																					fallback_value: e.target.value,
+																				};
+																			}
+																			return text;
+																		}),
+																	}
 																})
 															}
 														/>
@@ -431,9 +481,18 @@ export default function TemplateDialog({
 															value={item.custom_text}
 															onChange={(e) =>
 																setTemplateHeader((prev) => {
-																	const newHeader = { ...prev };
-																	newHeader.text[index].custom_text = e.target.value;
-																	return newHeader;
+																	return{
+																		...prev,
+																		text: (prev.text ?? []).map((text, i) => {
+																			if (i === index) {
+																				return {
+																					...text,
+																					custom_text: e.target.value,
+																				};
+																			}
+																			return text;
+																		}),
+																	}
 																})
 															}
 														/>
@@ -722,7 +781,7 @@ export default function TemplateDialog({
 						<div className='w-full lg:w-[30%] flex flex-col justify-start items-start gap-3'>
 							<Show.ShowIf condition={!!template}>
 								<TemplatePreview
-									headerVariables={template_header.text.map((variable) => {
+									headerVariables={(template_header.text ?? []).map((variable) => {
 										if (variable.variable_from === 'custom_text') {
 											return variable.custom_text;
 										} else {
@@ -752,7 +811,7 @@ export default function TemplateDialog({
 					</div>
 				</ScrollArea>
 				<DialogFooter>
-					<Button onClick={handleSave}>Send</Button>
+					<Button onClick={handleSave}>Save</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

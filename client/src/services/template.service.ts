@@ -6,8 +6,6 @@ export default class TemplateService {
 		try {
 			const { data } = await api.get(`/template`);
 
-			console.log(JSON.stringify(data.template));
-
 			const templates = data.templates as TemplateWithID[];
 
 			return templates;
@@ -18,8 +16,6 @@ export default class TemplateService {
 	static async fetchTemplate(template_id: string) {
 		try {
 			const { data } = await api.get(`/template/${template_id}`);
-
-			console.log(JSON.stringify(data.template))
 
 			return data.template as TemplateWithID;
 		} catch (err) {

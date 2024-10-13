@@ -67,8 +67,6 @@ export default function MediaSelectorDialog({
 		setSelectedMedia([]);
 	};
 
-	console.log(type);
-
 	const mediaList = list.filter((media) => {
 		if (type === 'all' || type === 'document') return true;
 		if (type === 'image') return media.mime_type.includes('image');

@@ -224,7 +224,6 @@ export default function ChatbotForm() {
 				return 'Successfully saved chatbot.';
 			},
 			error: (err) => {
-				console.log(err);
 				return 'Error saving chatbot. Please try agin.';
 			},
 		});

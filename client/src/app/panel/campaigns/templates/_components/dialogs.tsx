@@ -421,13 +421,10 @@ export function CarouselTemplateDialog({
 		data.cards.forEach((card, index) => {
 			card.header.example = handle[index];
 		});
-		console.log(data);
 		onSubmit(data);
 		buttonRef.current?.click();
 		return;
 	};
-
-	console.log(form.formState.errors);
 
 	return (
 		<Dialog>
