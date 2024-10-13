@@ -212,7 +212,7 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 
 			const msg = new FlowMessage(recipient)
 				.setTextHeader(quickReply.data.header)
-				.setBody(quickReply.data.text)
+				.setBody(quickReply.data.body)
 				.setFooter(quickReply.data.footer)
 				.setFlowDetails(
 					quickReply.data.flow_id,
