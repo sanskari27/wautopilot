@@ -311,8 +311,8 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 
 		message = msg;
 
-		formattedMessage = extractFormattedMessage(message.toObject(), {
-			template,
+		formattedMessage = extractFormattedMessage(message.toObject().template, {
+			template: template.buildToSave(),
 		});
 	}
 
