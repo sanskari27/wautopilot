@@ -20,7 +20,6 @@ type Body = {
 };
 
 export type Footer = {
-	type: 'footer';
 	text: string;
 };
 
@@ -95,7 +94,6 @@ export default class MediaMessage extends Message {
 			return this;
 		}
 		this.footer = {
-			type: 'footer',
 			text,
 		};
 	}

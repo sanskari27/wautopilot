@@ -21,7 +21,6 @@ type Body = {
 };
 
 export type Footer = {
-	type: 'footer';
 	text: string;
 };
 export default class FlowMessage extends Message {
@@ -83,7 +82,6 @@ export default class FlowMessage extends Message {
 			return this;
 		}
 		this.footer = {
-			type: 'footer',
 			text,
 		};
 		return this;
