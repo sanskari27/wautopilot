@@ -52,8 +52,8 @@ function extractTemplateBody(
 ) {
 	const body = components.find((component) => component.type?.toUpperCase() === 'BODY');
 	const bodyMsg = componentsMsg.find((component) => component.type?.toUpperCase() === 'BODY');
-	if (!body || !bodyMsg) {
-		return null;
+	if (!bodyMsg) {
+		return body?.text ?? '';
 	}
 	const parameters = bodyMsg.parameters as {
 		type: string;
@@ -62,7 +62,7 @@ function extractTemplateBody(
 
 	return parameters.reduce((acc, parameter, index) => {
 		return acc.replace(`{{${index + 1}}}`, parameter.text);
-	}, (body.text as string) ?? '');
+	}, body?.text ?? '');
 }
 
 function extractTemplateFooter(components: Record<string, any>[]) {

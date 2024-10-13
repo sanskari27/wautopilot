@@ -208,7 +208,6 @@ export default class BroadcastService extends WhatsappLinkService {
 		const tButtons = template.getURLButtonsWithVariable();
 		const tCarousel = template.getCarouselCards();
 
-		
 		const recipients = (
 			await phoneBook.fetchRecords({
 				page: 1,
@@ -596,8 +595,11 @@ export default class BroadcastService extends WhatsappLinkService {
 				scheduler_id: broadcastDoc._id,
 				scheduler_type: BroadcastDB_name,
 				sendAt,
-				formattedMessage: extractFormattedMessage(message.toObject(), {
-					template: await TemplateFactory.findByName(this.device, broadcast.template_name),
+				formattedMessage: extractFormattedMessage(message.toObject().template, {
+					template: (
+						await TemplateFactory.findByName(this.device, broadcast.template_name)
+					)?.buildToSave(),
+					type: 'template',
 				}),
 			});
 		});

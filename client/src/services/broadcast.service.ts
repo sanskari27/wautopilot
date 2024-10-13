@@ -247,7 +247,7 @@ export default class BroadcastService {
 
 		const contentDisposition = response.headers['content-disposition'];
 		const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.*)"/);
-		const filename = filenameMatch ? filenameMatch[1] : 'Broadcast Report.csv';
+		const filename = filenameMatch ? filenameMatch[1] : 'Campaign Report.csv';
 
 		// Create a temporary link element
 		const downloadLink = document.createElement('a');

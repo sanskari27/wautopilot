@@ -18,12 +18,12 @@ export default function EditRecurring({
 
 	function handleSave(data: Recurring) {
 		toast.promise(RecurringService.editRecurring({ ...data, id: recurring_id }), {
-			loading: 'Updating Recurring Broadcast',
+			loading: 'Updating Recurring Campaign',
 			success: () => {
 				router.back();
-				return 'Recurring Broadcast updated successfully';
+				return 'Recurring Campaign updated successfully';
 			},
-			error: 'Failed to update Recurring Broadcast',
+			error: 'Failed to update Recurring Campaign',
 		});
 	}
 
@@ -34,7 +34,7 @@ export default function EditRecurring({
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
 			<div className='justify-between flex'>
-				<h2 className='text-2xl font-bold'>Recurring Broadcast</h2>
+				<h2 className='text-2xl font-bold'>Recurring Campaign</h2>
 			</div>
 			<DataForm onSubmit={handleSave} defaultValues={data.success ? data.data : undefined} />
 		</div>

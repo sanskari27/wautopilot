@@ -108,7 +108,7 @@ export default function DataForm({
 							render={({ field }) => (
 								<FormItem className='space-y-0 flex-1 max-w-md'>
 									<FormLabel className='text-primary'>
-										Broadcast Name<span className='ml-[0.2rem] text-red-800'>*</span>
+										Campaign Name<span className='ml-[0.2rem] text-red-800'>*</span>
 									</FormLabel>
 									<FormControl>
 										<Input placeholder='eg. Fanfest' {...field} />

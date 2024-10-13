@@ -69,17 +69,17 @@ export default function ReportDataTable({
 			success: () => {
 				setSelectedBroadcast([]);
 				router.refresh();
-				return 'Broadcast deleted successfully';
+				return 'Campaign deleted successfully';
 			},
-			error: 'Failed to delete broadcast',
-			loading: 'Deleting Broadcast...',
+			error: 'Failed to delete campaign',
+			loading: 'Deleting Campaign...',
 		});
 	};
 
 	return (
 		<div>
 			<div className='justify-between flex'>
-				<h2 className='text-2xl font-bold'>Broadcast Report</h2>
+				<h2 className='text-2xl font-bold'>Campaign Report</h2>
 				<div className='flex gap-x-2 gap-y-1 flex-wrap '>
 					<Show.ShowIf condition={permissions.export}>
 						<Button onClick={handleExport} size={'sm'}>
