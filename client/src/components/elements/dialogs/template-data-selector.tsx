@@ -348,6 +348,7 @@ export default function TemplateDialog({
 											});
 										}}
 										returnType='media_id'
+										type={template_header.type.toLowerCase() as 'image' | 'video' | 'document'}
 									>
 										<Button variant={'outline'}>Select Media</Button>
 									</MediaSelectorDialog>
@@ -559,6 +560,11 @@ export default function TemplateDialog({
 															});
 														}}
 														returnType='media_id'
+														type={
+															template?.carousel?.cards[cardIndex].header.format.toLowerCase() as
+																| 'image'
+																| 'video'
+														}
 													>
 														<Button variant={'outline'}>Select Media</Button>
 													</MediaSelectorDialog>

@@ -21,13 +21,11 @@ const noneHeaderSchema = z.object({
 	format: z.literal('NONE'),
 });
 
-const headerSchema = z.discriminatedUnion('format', [
-	textHeaderSchema,
-	mediaHeaderSchema,
-	noneHeaderSchema,
-]).default({
-	format: 'NONE',
-});
+const headerSchema = z
+	.discriminatedUnion('format', [textHeaderSchema, mediaHeaderSchema, noneHeaderSchema])
+	.default({
+		format: 'NONE',
+	});
 
 // --------------------------------------bodySchema--------------------------------------
 
@@ -42,11 +40,13 @@ const bodySchema = z.object({
 
 // --------------------------------------footerSchema--------------------------------------
 
-const footerSchema = z.object({
-	text: z.string().trim().default(''),
-}).default({
-	text: '',
-});
+const footerSchema = z
+	.object({
+		text: z.string().trim().default(''),
+	})
+	.default({
+		text: '',
+	});
 
 // --------------------------------------buttonsSchema--------------------------------------
 
@@ -192,77 +192,6 @@ export const templateSchema = z
 		return isValidate;
 	});
 
-// --------------------------------------template data schema--------------------------------------
-//---------------------------------------template header schema---------------------------------------
-
-const templateHeaderWithVariablesSchema = z.object({
-	format: z.literal('TEXT'),
-	text: z.array(
-		z.object({
-			variable_from: z.enum(['custom_text', 'phonebook_data']),
-			phonebook_data: z.string().trim(),
-			custom_text: z.string().trim(),
-			fallback_value: z.string().trim(),
-		})
-	),
-});
-
-const templateHeaderWithMediaSchema = z.object({
-	format: z.enum(['IMAGE', 'VIDEO', 'DOCUMENT']),
-	media_id: z.string().trim(),
-});
-
-const templateHeaderNoneSchema = z.object({
-	format: z.literal('NONE'),
-});
-
-const templateHeaderSchema = z.discriminatedUnion('format', [
-	templateHeaderNoneSchema,
-	templateHeaderWithVariablesSchema,
-	templateHeaderWithMediaSchema,
-]);
-
-//---------------------------------------template body schema---------------------------------------
-
-const templateBodyWithVariablesSchema = z.object({
-	text: z.array(
-		z.object({
-			variable_from: z.enum(['custom_text', 'phonebook_data']),
-			phonebook_data: z.string().trim(),
-			custom_text: z.string().trim(),
-			fallback_value: z.string().trim(),
-		})
-	),
-});
-
-//---------------------------------------template buttons schema---------------------------------------
-
-const templateButtonWithVariableSchema = z.object({
-	buttons: z.array(z.array(z.string().trim())),
-});
-
-//---------------------------------------template carousel---------------------------------------
-
-const templateCarouselCardSchema = z.object({
-	cards: z.array(
-		z.object({
-			header: templateHeaderSchema,
-			body: templateBodyWithVariablesSchema,
-			buttons: templateButtonWithVariableSchema,
-		})
-	),
-});
-
-export const templateDataSchema = z.object({
-	id: z.string().trim(),
-	name: z.string().trim(),
-	header: templateHeaderSchema,
-	body: templateBodyWithVariablesSchema,
-	buttons: templateButtonWithVariableSchema,
-	carousels: templateCarouselCardSchema,
-});
-
 export type Template = z.infer<typeof templateSchema>;
 export type TemplateWithID = Template & { id: string; status: string };
 export type Carousel = z.infer<typeof carouselSchema>;
-export type TemplateData = z.infer<typeof templateDataSchema>;
