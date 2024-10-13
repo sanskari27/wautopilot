@@ -183,6 +183,7 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 		labels,
 		header,
 		buttons,
+		carousel,
 	} = req.locals.data as CreateBroadcastValidationResult;
 
 	const {
@@ -219,6 +220,7 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 
 		const tHeader = template.getHeader();
 		const tButtons = template.getURLButtonsWithVariable();
+		const tCarousel = template.getCarouselCards();
 
 		const messages = _to.map(async (number) => {
 			const msg = new TemplateMessage(number, template);
@@ -245,6 +247,21 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 
 			if (tButtons.length > 0) {
 				msg.setButtons(buttons);
+			}
+
+			if (tCarousel.length > 0 && carousel) {
+				const cards = carousel.cards.map((card, index) => {
+					const bodyVariables = parseToBodyVariables({
+						variables: card.body,
+						fields: fields || ({} as IPhonebookRecord),
+					});
+					return {
+						header: card.header,
+						body: bodyVariables,
+						buttons: card.buttons,
+					};
+				});
+				msg.setCarousel(cards);
 			}
 
 			return msg;

@@ -37,7 +37,7 @@ type Body = {
 	parameters: string[];
 };
 
-type Button = {
+type URLButton = {
 	type: 'button';
 	sub_type: 'url';
 	index: number;
@@ -47,12 +47,67 @@ type Button = {
 	}[];
 };
 
+export type ReplyButton = {
+	type: 'button';
+	sub_type: 'quick_reply';
+	index: number;
+	parameters: [
+		{
+			type: 'payload';
+			payload: string;
+		}
+	];
+};
+
+type CarouselHeader = {
+	type: 'header';
+	parameters: [
+		{
+			type: 'image' | 'video';
+			image?: {
+				id: string;
+			};
+			video?: {
+				id: string;
+			};
+		}
+	];
+};
+
+type CarouselBody = {
+	type: 'body';
+	parameters: {
+		type: 'text';
+		text: string;
+	}[];
+};
+
+export interface Carousel {
+	type: 'carousel';
+	cards: {
+		card_index: number;
+		components: (CarouselHeader | CarouselBody | URLButton | ReplyButton)[];
+	}[];
+}
+
+export interface ParameterClass {
+	type: string;
+	'<MESSAGE_HEADER_FORMAT>'?: MessageHeaderFormat;
+	payload?: string;
+	text?: string;
+}
+
+export interface MessageHeaderFormat {
+	id: string;
+}
+
 export default class TemplateMessage extends Message {
 	private template: Template;
 
 	private header?: Header;
 	private body?: Body;
-	private buttons?: Button[];
+	private buttons?: URLButton[];
+	private carousel?: Carousel;
 
 	constructor(recipient: string, template: Template) {
 		super(recipient);
@@ -122,6 +177,80 @@ export default class TemplateMessage extends Message {
 		return this;
 	}
 
+	setCarousel(
+		cards: {
+			header: {
+				media_id: string;
+			};
+			body: string[];
+			buttons: string[][];
+		}[]
+	) {
+		const cCards = this.template.getCarouselCards();
+		if (!cards || cards.length === 0 || cCards.length === 0) {
+			return this;
+		}
+
+		this.carousel = {
+			type: 'carousel',
+			cards: cards.map((card, card_index) => {
+				const selectedCard = cCards[card_index];
+				const headerFormat = selectedCard.header.format === 'IMAGE' ? 'image' : 'video';
+				const selectedCardButtons = selectedCard.buttons;
+				const buttons = card.buttons.map((button, index) => {
+					if (selectedCardButtons[index].type === 'QUICK_REPLY') {
+						return {
+							type: 'button',
+							sub_type: 'quick_reply',
+							index,
+							parameters: [
+								{
+									type: 'payload',
+									payload: selectedCardButtons[index].text,
+								},
+							],
+						} as ReplyButton;
+					} else {
+						return {
+							type: 'button',
+							sub_type: 'url',
+							index,
+							parameters: button.map((text) => ({
+								type: 'text',
+								text,
+							})),
+						} as URLButton;
+					}
+				});
+				return {
+					card_index,
+					components: [
+						{
+							type: 'header',
+							parameters: [
+								{
+									type: headerFormat,
+									[headerFormat]: {
+										id: card.header.media_id,
+									},
+								},
+							],
+						},
+						{
+							type: 'body',
+							parameters: card.body.map((body) => ({
+								type: 'text',
+								text: body,
+							})),
+						},
+						...buttons,
+					],
+				};
+			}),
+		};
+		return this;
+	}
+
 	toObject() {
 		return {
 			messaging_product: 'whatsapp',
@@ -138,6 +267,7 @@ export default class TemplateMessage extends Message {
 					...(this.header ? [this.header] : []),
 					...(this.body ? [this.body] : []),
 					...(this.buttons ? this.buttons : []),
+					...(this.carousel ? [this.carousel] : []),
 				],
 			},
 		};

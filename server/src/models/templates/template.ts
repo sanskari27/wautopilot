@@ -181,6 +181,10 @@ export default class Template {
 		return buttons.filter((button) => button.example.length > 0);
 	}
 
+	getCarouselCards() {
+		return this.carousel?.cards ?? [];
+	}
+
 	buildToSave() {
 		let header = {};
 		let body = {};
@@ -239,7 +243,9 @@ export default class Template {
 					const header = {
 						type: 'HEADER',
 						format: card.header.format,
-						header_handle: [card.header.example],
+						example: {
+							header_handle: [card.header.example],
+						},
 					};
 					const body = {
 						type: 'BODY',

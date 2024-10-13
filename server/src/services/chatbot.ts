@@ -100,6 +100,21 @@ type CreateFlowData = {
 			variable_from: 'custom_text' | 'phonebook_data';
 			fallback_value: string;
 		}[];
+		template_buttons?: string[][];
+		template_carousel?: {
+			cards: {
+				header: {
+					media_id: string;
+				};
+				body: {
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value: string;
+				}[];
+				buttons: string[][];
+			}[];
+		};
 	}[];
 	forward: { number: string; message: string };
 };
@@ -162,6 +177,20 @@ type IChatBotFlowPopulated = Omit<IChatBotFlow, 'nurturing'> & {
 			fallback_value: string;
 		}[];
 		template_buttons?: string[][];
+		template_carousel?: {
+			cards: {
+				header: {
+					media_id: string;
+				};
+				body: {
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value: string;
+				}[];
+				buttons: string[][];
+			}[];
+		};
 	}[];
 };
 
@@ -595,6 +624,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 					const header = template.getHeader();
 					const tButtons = template.getURLButtonsWithVariable();
+					const tCarousel = template.getCarouselCards();
 
 					const msg = new TemplateMessage(recipient, template);
 
@@ -621,6 +651,21 @@ export default class ChatBotService extends WhatsappLinkService {
 
 					if (tButtons.length > 0) {
 						msg.setButtons(el?.template_buttons ?? []);
+					}
+
+					if (tCarousel.length > 0 && el.template_carousel) {
+						const cards = el.template_carousel.cards.map((card, index) => {
+							const bodyVariables = parseToBodyVariables({
+								variables: card.body,
+								fields: contact,
+							});
+							return {
+								header: card.header,
+								body: bodyVariables,
+								buttons: card.buttons,
+							};
+						});
+						msg.setCarousel(cards);
 					}
 
 					schedulerService.scheduleMessage(msg, {

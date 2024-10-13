@@ -250,7 +250,7 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 		}
 	} else if (data.type === 'template') {
 		const phoneBookService = new PhoneBookService(serviceAccount);
-		const { header, body, template_name, buttons } = data;
+		const { header, body, template_name, buttons, carousel } = data;
 		const template = await TemplateFactory.findByName(device, template_name);
 
 		if (!template) {
@@ -259,6 +259,7 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 
 		const tHeader = template.getHeader();
 		const tButtons = template.getURLButtonsWithVariable();
+		const tCarousel = template.getCarouselCards();
 
 		const msg = new TemplateMessage(recipient, template);
 
@@ -285,6 +286,21 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 
 		if (tButtons.length > 0) {
 			msg.setButtons(buttons);
+		}
+
+		if (tCarousel.length > 0 && carousel) {
+			const cards = carousel.cards.map((card, index) => {
+				const bodyVariables = parseToBodyVariables({
+					variables: card.body,
+					fields: fields || ({} as IPhonebookRecord),
+				});
+				return {
+					header: card.header,
+					body: bodyVariables,
+					buttons: card.buttons,
+				};
+			});
+			msg.setCarousel(cards);
 		}
 
 		message = msg;

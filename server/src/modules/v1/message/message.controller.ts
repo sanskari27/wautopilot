@@ -111,6 +111,7 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 
 		const header = template.getHeader();
 		const tButtons = template.getURLButtonsWithVariable();
+		const tCarousel = template.getCarouselCards();
 		const phonebookService = new PhoneBookService(serviceAccount);
 
 		const fields = await phonebookService.findRecordByPhone(data.recipient);
@@ -141,6 +142,21 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 		msg.setBody(bodyVariables);
 		if (tButtons.length > 0) {
 			msg.setButtons(data.message.template_buttons);
+		}
+
+		if (tCarousel.length > 0 && data.message.template_carousel) {
+			const cards = data.message.template_carousel.cards.map((card, index) => {
+				const bodyVariables = parseToBodyVariables({
+					variables: card.body,
+					fields: fields || ({} as IPhonebookRecord),
+				});
+				return {
+					header: card.header,
+					body: bodyVariables,
+					buttons: card.buttons,
+				};
+			});
+			msg.setCarousel(cards);
 		}
 
 		messageInst = msg;

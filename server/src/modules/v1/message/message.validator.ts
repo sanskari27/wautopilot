@@ -115,6 +115,20 @@ export type SendMessageValidationResult = {
 					fallback_value: string;
 				}[];
 				template_buttons: string[][];
+				template_carousel?: {
+					cards: {
+						header: {
+							media_id: string;
+						};
+						body: {
+							custom_text: string;
+							phonebook_data: string;
+							variable_from: 'custom_text' | 'phonebook_data';
+							fallback_value: string;
+						}[];
+						buttons: string[][];
+					}[];
+				};
 		  };
 	recipient: string;
 	context?: {
@@ -281,6 +295,28 @@ export async function SendMessageValidator(req: Request, res: Response, next: Ne
 			)
 			.default([]),
 		template_buttons: z.array(z.array(z.string().trim())).default([]),
+		template_carousel: z
+			.object({
+				cards: z.array(
+					z.object({
+						header: z.object({
+							media_id: z.string().trim(),
+						}),
+						body: z
+							.array(
+								z.object({
+									custom_text: z.string().trim(),
+									phonebook_data: z.string().trim(),
+									variable_from: z.enum(['custom_text', 'phonebook_data']),
+									fallback_value: z.string().trim(),
+								})
+							)
+							.default([]),
+						buttons: z.array(z.array(z.string().trim())).default([]),
+					})
+				),
+			})
+			.optional(),
 	});
 
 	const reqValidator = z.object({

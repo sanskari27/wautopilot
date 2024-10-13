@@ -20,7 +20,7 @@ import { filterUndefinedKeys } from '../utils/ExpressUtils';
 import { extractFormattedMessage, parseToBodyVariables } from '../utils/MessageHelper';
 import TimeGenerator from '../utils/TimeGenerator';
 import MessageScheduler from './messageScheduler';
-import PhoneBookService from './phonebook';
+import PhoneBookService, { IPhonebookRecord } from './phonebook';
 import WhatsappLinkService from './whatsappLink';
 
 type Broadcast = {
@@ -56,6 +56,20 @@ type RecurringBroadcast = {
 		variable_from: 'custom_text' | 'phonebook_data';
 		fallback_value: string;
 	}[];
+	template_carousel?: {
+		cards: {
+			header: {
+				media_id: string;
+			};
+			body: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
+			buttons: string[][];
+		}[];
+	};
 	delay: number;
 	startTime: string;
 	endTime: string;
@@ -86,6 +100,7 @@ function processRecurringDocs(docs: IRecurringBroadcast[]) {
 		template_header: doc.template_header?.type ? doc.template_header : undefined,
 		template_body: doc.template_body,
 		template_buttons: doc.template_buttons,
+		template_carousel: doc.template_carousel,
 		delay: doc.delay,
 		startTime: doc.startTime,
 		endTime: doc.endTime,
@@ -191,6 +206,9 @@ export default class BroadcastService extends WhatsappLinkService {
 
 		const header = template.getHeader();
 		const tButtons = template.getURLButtonsWithVariable();
+		const tCarousel = template.getCarouselCards();
+
+		
 		const recipients = (
 			await phoneBook.fetchRecords({
 				page: 1,
@@ -245,6 +263,21 @@ export default class BroadcastService extends WhatsappLinkService {
 
 			if (tButtons.length > 0) {
 				msg.setButtons(broadcast.template_buttons);
+			}
+
+			if (tCarousel.length > 0 && broadcast.template_carousel) {
+				const cards = broadcast.template_carousel.cards.map((card, index) => {
+					const bodyVariables = parseToBodyVariables({
+						variables: card.body,
+						fields: fields || ({} as IPhonebookRecord),
+					});
+					return {
+						header: card.header,
+						body: bodyVariables,
+						buttons: card.buttons,
+					};
+				});
+				msg.setCarousel(cards);
 			}
 
 			return msg;
@@ -758,6 +791,8 @@ export default class BroadcastService extends WhatsappLinkService {
 
 			const header = template.getHeader();
 			const tButtons = template.getURLButtonsWithVariable();
+			const tCarousel = template.getCarouselCards();
+
 			const recipients = (
 				await phoneBook.fetchRecords({
 					page: 1,
@@ -813,6 +848,21 @@ export default class BroadcastService extends WhatsappLinkService {
 
 				if (tButtons.length > 0) {
 					msg.setButtons(broadcast.template_buttons);
+				}
+
+				if (tCarousel.length > 0 && broadcast.template_carousel) {
+					const cards = broadcast.template_carousel.cards.map((card, index) => {
+						const bodyVariables = parseToBodyVariables({
+							variables: card.body,
+							fields: fields || ({} as IPhonebookRecord),
+						});
+						return {
+							header: card.header,
+							body: bodyVariables,
+							buttons: card.buttons,
+						};
+					});
+					msg.setCarousel(cards);
 				}
 
 				return msg;

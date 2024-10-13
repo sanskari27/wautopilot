@@ -91,6 +91,20 @@ export type SendQuickReplyValidationResult =
 				link?: string | undefined;
 			};
 			buttons: string[][];
+			carousel?: {
+				cards: {
+					header: {
+						media_id: string;
+					};
+					body: {
+						custom_text: string;
+						phonebook_data: string;
+						variable_from: 'custom_text' | 'phonebook_data';
+						fallback_value: string;
+					}[];
+					buttons: string[][];
+				}[];
+			};
 	  };
 
 export type NumbersValidationResult = {
@@ -232,6 +246,28 @@ export async function SendQuickReplyValidator(req: Request, res: Response, next:
 			})
 			.optional(),
 		buttons: z.array(z.array(z.string().trim())).default([]),
+		carousel: z
+			.object({
+				cards: z.array(
+					z.object({
+						header: z.object({
+							media_id: z.string().trim(),
+						}),
+						body: z
+							.array(
+								z.object({
+									custom_text: z.string().trim(),
+									phonebook_data: z.string().trim(),
+									variable_from: z.enum(['custom_text', 'phonebook_data']),
+									fallback_value: z.string().trim(),
+								})
+							)
+							.default([]),
+						buttons: z.array(z.array(z.string().trim())).default([]),
+					})
+				),
+			})
+			.optional(),
 	});
 
 	const reqValidator = z.union([quickReplyValidator, templateValidator]);
