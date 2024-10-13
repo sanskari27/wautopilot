@@ -11,8 +11,8 @@ function extractTemplateHeader(
 		return null;
 	}
 
-	const header = components.find((component) => component.type === 'HEADER');
-	const headerMsg = componentsMsg.find((component) => component.type === 'HEADER');
+	const header = components.find((component) => component.type?.toUpperCase() === 'HEADER');
+	const headerMsg = componentsMsg.find((component) => component.type?.toUpperCase() === 'HEADER');
 	if (!header) {
 		return null;
 	}
@@ -50,8 +50,8 @@ function extractTemplateBody(
 	components: Record<string, any>[],
 	componentsMsg: Record<string, any>[]
 ) {
-	const body = components.find((component) => component.type === 'BODY');
-	const bodyMsg = componentsMsg.find((component) => component.type === 'BODY');
+	const body = components.find((component) => component.type?.toUpperCase() === 'BODY');
+	const bodyMsg = componentsMsg.find((component) => component.type?.toUpperCase() === 'BODY');
 	if (!body || !bodyMsg) {
 		return null;
 	}
@@ -66,7 +66,7 @@ function extractTemplateBody(
 }
 
 function extractTemplateFooter(components: Record<string, any>[]) {
-	const footer = components.find((component) => component.type === 'FOOTER');
+	const footer = components.find((component) => component.type.toUpperCase() === 'FOOTER');
 	if (!footer) {
 		return null;
 	}
@@ -74,7 +74,7 @@ function extractTemplateFooter(components: Record<string, any>[]) {
 }
 
 function extractTemplateButtons(components: Record<string, any>[]) {
-	const buttons = components.find((component) => component.type === 'BUTTONS');
+	const buttons = components.find((component) => component.type?.toUpperCase() === 'BUTTONS');
 	if (!buttons || buttons.buttons.length === 0) {
 		return null;
 	}
@@ -91,7 +91,7 @@ function extractInteractiveHeader(components: Record<string, any>) {
 		return null;
 	}
 	const type = header.type.toUpperCase();
-	if (type === 'TEXT') {
+	if (type?.toUpperCase() === 'TEXT') {
 		return {
 			header_type: type,
 			header_content_source: 'TEXT',
@@ -132,7 +132,7 @@ function extractInteractiveButtons(components: Record<string, any>): {
 		return [];
 	}
 
-	if (components.type === 'flow') {
+	if (components.type?.toUpperCase() === 'FLOW') {
 		return [
 			{
 				button_type: 'CTA',
@@ -471,6 +471,16 @@ export function extractFormattedMessage(
 	messageObject: any,
 	opts?: {
 		template?: any;
+		type?:
+			| 'template'
+			| 'interactive'
+			| 'text'
+			| 'contacts'
+			| 'location'
+			| 'image'
+			| 'video'
+			| 'document'
+			| 'audio';
 	}
 ): {
 	header: {
@@ -499,7 +509,7 @@ export function extractFormattedMessage(
 		  }[]
 		| null;
 } {
-	if (messageObject.type === 'template') {
+	if (messageObject.type === 'template' || opts?.type === 'template') {
 		return {
 			header: extractTemplateHeader(opts?.template.components, messageObject.components),
 			body: {

@@ -109,12 +109,12 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 						) : null}
 						{children}
 						<Show.ShowIf condition={!!message.buttons}>
-							{message.buttons.length > 0 && (
+							{message.buttons?.length > 0 && (
 								<>
 									<Separator className='my-4 bg-gray-300' />
 									<div className='flex flex-col w-full gap-y-1'>
 										<Each
-											items={message.buttons}
+											items={message.buttons ?? []}
 											render={(button, index) => (
 												<Button
 													variant={'outline'}
