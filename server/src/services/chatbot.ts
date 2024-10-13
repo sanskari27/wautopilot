@@ -91,6 +91,12 @@ type CreateFlowData = {
 		template_name: string;
 		template_header?: {
 			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+			text?: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
 			media_id?: string;
 			link?: string;
 		};

@@ -83,9 +83,6 @@ async function createFlow(req: Request, res: Response, next: NextFunction) {
 	return Respond({
 		res,
 		status: 200,
-		data: {
-			flow,
-		},
 	});
 }
 
@@ -111,9 +108,6 @@ async function updateFlow(req: Request, res: Response, next: NextFunction) {
 	return Respond({
 		res,
 		status: 200,
-		data: {
-			flow,
-		},
 	});
 }
 
