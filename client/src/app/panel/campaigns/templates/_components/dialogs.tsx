@@ -20,7 +20,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
@@ -290,7 +289,7 @@ export function CarouselTemplateDialog({
 	function removeButtonComponent(index: number, buttonIndex: number) {
 		form.setValue(
 			`cards.${index}.buttons`,
-			form.getValues(`cards.${index}.buttons`).splice(buttonIndex, 1)
+			form.getValues(`cards.${index}.buttons`).filter((_, i) => i !== buttonIndex)
 		);
 	}
 
@@ -344,7 +343,9 @@ export function CarouselTemplateDialog({
 		);
 	};
 
-	const handleSave = (data: Carousel) => {
+	const handleSave = (data: Carousel, e?: React.BaseSyntheticEvent<object, any, any>) => {
+		e?.stopPropagation();
+		e?.preventDefault();
 		let hasError = false;
 		if (data.cards.length < 2) {
 			hasError = true;
@@ -390,6 +391,7 @@ export function CarouselTemplateDialog({
 		if (!hasError) {
 			handleFileUpload(data);
 		}
+		return;
 	};
 
 	const handleFileInput = (index: number, e: File | null) => {
@@ -419,12 +421,13 @@ export function CarouselTemplateDialog({
 		data.cards.forEach((card, index) => {
 			card.header.example = handle[index];
 		});
-		// console.log(data)
+		console.log(data);
 		onSubmit(data);
 		buttonRef.current?.click();
+		return;
 	};
 
-	console.log(carouselSchema.safeParse({cards}));
+	console.log(form.formState.errors);
 
 	return (
 		<Dialog>
@@ -437,7 +440,7 @@ export function CarouselTemplateDialog({
 				</DialogHeader>
 				<Button onClick={addBlankCard}>Add Card</Button>
 				<ScrollArea className='max-h-[800px] px-1'>
-					<form onSubmit={form.handleSubmit(handleSave)}>
+					<form onSubmit={form.handleSubmit((data, e) => handleSave(data, e))}>
 						<FormField
 							control={form.control}
 							name='cards'
@@ -571,10 +574,6 @@ export function CarouselTemplateDialog({
 																				disabled={(field.value ?? []).length >= 3}
 																				onSubmit={(text) => addQuickReply(index, text)}
 																			/>
-																			<PhoneNumberButton
-																				disabled={(field.value ?? []).length >= 3}
-																				onSubmit={(payload) => addPhoneNumberButton(index, payload)}
-																			/>
 																			<URLButton
 																				disabled={(field.value ?? []).length >= 3}
 																				onSubmit={(payload) => addURLButton(index, payload)}
@@ -601,17 +600,16 @@ export function CarouselTemplateDialog({
 							)}
 						/>
 					</form>
-					<DialogClose>
-						<Button
-							onClick={(e) => {
-								e.stopPropagation();
-								e.preventDefault();
-							}}
-							disabled={!form.formState.errors}
-						>
-							Submit
-						</Button>
-					</DialogClose>
+					<Button
+						onClick={(e) => {
+							e.stopPropagation();
+							e.preventDefault();
+							handleSave(form.watch(), e);
+						}}
+						disabled={!form.formState.errors}
+					>
+						Submit
+					</Button>
 				</ScrollArea>
 			</DialogContent>
 		</Dialog>

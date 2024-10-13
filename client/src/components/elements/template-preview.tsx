@@ -8,15 +8,23 @@ import { MdOutlinePermMedia } from 'react-icons/md';
 import Each from '../containers/each';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Separator } from '../ui/separator';
-export default function TemplatePreview({ template }: { template: Template | undefined }) {
-
-	console.log(template)
-	if(!template){
-		return <></>
+export default function TemplatePreview({
+	template,
+	bodyVariables,
+	carouselVariables,
+	headerVariables,
+}: {
+	template: Template | undefined;
+	headerVariables?: string[];
+	bodyVariables?: string[];
+	carouselVariables?: string[][];
+}) {
+	if (!template) {
+		return <></>;
 	}
 
 	return (
-		<div className='shadow-lg drop-shadow-lg min-w-[200px] max-w-lg min-h-fit w-[95%] mx-auto my-1rem bg-white rounded-2xl p-2'>
+		<div className='shadow-lg drop-shadow-lg min-w-[350px] max-w-lg min-h-fit w-[95%] mx-auto my-1rem bg-white rounded-2xl p-2'>
 			<div className='h-full bg-white rounded-2xl overflow-hidden'>
 				<div className='bg-teal-900 h-5 rounded-t-2xl' />
 				<div className='bg-teal-700 h-20 flex items-center px-4 gap-3'>
@@ -32,7 +40,10 @@ export default function TemplatePreview({ template }: { template: Template | und
 						<div hidden={!template?.header}>
 							{template.header?.format === 'TEXT' && (
 								<p className='font-medium'>
-									{replaceTextWithVariables(template.header.text, template.header.example)}
+									{replaceTextWithVariables(
+										template.header.text,
+										headerVariables ?? template.header.example
+									)}
 								</p>
 							)}
 							{template.header?.format !== 'TEXT' && (
@@ -50,7 +61,10 @@ export default function TemplatePreview({ template }: { template: Template | und
 						<div className='mt-2' hidden={!template.body}>
 							{template.body && template.body.text ? (
 								<p className='whitespace-pre-line'>
-									{replaceTextWithVariables(template.body.text, template.body.example)}
+									{replaceTextWithVariables(
+										template.body.text,
+										bodyVariables ?? template.body.example
+									)}
 								</p>
 							) : null}
 						</div>
@@ -94,47 +108,55 @@ export default function TemplatePreview({ template }: { template: Template | und
 							</p>
 						</div>
 					</div>
-					<div className='mt-2 flex gap-4 overflow-X-scroll' hidden={!template.carousel}>
-						<Each
-							items={template.carousel?.cards ?? []}
-							render={(card, index) => (
-								<div key={index} className='mt-2 w-[500px] min-w-[300px]  bg-white p-2 rounded-2xl'>
-									<div className='flex justify-center items-center bg-gray-200 w-full aspect-video rounded-xl'>
-										{card.header.format === 'IMAGE' && (
-											<MdOutlinePermMedia size={'2.5rem'} color='white' />
-										)}
-										{card.header.format === 'VIDEO' && <FaVideo size={'2.5rem'} color='white' />}
-									</div>
-									<div className='mt-2'>
-										{card.body.text ? (
-											<p className='whitespace-pre-line'>
-												{replaceTextWithVariables(card.body.text, card.body.example)}
-											</p>
-										) : null}
-									</div>
-									<div className='mt-2'>
-										<Each
-											items={card.buttons}
-											render={(button) => (
-												<div
-													className='flex justify-center items-center text-teal-500  rounded-md border border-teal-500 p-1 gap-2 my-1'
-													hidden={!button.text}
-												>
-													{button.type === 'QUICK_REPLY' && (
-														<MessageCircleReply className='w-4 h-4 text-teal-500' />
-													)}
-													{button.type === 'PHONE_NUMBER' && (
-														<PhoneCall className='w-4 h-4 text-teal-500' />
-													)}
-													{button.type === 'URL' && <Link className='w-4 h-4 text-teal-500' />}
-													<p className='text-sm'>{button.text}</p>
-												</div>
+					<div className='overflow-x-auto'>
+						<div className='mt-2 flex gap-4 min-w-full' hidden={!template.carousel}>
+							<Each
+								items={template.carousel?.cards ?? []}
+								render={(card, index) => (
+									<div
+										key={index}
+										className='  mt-2 min-w-full w-[500px] max-w-[500px] bg-white p-2 rounded-2xl'
+									>
+										<div className='flex justify-center items-center bg-gray-200 w-full aspect-video rounded-xl'>
+											{card.header.format === 'IMAGE' && (
+												<MdOutlinePermMedia size={'2.5rem'} color='white' />
 											)}
-										/>
+											{card.header.format === 'VIDEO' && <FaVideo size={'2.5rem'} color='white' />}
+										</div>
+										<div className='mt-2'>
+											{card.body.text ? (
+												<p className='whitespace-pre-line'>
+													{replaceTextWithVariables(
+														card.body.text,
+														carouselVariables?.[index] ?? card.body.example
+													)}
+												</p>
+											) : null}
+										</div>
+										<div className='mt-2'>
+											<Each
+												items={card.buttons}
+												render={(button) => (
+													<div
+														className='flex justify-center items-center text-teal-500  rounded-md border border-teal-500 p-1 gap-2 my-1'
+														hidden={!button.text}
+													>
+														{button.type === 'QUICK_REPLY' && (
+															<MessageCircleReply className='w-4 h-4 text-teal-500' />
+														)}
+														{button.type === 'PHONE_NUMBER' && (
+															<PhoneCall className='w-4 h-4 text-teal-500' />
+														)}
+														{button.type === 'URL' && <Link className='w-4 h-4 text-teal-500' />}
+														<p className='text-sm'>{button.text}</p>
+													</div>
+												)}
+											/>
+										</div>
 									</div>
-								</div>
-							)}
-						/>
+								)}
+							/>
+						</div>
 					</div>
 				</div>
 			</div>

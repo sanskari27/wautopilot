@@ -1,3 +1,4 @@
+import { QuickTemplateMessageProps } from '@/app/panel/conversations/_components/message-input';
 import api from '@/lib/api';
 import { Contact } from '@/schema/phonebook';
 import { QuickReply, Recipient } from '@/types/recipient';
@@ -186,7 +187,7 @@ export default class MessagesService {
 			};
 		}
 	) {
-		if(!message.context?.message_id) {
+		if (!message.context?.message_id) {
 			delete message.context;
 		}
 		try {
@@ -199,38 +200,31 @@ export default class MessagesService {
 
 	static async sendQuickTemplateMessage({
 		recipientId,
-		quickReply,
 		type = 'quickReply',
 		...details
 	}: {
 		recipientId: string;
 		type?: string;
-		quickReply?: string;
-		template_id?: string;
-		template_name?: string;
-		body?: {
-			custom_text: string;
-			phonebook_data: string;
-			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
-		}[];
-		header?: {
-			type?: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE';
-			media_id?: string;
-			link?: string;
-		};
 		context?: { message_id: string };
-	}) {
-		if (details.header?.type === 'NONE') {
+	} & (
+		| QuickTemplateMessageProps
+		| {
+				quickReply?: string;
+		  }
+	)) {
+		if ('header' in details && details.header?.type === 'NONE') {
 			delete details.header;
 		}
-		if(!details.context?.message_id) {
+		if ('carousel' in details) {
+			delete details.header;
+			delete details.buttons;
+		}
+		if (!details.context?.message_id) {
 			delete details.context;
 		}
 		try {
 			await api.post(`/conversation/${recipientId}/send-quick-message`, {
 				type,
-				quickReply,
 				...details,
 			});
 			return true;

@@ -52,6 +52,7 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { countOccurrences } from '@/lib/utils';
+import { Carousel } from '@/schema/template';
 import MessagesService from '@/services/messages.service';
 import UploadService from '@/services/upload.service';
 import { Recipient } from '@/types/recipient';
@@ -1433,387 +1434,664 @@ function AddQuickLocationTemplateMessage({
 	);
 }
 
-export function QuickTemplateMessage({
-	children,
-	onConfirm,
-}: {
-	children: React.ReactNode;
-	onConfirm: (
-		template_id: string,
-		template_name: string,
-		template_header: {
-			type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE';
-			link: string;
-			media_id: string;
-		},
-		template_body: {
-			custom_text: string;
-			phonebook_data: string;
-			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
-		}[]
-	) => void;
-}) {
-	const buttonRef = React.useRef<HTMLButtonElement>(null);
+// export function QuickTemplateMessage({
+// 	children,
+// 	onConfirm,
+// }: {
+// 	children: React.ReactNode;
+// 	onConfirm: (
+// 		template_id: string,
+// 		template_name: string,
+// 		template_header: {
+// 			type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE';
+// 			link: string;
+// 			media_id: string;
+// 		},
+// 		template_body: {
+// 			custom_text: string;
+// 			phonebook_data: string;
+// 			variable_from: 'custom_text' | 'phonebook_data';
+// 			fallback_value: string;
+// 		}[]
+// 	) => void;
+// }) {
+// 	const buttonRef = React.useRef<HTMLButtonElement>(null);
 
-	const templates = useTemplates();
+// 	const templates = useTemplates();
 
-	const [template_name, setTemplateName] = useState<string>('');
-	const [template_header, setTemplateHeader] = useState<{
-		type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE';
-		link: string;
-		media_id: string;
-		text: {
-			custom_text: string;
-			phonebook_data: string;
-			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
-		}[];
-	}>({
-		type: 'TEXT',
-		link: '',
-		media_id: '',
-		text: [],
-	});
-	const [template_body, setTemplateBody] = useState<
-		{
-			custom_text: string;
-			phonebook_data: string;
-			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
-		}[]
-	>([]);
-	const [template_id, setTemplateId] = useState<string>('');
-	let phonebook_fields = useFields();
-	phonebook_fields = phonebook_fields.filter((field) => field.value !== 'all');
+// 	const [template_name, setTemplateName] = useState<string>('');
+// 	const [template_header, setTemplateHeader] = useState<{
+// 		type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE';
+// 		link: string;
+// 		media_id: string;
+// 		text: {
+// 			custom_text: string;
+// 			phonebook_data: string;
+// 			variable_from: 'custom_text' | 'phonebook_data';
+// 			fallback_value: string;
+// 		}[];
+// 	}>({
+// 		type: 'NONE',
+// 		link: '',
+// 		media_id: '',
+// 		text: [],
+// 	});
+// 	const [template_body, setTemplateBody] = useState<
+// 		{
+// 			custom_text: string;
+// 			phonebook_data: string;
+// 			variable_from: 'custom_text' | 'phonebook_data';
+// 			fallback_value: string;
+// 		}[]
+// 	>([]);
+// 	const [template_id, setTemplateId] = useState<string>('');
+// 	const [template_carousel, setTemplateCarousel] = useState<{
+// 		cards: {
+// 			header: {
+// 				media_id: string;
+// 			};
+// 			body: {
+// 				text: {
+// 					custom_text: string;
+// 					phonebook_data: string;
+// 					variable_from: 'custom_text' | 'phonebook_data';
+// 					fallback_value: string;
+// 				}[];
+// 			};
+// 			buttons: string[][];
+// 		}[];
+// 	}>({ cards: [] });
+// 	let phonebook_fields = useFields();
+// 	phonebook_fields = phonebook_fields.filter((field) => field.value !== 'all');
 
-	const handleSave = () => {
-		if (!template_id) {
-			return toast.error('Please select a template');
-		}
-		if (
-			template_header.type !== 'TEXT' &&
-			template_header.type !== 'NONE' &&
-			!template_header.media_id
-		) {
-			return toast.error('Please select a media for the header');
-		}
-		if (template_body.length > 0) {
-			if (
-				template_body.some(
-					(body) => body.variable_from === 'phonebook_data' && !body.phonebook_data
-				)
-			) {
-				return toast.error('Please select a phonebook field for all variables');
-			}
-			if (
-				template_body.some(
-					(body) => body.variable_from === 'phonebook_data' && !body.fallback_value
-				)
-			) {
-				return toast.error('Please provide a fallback value for all variables');
-			}
-			if (template_body.some((body) => body.variable_from === 'custom_text' && !body.custom_text)) {
-				return toast.error('Please provide a value for all variables');
-			}
-		}
-		onConfirm(template_id, template_name, template_header, template_body);
-		buttonRef.current?.click();
-		setTemplateName('');
-		setTemplateHeader({
-			type: 'TEXT',
-			link: '',
-			media_id: '',
-			text: [],
-		});
-		setTemplateBody([]);
-		setTemplateId('');
-	};
+// 	const handleSave = () => {
+// 		if (!template_id) {
+// 			return toast.error('Please select a template');
+// 		}
+// 		if (
+// 			(template?.header?.format === 'IMAGE' ||
+// 				template?.header?.format === 'VIDEO' ||
+// 				template?.header?.format === 'DOCUMENT') &&
+// 			!template_header.media_id
+// 		) {
+// 			return toast.error('Please select a media for the header');
+// 		}
+// 		if (template_header.type === 'TEXT') {
+// 			if (
+// 				template_header.text.some(
+// 					(text) => text.variable_from === 'custom_text' && !text.custom_text
+// 				)
+// 			) {
+// 				return toast.error('Please provide variables for all variable in template header');
+// 			}
+// 			if (
+// 				template_header.text.some(
+// 					(text) => text.variable_from === 'phonebook_data' && !text.phonebook_data
+// 				)
+// 			) {
+// 				return toast.error('Please select a phonebook field for all variables in template header');
+// 			}
+// 			if (
+// 				template_header.text.some(
+// 					(text) => text.variable_from === 'phonebook_data' && !text.fallback_value
+// 				)
+// 			) {
+// 				return toast.error('Please provide a fallback value for all variables in template header');
+// 			}
+// 		}
+// 		if (template_body.length > 0) {
+// 			if (
+// 				template_body.some(
+// 					(body) => body.variable_from === 'phonebook_data' && !body.phonebook_data
+// 				)
+// 			) {
+// 				return toast.error('Please select a phonebook field for all variables in template body');
+// 			}
+// 			if (
+// 				template_body.some(
+// 					(body) => body.variable_from === 'phonebook_data' && !body.fallback_value
+// 				)
+// 			) {
+// 				return toast.error('Please provide a fallback value for all variables in template body');
+// 			}
+// 			if (template_body.some((body) => body.variable_from === 'custom_text' && !body.custom_text)) {
+// 				return toast.error('Please provide a value for all variables in template body');
+// 			}
+// 		}
+// 		// onConfirm(template_id, template_name, template_header, template_body);
+// 		buttonRef.current?.click();
+// 		setTemplateName('');
+// 		setTemplateHeader({
+// 			type: 'TEXT',
+// 			link: '',
+// 			media_id: '',
+// 			text: [],
+// 		});
+// 		setTemplateBody([]);
+// 		setTemplateId('');
+// 		console.log({ template_header, template_body, template_carousel });
+// 	};
 
-	const template = templates.find((t) => t.id === template_id);
+// 	const template = templates.find((t) => t.id === template_id);
 
-	const handleTemplateChange = (details: { id: string; name: string } | null) => {
-		if (!details) return;
-		setTemplateName(details.name);
-		const selectedTemplate = templates.find((template) => template.id === details.id);
-		console.log(selectedTemplate);
-		setTemplateId(details.id);
-		const body_variables = countOccurrences(selectedTemplate?.body?.text ?? '');
-		if (selectedTemplate?.header && selectedTemplate?.header?.format === 'TEXT') {
-			const header_variables = countOccurrences(selectedTemplate?.header.text ?? '');
-			console.log(header_variables);
-			setTemplateHeader({
-				type: selectedTemplate?.header?.format ?? '',
-				link: '',
-				media_id: '',
-				text: Array.from({ length: header_variables }).map(() => ({
-					custom_text: '',
-					phonebook_data: '',
-					variable_from: 'custom_text',
-					fallback_value: '',
-				})),
-			});
-		} else {
-			setTemplateHeader({
-				type: selectedTemplate?.header?.format as 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE',
-				media_id: '',
-				link:'',
-				text: [],
-			});
-		}
+// 	const handleTemplateChange = (details: { id: string; name: string } | null) => {
+// 		if (!details) return;
 
-		setTemplateBody(
-			Array.from({ length: body_variables }).map(() => ({
-				custom_text: '',
-				phonebook_data: '',
-				variable_from: 'custom_text',
-				fallback_value: '',
-			}))
-		);
-	};
+// 		setTemplateName(details.name);
+// 		setTemplateId(details.id);
 
-	return (
-		<Dialog>
-			<DialogTrigger ref={buttonRef} asChild>
-				{children}
-			</DialogTrigger>
-			<DialogContent className='max-w-sm md:max-w-xl lg:max-w-5xl max-h-full'>
-				<DialogHeader>
-					<DialogTitle>Template Message</DialogTitle>
-				</DialogHeader>
-				<ScrollArea className='max-h-[700px]'>
-					<TemplateSelector
-						onChange={(value) => handleTemplateChange(value)}
-						value={template_name}
-						placeholder='Select template'
-					/>
-					<Separator className='my-4' />
-					<div className='flex flex-col lg:flex-row w-full justify-between gap-3'>
-						<div className='flex flex-col w-full lg:w-[70%] space-y-2'>
-							<p
-								className='text-lg font-medium'
-								hidden={
-									!(
-										(!!template_header &&
-											template_header.type !== 'TEXT' &&
-											template_header.type !== 'NONE') ||
-										template_body.length > 0
-									)
-								}
-							>
-								Template details
-							</p>
-							<Show.ShowIf
-								condition={
-									!!template_header &&
-									template_header.type !== 'TEXT' &&
-									template_header.type !== 'NONE'
-								}
-							>
-								<div className='flex items-center gap-6'>
-									<p className='font-medium'>
-										Header Media<span className='mr-[0.2rem] text-red-800'>*</span>:{' '}
-									</p>
-									<MediaSelectorDialog
-										singleSelect
-										selectedValue={template_header?.media_id ? [template_header?.media_id] : []}
-										onConfirm={(media) => {
-											setTemplateHeader({
-												...template_header,
-												media_id: media[0],
-											});
-										}}
-										returnType='media_id'
-									>
-										<Button variant={'outline'}>Select Media</Button>
-									</MediaSelectorDialog>
+// 		const selectedTemplate = templates.find((template) => template.id === details.id);
 
-									<span>{template_header?.media_id ? 'Media selected' : 'No media selected'}</span>
-								</div>
-							</Show.ShowIf>
-							<Show.ShowIf condition={template_header.text.length > 0}>
-								<div className='border-2 p-2 rounded-lg border-dashed'>
-									<Label className='text-md text-center'>Header Variables</Label>
-									<Each
-										items={template_header.text}
-										render={(item, index) => (
-											<div className='flex flex-col'>
-												<Label>
-													Variable value {index + 1}
-													<span className='ml-[0.2rem] text-red-800'>*</span>
-												</Label>
-												<div className='flex gap-3 flex-col md:flex-row'>
-													<Select
-														onValueChange={(value) =>
-															setTemplateHeader((prev) => {
-																const newHeader = { ...prev };
-																newHeader.text[index].variable_from =
-																	value as typeof item.variable_from;
-																return newHeader;
-															})
-														}
-														defaultValue={item.variable_from}
-													>
-														<SelectTrigger>
-															<SelectValue placeholder='Data From' />
-														</SelectTrigger>
-														<SelectContent>
-															<SelectItem value='phonebook_data'>Phonebook Data</SelectItem>
-															<SelectItem value='custom_text'>Custom Text</SelectItem>
-														</SelectContent>
-													</Select>
-													<Show.ShowIf condition={item.variable_from === 'phonebook_data'}>
-														<Select
-															onValueChange={(value) =>
-																setTemplateHeader((prev) => {
-																	const newHeader = { ...prev };
-																	newHeader.text[index].phonebook_data = value as string;
-																	return newHeader;
-																})
-															}
-															defaultValue={item.phonebook_data}
-														>
-															<SelectTrigger>
-																<SelectValue placeholder='Select Fields' />
-															</SelectTrigger>
-															<SelectContent>
-																<Each
-																	items={phonebook_fields}
-																	render={(field) => (
-																		<SelectItem value={field.value}>{field.label}</SelectItem>
-																	)}
-																/>
-															</SelectContent>
-														</Select>
-														<Input
-															placeholder='Fallback Value'
-															value={item.fallback_value}
-															onChange={(e) =>
-																setTemplateHeader((prev) => {
-																	const newHeader = { ...prev };
-																	newHeader.text[index].fallback_value = e.target.value;
-																	return newHeader;
-																})
-															}
-														/>
-													</Show.ShowIf>
+// 		const body_variables = countOccurrences(selectedTemplate?.body?.text ?? '');
+// 		if (selectedTemplate?.header && selectedTemplate?.header?.format === 'TEXT') {
+// 			const header_variables = countOccurrences(selectedTemplate?.header.text ?? '');
+// 			setTemplateHeader({
+// 				type: selectedTemplate?.header?.format ?? '',
+// 				link: '',
+// 				media_id: '',
+// 				text: Array.from({ length: header_variables }).map(() => ({
+// 					custom_text: '',
+// 					phonebook_data: '',
+// 					variable_from: 'custom_text',
+// 					fallback_value: '',
+// 				})),
+// 			});
+// 		} else {
+// 			setTemplateHeader({
+// 				type: selectedTemplate?.header?.format ?? 'NONE',
+// 				media_id: '',
+// 				link: '',
+// 				text: [],
+// 			});
+// 		}
 
-													<Show.ShowIf condition={item.variable_from === 'custom_text'}>
-														<Input
-															placeholder='Value'
-															value={item.custom_text}
-															onChange={(e) =>
-																setTemplateBody((prev) => {
-																	const newBody = [...prev];
-																	newBody[index].custom_text = e.target.value;
-																	return newBody;
-																})
-															}
-														/>
-													</Show.ShowIf>
-												</div>
-											</div>
-										)}
-									/>
-								</div>
-							</Show.ShowIf>
-							<Show.ShowIf condition={template_body.length > 0}>
-								<div className='border-2 p-2 rounded-lg border-dashed'>
-									<Label className='text-md text-center'>Body Variables</Label>
-									<Each
-										items={template_body}
-										render={(item, index) => (
-											<div className='flex flex-col'>
-												<Label>
-													Variable value {index + 1}
-													<span className='ml-[0.2rem] text-red-800'>*</span>
-												</Label>
-												<div className='flex gap-3 flex-col md:flex-row'>
-													<Select
-														onValueChange={(value) =>
-															setTemplateBody((prev) => {
-																const newBody = [...prev];
-																newBody[index].variable_from = value as typeof item.variable_from;
-																return newBody;
-															})
-														}
-														defaultValue={item.variable_from}
-													>
-														<SelectTrigger>
-															<SelectValue placeholder='Data From' />
-														</SelectTrigger>
-														<SelectContent>
-															<SelectItem value='phonebook_data'>Phonebook Data</SelectItem>
-															<SelectItem value='custom_text'>Custom Text</SelectItem>
-														</SelectContent>
-													</Select>
-													<Show.ShowIf condition={item.variable_from === 'phonebook_data'}>
-														<Select
-															onValueChange={(value) =>
-																setTemplateBody((prev) => {
-																	const newBody = [...prev];
-																	newBody[index].phonebook_data = value as string;
-																	return newBody;
-																})
-															}
-															defaultValue={item.phonebook_data}
-														>
-															<SelectTrigger>
-																<SelectValue placeholder='Select Fields' />
-															</SelectTrigger>
-															<SelectContent>
-																<Each
-																	items={phonebook_fields}
-																	render={(field) => (
-																		<SelectItem value={field.value}>{field.label}</SelectItem>
-																	)}
-																/>
-															</SelectContent>
-														</Select>
-														<Input
-															placeholder='Fallback Value'
-															value={item.fallback_value}
-															onChange={(e) =>
-																setTemplateBody((prev) => {
-																	const newBody = [...prev];
-																	newBody[index].fallback_value = e.target.value;
-																	return newBody;
-																})
-															}
-														/>
-													</Show.ShowIf>
+// 		setTemplateBody(
+// 			Array.from({ length: body_variables }).map(() => ({
+// 				custom_text: '',
+// 				phonebook_data: '',
+// 				variable_from: 'custom_text',
+// 				fallback_value: '',
+// 			}))
+// 		);
 
-													<Show.ShowIf condition={item.variable_from === 'custom_text'}>
-														<Input
-															placeholder='Value'
-															value={item.custom_text}
-															onChange={(e) =>
-																setTemplateBody((prev) => {
-																	const newBody = [...prev];
-																	newBody[index].custom_text = e.target.value;
-																	return newBody;
-																})
-															}
-														/>
-													</Show.ShowIf>
-												</div>
-											</div>
-										)}
-									/>
-								</div>
-							</Show.ShowIf>
-						</div>
-						<div className='w-full lg:w-[30%] flex flex-col justify-start items-start gap-3'>
-							<Show.ShowIf condition={!!template}>
-								<TemplatePreview template={template} />
-							</Show.ShowIf>
-						</div>
-					</div>
-				</ScrollArea>
-				<DialogFooter>
-					<Button onClick={handleSave}>Send</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
-	);
-}
+// 		if (selectedTemplate?.carousel?.cards) {
+// 			setTemplateCarousel({
+// 				cards: Array.from({
+// 					length: (selectedTemplate?.carousel?.cards as Carousel['cards']).length,
+// 				}).map((_, index) => {
+// 					return {
+// 						header: {
+// 							media_id: '',
+// 						},
+// 						body: {
+// 							text: Array.from({
+// 								length: countOccurrences(selectedTemplate?.carousel?.cards[index].body.text ?? ''),
+// 							}).map(() => ({
+// 								custom_text: '',
+// 								phonebook_data: '',
+// 								variable_from: 'custom_text',
+// 								fallback_value: '',
+// 							})),
+// 						},
+// 						buttons: Array.from({
+// 							length: (selectedTemplate?.carousel?.cards[index].buttons ?? []).length,
+// 						}).map((_, buttonIndex) => ({
+// 							text: Array.from({
+// 								length: countOccurrences(
+// 									selectedTemplate?.carousel?.cards[index].buttons[buttonIndex].text ?? ''
+// 								),
+// 							}).map(() => ({
+// 								custom_text: '',
+// 								phonebook_data: '',
+// 								variable_from: 'custom_text',
+// 								fallback_value: '',
+// 							})),
+// 						})),
+// 					};
+// 				}),
+// 			});
+// 		} else {
+// 			setTemplateCarousel({
+// 				cards: [],
+// 			});
+// 		}
+// 	};
+
+// 	return (
+// 		<Dialog>
+// 			<DialogTrigger ref={buttonRef} asChild>
+// 				{children}
+// 			</DialogTrigger>
+// 			<DialogContent className='max-w-sm md:max-w-xl lg:max-w-5xl max-h-full'>
+// 				<DialogHeader>
+// 					<DialogTitle>Template Message</DialogTitle>
+// 				</DialogHeader>
+// 				<ScrollArea className='max-h-[700px]'>
+// 					<TemplateSelector
+// 						onChange={(value) => handleTemplateChange(value)}
+// 						value={template_name}
+// 						placeholder='Select template'
+// 					/>
+// 					<Separator className='my-4' />
+// 					<div className='flex flex-col lg:flex-row w-full justify-between gap-3'>
+// 						<div className='flex flex-col w-full lg:w-[70%] space-y-2'>
+// 							<p
+// 								className='text-lg font-medium'
+// 								hidden={
+// 									!(
+// 										(!!template_header &&
+// 											template_header.type !== 'TEXT' &&
+// 											template_header.type !== 'NONE') ||
+// 										template_body.length > 0
+// 									)
+// 								}
+// 							>
+// 								Template details
+// 							</p>
+// 							<Show.ShowIf
+// 								condition={
+// 									(!!template_header && template_header.type === 'IMAGE') ||
+// 									template_header.type === 'VIDEO' ||
+// 									template_header.type === 'DOCUMENT'
+// 								}
+// 							>
+// 								<div className='flex items-center gap-6'>
+// 									<p className='font-medium'>
+// 										Header Media<span className='mr-[0.2rem] text-red-800'>*</span>:{' '}
+// 									</p>
+// 									<MediaSelectorDialog
+// 										singleSelect
+// 										selectedValue={template_header?.media_id ? [template_header?.media_id] : []}
+// 										onConfirm={(media) => {
+// 											setTemplateHeader({
+// 												...template_header,
+// 												media_id: media[0],
+// 											});
+// 										}}
+// 										returnType='media_id'
+// 									>
+// 										<Button variant={'outline'}>Select Media</Button>
+// 									</MediaSelectorDialog>
+
+// 									<span>{template_header?.media_id ? 'Media selected' : 'No media selected'}</span>
+// 								</div>
+// 							</Show.ShowIf>
+// 							<Show.ShowIf condition={template_header.text.length > 0}>
+// 								<div className='border-2 p-2 rounded-lg border-dashed'>
+// 									<div className='text-md text-center'>Header Variables</div>
+// 									<Each
+// 										items={template_header.text}
+// 										render={(item, index) => (
+// 											<div className='flex flex-col'>
+// 												<Label>
+// 													Variable value {index + 1}
+// 													<span className='ml-[0.2rem] text-red-800'>*</span>
+// 												</Label>
+// 												<div className='flex gap-3 flex-col md:flex-row'>
+// 													<Select
+// 														onValueChange={(value) =>
+// 															setTemplateHeader((prev) => {
+// 																const newHeader = { ...prev };
+// 																newHeader.text[index].variable_from =
+// 																	value as typeof item.variable_from;
+// 																return newHeader;
+// 															})
+// 														}
+// 														defaultValue={item.variable_from}
+// 													>
+// 														<SelectTrigger>
+// 															<SelectValue placeholder='Data From' />
+// 														</SelectTrigger>
+// 														<SelectContent>
+// 															<SelectItem value='phonebook_data'>Phonebook Data</SelectItem>
+// 															<SelectItem value='custom_text'>Custom Text</SelectItem>
+// 														</SelectContent>
+// 													</Select>
+// 													<Show.ShowIf condition={item.variable_from === 'phonebook_data'}>
+// 														<Select
+// 															onValueChange={(value) =>
+// 																setTemplateHeader((prev) => {
+// 																	const newHeader = { ...prev };
+// 																	newHeader.text[index].phonebook_data = value as string;
+// 																	return newHeader;
+// 																})
+// 															}
+// 															defaultValue={item.phonebook_data}
+// 														>
+// 															<SelectTrigger>
+// 																<SelectValue placeholder='Select Fields' />
+// 															</SelectTrigger>
+// 															<SelectContent>
+// 																<Each
+// 																	items={phonebook_fields}
+// 																	render={(field) => (
+// 																		<SelectItem value={field.value}>{field.label}</SelectItem>
+// 																	)}
+// 																/>
+// 															</SelectContent>
+// 														</Select>
+// 														<Input
+// 															placeholder='Fallback Value'
+// 															value={item.fallback_value}
+// 															onChange={(e) =>
+// 																setTemplateHeader((prev) => {
+// 																	const newHeader = { ...prev };
+// 																	newHeader.text[index].fallback_value = e.target.value;
+// 																	return newHeader;
+// 																})
+// 															}
+// 														/>
+// 													</Show.ShowIf>
+
+// 													<Show.ShowIf condition={item.variable_from === 'custom_text'}>
+// 														<Input
+// 															placeholder='Value'
+// 															value={item.custom_text}
+// 															onChange={(e) =>
+// 																setTemplateHeader((prev) => {
+// 																	const newHeader = { ...prev };
+// 																	newHeader.text[index].custom_text = e.target.value;
+// 																	return newHeader;
+// 																})
+// 															}
+// 														/>
+// 													</Show.ShowIf>
+// 												</div>
+// 											</div>
+// 										)}
+// 									/>
+// 								</div>
+// 							</Show.ShowIf>
+// 							<Show.ShowIf condition={template_body.length > 0}>
+// 								<div className='border-2 p-2 rounded-lg border-dashed'>
+// 									<div className='w-full text-md !text-center'>Body Variables</div>
+// 									<Each
+// 										items={template_body}
+// 										render={(item, index) => (
+// 											<div className='flex flex-col'>
+// 												<Label>
+// 													Variable value {index + 1}
+// 													<span className='ml-[0.2rem] text-red-800'>*</span>
+// 												</Label>
+// 												<div className='flex gap-3 flex-col md:flex-row'>
+// 													<Select
+// 														onValueChange={(value) =>
+// 															setTemplateBody((prev) => {
+// 																const newBody = [...prev];
+// 																newBody[index].variable_from = value as typeof item.variable_from;
+// 																return newBody;
+// 															})
+// 														}
+// 														defaultValue={item.variable_from}
+// 													>
+// 														<SelectTrigger>
+// 															<SelectValue placeholder='Data From' />
+// 														</SelectTrigger>
+// 														<SelectContent>
+// 															<SelectItem value='phonebook_data'>Phonebook Data</SelectItem>
+// 															<SelectItem value='custom_text'>Custom Text</SelectItem>
+// 														</SelectContent>
+// 													</Select>
+// 													<Show.ShowIf condition={item.variable_from === 'phonebook_data'}>
+// 														<Select
+// 															onValueChange={(value) =>
+// 																setTemplateBody((prev) => {
+// 																	const newBody = [...prev];
+// 																	newBody[index].phonebook_data = value as string;
+// 																	return newBody;
+// 																})
+// 															}
+// 															defaultValue={item.phonebook_data}
+// 														>
+// 															<SelectTrigger>
+// 																<SelectValue placeholder='Select Fields' />
+// 															</SelectTrigger>
+// 															<SelectContent>
+// 																<Each
+// 																	items={phonebook_fields}
+// 																	render={(field) => (
+// 																		<SelectItem value={field.value}>{field.label}</SelectItem>
+// 																	)}
+// 																/>
+// 															</SelectContent>
+// 														</Select>
+// 														<Input
+// 															placeholder='Fallback Value'
+// 															value={item.fallback_value}
+// 															onChange={(e) =>
+// 																setTemplateBody((prev) => {
+// 																	const newBody = [...prev];
+// 																	newBody[index].fallback_value = e.target.value;
+// 																	return newBody;
+// 																})
+// 															}
+// 														/>
+// 													</Show.ShowIf>
+
+// 													<Show.ShowIf condition={item.variable_from === 'custom_text'}>
+// 														<Input
+// 															placeholder='Value'
+// 															value={item.custom_text}
+// 															onChange={(e) =>
+// 																setTemplateBody((prev) => {
+// 																	const newBody = [...prev];
+// 																	newBody[index].custom_text = e.target.value;
+// 																	return newBody;
+// 																})
+// 															}
+// 														/>
+// 													</Show.ShowIf>
+// 												</div>
+// 											</div>
+// 										)}
+// 									/>
+// 								</div>
+// 							</Show.ShowIf>
+// 							<Show.ShowIf condition={template_carousel.cards.length > 0}>
+// 								<div className='border-2 p-2 rounded-lg border-dashed'>
+// 									<div className='w-full text-md !text-center'>Carousel Variables</div>
+
+// 									<Each
+// 										items={template_carousel.cards}
+// 										render={(card, cardIndex) => (
+// 											<div>
+// 												<div className='text-center border-t-2 pt-2 mt-1'>
+// 													Card number {cardIndex + 1}
+// 												</div>
+// 												<div className='text-center'>Body variables</div>
+// 												<Each
+// 													items={template_carousel.cards[cardIndex].body.text}
+// 													render={(item, index) => (
+// 														<div className='flex flex-col'>
+// 															<Label>
+// 																Variable value {index + 1}
+// 																<span className='ml-[0.2rem] text-red-800'>*</span>
+// 															</Label>
+// 															<div className='flex gap-3 flex-col md:flex-row'>
+// 																<Select
+// 																	onValueChange={(value) =>
+// 																		setTemplateBody((prev) => {
+// 																			const newBody = [...prev];
+// 																			newBody[index].variable_from =
+// 																				value as typeof item.variable_from;
+// 																			return newBody;
+// 																		})
+// 																	}
+// 																	defaultValue={item.variable_from}
+// 																>
+// 																	<SelectTrigger>
+// 																		<SelectValue placeholder='Data From' />
+// 																	</SelectTrigger>
+// 																	<SelectContent>
+// 																		<SelectItem value='phonebook_data'>Phonebook Data</SelectItem>
+// 																		<SelectItem value='custom_text'>Custom Text</SelectItem>
+// 																	</SelectContent>
+// 																</Select>
+// 																<Show.ShowIf condition={item.variable_from === 'phonebook_data'}>
+// 																	<Select
+// 																		onValueChange={(value) =>
+// 																			setTemplateBody((prev) => {
+// 																				const newBody = [...prev];
+// 																				newBody[index].phonebook_data = value as string;
+// 																				return newBody;
+// 																			})
+// 																		}
+// 																		defaultValue={item.phonebook_data}
+// 																	>
+// 																		<SelectTrigger>
+// 																			<SelectValue placeholder='Select Fields' />
+// 																		</SelectTrigger>
+// 																		<SelectContent>
+// 																			<Each
+// 																				items={phonebook_fields}
+// 																				render={(field) => (
+// 																					<SelectItem value={field.value}>{field.label}</SelectItem>
+// 																				)}
+// 																			/>
+// 																		</SelectContent>
+// 																	</Select>
+// 																	<Input
+// 																		placeholder='Fallback Value'
+// 																		value={item.fallback_value}
+// 																		onChange={(e) =>
+// 																			setTemplateBody((prev) => {
+// 																				const newBody = [...prev];
+// 																				newBody[index].fallback_value = e.target.value;
+// 																				return newBody;
+// 																			})
+// 																		}
+// 																	/>
+// 																</Show.ShowIf>
+
+// 																<Show.ShowIf condition={item.variable_from === 'custom_text'}>
+// 																	<Input
+// 																		placeholder='Value'
+// 																		value={item.custom_text}
+// 																		onChange={(e) =>
+// 																			setTemplateBody((prev) => {
+// 																				const newBody = [...prev];
+// 																				newBody[index].custom_text = e.target.value;
+// 																				return newBody;
+// 																			})
+// 																		}
+// 																	/>
+// 																</Show.ShowIf>
+// 															</div>
+// 														</div>
+// 													)}
+// 												/>
+// 												<div className='text-center'>Button Variables</div>
+// 												<Each
+// 													items={template_carousel.cards[cardIndex].buttons}
+// 													render={(_, buttonIndex) => (
+// 														<div>
+// 															<Each
+// 																items={template_carousel.cards[cardIndex].buttons[buttonIndex].text}
+// 																render={(_, index) => (
+// 																	<div className='flex flex-col'>
+// 																		<Label>
+// 																			Variable value {index + 1}
+// 																			<span className='ml-[0.2rem] text-red-800'>*</span>
+// 																		</Label>
+// 																		<div className='flex gap-3 flex-col md:flex-row'>
+// 																			<Select
+// 																				onValueChange={(value) =>
+// 																					setTemplateBody((prev) => {
+// 																						const newBody = [...prev];
+// 																						newBody[index].variable_from =
+// 																							value as typeof item.variable_from;
+// 																						return newBody;
+// 																					})
+// 																				}
+// 																				defaultValue={item.variable_from}
+// 																			>
+// 																				<SelectTrigger>
+// 																					<SelectValue placeholder='Data From' />
+// 																				</SelectTrigger>
+// 																				<SelectContent>
+// 																					<SelectItem value='phonebook_data'>
+// 																						Phonebook Data
+// 																					</SelectItem>
+// 																					<SelectItem value='custom_text'>Custom Text</SelectItem>
+// 																				</SelectContent>
+// 																			</Select>
+// 																			<Show.ShowIf
+// 																				condition={item.variable_from === 'phonebook_data'}
+// 																			>
+// 																				<Select
+// 																					onValueChange={(value) =>
+// 																						setTemplateBody((prev) => {
+// 																							const newBody = [...prev];
+// 																							newBody[index].phonebook_data = value as string;
+// 																							return newBody;
+// 																						})
+// 																					}
+// 																					defaultValue={item.phonebook_data}
+// 																				>
+// 																					<SelectTrigger>
+// 																						<SelectValue placeholder='Select Fields' />
+// 																					</SelectTrigger>
+// 																					<SelectContent>
+// 																						<Each
+// 																							items={phonebook_fields}
+// 																							render={(field) => (
+// 																								<SelectItem value={field.value}>
+// 																									{field.label}
+// 																								</SelectItem>
+// 																							)}
+// 																						/>
+// 																					</SelectContent>
+// 																				</Select>
+// 																				<Input
+// 																					placeholder='Fallback Value'
+// 																					value={item.fallback_value}
+// 																					onChange={(e) =>
+// 																						setTemplateBody((prev) => {
+// 																							const newBody = [...prev];
+// 																							newBody[index].fallback_value = e.target.value;
+// 																							return newBody;
+// 																						})
+// 																					}
+// 																				/>
+// 																			</Show.ShowIf>
+
+// 																			<Show.ShowIf condition={item.variable_from === 'custom_text'}>
+// 																				<Input
+// 																					placeholder='Value'
+// 																					value={item.custom_text}
+// 																					onChange={(e) =>
+// 																						setTemplateBody((prev) => {
+// 																							const newBody = [...prev];
+// 																							newBody[index].custom_text = e.target.value;
+// 																							return newBody;
+// 																						})
+// 																					}
+// 																				/>
+// 																			</Show.ShowIf>
+// 																		</div>
+// 																	</div>
+// 																)}
+// 															/>
+// 														</div>
+// 													)}
+// 												/>
+// 											</div>
+// 										)}
+// 									/>
+// 								</div>
+// 							</Show.ShowIf>
+// 						</div>
+// 						<div className='w-full lg:w-[30%] flex flex-col justify-start items-start gap-3'>
+// 							<Show.ShowIf condition={!!template}>
+// 								<TemplatePreview template={template} />
+// 							</Show.ShowIf>
+// 						</div>
+// 					</div>
+// 				</ScrollArea>
+// 				<DialogFooter>
+// 					<Button onClick={handleSave}>Send</Button>
+// 				</DialogFooter>
+// 			</DialogContent>
+// 		</Dialog>
+// 	);
+// }

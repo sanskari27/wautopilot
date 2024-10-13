@@ -80,7 +80,7 @@ export default function Navbar() {
 					<MenubarLink href={getLink('/campaigns/report')}>Broadcast Report</MenubarLink>
 					<MenubarLink href={getLink('/campaigns/recurring')}>Recurring</MenubarLink>
 					<MenubarSeparator />
-					<MenubarLink href={getLink('/campaigns/chatbot')}>Chatbot</MenubarLink>
+					{/* <MenubarLink href={getLink('/campaigns/chatbot')}>Chatbot</MenubarLink> */}
 					<MenubarLink href={getLink('/campaigns/chatbot-flow')}>Chatbot Flow</MenubarLink>
 					<MenubarLink href={getLink('/campaigns/whatsapp-flow')}>Whatsapp Forms</MenubarLink>
 				</MenubarContent>

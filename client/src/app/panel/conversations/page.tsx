@@ -1,3 +1,5 @@
+'use client'
+
 import ConversationScreen from './_components/conversation-screen';
 import RecipientsList from './_components/recipientsList';
 

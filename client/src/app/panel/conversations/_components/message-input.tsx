@@ -5,6 +5,7 @@ import { useQuickReplies } from '@/components/context/quick-replies';
 import { useRecipient } from '@/components/context/recipients';
 import ContactSelectorDialog from '@/components/elements/dialogs/contact-selector';
 import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
+import TemplateDialog from '@/components/elements/dialogs/template-data-selector';
 import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
@@ -50,9 +51,46 @@ import {
 	QuickFlowTemplateMessage,
 	QuickListTemplateMessage,
 	QuickLocationTemplateMessage,
-	QuickTemplateMessage,
 	UploadMediaDialog,
 } from './dialogs';
+
+export type QuickTemplateMessageProps = {
+	template_id: string;
+	template_name: string;
+	body: {
+		variable_from: 'custom_text' | 'phonebook_data';
+		custom_text: string;
+		phonebook_data: string;
+		fallback_value: string;
+	}[];
+	header?: {
+		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | 'NONE';
+		text?:
+			| {
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value: string;
+			  }[];
+		media_id?: string | undefined;
+		link?: string | undefined;
+	};
+	carousel?: {
+		cards: {
+			header: {
+				media_id: string;
+			};
+			body: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
+			buttons: string[][];
+		}[];
+	};
+	buttons?: string[][];
+};
 
 export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 	const { value: isMessageSending, on: setSending, off: setNotSending } = useBoolean(false);
@@ -149,29 +187,12 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 		});
 	}
 
-	function sendQuickTemplateMessage(
-		template_id: string,
-		template_name: string,
-		template_body: {
-			variable_from: 'custom_text' | 'phonebook_data';
-			custom_text: string;
-			phonebook_data: string;
-			fallback_value: string;
-		}[],
-		template_header: {
-			type: 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'NONE';
-			media_id: string;
-			link?: string;
-		}
-	) {
+	function sendQuickTemplateMessage(details: QuickTemplateMessageProps) {
 		MessagesService.sendQuickTemplateMessage({
+			...details,
 			recipientId: selected_recipient!.id,
-			template_id,
-			template_name,
-			body: template_body,
-			header: template_header,
-			type: 'template',
 			context: { message_id: replyMessageId },
+			type: 'template',
 		}).then((data) => {
 			setReplyMessageId('');
 			if (!data) {
@@ -406,16 +427,12 @@ export default function MessageBox({ isExpired }: { isExpired: boolean }) {
 								Location message
 							</Button>
 						</QuickLocationTemplateMessage>
-						<QuickTemplateMessage
-							onConfirm={(template_id, template_name, template_header, template_body) =>
-								sendQuickTemplateMessage(template_id, template_name, template_body, template_header)
-							}
-						>
+						<TemplateDialog onConfirm={sendQuickTemplateMessage}>
 							<Button variant={'ghost'} size={'sm'} className='w-full justify-start'>
 								<TbTemplate className='w-4 h-4 mr-2' />
 								Template message
 							</Button>
-						</QuickTemplateMessage>
+						</TemplateDialog>
 					</DropdownMenuContent>
 				</DropdownMenu>
 				<Button disabled={isExpired} variant={'ghost'} size={'icon'} onClick={toggleQuickReply}>

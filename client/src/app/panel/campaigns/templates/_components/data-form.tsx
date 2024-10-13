@@ -179,7 +179,7 @@ export default function DataForm({
 
 	const hasError = templateSchema.safeParse(form.getValues()).success === false;
 
-	console.log(hasError)
+	console.log(templateSchema.safeParse(form.getValues()));
 
 	return (
 		<Form {...form}>
@@ -299,7 +299,7 @@ export default function DataForm({
 										<FormLabel className='text-primary'>Carousel Template</FormLabel>
 										<FormControl>
 											<Switch
-												checked={!!field.value}
+												checked={!!form.watch('carousel')}
 												onCheckedChange={(val) => {
 													if (val) {
 														form.setValue('header', undefined);
