@@ -96,7 +96,7 @@ async function updateFlow(req: Request, res: Response, next: NextFunction) {
 
 	const data = req.locals.data as UpdateFlowValidationResult;
 
-	const flow = await new ChatBotService(account, device).modifyFlow(id, data);
+	await new ChatBotService(account, device).modifyFlow(id, data);
 
 	agentLogService?.addLog({
 		text: `Create flow with id ${id}`,

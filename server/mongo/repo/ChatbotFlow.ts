@@ -118,10 +118,21 @@ const schema = new mongoose.Schema<IChatBotFlow>(
 				template_header: {
 					type: {
 						type: String,
-						enum: ['TEXT', 'VIDEO', 'DOCUMENT'],
+						enum: ['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT'],
 					},
 					media_id: String,
 					link: String,
+					text: [
+						{
+							custom_text: String,
+							phonebook_data: String,
+							variable_from: {
+								type: String,
+								enum: ['custom_text', 'phonebook_data'],
+							},
+							fallback_value: String,
+						},
+					],
 				},
 				template_body: [
 					{
