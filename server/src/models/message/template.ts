@@ -34,7 +34,10 @@ type Header = TextHeader | MediaHeader;
 
 type Body = {
 	type: 'body';
-	parameters: string[];
+	parameters: {
+		type: 'text';
+		text: string;
+	}[];
 };
 
 type URLButton = {
@@ -156,7 +159,10 @@ export default class TemplateMessage extends Message {
 		}
 		this.body = {
 			type: 'body',
-			parameters: variables,
+			parameters: variables.map((text) => ({
+				type: 'text',
+				text,
+			})),
 		};
 		return this;
 	}
