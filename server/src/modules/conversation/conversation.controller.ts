@@ -199,6 +199,8 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 		| TemplateMessage
 		| undefined;
 
+	let formattedMessage: ReturnType<typeof extractFormattedMessage> | undefined;
+
 	if (data.type === 'quickReply') {
 		const quickReply = await QuickReplyDB.findById(data.quickReply);
 		if (!quickReply) {
@@ -247,7 +249,11 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 			const msg = new LocationRequestMessage(recipient).setBody(quickReply.data.body);
 
 			message = msg;
+		} else {
+			return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
 		}
+
+		formattedMessage = extractFormattedMessage(message.toObject());
 	} else if (data.type === 'template') {
 		const phoneBookService = new PhoneBookService(serviceAccount);
 		const { header, body, template_name, buttons, carousel } = data;
@@ -304,6 +310,10 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 		}
 
 		message = msg;
+
+		formattedMessage = extractFormattedMessage(message.toObject(), {
+			template,
+		});
 	}
 
 	if (!message) {
@@ -312,8 +322,6 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 	const messageSender = new MessageSender(device);
 	try {
 		const data = await messageSender.sendMessage(message);
-
-		const formattedMessage = extractFormattedMessage(message.toObject());
 
 		await conversationService.addMessageToConversation(id, {
 			...data,

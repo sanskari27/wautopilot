@@ -268,6 +268,11 @@ export async function SendQuickReplyValidator(req: Request, res: Response, next:
 				),
 			})
 			.optional(),
+		context: z
+			.object({
+				message_id: z.string().trim(),
+			})
+			.optional(),
 	});
 
 	const reqValidator = z.union([quickReplyValidator, templateValidator]);

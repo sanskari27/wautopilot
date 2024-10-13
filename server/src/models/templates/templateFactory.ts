@@ -93,8 +93,6 @@ export default class TemplateFactory {
 
 			return data.map((template: any) => TemplateFactory.convertToTemplate(template));
 		} catch (err) {
-			console.log(err);
-
 			return [];
 		}
 	}
