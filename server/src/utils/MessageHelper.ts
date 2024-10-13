@@ -141,6 +141,20 @@ function extractInteractiveButtons(components: Record<string, any>): {
 			},
 		];
 	}
+	if ('sections' in components.action) {
+		const buttons = [];
+		components.action.sections.forEach(
+			(section: { title: string; rows: { id: string; title: string }[] }) => {
+				section.rows.forEach((row) => {
+					buttons.push({
+						button_type: 'QUICK_REPLY',
+						button_content: `${section.title} - ${row.title}`,
+						button_data: row.id,
+					});
+				});
+			}
+		);
+	}
 	if (!components.action.buttons) {
 		return [];
 	}
