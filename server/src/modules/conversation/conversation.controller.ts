@@ -216,7 +216,7 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 				.setFooter(quickReply.data.footer)
 				.setFlowDetails(
 					quickReply.data.flow_id,
-					quickReply.data.button.text,
+					quickReply.data.button_text,
 					fDetails[0]?.id || ''
 				);
 
