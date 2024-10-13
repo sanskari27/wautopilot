@@ -178,7 +178,7 @@ export default class Template {
 
 	getURLButtonsWithVariable() {
 		const buttons = (this.buttons?.filter((button) => button.type === 'URL') as URLButton[]) ?? [];
-		return buttons.filter((button) => button.example.length > 0);
+		return buttons.filter((button) => button?.example?.length > 0);
 	}
 
 	getCarouselCards() {
