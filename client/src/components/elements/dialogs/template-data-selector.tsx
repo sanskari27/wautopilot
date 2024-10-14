@@ -52,9 +52,9 @@ export default function TemplateDialog({
 		media_id?: string;
 		text?: {
 			custom_text: string;
-			phonebook_data: string;
+			phonebook_data?: string;
 			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
+			fallback_value?: string;
 		}[];
 	}>({
 		type: 'NONE',
@@ -65,9 +65,9 @@ export default function TemplateDialog({
 	const [template_body, setTemplateBody] = useState<
 		{
 			custom_text: string;
-			phonebook_data: string;
+			phonebook_data?: string;
 			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
+			fallback_value?: string;
 		}[]
 	>([]);
 	const [template_id, setTemplateId] = useState<string>('');
@@ -78,9 +78,9 @@ export default function TemplateDialog({
 			};
 			body: {
 				custom_text: string;
-				phonebook_data: string;
+				phonebook_data?: string;
 				variable_from: 'custom_text' | 'phonebook_data';
-				fallback_value: string;
+				fallback_value?: string;
 			}[];
 			buttons: string[][];
 		}[];
@@ -384,7 +384,7 @@ export default function TemplateDialog({
 								<div className='border-2 p-2 rounded-lg border-dashed'>
 									<div className='text-md text-center font-bold'>Header Variables</div>
 									<Each
-										items={(template_header.text ?? [])}
+										items={template_header.text ?? []}
 										render={(item, index) => (
 											<div className='flex flex-col'>
 												<Label>
@@ -396,7 +396,7 @@ export default function TemplateDialog({
 														<Select
 															onValueChange={(value) =>
 																setTemplateHeader((prev) => {
-																	return{
+																	return {
 																		...prev,
 																		text: (prev.text ?? []).map((text, i) => {
 																			if (i === index) {
@@ -407,7 +407,7 @@ export default function TemplateDialog({
 																			}
 																			return text;
 																		}),
-																	}
+																	};
 																})
 															}
 															defaultValue={item.variable_from}
@@ -458,7 +458,7 @@ export default function TemplateDialog({
 															value={item.fallback_value}
 															onChange={(e) =>
 																setTemplateHeader((prev) => {
-																	return{
+																	return {
 																		...prev,
 																		text: (prev.text ?? []).map((text, i) => {
 																			if (i === index) {
@@ -469,7 +469,7 @@ export default function TemplateDialog({
 																			}
 																			return text;
 																		}),
-																	}
+																	};
 																})
 															}
 														/>
@@ -481,7 +481,7 @@ export default function TemplateDialog({
 															value={item.custom_text}
 															onChange={(e) =>
 																setTemplateHeader((prev) => {
-																	return{
+																	return {
 																		...prev,
 																		text: (prev.text ?? []).map((text, i) => {
 																			if (i === index) {
@@ -492,7 +492,7 @@ export default function TemplateDialog({
 																			}
 																			return text;
 																		}),
-																	}
+																	};
 																})
 															}
 														/>
@@ -785,14 +785,14 @@ export default function TemplateDialog({
 										if (variable.variable_from === 'custom_text') {
 											return variable.custom_text;
 										} else {
-											return variable.fallback_value;
+											return (variable.fallback_value ?? '');
 										}
 									})}
 									bodyVariables={template_body.map((variable) => {
 										if (variable.variable_from === 'custom_text') {
 											return variable.custom_text;
 										} else {
-											return variable.fallback_value;
+											return variable.fallback_value ?? '';
 										}
 									})}
 									carouselVariables={template_carousel.cards.map((card) => {
@@ -800,7 +800,7 @@ export default function TemplateDialog({
 											if (body.variable_from === 'custom_text') {
 												return body.custom_text;
 											} else {
-												return body.fallback_value;
+												return (body.fallback_value ?? '');
 											}
 										});
 									})}

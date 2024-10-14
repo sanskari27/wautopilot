@@ -60,17 +60,17 @@ export type QuickTemplateMessageProps = {
 	body: {
 		variable_from: 'custom_text' | 'phonebook_data';
 		custom_text: string;
-		phonebook_data: string;
-		fallback_value: string;
+		phonebook_data?: string;
+		fallback_value?: string;
 	}[];
 	header?: {
 		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | 'NONE';
 		text?:
 			| {
 					custom_text: string;
-					phonebook_data: string;
+					phonebook_data?: string;
 					variable_from: 'custom_text' | 'phonebook_data';
-					fallback_value: string;
+					fallback_value?: string;
 			  }[];
 		media_id?: string | undefined;
 		link?: string | undefined;
@@ -82,9 +82,9 @@ export type QuickTemplateMessageProps = {
 			};
 			body: {
 				custom_text: string;
-				phonebook_data: string;
+				phonebook_data?: string;
 				variable_from: 'custom_text' | 'phonebook_data';
-				fallback_value: string;
+				fallback_value?: string;
 			}[];
 			buttons: string[][];
 		}[];
