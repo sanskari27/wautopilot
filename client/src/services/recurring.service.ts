@@ -50,70 +50,12 @@ const validateRecurringResult = (recurring: any): RecurringWithId => {
 	};
 };
 
-const data = [
-	{
-		id: '6687dc430afc1d8236221064',
-		name: '123123',
-		description: '123123',
-		wish_from: 'birthday',
-		status: 'ACTIVE',
-		labels: ['UNSAVED'],
-		template_id: '914676950062961',
-		template_name: 'get_your_vcard',
-		template_body: [],
-		template_buttons: [],
-		template_carousel: { cards: [] },
-		delay: -1,
-		startTime: '10:00',
-		endTime: '18:00',
-	},
-	{
-		id: '670cb7373cf68d07f6e2b15a',
-		name: 'birthday test',
-		description: '',
-		wish_from: 'birthday',
-		status: 'ACTIVE',
-		labels: ['Developer'],
-		template_id: '1523000151653254',
-		template_name: '234',
-		template_header: {
-			type: 'TEXT',
-			text: [
-				{
-					custom_text: '4213',
-					phonebook_data: '',
-					variable_from: 'custom_text',
-					fallback_value: '',
-					_id: '670cc4983cf68d07f6e35d7b',
-				},
-			],
-			media_id: '',
-		},
-		template_body: [
-			{
-				custom_text: '324124',
-				phonebook_data: '',
-				variable_from: 'custom_text',
-				fallback_value: '',
-				_id: '670cc4983cf68d07f6e35d7a',
-			},
-		],
-		template_buttons: [],
-		template_carousel: { cards: [] },
-		delay: 0,
-		startTime: '10:00',
-		endTime: '18:00',
-	},
-];
-
 export default class RecurringService {
 	static async getRecurringList(): Promise<RecurringWithId[]> {
 		try {
 			const { data } = await api.get(`/broadcast/recurring`);
-			console.log(JSON.stringify(data.list));
 			return data.list.map(validateRecurringResult);
 		} catch (err) {
-			console.log(err);
 			return [];
 		}
 	}

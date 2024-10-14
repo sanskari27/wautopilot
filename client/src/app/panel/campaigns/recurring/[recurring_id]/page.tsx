@@ -51,7 +51,6 @@ export default function EditRecurring({
 	const data = recurringSchema.safeParse(raw);
 
 	function handleSave(data: Recurring) {
-		console.log(data);
 		toast.promise(RecurringService.editRecurring({ ...data, id: recurring_id }), {
 			loading: 'Updating Recurring Campaign',
 			success: () => {
