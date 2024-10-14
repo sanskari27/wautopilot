@@ -13,7 +13,7 @@ export default function AgentFilter({
 	onConfirm: (labels: string[]) => void;
 }) {
 	const buttonRef = useRef<HTMLButtonElement>(null);
-	const agents = useAgents();
+	const {list:agents} = useAgents();
 
 	const onClose = () => {
 		buttonRef.current?.click();

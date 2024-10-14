@@ -29,7 +29,6 @@ export default function BalanceAlertDialog() {
 					<DialogClose asChild>
 						<Button variant={'destructive'}>Close</Button>
 					</DialogClose>
-					<Button onClick={() => setBalanceAlert(false)}>Okay</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

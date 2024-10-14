@@ -20,7 +20,7 @@ export default function AgentSelector({
 	isMultiSelect?: boolean;
 }) {
 	const [selectedTags, setSelectedTags] = useState<string[]>(selected);
-	const agents = useAgents();
+	const {list: agents} = useAgents();
 
 	return (
 		<Popover>

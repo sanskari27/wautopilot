@@ -32,9 +32,9 @@ export const ChatbotFlowSchema = z.object({
 					text: z.array(
 						z.object({
 							custom_text: z.string().trim(),
-							phonebook_data: z.string().trim(),
+							phonebook_data: z.string().trim().optional(),
 							variable_from: z.enum(['custom_text', 'phonebook_data']),
-							fallback_value: z.string().trim(),
+							fallback_value: z.string().trim().optional(),
 						})
 					).optional(),
 					media_id: z.string().trim().optional(),
@@ -45,9 +45,9 @@ export const ChatbotFlowSchema = z.object({
 				.array(
 					z.object({
 						custom_text: z.string().trim(),
-						phonebook_data: z.string().trim(),
+						phonebook_data: z.string().trim().optional(),
 						variable_from: z.enum(['custom_text', 'phonebook_data']),
-						fallback_value: z.string().trim(),
+						fallback_value: z.string().trim().optional(),
 					})
 				)
 				.default([]),
@@ -63,9 +63,9 @@ export const ChatbotFlowSchema = z.object({
 								.array(
 									z.object({
 										custom_text: z.string().trim(),
-										phonebook_data: z.string().trim(),
+										phonebook_data: z.string().trim().optional(),
 										variable_from: z.enum(['custom_text', 'phonebook_data']),
-										fallback_value: z.string().trim(),
+										fallback_value: z.string().trim().optional(),
 									})
 								)
 								.default([]),
@@ -83,75 +83,3 @@ export const ChatbotFlowSchema = z.object({
 });
 
 export type ChatbotFlow = z.infer<typeof ChatbotFlowSchema>;
-
-const d = {
-	id: '670c1f8ab9da1e12cf7a8b05',
-	name: '2134',
-	trigger: ['new%20structure'],
-	options: 'INCLUDES_IGNORE_CASE',
-	isActive: true,
-	nurturing: [
-		{
-			message: '',
-			respond_type: 'template',
-			images: [],
-			videos: [],
-			audios: [],
-			documents: [],
-			contacts: [],
-			template_id: '3837455136535795',
-			template_name: 'product_catalog',
-			template_body: [],
-			template_header: { type: '', media_id: '', link: '', text: [] },
-			template_buttons: [],
-			template_carousel: {
-				cards: [
-					{
-						header: { media_id: '493756323632033' },
-						body: [
-							{
-								custom_text: '{{1}}',
-								phonebook_data: '',
-								variable_from: 'custom_text',
-								fallback_value: '',
-								_id: '670c30193cf68d07f6e1f926',
-							},
-							{
-								custom_text: '{{2}}',
-								phonebook_data: '',
-								variable_from: 'custom_text',
-								fallback_value: '',
-								_id: '670c30193cf68d07f6e1f927',
-							},
-						],
-						buttons: [[]],
-						_id: '670c30193cf68d07f6e1f925',
-					},
-					{
-						header: { media_id: '504803905726510' },
-						body: [
-							{
-								custom_text: '{{1}}',
-								phonebook_data: '',
-								variable_from: 'custom_text',
-								fallback_value: '',
-								_id: '670c30193cf68d07f6e1f929',
-							},
-							{
-								custom_text: '{{2}}',
-								phonebook_data: '',
-								variable_from: 'custom_text',
-								fallback_value: '',
-								_id: '670c30193cf68d07f6e1f92a',
-							},
-						],
-						buttons: [[]],
-						_id: '670c30193cf68d07f6e1f928',
-					},
-				],
-			},
-			after: { type: 'min', value: '1' },
-		},
-	],
-	forward: { number: '', message: '' },
-};

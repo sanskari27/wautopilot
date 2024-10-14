@@ -21,18 +21,18 @@ export type ChatbotFlow = {
 		template_name: string;
 		template_body?: {
 			custom_text: string;
-			phonebook_data: string;
+			phonebook_data?: string;
 			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
+			fallback_value?: string;
 		}[];
 		template_header?: {
 			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | 'NONE';
 			text?:
 				| {
 						custom_text: string;
-						phonebook_data: string;
+						phonebook_data?: string;
 						variable_from: 'custom_text' | 'phonebook_data';
-						fallback_value: string;
+						fallback_value?: string;
 				  }[];
 			media_id?: string | undefined;
 			link?: string | undefined;
@@ -45,9 +45,9 @@ export type ChatbotFlow = {
 				};
 				body: {
 					custom_text: string;
-					phonebook_data: string;
+					phonebook_data?: string;
 					variable_from: 'custom_text' | 'phonebook_data';
-					fallback_value: string;
+					fallback_value?: string;
 				}[];
 				buttons: string[][];
 			}[];

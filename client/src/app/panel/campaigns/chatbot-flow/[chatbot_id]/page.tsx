@@ -114,7 +114,7 @@ export default function CreateChatbotFlow() {
 		const details = {
 			...data,
 			nurturing: data.nurturing.map((nurturing) => {
-				if(nurturing.template_header?.type === 'NONE'){
+				if (nurturing.template_header?.type === 'NONE') {
 					delete nurturing.template_header;
 				}
 				return {

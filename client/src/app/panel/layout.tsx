@@ -6,7 +6,6 @@ import { DevicesStateProvider } from '@/components/context/devicesState';
 import { SettingStateProvider } from '@/components/context/settingState';
 import { FieldsContextProvider, TagsProvider } from '@/components/context/tags';
 import { UserDetailsProvider } from '@/components/context/user-details';
-import BalanceAlertDialog from '@/components/elements/dialogs/balance-alert-dialog';
 import DevicesDialog from '@/components/elements/dialogs/devices';
 import SettingsDialog from '@/components/elements/dialogs/settings';
 import Loading from '@/components/elements/loading';
@@ -17,6 +16,7 @@ import PhoneBookService from '@/services/phonebook.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import DevicesAlertDialog from '../../components/elements/dialogs/devices-alert';
+import BalanceAlertDialog from '@/components/elements/dialogs/balance-alert-dialog';
 
 export const dynamic = 'force-dynamic';
 
