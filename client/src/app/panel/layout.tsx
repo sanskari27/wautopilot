@@ -18,8 +18,6 @@ import { Suspense } from 'react';
 import DevicesAlertDialog from '../../components/elements/dialogs/devices-alert';
 import BalanceAlertDialog from '@/components/elements/dialogs/balance-alert-dialog';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
 	title: 'Dashboard • Wautopilot',
 };
