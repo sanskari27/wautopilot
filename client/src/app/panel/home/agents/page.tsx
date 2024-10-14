@@ -1,5 +1,9 @@
+'use client';
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
+import { useAgents, useAgentSearch } from '@/components/context/agents';
+import { useUserDetails } from '@/components/context/user-details';
+import { SearchBar } from '@/components/elements/searchbar';
 import { Button } from '@/components/ui/button';
 import {
 	Table,
@@ -10,14 +14,12 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import AgentService from '@/services/agent.service';
-import AuthService from '@/services/auth.service';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { AgentContextMenu } from './_components/contextMenu';
 import { DetailsDialog, PasswordDialog, PermissionDialog } from './_components/dialogs';
 
-export default async function AgentPage({
+export default function AgentPage({
 	searchParams: { edit, update_password, permissions },
 }: {
 	searchParams: {
@@ -26,21 +28,31 @@ export default async function AgentPage({
 		permissions: string;
 	};
 }) {
-	const agents = await AgentService.getAgents();
-	const { isAgent } = (await AuthService.userDetails())!;
+	const { list: agents } = useAgents();
+	const { isAgent } = useUserDetails();
+	const setAgentSearch = useAgentSearch();
 
 	return (
 		<div className='flex flex-col gap-2 justify-center p-4'>
 			<div className='flex justify-between'>
 				<h1 className='text-2xl font-bold'>Agents</h1>
-				<Show.ShowIf condition={!isAgent}>
-					<Link href={'?edit=new'}>
-						<Button size={'sm'}>
-							<Plus className='mr-2 w-4 h-4' />
-							Create Agent
-						</Button>
-					</Link>
-				</Show.ShowIf>
+				<div className='flex items-center'>
+					<Show.ShowIf condition={!isAgent}>
+						<Link href={'?edit=new'}>
+							<Button size={'sm'}>
+								<Plus className='mr-2 w-4 h-4' />
+								Create Agent
+							</Button>
+						</Link>
+					</Show.ShowIf>
+					<div className='flex items-center rounded-lg p-2 w-[450px]'>
+						<SearchBar
+							onChange={setAgentSearch}
+							onSubmit={setAgentSearch}
+							placeholders={['Search by name', 'Search by email', 'Search by phone']}
+						/>
+					</div>
+				</div>
 			</div>
 			<div className='border border-dashed border-gray-700 rounded-2xl overflow-hidden'>
 				<Table>

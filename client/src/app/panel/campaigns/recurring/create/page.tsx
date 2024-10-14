@@ -11,6 +11,7 @@ export default function CreateRecurring() {
 	const { create: createPermission } = usePermissions().recurring;
 
 	function handleSave(data: Recurring) {
+		console.log(data);
 		toast.promise(RecurringService.createRecurring(data), {
 			loading: 'Creating Recurring Campaign',
 			success: () => {

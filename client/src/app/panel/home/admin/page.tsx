@@ -2,6 +2,7 @@
 import Each from '@/components/containers/each';
 import { useAdmins, useAdminSearch } from '@/components/context/admin';
 import { SearchBar } from '@/components/elements/searchbar';
+import { Button } from '@/components/ui/button';
 import {
 	Table,
 	TableBody,
@@ -39,24 +40,30 @@ export default function AdminPage() {
 							<TableHead className='w-[35%]'>Email</TableHead>
 							<TableHead className='text-right'>Phone</TableHead>
 							<TableHead>Subscription Status</TableHead>
+							<TableHead>Action</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						<Each
 							items={list}
 							render={(admin) => (
-								<AdminContextMenu id={admin.id} admin={admin}>
-									<TableRow className='cursor-context-menu'>
-										<TableCell className='font-medium'>{admin.name}</TableCell>
-										<TableCell className='w-[40%]'>
-											<a href={`mailto:${admin.email}`}>{admin.email}</a>
-										</TableCell>
-										<TableCell className='text-right'>
-											<a href={`tel:${admin.phone}`}>+{admin.phone}</a>
-										</TableCell>
-										<TableCell>{admin.isSubscribed ? 'Subscribed' : 'Not Subscribed'}</TableCell>
-									</TableRow>
-								</AdminContextMenu>
+								<TableRow className='cursor-context-menu'>
+									<TableCell className='font-medium'>{admin.name}</TableCell>
+									<TableCell className='w-[40%]'>
+										<a href={`mailto:${admin.email}`}>{admin.email}</a>
+									</TableCell>
+									<TableCell className='text-right'>
+										<a href={`tel:${admin.phone}`}>+{admin.phone}</a>
+									</TableCell>
+									<TableCell>{admin.isSubscribed ? 'Subscribed' : 'Not Subscribed'}</TableCell>
+									<TableCell>
+										<AdminContextMenu id={admin.id} admin={admin}>
+											<Button size={'sm'} variant={'outline'}>
+												Action
+											</Button>
+										</AdminContextMenu>
+									</TableCell>
+								</TableRow>
 							)}
 						/>
 					</TableBody>

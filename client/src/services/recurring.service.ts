@@ -16,8 +16,8 @@ const validateRecurringResult = (recurring: any): RecurringWithId => {
 		endTime: recurring.endTime ?? '18:00',
 		active: recurring.status ?? 'ACTIVE',
 		header: {
-			type: recurring.header?.type ?? 'NONE',
-			text: (recurring.header?.text ?? []).map((text: any) => ({
+			type: recurring.template_header?.type ?? 'NONE',
+			text: (recurring.template_header?.text ?? []).map((text: any) => ({
 				custom_text: text.custom_text ?? '',
 				variable_from: text.variable_from ?? 'custom_text',
 				phonebook_data: text.phonebook_data ?? '',
@@ -26,14 +26,14 @@ const validateRecurringResult = (recurring: any): RecurringWithId => {
 			media_id: recurring.header?.media_id ?? '',
 		},
 		body:
-			(recurring.body ?? []).map((text: any) => ({
+			(recurring.template_body ?? []).map((text: any) => ({
 				custom_text: text.custom_text ?? '',
 				variable_from: text.variable_from ?? 'custom_text',
 				phonebook_data: text.phonebook_data ?? '',
 				fallback_value: text.fallback_value ?? '',
 			})) ?? [],
 		carousel: {
-			cards: (recurring.carousel?.cards ?? []).map((card: any) => ({
+			cards: (recurring.template_carousel?.cards ?? []).map((card: any) => ({
 				header: {
 					media_id: card.header.media_id ?? '',
 				},
@@ -46,11 +46,11 @@ const validateRecurringResult = (recurring: any): RecurringWithId => {
 				buttons: card.buttons ?? [],
 			})),
 		},
-		buttons: recurring.buttons ?? [],
+		buttons: recurring.template_buttons ?? [],
 	};
 };
 
-[
+const data = [
 	{
 		id: '6687dc430afc1d8236221064',
 		name: '123123',
@@ -67,16 +67,53 @@ const validateRecurringResult = (recurring: any): RecurringWithId => {
 		startTime: '10:00',
 		endTime: '18:00',
 	},
+	{
+		id: '670cb7373cf68d07f6e2b15a',
+		name: 'birthday test',
+		description: '',
+		wish_from: 'birthday',
+		status: 'ACTIVE',
+		labels: ['Developer'],
+		template_id: '1523000151653254',
+		template_name: '234',
+		template_header: {
+			type: 'TEXT',
+			text: [
+				{
+					custom_text: '4213',
+					phonebook_data: '',
+					variable_from: 'custom_text',
+					fallback_value: '',
+					_id: '670cc4983cf68d07f6e35d7b',
+				},
+			],
+			media_id: '',
+		},
+		template_body: [
+			{
+				custom_text: '324124',
+				phonebook_data: '',
+				variable_from: 'custom_text',
+				fallback_value: '',
+				_id: '670cc4983cf68d07f6e35d7a',
+			},
+		],
+		template_buttons: [],
+		template_carousel: { cards: [] },
+		delay: 0,
+		startTime: '10:00',
+		endTime: '18:00',
+	},
 ];
 
 export default class RecurringService {
 	static async getRecurringList(): Promise<RecurringWithId[]> {
 		try {
 			const { data } = await api.get(`/broadcast/recurring`);
-			// console.log(JSON.stringify(data.list));
+			console.log(JSON.stringify(data.list));
 			return data.list.map(validateRecurringResult);
 		} catch (err) {
-			console.log(err)
+			console.log(err);
 			return [];
 		}
 	}
@@ -91,7 +128,13 @@ export default class RecurringService {
 		if (details.carousel?.cards.length === 0) {
 			delete details.carousel;
 		}
-		const { data } = await api.post(`/broadcast/recurring`, details);
+		const { data } = await api.post(`/broadcast/recurring`, {
+			...details,
+			template_header: details.header,
+			template_body: details.body,
+			template_buttons: details.buttons,
+			template_carousel: details.carousel,
+		});
 		return validateRecurringResult(data.details);
 	}
 
@@ -110,7 +153,13 @@ export default class RecurringService {
 		if (details.header?.type === 'NONE') {
 			delete details.header;
 		}
-		const { data } = await api.put(`/broadcast/recurring/${details.id}`, details);
+		const { data } = await api.put(`/broadcast/recurring/${details.id}`, {
+			...details,
+			template_header: details.header,
+			template_body: details.body,
+			template_buttons: details.buttons,
+			template_carousel: details.carousel,
+		});
 		return validateRecurringResult(data);
 	}
 

@@ -123,27 +123,13 @@ export default function BroadcastPage() {
 								</FormLabel>
 								<FormControl>
 									<TemplateDialog
+										template={{
 											template_id: fields.template_id,
 											template_name: fields.template_name,
 											buttons: fields.buttons,
 											carousel: fields.carousel,
 											header: fields.header,
-										}}
-										onConfirm={(details) => handleTemplateSave(details)}
-									>
-										<Button variant={'outline'} className='w-full'>
-											{fields.template_name ? fields.template_name : 'Select Template'}
-										</Button>
-									</TemplateDialog>
-								</FormControl>
-								<FormMessage />
-							</FormItem>		template={{
 											body: fields.body,
-											template_id: fields.template_id,
-											template_name: fields.template_name,
-											buttons: fields.buttons,
-											carousel: fields.carousel,
-											header: fields.header,
 										}}
 										onConfirm={(details) => handleTemplateSave(details)}
 									>

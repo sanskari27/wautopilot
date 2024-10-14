@@ -1,14 +1,14 @@
 'use client';
 import Show from '@/components/containers/show';
 import {
-	ContextMenu,
-	ContextMenuContent,
-	ContextMenuItem,
-	ContextMenuLink,
-	ContextMenuTrigger,
-} from '@/components/ui/context-menu';
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import AuthService from '@/services/auth.service';
 import { Admin } from '@/types/admin';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
@@ -41,27 +41,28 @@ export function AdminContextMenu({
 	}
 
 	return (
-		<ContextMenu>
-			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-			<ContextMenuContent className='w-64'>
-				<ContextMenuLink href={`?upgrade-plan=${admin.id}`} inset>
-					Upgrade Plan
-				</ContextMenuLink>
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+			<DropdownMenuContent className='w-64'>
+				<DropdownMenuItem inset asChild>
+					<Link href={`?upgrade-plan=${admin.id}`}>Upgrade Plan</Link>
+				</DropdownMenuItem>
 				<Show.ShowIf condition={admin.isSubscribed}>
-					<ContextMenuLink href={`?extend-expiry=${admin.id}&admin=${JSON.stringify(admin)}`} inset>
-						Extend Expiry
-					</ContextMenuLink>
+					<DropdownMenuItem inset asChild>
+						<Link href={`?extend-expiry=${admin.id}&admin=${JSON.stringify(admin)}`}>
+							Extend Expiry
+						</Link>
+					</DropdownMenuItem>
 				</Show.ShowIf>
-				<ContextMenuLink
-					href={`?markup-price=${admin.id}&price=${JSON.stringify(admin.markup)}`}
-					inset
-				>
-					Set markup price
-				</ContextMenuLink>
-				<ContextMenuItem onClick={openServiceAccount} inset>
+				<DropdownMenuItem inset asChild>
+					<Link href={`?markup-price=${admin.id}&price=${JSON.stringify(admin.markup)}`}>
+						Set markup price
+					</Link>
+				</DropdownMenuItem>
+				<DropdownMenuItem onClick={openServiceAccount} inset>
 					Login as {admin.name}
-				</ContextMenuItem>
-			</ContextMenuContent>
-		</ContextMenu>
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
 	);
 }
