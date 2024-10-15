@@ -493,22 +493,42 @@ export function CarouselTemplateDialog({
 																			<span className='ml-[0.2rem] text-red-800'>*</span>
 																		</FormLabel>
 																		<FormControl>
-																			<Input
-																				type='file'
-																				ref={fileInputRef}
-																				accept={
-																					field.value.format === 'IMAGE'
-																						? 'image/*'
-																						: field.value.format === 'VIDEO'
-																						? 'video/*'
-																						: field.value.format === 'DOCUMENT'
-																						? 'application/pdf'
-																						: ''
-																				}
-																				onChange={(e) =>
-																					handleFileInput(index, e.target.files?.[0] ?? null)
-																				}
-																			/>
+																			{file[index]?.file ? (
+																				<div>
+																					<Label>
+																						File Selected
+																						<span
+																							onClick={() =>
+																								setFile((prev) => {
+																									const newFiles = [...prev];
+																									newFiles[index] = { index, file: null };
+																									return newFiles;
+																								})
+																							}
+																							className='ml-1 underline cursor-pointer'
+																						>
+																							Reset?
+																						</span>
+																					</Label>
+																				</div>
+																			) : (
+																				<Input
+																					type='file'
+																					ref={fileInputRef}
+																					accept={
+																						field.value.format === 'IMAGE'
+																							? 'image/*'
+																							: field.value.format === 'VIDEO'
+																							? 'video/*'
+																							: field.value.format === 'DOCUMENT'
+																							? 'application/pdf'
+																							: ''
+																					}
+																					onChange={(e) =>
+																						handleFileInput(index, e.target.files?.[0] ?? null)
+																					}
+																				/>
+																			)}
 																		</FormControl>
 																	</FormItem>
 																</>
