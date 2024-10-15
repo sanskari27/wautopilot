@@ -507,7 +507,7 @@ export function CarouselTemplateDialog({
 																							}
 																							className='ml-1 underline cursor-pointer'
 																						>
-																							Reset?
+																							change file?
 																						</span>
 																					</Label>
 																				</div>
