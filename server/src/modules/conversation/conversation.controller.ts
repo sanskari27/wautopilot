@@ -491,6 +491,7 @@ async function exportConversationsFromPhonebook(req: Request, res: Response, nex
 					: '',
 				failed_reason: message.failed_reason,
 				sent_by: message.sender?.name ?? '',
+				tags: (message.labels ?? []).join(','),
 			};
 		});
 

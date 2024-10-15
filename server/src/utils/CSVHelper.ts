@@ -191,6 +191,7 @@ export default class CSVHelper {
 			failed_at: string | Date;
 			failed_reason: string | undefined;
 			sent_by: string;
+			tags: string;
 		}[]
 	): string {
 		const keys = [
@@ -253,6 +254,10 @@ export default class CSVHelper {
 			{
 				value: 'sent_by',
 				label: 'Sent By',
+			},
+			{
+				value: 'tags',
+				label: 'Tags',
 			},
 		];
 
