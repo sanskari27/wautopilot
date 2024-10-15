@@ -70,7 +70,6 @@ export default class ChatbotFlowService {
 	}
 	static async updateChatbotFlow({ bot_id, details }: { bot_id: string; details: TChatbotFlow }) {
 		await api.patch(`/chatbot/flows/${bot_id}`, details);
-    revalidatePath('panel/campaigns/chatbot-flow', 'page');
 	}
 	static async updateNodesAndEdges(botId: string, details: { nodes: any[]; edges: any[] }) {
 		await api.patch(`/chatbot/flows/${botId}`, details);
