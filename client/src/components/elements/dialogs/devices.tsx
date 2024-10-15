@@ -368,7 +368,6 @@ const EmbeddedSignupButton = (props: EmbeddedSignupProps) => {
 					waid: waba_id,
 				}));
 			} catch (err) {
-				return toast.error('Error signing up with facebook. Please try again.');
 				//ignore
 			}
 		};
