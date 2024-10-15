@@ -297,12 +297,7 @@ export function DataTable({
 
 	const handleSelectAll = async () => {
 		const ids = await PhoneBookService.getAllIds();
-		setRowSelection(
-			ids.reduce((acc, id) => {
-				acc[id] = true;
-				return acc;
-			}, {} as { [key: string]: boolean })
-		);
+		setRowSelection(ids);
 	};
 
 	const handleDeselectAll = () => {

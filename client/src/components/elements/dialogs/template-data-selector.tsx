@@ -777,6 +777,51 @@ export default function TemplateDialog({
 									/>
 								</div>
 							</Show.ShowIf>
+							<Show.ShowIf condition={template_buttons.length > 0}>
+								<div className='border-2 border-dashed p-2 mt-2 rounded-lg'>
+									<div className='w-full text-md !text-center'>Buttons Variables</div>
+									<Each
+										items={template_buttons}
+										render={(item, buttonIndex) => (
+											<div>
+												<div className='text-center'>Button number {buttonIndex + 1}</div>
+												<Show.ShowIf condition={item[buttonIndex].length == 0}>
+													<div className='text-center text-destructive'>
+														Not required for reply back buttons
+													</div>
+												</Show.ShowIf>
+												<Each
+													items={item}
+													render={(_, buttonVariableIndex) => (
+														<div className='flex flex-col'>
+															<Label>
+																Variable value {buttonIndex + 1}
+																<span className='ml-[0.2rem] text-red-800'>*</span>
+															</Label>
+															<div className='flex gap-3 flex-col md:flex-row'>
+																<div className='flex-1'>
+																	<Input
+																		placeholder='Value'
+																		value={item[buttonIndex][buttonVariableIndex]}
+																		onChange={(e) =>
+																			setTemplateButton((prev) => {
+																				const newButton = [...prev];
+																				newButton[buttonIndex][buttonVariableIndex] =
+																					e.target.value;
+																				return newButton;
+																			})
+																		}
+																	/>
+																</div>
+															</div>
+														</div>
+													)}
+												/>
+											</div>
+										)}
+									/>
+								</div>
+							</Show.ShowIf>
 						</div>
 						<div className='w-full lg:w-[30%] flex flex-col justify-start items-start gap-3'>
 							<Show.ShowIf condition={!!template}>
@@ -785,7 +830,7 @@ export default function TemplateDialog({
 										if (variable.variable_from === 'custom_text') {
 											return variable.custom_text;
 										} else {
-											return (variable.fallback_value ?? '');
+											return variable.fallback_value ?? '';
 										}
 									})}
 									bodyVariables={template_body.map((variable) => {
@@ -800,7 +845,7 @@ export default function TemplateDialog({
 											if (body.variable_from === 'custom_text') {
 												return body.custom_text;
 											} else {
-												return (body.fallback_value ?? '');
+												return body.fallback_value ?? '';
 											}
 										});
 									})}

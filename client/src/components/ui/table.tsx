@@ -88,7 +88,7 @@ const TableCellLink = React.forwardRef<
 	}
 >(({ className, href, children, ...props }, ref) => (
 	<td ref={ref} className={cn('align-middle [&:has([role=checkbox])]:pr-0', className)} {...props}>
-		<Link href={href}>
+		<Link prefetch={false} href={href}>
 			<div className='p-2'>{children}</div>
 		</Link>
 	</td>

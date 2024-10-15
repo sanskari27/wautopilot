@@ -84,7 +84,7 @@ export default class PhoneBookService {
 	static async getAllIds() {
 		try {
 			const { data } = await api.get(`/phonebook/all-ids`);
-			return data.ids as string[];
+			return data.selected as { [key: string]: boolean };
 		} catch (err) {
 			return [];
 		}

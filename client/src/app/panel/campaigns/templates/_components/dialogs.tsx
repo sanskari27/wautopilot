@@ -355,9 +355,18 @@ export function CarouselTemplateDialog({
 			hasError = true;
 			return toast.error('Maximum 10 cards are allowed');
 		}
+		if (file.length !== data.cards.length) {
+			hasError = true;
+			return toast.error('Please upload media file in all cards');
+		}
+
 		const buttonLength = new Set();
 		const buttonType = new Set();
-		data.cards.some((card, index) => {
+		data.cards.forEach((card, index) => {
+			if (!card.header.example) {
+				hasError = true;
+				return toast.error(`Please upload media file in card ${index + 1}`);
+			}
 			if (card.body.text.length === 0) {
 				hasError = true;
 
@@ -367,14 +376,14 @@ export function CarouselTemplateDialog({
 				hasError = true;
 				return toast.error(`Card ${index + 1} body should not contain new line`);
 			}
-			card.body.example.some((variable, index) => {
+			card.body.example.forEach((variable, index) => {
 				if (variable.length === 0) {
 					hasError = true;
 					return toast.error(`Card ${index + 1} has no variables`);
 				}
 			});
 			buttonLength.add(card.buttons.length);
-			card.buttons.some((button) => {
+			card.buttons.forEach((button) => {
 				buttonType.add(button.type);
 			});
 		});
@@ -382,12 +391,7 @@ export function CarouselTemplateDialog({
 			hasError = true;
 			return toast.error('All cards should have same number of buttons');
 		}
-		for (const ele of file) {
-			if (ele.file === null) {
-				hasError = true;
-				return toast.error('Please select media for all cards');
-			}
-		}
+
 		if (!hasError) {
 			handleFileUpload(data);
 		}
