@@ -319,7 +319,7 @@ export default function TemplateDialog({
 			});
 		}
 	};
-
+	console.log(template_buttons);
 	return (
 		<Dialog>
 			<DialogTrigger ref={buttonRef} asChild>
@@ -782,16 +782,16 @@ export default function TemplateDialog({
 									<div className='w-full text-md !text-center'>Buttons Variables</div>
 									<Each
 										items={template_buttons}
-										render={(item, buttonIndex) => (
+										render={(template_button, buttonIndex) => (
 											<div>
 												<div className='text-center'>Button number {buttonIndex + 1}</div>
-												<Show.ShowIf condition={item[buttonIndex].length == 0}>
+												<Show.ShowIf condition={template_buttons[buttonIndex].length === 0}>
 													<div className='text-center text-destructive'>
 														Not required for reply back buttons
 													</div>
 												</Show.ShowIf>
 												<Each
-													items={item}
+													items={template_button}
 													render={(_, buttonVariableIndex) => (
 														<div className='flex flex-col'>
 															<Label>
@@ -802,7 +802,7 @@ export default function TemplateDialog({
 																<div className='flex-1'>
 																	<Input
 																		placeholder='Value'
-																		value={item[buttonIndex][buttonVariableIndex]}
+																		value={template_button[buttonVariableIndex]}
 																		onChange={(e) =>
 																			setTemplateButton((prev) => {
 																				const newButton = [...prev];
