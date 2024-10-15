@@ -1,6 +1,7 @@
 import Each from '@/components/containers/each';
 import { Button } from '@/components/ui/button';
 
+import { Badge } from '@/components/ui/badge';
 import {
 	Table,
 	TableBody,
@@ -12,6 +13,7 @@ import {
 import RecurringService from '@/services/recurring.service';
 import { CreateButton } from './_components/buttons';
 import RecurringActionContextMenu from './_components/context-menu';
+import { cn } from '@/lib/utils';
 
 export default async function Recurring({
 	params: { panel },
@@ -51,7 +53,13 @@ export default async function Recurring({
 									<TableCell>{recurring.description}</TableCell>
 									<TableCell>{recurring.wish_from}</TableCell>
 									<TableCell className='text-right'>{recurring.delay} Days</TableCell>
-									<TableCell>{recurring.active}</TableCell>
+									<TableCell>
+										<Badge
+											className={cn('rounded', recurring.active ? 'bg-green-500' : 'bg-red-500')}
+										>
+											{recurring.active ? 'Active' : 'Inactive'}
+										</Badge>
+									</TableCell>
 									<TableCell className='text-center'>
 										<RecurringActionContextMenu
 											recurring={recurring}

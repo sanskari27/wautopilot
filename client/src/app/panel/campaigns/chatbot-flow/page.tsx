@@ -1,4 +1,5 @@
 import Each from '@/components/containers/each';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
 	Table,
@@ -8,6 +9,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 import ChatbotFlowService from '@/services/chatbot-flow.service';
 import { notFound } from 'next/navigation';
 import { CreateButton } from './_components/buttons';
@@ -49,7 +51,11 @@ export default async function ChatbotFlow({ params }: { params: { panel: string 
 									<TableCell className='capitalize'>
 										{item.options.toLowerCase().replaceAll('_', ' ')}
 									</TableCell>
-									<TableCell>{item.isActive ? 'Active' : 'Inactive'}</TableCell>
+									<TableCell>
+										<Badge className={cn('rounded', item.isActive ? 'bg-green-500' : 'bg-red-500')}>
+											{item.isActive ? 'Active' : 'Inactive'}
+										</Badge>
+									</TableCell>
 									<TableCell className='text-center'>
 										<MainContextMenu details={item}>
 											<Button variant={'outline'} size={'sm'}>
