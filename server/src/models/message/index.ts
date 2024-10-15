@@ -1,0 +1,9 @@
+export { default as ContactMessage } from './contact';
+export { default as FlowMessage } from './flow';
+export { default as InteractiveMediaMessage } from './interactiveMedia';
+export { default as LocationMessage } from './location';
+export { default as LocationRequestMessage } from './locationRequest';
+export { default as MediaMessage } from './media';
+export { default as Message } from './message';
+export { default as TemplateMessage } from './template';
+export { default as TextMessage } from './text';

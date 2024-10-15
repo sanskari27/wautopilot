@@ -1,3 +1,4 @@
+import { QuickTemplateMessageProps } from '@/app/panel/conversations/_components/message-input';
 import api from '@/lib/api';
 import { RecurringWithId } from '@/schema/broadcastSchema';
 
@@ -10,19 +11,42 @@ const validateRecurringResult = (recurring: any): RecurringWithId => {
 		labels: recurring.labels ?? [],
 		template_id: recurring.template_id ?? '',
 		template_name: recurring.template_name ?? '',
-		template_body: (recurring.template_body ?? []).map((body: any) => {
-			return {
-				custom_text: body.custom_text ?? '',
-				phonebook_data: body.phonebook_data ?? '',
-				variable_from: body.variable_from ?? 'custom_text',
-				fallback_value: body.fallback_value ?? '',
-			};
-		}),
-		template_header: recurring.template_header,
 		delay: recurring.delay ?? 0,
 		startTime: recurring.startTime ?? '10:00',
 		endTime: recurring.endTime ?? '18:00',
 		active: recurring.status ?? 'ACTIVE',
+		header: {
+			type: recurring.template_header?.type ?? 'NONE',
+			text: (recurring.template_header?.text ?? []).map((text: any) => ({
+				custom_text: text.custom_text ?? '',
+				variable_from: text.variable_from ?? 'custom_text',
+				phonebook_data: text.phonebook_data ?? '',
+				fallback_value: text.fallback_value ?? '',
+			})),
+			media_id: recurring.header?.media_id ?? '',
+		},
+		body:
+			(recurring.template_body ?? []).map((text: any) => ({
+				custom_text: text.custom_text ?? '',
+				variable_from: text.variable_from ?? 'custom_text',
+				phonebook_data: text.phonebook_data ?? '',
+				fallback_value: text.fallback_value ?? '',
+			})) ?? [],
+		carousel: {
+			cards: (recurring.template_carousel?.cards ?? []).map((card: any) => ({
+				header: {
+					media_id: card.header.media_id ?? '',
+				},
+				body: (card.body ?? []).map((text: any) => ({
+					custom_text: text.custom_text ?? '',
+					variable_from: text.variable_from ?? 'custom_text',
+					phonebook_data: text.phonebook_data ?? '',
+					fallback_value: text.fallback_value ?? '',
+				})),
+				buttons: card.buttons ?? [],
+			})),
+		},
+		buttons: recurring.template_buttons ?? [],
 	};
 };
 
@@ -36,66 +60,48 @@ export default class RecurringService {
 		}
 	}
 
-	static async createRecurring(details: {
-		id?: string;
-		name: string;
-		description: string;
-		wish_from: 'birthday' | 'anniversary';
-		labels: string[];
-		template_id: string;
-		template_name: string;
-		template_body: {
-			custom_text: string;
-			phonebook_data: string;
-			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
-		}[];
-		template_header?: {
-			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | '';
-			link?: string;
-			media_id?: string;
-		};
-		delay: number;
-		startTime: string;
-		endTime: string;
-	}) {
-		if (details.id === '') {
-			delete details.id;
+	static async createRecurring(details: QuickTemplateMessageProps) {
+		if (details.header?.type === 'NONE') {
+			delete details.header;
 		}
-		if (details.template_header?.type === '') {
-			delete details.template_header;
+		if (details.buttons?.length === 0) {
+			delete details.buttons;
 		}
-		const { data } = await api.post(`/broadcast/recurring`, details);
+		if (details.carousel?.cards.length === 0) {
+			delete details.carousel;
+		}
+		const { data } = await api.post(`/broadcast/recurring`, {
+			...details,
+			template_header: details.header,
+			template_body: details.body,
+			template_buttons: details.buttons,
+			template_carousel: details.carousel,
+		});
 		return validateRecurringResult(data.details);
 	}
 
-	static async editRecurring(details: {
-		id: string;
-		name: string;
-		description: string;
-		wish_from: 'birthday' | 'anniversary';
-		labels: string[];
-		template_id: string;
-		template_name: string;
-		template_body: {
-			custom_text: string;
-			phonebook_data: string;
-			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
-		}[];
-		template_header?: {
-			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | '';
-			link?: string;
-			media_id?: string;
-		};
-		delay: number;
-		startTime: string;
-		endTime: string;
-	}) {
-		if (details.template_header?.type === '') {
-			delete details.template_header;
+	static async editRecurring(
+		details: {
+			id: string;
+			name: string;
+			description: string;
+			wish_from: 'birthday' | 'anniversary';
+			labels: string[];
+			delay: number;
+			startTime: string;
+			endTime: string;
+		} & QuickTemplateMessageProps
+	) {
+		if (details.header?.type === 'NONE') {
+			delete details.header;
 		}
-		const { data } = await api.put(`/broadcast/recurring/${details.id}`, details);
+		const { data } = await api.put(`/broadcast/recurring/${details.id}`, {
+			...details,
+			template_header: details.header,
+			template_body: details.body,
+			template_buttons: details.buttons,
+			template_carousel: details.carousel,
+		});
 		return validateRecurringResult(data);
 	}
 

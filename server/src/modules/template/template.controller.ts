@@ -1,24 +1,21 @@
 import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
-import TemplateService from '../../services/templates';
-import { Template } from '../../types/template';
+import Template from '../../models/templates/template';
+import TemplateFactory from '../../models/templates/templateFactory';
 import { Respond } from '../../utils/ExpressUtils';
 import { TemplateRemoveValidationResult } from './template.validator';
 
 async function addTemplate(req: Request, res: Response, next: NextFunction) {
 	const {
-		serviceAccount: account,
 		device: { device },
 		agentLogService,
 		data,
 	} = req.locals;
 
 	try {
-		const templateService = new TemplateService(account, device);
-		const error = await templateService.addTemplate(data as Template);
-
-		console.log(error	)
+		const template = new Template(data);
+		const error = await TemplateFactory.saveTemplate(device, template);
 
 		if (error) {
 			return Respond({
@@ -45,16 +42,15 @@ async function addTemplate(req: Request, res: Response, next: NextFunction) {
 
 async function editTemplate(req: Request, res: Response, next: NextFunction) {
 	const {
-		serviceAccount: account,
 		device: { device },
+		data,
 		agentLogService,
 	} = req.locals;
 
 	try {
-		const { id, ...data } = req.locals.data as Template & { id: string };
+		const template = new Template(data);
+		const error = await TemplateFactory.saveTemplate(device, template);
 
-		const templateService = new TemplateService(account, device);
-		const error = await templateService.editTemplate(id, data);
 		if (error) {
 			return Respond({
 				res,
@@ -66,10 +62,7 @@ async function editTemplate(req: Request, res: Response, next: NextFunction) {
 		}
 
 		agentLogService?.addLog({
-			text: `Update template with name ${data.name}`,
-			data: {
-				id,
-			},
+			text: `Edit template with name ${data.name}`,
 		});
 
 		return Respond({
@@ -84,14 +77,12 @@ async function editTemplate(req: Request, res: Response, next: NextFunction) {
 async function deleteTemplate(req: Request, res: Response, next: NextFunction) {
 	const { id, name } = req.locals.data as TemplateRemoveValidationResult;
 	const {
-		serviceAccount: account,
 		device: { device },
 		agentLogService,
 	} = req.locals;
 
 	try {
-		const templateService = new TemplateService(account, device);
-		const success = await templateService.deleteTemplate(id, name);
+		const success = await TemplateFactory.deleteTemplate(device, id, name);
 
 		if (!success) {
 			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
@@ -114,12 +105,10 @@ async function deleteTemplate(req: Request, res: Response, next: NextFunction) {
 }
 async function fetchTemplates(req: Request, res: Response, next: NextFunction) {
 	const {
-		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 	try {
-		const templateService = new TemplateService(account, device);
-		const templates = await templateService.fetchTemplates();
+		const templates = await TemplateFactory.find(device);
 
 		return Respond({
 			res,
@@ -136,12 +125,10 @@ async function fetchTemplates(req: Request, res: Response, next: NextFunction) {
 async function fetchTemplate(req: Request, res: Response, next: NextFunction) {
 	const id = req.params.id;
 	const {
-		serviceAccount: account,
 		device: { device },
 	} = req.locals;
 	try {
-		const templateService = new TemplateService(account, device);
-		const template = await templateService.fetchTemplate(id);
+		const template = await TemplateFactory.findById(device, id);
 
 		if (!template) {
 			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));

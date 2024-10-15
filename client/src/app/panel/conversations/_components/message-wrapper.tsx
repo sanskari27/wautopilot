@@ -108,36 +108,38 @@ const ChatMessageWrapper = ({ message, children }: { message: Message; children:
 							</div>
 						) : null}
 						{children}
-						{message.buttons.length > 0 && (
-							<>
-								<Separator className='my-4 bg-gray-300' />
-								<div className='flex flex-col w-full gap-y-1'>
-									<Each
-										items={message.buttons}
-										render={(button, index) => (
-											<Button
-												variant={'outline'}
-												className='w-full cursor-pointer text-center py-2 whitespace-pre-wrap h-max bg-transparent border-green-600'
-											>
-												<Show>
-													<Show.When condition={button.button_type === 'URL'}>
-														<Link className='w-4 h-4 mr-2' />
-													</Show.When>
-													<Show.When condition={button.button_type === 'QUICK_REPLY'}>
-														<MessageCircleReply className='w-4 h-4 mr-2' />
-													</Show.When>
-													<Show.When condition={button.button_type === 'PHONE_NUMBER'}>
-														<PhoneCall className='w-4 h-4 mr-2' />
-													</Show.When>
-												</Show>
+						<Show.ShowIf condition={!!message.buttons}>
+							{message.buttons?.length > 0 && (
+								<>
+									<Separator className='my-4 bg-gray-300' />
+									<div className='flex flex-col w-full gap-y-1'>
+										<Each
+											items={message.buttons ?? []}
+											render={(button, index) => (
+												<Button
+													variant={'outline'}
+													className='w-full cursor-pointer text-center py-2 whitespace-pre-wrap h-max bg-transparent border-green-600'
+												>
+													<Show>
+														<Show.When condition={button.button_type === 'URL'}>
+															<Link className='w-4 h-4 mr-2' />
+														</Show.When>
+														<Show.When condition={button.button_type === 'QUICK_REPLY'}>
+															<MessageCircleReply className='w-4 h-4 mr-2' />
+														</Show.When>
+														<Show.When condition={button.button_type === 'PHONE_NUMBER'}>
+															<PhoneCall className='w-4 h-4 mr-2' />
+														</Show.When>
+													</Show>
 
-												{button.button_content}
-											</Button>
-										)}
-									/>
-								</div>
-							</>
-						)}
+													{button.button_content}
+												</Button>
+											)}
+										/>
+									</div>
+								</>
+							)}
+						</Show.ShowIf>
 					</div>
 					{sender.id && (
 						<Avatar className='w-6 h-6 inline-flex justify-center items-center'>

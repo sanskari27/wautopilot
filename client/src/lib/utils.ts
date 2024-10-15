@@ -95,6 +95,10 @@ export const mobileCheck = function () {
 export function countOccurrences(inputString: string) {
 	const regex = /\{\{\d+\}\}/g;
 
+	if (!inputString) {
+		return 0;
+	}
+
 	const matches = inputString.match(regex);
 
 	return matches ? matches.length : 0;
@@ -156,4 +160,11 @@ export function parseToMaxTime(value: number) {
 	} else {
 		return `${value / 3600} hours`;
 	}
+}
+
+export function replaceTextWithVariables(text: string, variables: string[]) {
+	return text.replace(/\{\{\d+\}\}/g, (match) => {
+		const index = parseInt(match.match(/\d+/)![0]);
+		return variables[index - 1] ?? '';
+	});
 }

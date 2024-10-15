@@ -1,3 +1,4 @@
+import axios from 'axios';
 import FormData from 'form-data';
 import fs from 'fs';
 import { Types } from 'mongoose';
@@ -6,11 +7,12 @@ import ChatBotDB from '../../mongo/repo/Chatbot';
 import IAccount from '../../mongo/types/account';
 import IMedia from '../../mongo/types/media';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
-import { IS_PRODUCTION } from '../config/const';
+import { IS_PRODUCTION, Path } from '../config/const';
 import MetaAPI from '../config/MetaAPI';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
 import DateUtils from '../utils/DateUtils';
+import { generateText } from '../utils/ExpressUtils';
 import FileUtils from '../utils/FileUtils';
 import WhatsappLinkService from './whatsappLink';
 
@@ -96,6 +98,40 @@ export default class MediaService extends WhatsappLinkService {
 			linked_to: this.userId,
 		});
 		return medias.reduce((acc, media) => acc + media.file_length, 0);
+	}
+
+	async linkToMediaId(media_link: string) {
+		const media = await axios.get(media_link, {
+			responseType: 'arraybuffer',
+		});
+
+		const uploadedFilePath = FileUtils.createFile({
+			base_path: __basedir + Path.Misc,
+			file_name: `media_${generateText(5)}`,
+			data: Buffer.from(media.data).toString('base64'),
+			mime_type: media.headers['content-type'],
+		});
+
+		try {
+			const form = new FormData();
+			form.append('messaging_product', 'whatsapp');
+			form.append('file', fs.createReadStream(uploadedFilePath));
+
+			const { data } = await MetaAPI(this.device.accessToken).post(
+				`/${this.device.phoneNumberId}/media`,
+				form,
+				{
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				}
+			);
+			FileUtils.deleteFile(uploadedFilePath);
+			return data.id;
+		} catch (e) {
+			FileUtils.deleteFile(uploadedFilePath);
+			return null;
+		}
 	}
 
 	static async syncMedia() {

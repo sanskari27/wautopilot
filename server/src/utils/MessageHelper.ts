@@ -1,8 +1,9 @@
 import IContact from '../../mongo/types/contact';
 import IPhoneBook from '../../mongo/types/phonebook';
+import { IPhonebookRecord } from '../services/phonebook';
 import { generateText } from './ExpressUtils';
 
-export function extractTemplateHeader(
+function extractTemplateHeader(
 	components: Record<string, any>[],
 	componentsMsg: Record<string, any>[]
 ) {
@@ -10,8 +11,8 @@ export function extractTemplateHeader(
 		return null;
 	}
 
-	const header = components.find((component) => component.type === 'HEADER');
-	const headerMsg = componentsMsg.find((component) => component.type === 'HEADER');
+	const header = components.find((component) => component.type?.toUpperCase() === 'HEADER');
+	const headerMsg = componentsMsg.find((component) => component.type?.toUpperCase() === 'HEADER');
 	if (!header) {
 		return null;
 	}
@@ -45,14 +46,14 @@ export function extractTemplateHeader(
 	return null;
 }
 
-export function extractTemplateBody(
+function extractTemplateBody(
 	components: Record<string, any>[],
 	componentsMsg: Record<string, any>[]
 ) {
-	const body = components.find((component) => component.type === 'BODY');
-	const bodyMsg = componentsMsg.find((component) => component.type === 'BODY');
-	if (!body || !bodyMsg) {
-		return null;
+	const body = components.find((component) => component.type?.toUpperCase() === 'BODY');
+	const bodyMsg = componentsMsg.find((component) => component.type?.toUpperCase() === 'BODY');
+	if (!bodyMsg) {
+		return body?.text ?? '';
 	}
 	const parameters = bodyMsg.parameters as {
 		type: string;
@@ -61,19 +62,19 @@ export function extractTemplateBody(
 
 	return parameters.reduce((acc, parameter, index) => {
 		return acc.replace(`{{${index + 1}}}`, parameter.text);
-	}, (body.text as string) ?? '');
+	}, body?.text ?? '');
 }
 
-export function extractTemplateFooter(components: Record<string, any>[]) {
-	const footer = components.find((component) => component.type === 'FOOTER');
+function extractTemplateFooter(components: Record<string, any>[]) {
+	const footer = components.find((component) => component.type.toUpperCase() === 'FOOTER');
 	if (!footer) {
 		return null;
 	}
 	return footer.text;
 }
 
-export function extractTemplateButtons(components: Record<string, any>[]) {
-	const buttons = components.find((component) => component.type === 'BUTTONS');
+function extractTemplateButtons(components: Record<string, any>[]) {
+	const buttons = components.find((component) => component.type?.toUpperCase() === 'BUTTONS');
 	if (!buttons || buttons.buttons.length === 0) {
 		return null;
 	}
@@ -84,13 +85,13 @@ export function extractTemplateButtons(components: Record<string, any>[]) {
 	}));
 }
 
-export function extractInteractiveHeader(components: Record<string, any>) {
+function extractInteractiveHeader(components: Record<string, any>) {
 	const header = components.header;
 	if (!header) {
 		return null;
 	}
 	const type = header.type.toUpperCase();
-	if (type === 'TEXT') {
+	if (type?.toUpperCase() === 'TEXT') {
 		return {
 			header_type: type,
 			header_content_source: 'TEXT',
@@ -104,7 +105,7 @@ export function extractInteractiveHeader(components: Record<string, any>) {
 	};
 }
 
-export function extractInteractiveBody(components: Record<string, any>) {
+function extractInteractiveBody(components: Record<string, any>) {
 	const body = components.body;
 	if (!body) {
 		return null;
@@ -113,7 +114,7 @@ export function extractInteractiveBody(components: Record<string, any>) {
 	return body.text;
 }
 
-export function extractInteractiveFooter(components: Record<string, any>) {
+function extractInteractiveFooter(components: Record<string, any>) {
 	const footer = components.footer;
 	if (!footer) {
 		return null;
@@ -122,7 +123,7 @@ export function extractInteractiveFooter(components: Record<string, any>) {
 	return footer.text;
 }
 
-export function extractInteractiveButtons(components: Record<string, any>): {
+function extractInteractiveButtons(components: Record<string, any>): {
 	button_type: 'QUICK_REPLY' | 'URL' | 'PHONE_NUMBER' | 'CTA';
 	button_content: string;
 	button_data: string;
@@ -131,7 +132,7 @@ export function extractInteractiveButtons(components: Record<string, any>): {
 		return [];
 	}
 
-	if (components.type === 'flow') {
+	if (components.type?.toUpperCase() === 'FLOW') {
 		return [
 			{
 				button_type: 'CTA',
@@ -139,6 +140,20 @@ export function extractInteractiveButtons(components: Record<string, any>): {
 				button_data: components.action.parameters.flow_id as string,
 			},
 		];
+	}
+	if ('sections' in components.action) {
+		const buttons = [];
+		components.action.sections.forEach(
+			(section: { title: string; rows: { id: string; title: string }[] }) => {
+				section.rows.forEach((row) => {
+					buttons.push({
+						button_type: 'QUICK_REPLY',
+						button_content: `${section.title} - ${row.title}`,
+						button_data: row.id,
+					});
+				});
+			}
+		);
 	}
 	if (!components.action.buttons) {
 		return [];
@@ -185,15 +200,23 @@ export function generateBodyText(text: string) {
 export function generateSections(
 	sections: {
 		title: string;
-		buttons: { id: string; text: string }[];
+		buttons: ({ id: string; text: string } | string)[];
 	}[]
 ) {
 	return sections.map((section) => ({
 		title: section.title,
-		rows: section.buttons.map((button: { id: string; text: string }) => ({
-			id: button.id ?? generateText(2),
-			title: button.text,
-		})),
+		rows: section.buttons.map((button) => {
+			if (typeof button === 'string') {
+				return {
+					id: generateText(2),
+					title: button,
+				};
+			}
+			return {
+				id: button.id ?? generateText(2),
+				title: button.text,
+			};
+		}),
 	}));
 }
 
@@ -204,7 +227,7 @@ export function generateButtons(
 	}[]
 ) {
 	return buttons.map((button) => ({
-		type: 'reply',
+		type: 'reply' as 'reply',
 		reply: {
 			id: button.id,
 			title: button.text,
@@ -233,6 +256,51 @@ export function objectToMessageBody(object: { [key: string]: string }, separator
 export function parseVariables(text: string, variables: { [key: string]: string }) {
 	return text.replace(/{{(.*?)}}/g, (match, variable) => {
 		return variables[variable] ?? `{{${variable}}}`;
+	});
+}
+
+export function parseToBodyVariables({
+	variables,
+	fields,
+}: {
+	variables: {
+		custom_text: string;
+		phonebook_data: string;
+		variable_from: 'custom_text' | 'phonebook_data';
+		fallback_value: string;
+	}[];
+	fields: IPhonebookRecord;
+}) {
+	const bodyParametersList = [
+		'first_name',
+		'last_name',
+		'middle_name',
+		'phone_number',
+		'email',
+		'birthday',
+		'anniversary',
+	];
+
+	return variables.map((b) => {
+		if (b.variable_from === 'custom_text') {
+			return b.custom_text;
+		} else {
+			if (!fields) {
+				return b.fallback_value;
+			}
+
+			const fieldVal = (
+				bodyParametersList.includes(b.phonebook_data)
+					? fields[b.phonebook_data as keyof typeof fields]
+					: fields.others[b.phonebook_data]
+			) as string;
+
+			if (typeof fieldVal === 'string') {
+				return fieldVal || b.fallback_value;
+			}
+			// const field = fields[]
+			return b.fallback_value;
+		}
 	});
 }
 
@@ -398,3 +466,104 @@ export function generateTemplateMessageObject(
 		},
 	};
 }
+
+export function extractFormattedMessage(
+	messageObject: any,
+	opts?: {
+		template?: any;
+		type?:
+			| 'template'
+			| 'interactive'
+			| 'text'
+			| 'contacts'
+			| 'location'
+			| 'image'
+			| 'video'
+			| 'document'
+			| 'audio';
+	}
+): {
+	header: {
+		header_type: string;
+		header_content_source: string;
+		header_content: string;
+	} | null;
+	body: {
+		body_type: 'TEXT' | 'MEDIA' | 'CONTACT' | 'LOCATION';
+		text?: string;
+		media_id?: string;
+		contacts?: IContact[];
+		location?: {
+			latitude: string;
+			longitude: string;
+			name: string;
+			address: string;
+		};
+	} | null;
+	footer: string | null;
+	buttons:
+		| {
+				button_type: 'URL' | 'PHONE_NUMBER' | 'QUICK_REPLY' | 'VOICE_CALL' | 'CTA';
+				button_content: string;
+				button_data: string;
+		  }[]
+		| null;
+} {
+	if (messageObject.type === 'template' || opts?.type === 'template') {
+		return {
+			header: extractTemplateHeader(opts?.template.components, messageObject.components),
+			body: {
+				body_type: 'TEXT',
+				text: extractTemplateBody(opts?.template.components, messageObject.components) ?? '',
+			},
+			footer: extractTemplateFooter(opts?.template.components),
+			buttons: extractTemplateButtons(opts?.template.components),
+		};
+	} else if (messageObject.type === 'interactive') {
+		return {
+			header: extractInteractiveHeader(messageObject.interactive),
+			body: {
+				body_type: 'TEXT',
+				text: extractInteractiveBody(messageObject.interactive),
+			},
+			footer: extractInteractiveFooter(messageObject.interactive),
+			buttons: extractInteractiveButtons(messageObject.interactive),
+		};
+	} else {
+		const body = {
+			body_type:
+				messageObject.type === 'text'
+					? 'TEXT'
+					: messageObject.type === 'contacts'
+					? 'CONTACT'
+					: messageObject.type === 'location'
+					? 'LOCATION'
+					: 'MEDIA',
+			media_id: ['image', 'video', 'document', 'audio', 'MEDIA'].includes(messageObject.type)
+				? messageObject[messageObject.type]?.id
+				: undefined,
+			text: messageObject.text?.body,
+			contacts: messageObject.contacts,
+			location: messageObject.location,
+		} as {
+			body_type: 'TEXT' | 'MEDIA' | 'CONTACT' | 'LOCATION';
+			text: string;
+			media_id: string;
+			contacts: IContact[];
+			location: {
+				latitude: string;
+				longitude: string;
+				name: string;
+				address: string;
+			};
+		};
+		return {
+			header: null,
+			body,
+			footer: null,
+			buttons: null,
+		};
+	}
+}
+
+export type FormattedMessage = ReturnType<typeof extractFormattedMessage>;

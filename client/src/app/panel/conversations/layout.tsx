@@ -18,13 +18,12 @@ import { Suspense } from 'react';
 export const metadata: Metadata = {
 	title: 'Conversations • Wautopilot',
 };
-
 export default async function Layout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const [conversations, quickReplies, media, contacts, template, flow] = await Promise.all([
+	const [conversations, quickReplies, media, contacts,template, flow] = await Promise.all([
 		MessagesService.fetchAllConversation(),
 		MessagesService.fetchQuickReplies(),
 		MediaService.getMedias(),

@@ -55,6 +55,11 @@ const schema = new mongoose.Schema<IScheduledMessage>(
 			type: Schema.Types.Mixed,
 			default: {},
 		},
+		formattedMessage: {
+			_id: false,
+			type: Schema.Types.Mixed,
+			default: {},
+		},
 	},
 	{
 		timestamps: { createdAt: true },

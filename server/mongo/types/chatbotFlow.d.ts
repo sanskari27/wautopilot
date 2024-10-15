@@ -71,6 +71,24 @@ export default interface IChatBotFlow extends Document {
 			variable_from: 'custom_text' | 'phonebook_data';
 			fallback_value: string;
 		}[];
+		template_buttons: string[][];
+		template_carousel?: {
+			cards: {
+				header: {
+					media_id: string;
+				};
+				body: {
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value: string;
+				}[];
+				buttons: string[][];
+			}[];
+		};
 	}[];
+	startAt: string;
+	endAt: string;
+	trigger_gap_seconds: number;
 	forward: { number: string; message: string };
 }

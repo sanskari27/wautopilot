@@ -12,12 +12,12 @@ export default function CreateRecurring() {
 
 	function handleSave(data: Recurring) {
 		toast.promise(RecurringService.createRecurring(data), {
-			loading: 'Creating Recurring Broadcast',
+			loading: 'Creating Recurring Campaign',
 			success: () => {
 				router.back();
-				return 'Recurring Broadcast created successfully';
+				return 'Recurring Campaign created successfully';
 			},
-			error: 'Failed to create Recurring Broadcast',
+			error: 'Failed to create Recurring Campaign',
 		});
 	}
 
@@ -28,7 +28,7 @@ export default function CreateRecurring() {
 	return (
 		<div className='flex flex-col gap-4 justify-center p-4'>
 			<div className='justify-between flex'>
-				<h2 className='text-2xl font-bold'>Recurring Broadcast</h2>
+				<h2 className='text-2xl font-bold'>Recurring Campaign</h2>
 			</div>
 			<DataForm onSubmit={handleSave} />
 		</div>

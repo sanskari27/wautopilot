@@ -5,42 +5,31 @@ import MetaAPI from '../../config/MetaAPI';
 import { UserLevel } from '../../config/const';
 import { AUTH_ERRORS, CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
+import {
+	FlowMessage,
+	InteractiveMediaMessage,
+	LocationRequestMessage,
+	TemplateMessage,
+} from '../../models/message';
+import TemplateFactory from '../../models/templates/templateFactory';
 import ConversationService from '../../services/conversation';
-import PhoneBookService from '../../services/phonebook';
-import TemplateService from '../../services/templates';
+import MessageSender from '../../services/messageSender';
+import PhoneBookService, { IPhonebookRecord } from '../../services/phonebook';
 import WhatsappFlowService from '../../services/wa_flow';
 import CSVHelper from '../../utils/CSVHelper';
 import DateUtils from '../../utils/DateUtils';
 import { generateText, Respond, RespondCSV } from '../../utils/ExpressUtils';
 import {
-	extractInteractiveBody,
-	extractInteractiveButtons,
-	extractInteractiveFooter,
-	extractInteractiveHeader,
-	extractTemplateBody,
-	extractTemplateButtons,
-	extractTemplateFooter,
-	extractTemplateHeader,
-	generateBodyText,
+	extractFormattedMessage,
 	generateButtons,
-	generateListBody,
 	generateSections,
+	parseToBodyVariables,
 } from '../../utils/MessageHelper';
 import {
 	NumbersValidationResult,
 	SendMessageValidationResult,
 	SendQuickReplyValidationResult,
 } from './conversation.validator';
-
-const bodyParametersList = [
-	'first_name',
-	'last_name',
-	'middle_name',
-	'phone_number',
-	'email',
-	'birthday',
-	'anniversary',
-];
 
 async function fetchConversations(req: Request, res: Response, next: NextFunction) {
 	const labels = req.query.labels ? (req.query.labels as string).split(',') : [];
@@ -203,236 +192,152 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 
+	let message:
+		| FlowMessage
+		| InteractiveMediaMessage
+		| LocationRequestMessage
+		| TemplateMessage
+		| undefined;
+
+	let formattedMessage: ReturnType<typeof extractFormattedMessage> | undefined;
+
 	if (data.type === 'quickReply') {
 		const quickReply = await QuickReplyDB.findById(data.quickReply);
 		if (!quickReply) {
 			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 		}
-		const msgObj: any = {
-			messaging_product: 'whatsapp',
-			to: recipient,
-			context: data.context,
-		};
 
 		if (quickReply.type === 'flow') {
 			const whatsappFlow = new WhatsappFlowService(serviceAccount, device);
 
-			const details = await whatsappFlow.getWhatsappFlowContents(quickReply.data.flow_id);
+			const fDetails = await whatsappFlow.getWhatsappFlowContents(quickReply.data.flow_id);
 
-			msgObj.type = 'interactive';
-			msgObj.interactive = {
-				type: 'flow',
-				...generateListBody(quickReply.data),
-				action: {
-					name: 'flow',
-					parameters: {
-						flow_message_version: '3',
-						flow_action: 'navigate',
-						flow_token: `wautopilot_${quickReply.data.flow_id}_${generateText(2)}`,
-						flow_id: quickReply.data.flow_id,
-						flow_cta: quickReply.data.button_text,
-						flow_action_payload: {
-							screen: details[0].id,
-						},
-					},
-				},
-			};
+			const msg = new FlowMessage(recipient)
+				.setTextHeader(quickReply.data.header)
+				.setBody(quickReply.data.body)
+				.setFooter(quickReply.data.footer)
+				.setFlowDetails(
+					quickReply.data.flow_id,
+					quickReply.data.button_text,
+					fDetails[0]?.id || ''
+				);
+
+			message = msg;
 		} else if (quickReply.type === 'button') {
-			msgObj.type = 'interactive';
-			msgObj.interactive = {
-				type: 'button',
-				...generateBodyText(quickReply.data.body),
-				action: {
-					buttons: generateButtons(
+			const msg = new InteractiveMediaMessage(recipient, 'none')
+				.setTextHeader(quickReply.data.header)
+				.setBody(quickReply.data.body)
+				.setButtons(
+					generateButtons(
 						quickReply.data.buttons.map((item: any) => ({
 							id: generateText(2),
 							text: item,
 						}))
-					),
-				},
-			};
+					)
+				);
+			message = msg;
 		} else if (quickReply.type === 'list') {
-			msgObj.type = 'interactive';
-			msgObj.interactive = {
-				type: 'list',
-				...generateListBody(quickReply.data),
-				action: {
-					button: 'Select an option',
-					sections: generateSections(
-						quickReply.data.sections.map((item: any) => ({
-							title: item.title,
-							buttons: item.buttons.map((button: any) => ({
-								id: generateText(2),
-								text: button,
-							})),
-						}))
-					),
-				},
-			};
+			const msg = new InteractiveMediaMessage(recipient, 'none');
+			msg.setTextHeader(quickReply.data.header);
+			msg.setBody(quickReply.data.body);
+			msg.setFooter(quickReply.data.footer);
+			msg.setSections(generateSections(quickReply.data.sections));
+			msg.setInteractiveType('list');
+
+			message = msg;
 		} else if (quickReply.type === 'location') {
-			msgObj.type = 'interactive';
-			msgObj.interactive = {
-				type: 'location_request_message',
-				body: {
-					text: quickReply.data.body,
-				},
-				action: {
-					name: 'send_location',
-				},
-			};
+			const msg = new LocationRequestMessage(recipient).setBody(quickReply.data.body);
+
+			message = msg;
 		} else {
 			return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
 		}
-		try {
-			const { data: res } = await MetaAPI(device.accessToken).post(
-				`/${device.phoneNumberId}/messages`,
-				msgObj
-			);
 
-			const header = extractInteractiveHeader(msgObj.interactive);
-			const body = extractInteractiveBody(msgObj.interactive);
-			const footer = extractInteractiveFooter(msgObj.interactive);
-			const buttons = extractInteractiveButtons(msgObj.interactive);
-
-			await conversationService.addMessageToConversation(id, {
-				message_id: res.messages[0].id,
-				recipient: recipient,
-				...(header ? { ...header } : {}),
-				...(body ? { body: { body_type: 'TEXT', text: body } } : {}),
-				...(footer ? { footer_content: footer } : {}),
-				...(buttons ? { buttons } : {}),
-				...(data.context
-					? {
-							context: {
-								id: data.context.message_id,
-							},
-					  }
-					: {}),
-				sender: {
-					id: user.userId,
-					name: user.account.name,
-				},
-				message_type: 'interactive',
-			});
-
-			serviceUser.deductCredit(1);
-		} catch (err) {
-			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
-		}
+		formattedMessage = extractFormattedMessage(message.toObject());
 	} else if (data.type === 'template') {
-		const { header, body, template_name } = data;
 		const phoneBookService = new PhoneBookService(serviceAccount);
-		const templateService = new TemplateService(serviceAccount, device);
-		const template = await templateService.fetchTemplateByName(template_name);
+		const { header, body, template_name, buttons, carousel } = data;
+		const template = await TemplateFactory.findByName(device, template_name);
 
 		if (!template) {
-			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+			return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
 		}
+
+		const tHeader = template.getHeader();
+		const tButtons = template.getURLButtonsWithVariable();
+		const tCarousel = template.getCarouselCards();
+
+		const msg = new TemplateMessage(recipient, template);
 
 		const fields = await phoneBookService.findRecordByPhone(recipient);
 
-		let headers = [] as Record<string, unknown>[];
-
-		if (header) {
-			const object = {
-				...(header.media_id ? { id: header.media_id } : header.link ? { link: header.link } : {}),
-			};
-
-			headers = [
-				{
-					type: 'HEADER',
-					parameters:
-						header.type !== 'TEXT'
-							? [
-									{
-										type: header.type,
-										[header.type.toLowerCase()]: object,
-									},
-							  ]
-							: [],
-				},
-			];
+		if (header && tHeader && tHeader.format !== 'TEXT') {
+			msg.setMediaHeader(header as any);
+		} else if (header?.text && tHeader && tHeader.format === 'TEXT') {
+			if (tHeader?.example.length > 0) {
+				const headerVariables = parseToBodyVariables({
+					variables: header.text,
+					fields: fields || ({} as IPhonebookRecord),
+				});
+				msg.setTextHeader(headerVariables);
+			}
 		}
 
-		const msgObj = {
-			messaging_product: 'whatsapp',
-			to: recipient,
-			recipient_type: 'individual',
-			type: 'template',
-			template: {
-				name: template_name,
-				language: {
-					code: 'en_US',
-				},
-				components: [
-					{
-						type: 'BODY',
-						parameters: body.map((b) => {
-							if (b.variable_from === 'custom_text') {
-								return {
-									type: 'text',
-									text: b.custom_text,
-								};
-							} else {
-								if (!fields) {
-									return {
-										type: 'text',
-										text: b.fallback_value,
-									};
-								}
+		const bodyVariables = parseToBodyVariables({
+			variables: body,
+			fields: fields || ({} as IPhonebookRecord),
+		});
 
-								const fieldVal = (
-									bodyParametersList.includes(b.phonebook_data)
-										? fields[b.phonebook_data as keyof typeof fields]
-										: fields.others[b.phonebook_data]
-								) as string;
+		msg.setBody(bodyVariables);
 
-								if (typeof fieldVal === 'string') {
-									return {
-										type: 'text',
-										text: fieldVal || b.fallback_value,
-									};
-								}
-								return {
-									type: 'text',
-									text: b.fallback_value,
-								};
-							}
-						}),
-					},
-					...headers,
-				],
-			},
-		};
-		try {
-			const { data: res } = await MetaAPI(device.accessToken).post(
-				`/${device.phoneNumberId}/messages`,
-				msgObj
-			);
+		if (tButtons.length > 0) {
+			msg.setButtons(buttons);
+		}
 
-			const header = extractTemplateHeader(template.components, msgObj.template.components);
-			const body = extractTemplateBody(template.components, msgObj.template.components);
-			const footer = extractTemplateFooter(template.components);
-			const buttons = extractTemplateButtons(template.components);
-
-			await conversationService.addMessageToConversation(id, {
-				message_id: res.messages[0].id,
-				recipient: recipient,
-				...(header ? { ...header } : {}),
-				...(body ? { body: { body_type: 'TEXT', text: body } } : {}),
-				...(footer ? { footer_content: footer } : {}),
-				...(buttons ? { buttons } : {}),
-				sender: {
-					id: user.userId,
-					name: user.account.name,
-				},
-				message_type: 'template',
+		if (tCarousel.length > 0 && carousel) {
+			const cards = carousel.cards.map((card, index) => {
+				const bodyVariables = parseToBodyVariables({
+					variables: card.body,
+					fields: fields || ({} as IPhonebookRecord),
+				});
+				return {
+					header: card.header,
+					body: bodyVariables,
+					buttons: card.buttons,
+				};
 			});
-
-			serviceUser.deductCredit(1);
-		} catch (err) {
-			return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+			msg.setCarousel(cards);
 		}
+
+		message = msg;
+
+		formattedMessage = extractFormattedMessage(message.toObject().template, {
+			template: template.buildToSave(),
+			type: 'template',
+		});
+	}
+
+	if (!message) {
+		return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
+	}
+	const messageSender = new MessageSender(device);
+	try {
+		const data = await messageSender.sendMessage(message);
+
+		await conversationService.addMessageToConversation(id, {
+			...data,
+			recipient: recipient,
+			...(formattedMessage ? { ...(formattedMessage as any) } : {}),
+			sender: {
+				id: user.userId,
+				name: user.account.name,
+			},
+			message_type: 'interactive',
+		});
+
+		serviceUser.deductCredit(1);
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
 	}
 
 	return Respond({

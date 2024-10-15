@@ -79,8 +79,31 @@ export type SendQuickReplyValidationResult =
 			}[];
 			header?: {
 				type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+				text?:
+					| {
+							custom_text: string;
+							phonebook_data: string;
+							variable_from: 'custom_text' | 'phonebook_data';
+							fallback_value: string;
+					  }[]
+					| undefined;
 				media_id?: string | undefined;
 				link?: string | undefined;
+			};
+			buttons: string[][];
+			carousel?: {
+				cards: {
+					header: {
+						media_id: string;
+					};
+					body: {
+						custom_text: string;
+						phonebook_data: string;
+						variable_from: 'custom_text' | 'phonebook_data';
+						fallback_value: string;
+					}[];
+					buttons: string[][];
+				}[];
 			};
 	  };
 
@@ -208,8 +231,46 @@ export async function SendQuickReplyValidator(req: Request, res: Response, next:
 		header: z
 			.object({
 				type: z.enum(['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT']),
+				text: z
+					.array(
+						z.object({
+							custom_text: z.string().trim(),
+							phonebook_data: z.string().trim(),
+							variable_from: z.enum(['custom_text', 'phonebook_data']),
+							fallback_value: z.string().trim(),
+						})
+					)
+					.optional(),
 				media_id: z.string().trim().optional(),
 				link: z.string().trim().optional(),
+			})
+			.optional(),
+		buttons: z.array(z.array(z.string().trim())).default([]),
+		carousel: z
+			.object({
+				cards: z.array(
+					z.object({
+						header: z.object({
+							media_id: z.string().trim(),
+						}),
+						body: z
+							.array(
+								z.object({
+									custom_text: z.string().trim(),
+									phonebook_data: z.string().trim(),
+									variable_from: z.enum(['custom_text', 'phonebook_data']),
+									fallback_value: z.string().trim(),
+								})
+							)
+							.default([]),
+						buttons: z.array(z.array(z.string().trim())).default([]),
+					})
+				),
+			})
+			.optional(),
+		context: z
+			.object({
+				message_id: z.string().trim(),
 			})
 			.optional(),
 	});

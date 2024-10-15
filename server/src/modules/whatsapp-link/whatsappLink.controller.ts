@@ -40,7 +40,7 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 
 	const devices = await WhatsappLinkService.fetchRecords(userId);
 
-	if (devices.length >= userDetails.no_of_devices) {
+	if (devices.length >= userDetails.max_devices) {
 		return next(new CustomError(COMMON_ERRORS.PERMISSION_DENIED));
 	}
 
@@ -55,6 +55,8 @@ async function linkDevice(req: Request, res: Response, next: NextFunction) {
 				messaging_product: 'whatsapp',
 				pin: '000000',
 			});
+
+			await MetaAPI(accessToken, 'v19.0').post(`/${waid}/subscribed_apps`);
 		} catch (err) {
 			return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
 		}

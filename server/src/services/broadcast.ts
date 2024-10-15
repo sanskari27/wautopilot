@@ -13,11 +13,14 @@ import IWhatsappLink from '../../mongo/types/whatsappLink';
 import { BROADCAST_STATUS, MESSAGE_STATUS } from '../config/const';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
+import { TemplateMessage } from '../models/message';
+import TemplateFactory from '../models/templates/templateFactory';
 import DateUtils from '../utils/DateUtils';
 import { filterUndefinedKeys } from '../utils/ExpressUtils';
+import { extractFormattedMessage, parseToBodyVariables } from '../utils/MessageHelper';
 import TimeGenerator from '../utils/TimeGenerator';
-import PhoneBookService from './phonebook';
-import SchedulerService from './scheduler';
+import MessageScheduler from './messageScheduler';
+import PhoneBookService, { IPhonebookRecord } from './phonebook';
 import WhatsappLinkService from './whatsappLink';
 
 type Broadcast = {
@@ -25,12 +28,7 @@ type Broadcast = {
 	description: string;
 	template_id: string;
 	template_name: string;
-	messages: {
-		to: string;
-		messageObject: {
-			[key: string]: unknown;
-		};
-	}[];
+	messages: TemplateMessage[];
 };
 
 type RecurringBroadcast = {
@@ -44,7 +42,13 @@ type RecurringBroadcast = {
 		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
 		link?: string | undefined;
 		media_id?: string | undefined;
-		text?: string | undefined;
+		text?:
+			| {
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value: string;
+			  }[];
 	};
 	template_body: {
 		custom_text: string;
@@ -52,6 +56,20 @@ type RecurringBroadcast = {
 		variable_from: 'custom_text' | 'phonebook_data';
 		fallback_value: string;
 	}[];
+	template_carousel?: {
+		cards: {
+			header: {
+				media_id: string;
+			};
+			body: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
+			buttons: string[][];
+		}[];
+	};
 	delay: number;
 	startTime: string;
 	endTime: string;
@@ -68,15 +86,6 @@ type ScheduledBroadcastOptions = {
 	endTime: string;
 	daily_messages_count: number;
 };
-const bodyParametersList = [
-	'first_name',
-	'last_name',
-	'middle_name',
-	'phone_number',
-	'email',
-	'birthday',
-	'anniversary',
-];
 
 function processRecurringDocs(docs: IRecurringBroadcast[]) {
 	return docs.map((doc) => ({
@@ -90,6 +99,8 @@ function processRecurringDocs(docs: IRecurringBroadcast[]) {
 		template_name: doc.template_name,
 		template_header: doc.template_header?.type ? doc.template_header : undefined,
 		template_body: doc.template_body,
+		template_buttons: doc.template_buttons,
+		template_carousel: doc.template_carousel,
 		delay: doc.delay,
 		startTime: doc.startTime,
 		endTime: doc.endTime,
@@ -186,11 +197,17 @@ export default class BroadcastService extends WhatsappLinkService {
 		const today = DateUtils.getDate('YYYY-MM-DD');
 
 		const phoneBook = new PhoneBookService(broadcast.linked_to);
-		const schedulerService = new SchedulerService(broadcast.linked_to, broadcast.device_id);
+		const schedulerService = new MessageScheduler(broadcast.linked_to._id, broadcast.device_id._id);
 
-		const template_name = broadcast.template_name;
-		const header = broadcast.template_header;
-		const body = broadcast.template_body;
+		const template = await TemplateFactory.findByName(broadcast.device_id, broadcast.template_name);
+		if (!template) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+
+		const header = template.getHeader();
+		const tButtons = template.getURLButtonsWithVariable();
+		const tCarousel = template.getCarouselCards();
+
 		const recipients = (
 			await phoneBook.fetchRecords({
 				page: 1,
@@ -223,85 +240,58 @@ export default class BroadcastService extends WhatsappLinkService {
 		});
 
 		const formattedMessages = recipients.map((fields) => {
-			let headers = [] as Record<string, unknown>[];
+			const msg = new TemplateMessage(fields.phone_number, template);
 
-			if (header) {
-				const object = {
-					...(header.media_id ? { id: header.media_id } : header.link ? { link: header.link } : {}),
-				};
-
-				headers = [
-					{
-						type: 'HEADER',
-						parameters:
-							header.type !== 'TEXT'
-								? [
-										{
-											type: header.type,
-											[header.type.toLowerCase()]: object,
-										},
-								  ]
-								: [],
-					},
-				];
+			if (header && broadcast.template_header) {
+				if (
+					header.format !== 'TEXT' &&
+					('link' in broadcast.template_header || 'media_id' in broadcast.template_header)
+				) {
+					msg.setMediaHeader(broadcast.template_header as any);
+				} else if (broadcast.template_header.text && header?.example.length > 0) {
+					const headerVariables = parseToBodyVariables({
+						variables: broadcast.template_header.text,
+						fields,
+					});
+					msg.setTextHeader(headerVariables);
+				}
 			}
 
-			return {
-				to: fields.phone_number,
-				messageObject: {
-					template_name,
-					to: fields.phone_number,
-					components: [
-						{
-							type: 'BODY',
-							parameters: body.map((b) => {
-								if (b.variable_from === 'custom_text') {
-									return {
-										type: 'text',
-										text: b.custom_text,
-									};
-								} else {
-									if (!fields) {
-										return {
-											type: 'text',
-											text: b.fallback_value,
-										};
-									}
+			const bodyVariables = parseToBodyVariables({ variables: broadcast.template_body, fields });
+			msg.setBody(bodyVariables);
 
-									const fieldVal = (
-										bodyParametersList.includes(b.phonebook_data)
-											? fields[b.phonebook_data as keyof typeof fields]
-											: fields.others[b.phonebook_data]
-									) as string;
+			if (tButtons.length > 0) {
+				msg.setButtons(broadcast.template_buttons);
+			}
 
-									if (typeof fieldVal === 'string') {
-										return {
-											type: 'text',
-											text: fieldVal || b.fallback_value,
-										};
-									}
-									// const field = fields[]
-									return {
-										type: 'text',
-										text: b.fallback_value,
-									};
-								}
-							}),
-						},
-						...headers,
-					],
-				},
-			};
+			if (tCarousel.length > 0 && broadcast.template_carousel) {
+				const cards = broadcast.template_carousel.cards.map((card, index) => {
+					const bodyVariables = parseToBodyVariables({
+						variables: card.body,
+						fields: fields || ({} as IPhonebookRecord),
+					});
+					return {
+						header: card.header,
+						body: bodyVariables,
+						buttons: card.buttons,
+					};
+				});
+				msg.setCarousel(cards);
+			}
+
+			return msg;
 		});
 
-		formattedMessages.forEach(({ messageObject, to }) => {
+		formattedMessages.forEach((msg) => {
 			const sendAt = timeGenerator.next(5).value;
 
-			schedulerService.schedule(to, messageObject, {
+			schedulerService.scheduleMessage(msg, {
 				scheduler_id: broadcast._id,
 				scheduler_type: RecurringBroadcastDB_name,
 				sendAt,
-				message_type: 'template',
+				formattedMessage: extractFormattedMessage(msg.toObject(), {
+					template,
+				}),
 			});
 		});
 
@@ -565,7 +555,7 @@ export default class BroadcastService extends WhatsappLinkService {
 		broadcast: Broadcast,
 		options: InstantBroadcastOptions | ScheduledBroadcastOptions
 	) {
-		const schedulerService = new SchedulerService(this.account, this.device);
+		const schedulerService = new MessageScheduler(this.userId, this.device._id);
 		const broadcastDoc = await BroadcastDB.create({
 			linked_to: this.account._id,
 			device_id: this.deviceId,
@@ -596,16 +586,21 @@ export default class BroadcastService extends WhatsappLinkService {
 					: broadcast.messages.length,
 		});
 
-		const messages = broadcast.messages.map(async ({ messageObject, to }) => {
+		const messages = broadcast.messages.map(async (message) => {
 			const sendAt = timeGenerator.next(
 				options.broadcast_type === 'scheduled' ? undefined : 5
 			).value;
 
-			return await schedulerService.schedule(to, messageObject, {
+			return await schedulerService.scheduleMessage(message, {
 				scheduler_id: broadcastDoc._id,
 				scheduler_type: BroadcastDB_name,
 				sendAt,
-				message_type: 'template',
+				formattedMessage: extractFormattedMessage(message.toObject().template, {
+					template: (
+						await TemplateFactory.findByName(this.device, broadcast.template_name)
+					)?.buildToSave(),
+					type: 'template',
+				}),
 			});
 		});
 
@@ -783,11 +778,23 @@ export default class BroadcastService extends WhatsappLinkService {
 
 		recurringBroadcasts.forEach(async (broadcast) => {
 			const phoneBook = new PhoneBookService(broadcast.linked_to);
-			const schedulerService = new SchedulerService(broadcast.linked_to, broadcast.device_id);
+			const schedulerService = new MessageScheduler(
+				broadcast.linked_to._id,
+				broadcast.device_id._id
+			);
+			const template = await TemplateFactory.findByName(
+				broadcast.device_id,
+				broadcast.template_name
+			);
 
-			const template_name = broadcast.template_name;
-			const header = broadcast.template_header;
-			const body = broadcast.template_body;
+			if (!template) {
+				return;
+			}
+
+			const header = template.getHeader();
+			const tButtons = template.getURLButtonsWithVariable();
+			const tCarousel = template.getCarouselCards();
+
 			const recipients = (
 				await phoneBook.fetchRecords({
 					page: 1,
@@ -824,89 +831,55 @@ export default class BroadcastService extends WhatsappLinkService {
 			});
 
 			const formattedMessages = recipients.map((fields) => {
-				let headers = [] as Record<string, unknown>[];
+				const msg = new TemplateMessage(fields.phone_number, template);
 
-				if (header) {
-					const object = {
-						...(header.media_id
-							? { id: header.media_id }
-							: header.link
-							? { link: header.link }
-							: {}),
-					};
-
-					headers = [
-						{
-							type: 'HEADER',
-							parameters:
-								header.type !== 'TEXT'
-									? [
-											{
-												type: header.type,
-												[header.type.toLowerCase()]: object,
-											},
-									  ]
-									: [],
-						},
-					];
+				if (header && broadcast.template_header) {
+					if (
+						header.format !== 'TEXT' &&
+						('link' in broadcast.template_header || 'media_id' in broadcast.template_header)
+					) {
+						msg.setMediaHeader(broadcast.template_header as any);
+					}
 				}
 
-				return {
-					to: fields.phone_number,
-					messageObject: {
-						template_name,
-						to: fields.phone_number,
-						components: [
-							{
-								type: 'BODY',
-								parameters: body.map((b) => {
-									if (b.variable_from === 'custom_text') {
-										return {
-											type: 'text',
-											text: b.custom_text,
-										};
-									} else {
-										if (!fields) {
-											return {
-												type: 'text',
-												text: b.fallback_value,
-											};
-										}
+				const bodyVariables = parseToBodyVariables({
+					variables: broadcast.template_body,
+					fields,
+				});
+				msg.setBody(bodyVariables);
 
-										const fieldVal = (
-											bodyParametersList.includes(b.phonebook_data)
-												? fields[b.phonebook_data as keyof typeof fields]
-												: fields.others[b.phonebook_data]
-										) as string;
+				if (tButtons.length > 0) {
+					msg.setButtons(broadcast.template_buttons);
+				}
 
-										if (typeof fieldVal === 'string') {
-											return {
-												type: 'text',
-												text: fieldVal || b.fallback_value,
-											};
-										}
-										// const field = fields[]
-										return {
-											type: 'text',
-											text: b.fallback_value,
-										};
-									}
-								}),
-							},
-							...headers,
-						],
-					},
-				};
+				if (tCarousel.length > 0 && broadcast.template_carousel) {
+					const cards = broadcast.template_carousel.cards.map((card, index) => {
+						const bodyVariables = parseToBodyVariables({
+							variables: card.body,
+							fields: fields || ({} as IPhonebookRecord),
+						});
+						return {
+							header: card.header,
+							body: bodyVariables,
+							buttons: card.buttons,
+						};
+					});
+					msg.setCarousel(cards);
+				}
+
+				return msg;
 			});
 
-			formattedMessages.forEach(({ messageObject, to }) => {
+			formattedMessages.forEach((msg) => {
 				const sendAt = timeGenerator.next(5).value;
 
-				schedulerService.schedule(to, messageObject, {
+				schedulerService.scheduleMessage(msg, {
 					scheduler_id: broadcast._id,
 					scheduler_type: RecurringBroadcastDB_name,
 					sendAt,
-					message_type: 'template',
+					formattedMessage: extractFormattedMessage(msg.toObject(), {
+						template,
+					}),
 				});
 			});
 		});

@@ -1,87 +1,42 @@
 import { Types } from 'mongoose';
 import { ConversationMessageDB } from '../../mongo';
-import ChatBotDB, { ChatBotDB_name } from '../../mongo/repo/Chatbot';
 import ChatBotFlowDB, { ChatBotFlowDB_name } from '../../mongo/repo/ChatbotFlow';
 import FlowMessageDB from '../../mongo/repo/FlowMessages';
 import IAccount from '../../mongo/types/account';
-import IChatBot from '../../mongo/types/chatbot';
 import IChatBotFlow from '../../mongo/types/chatbotFlow';
 import IContact from '../../mongo/types/contact';
 import IFlowMessage from '../../mongo/types/flowMessage';
 import IMedia from '../../mongo/types/media';
-import IPhoneBook from '../../mongo/types/phonebook';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
 import { BOT_TRIGGER_OPTIONS } from '../config/const';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
+import {
+	ContactMessage,
+	FlowMessage,
+	InteractiveMediaMessage,
+	LocationRequestMessage,
+	MediaMessage,
+	Message,
+	TemplateMessage,
+	TextMessage,
+} from '../models/message';
+import TemplateFactory from '../models/templates/templateFactory';
 import DateUtils from '../utils/DateUtils';
 import { Delay, filterUndefinedKeys } from '../utils/ExpressUtils';
 import {
-	generateBodyText,
+	extractFormattedMessage,
 	generateButtons,
-	generateContactMessageObject,
-	generateHeader,
-	generateListBody,
-	generateMediaMessageObject,
 	generateSections,
-	generateTemplateMessageObject,
-	generateTextMessageObject,
+	parseToBodyVariables,
 	parseVariables,
 } from '../utils/MessageHelper';
 import TimeGenerator from '../utils/TimeGenerator';
 import MediaService from './media';
+import MessageScheduler from './messageScheduler';
 import PhoneBookService, { IPhonebookRecord } from './phonebook';
-import SchedulerService from './scheduler';
 import WhatsappFlowService from './wa_flow';
 import WhatsappLinkService from './whatsappLink';
-
-type CreateBotData = {
-	trigger: string[];
-	trigger_gap_seconds: number;
-	response_delay_seconds: number;
-	options: BOT_TRIGGER_OPTIONS;
-	startAt: string;
-	endAt: string;
-	respond_type: 'template' | 'normal';
-	message: string;
-	images: Types.ObjectId[];
-	videos: Types.ObjectId[];
-	audios: Types.ObjectId[];
-	documents: Types.ObjectId[];
-	contacts: Types.ObjectId[];
-	template_id: string;
-	template_name: string;
-	template_header?: {
-		type?: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
-		media_id?: string;
-		link?: string;
-	};
-	template_body: {
-		custom_text: string;
-		phonebook_data: string;
-		variable_from: 'custom_text' | 'phonebook_data';
-		fallback_value: string;
-	}[];
-	nurturing: {
-		template_id: string;
-		template_name: string;
-		after: number;
-		start_from: string;
-		end_at: string;
-		template_header?: {
-			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
-			media_id?: string;
-			link?: string;
-		};
-		template_body: {
-			custom_text: string;
-			phonebook_data: string;
-			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
-		}[];
-	}[];
-	forward: { number: string; message: string };
-};
 
 type CreateFlowData = {
 	name: string;
@@ -136,6 +91,12 @@ type CreateFlowData = {
 		template_name: string;
 		template_header?: {
 			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+			text?: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
 			media_id?: string;
 			link?: string;
 		};
@@ -145,42 +106,24 @@ type CreateFlowData = {
 			variable_from: 'custom_text' | 'phonebook_data';
 			fallback_value: string;
 		}[];
+		template_buttons?: string[][];
+		template_carousel?: {
+			cards: {
+				header: {
+					media_id: string;
+				};
+				body: {
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value: string;
+				}[];
+				buttons: string[][];
+			}[];
+		};
 	}[];
 	forward: { number: string; message: string };
 };
-
-function processDocs(docs: IChatBot[]) {
-	return docs.map((bot) => {
-		return {
-			bot_id: bot._id as Types.ObjectId,
-			trigger: bot.trigger,
-			trigger_gap_seconds: bot.trigger_gap_seconds,
-			response_delay_seconds: bot.response_delay_seconds,
-			options: bot.options,
-			message: bot.message,
-			startAt: bot.startAt,
-			endAt: bot.endAt,
-			respond_type: bot.respond_type,
-			images: bot.images ?? [],
-			videos: bot.videos ?? [],
-			audios: bot.audios ?? [],
-			documents: bot.documents ?? [],
-			contacts: bot.contacts ?? [],
-			template_id: bot.template_id,
-			template_name: bot.template_name,
-			template_header: bot.template_header,
-			template_body: bot.template_body,
-
-			nurturing: bot.nurturing ?? [],
-			forward: bot.forward ?? {
-				number: '',
-				message: '',
-			},
-			isActive: bot.active,
-			reply_to_message: bot.reply_to_message,
-		};
-	});
-}
 
 function processFlowDocs(docs: IChatBotFlow[]) {
 	return docs.map((bot) => {
@@ -226,6 +169,12 @@ type IChatBotFlowPopulated = Omit<IChatBotFlow, 'nurturing'> & {
 			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
 			media_id?: string;
 			link?: string;
+			text?: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
 		};
 		template_body: {
 			custom_text: string;
@@ -233,6 +182,21 @@ type IChatBotFlowPopulated = Omit<IChatBotFlow, 'nurturing'> & {
 			variable_from: 'custom_text' | 'phonebook_data';
 			fallback_value: string;
 		}[];
+		template_buttons?: string[][];
+		template_carousel?: {
+			cards: {
+				header: {
+					media_id: string;
+				};
+				body: {
+					custom_text: string;
+					phonebook_data: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value: string;
+				}[];
+				buttons: string[][];
+			}[];
+		};
 	}[];
 };
 
@@ -241,73 +205,23 @@ export default class ChatBotService extends WhatsappLinkService {
 		super(user, device);
 	}
 
-	public async allBots() {
-		const bots = await ChatBotDB.find({
-			linked_to: this.userId,
-			device_id: this.deviceId,
-		});
-		return processDocs(bots);
-	}
-
-	public async createBot(data: CreateBotData) {
-		const bot = await ChatBotDB.create({
-			...data,
-			linked_to: this.userId,
-			device_id: this.deviceId,
-		});
-
-		return processDocs([bot])[0];
-	}
-
-	public async modifyBot(id: Types.ObjectId, data: Partial<CreateBotData>) {
-		const { matchedCount } = await ChatBotDB.updateOne(
+	public async toggleActive(id: Types.ObjectId) {
+		const { matchedCount } = await ChatBotFlowDB.updateOne(
 			{ _id: id, linked_to: this.userId, device_id: this.deviceId },
-			{ $set: filterUndefinedKeys(data) }
+			{
+				$set: {
+					active: {
+						$not: '$active',
+					},
+				},
+			}
 		);
 		if (matchedCount === 0) {
 			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
 		}
 	}
 
-	public async toggleActive(id: Types.ObjectId, type: 'chatbot' | 'chatbotflow' = 'chatbot') {
-		const $set = {
-			$expr: {
-				$cond: {
-					if: '$active',
-					then: false,
-					else: true,
-				},
-			},
-		};
-
-		if (type === 'chatbot') {
-			const { matchedCount } = await ChatBotDB.updateOne(
-				{ _id: id, linked_to: this.userId, device_id: this.deviceId },
-				{
-					$set,
-				}
-			);
-			if (matchedCount === 0) {
-				throw new CustomError(COMMON_ERRORS.NOT_FOUND);
-			}
-		} else {
-			const { matchedCount } = await ChatBotFlowDB.updateOne(
-				{ _id: id, linked_to: this.userId, device_id: this.deviceId },
-				{
-					$set,
-				}
-			);
-			if (matchedCount === 0) {
-				throw new CustomError(COMMON_ERRORS.NOT_FOUND);
-			}
-		}
-	}
-
 	public async pauseAll() {
-		await ChatBotDB.updateMany(
-			{ linked_to: this.userId, device_id: this.deviceId },
-			{ active: false }
-		);
 		await ChatBotFlowDB.updateMany(
 			{ linked_to: this.userId, device_id: this.deviceId },
 			{ active: false }
@@ -315,28 +229,22 @@ export default class ChatBotService extends WhatsappLinkService {
 	}
 
 	public async deleteBot(bot_id: Types.ObjectId) {
-		await ChatBotDB.deleteMany({ _id: bot_id, linked_to: this.userId });
 		await ChatBotFlowDB.deleteMany({ _id: bot_id, linked_to: this.userId });
 	}
 
-	public async botResponses(bot_id: Types.ObjectId, type: 'chatbot' | 'chatbotflow' = 'chatbot') {
-		let bot;
-		if (type === 'chatbot') {
-			bot = await ChatBotDB.findById(bot_id);
-		} else {
-			bot = await ChatBotFlowDB.findById(bot_id);
+	public async botResponses(bot_id: Types.ObjectId) {
+		let bot = await ChatBotFlowDB.findById(bot_id);
+		if (!bot) {
+			return [];
 		}
 		const responses = await ConversationMessageDB.find({
 			linked_to: this.userId,
 			device_id: this.deviceId,
 			scheduled_by: {
 				id: bot_id,
-				name: ChatBotDB_name,
+				name: ChatBotFlowDB_name,
 			},
 		});
-		if (!bot) {
-			return [];
-		}
 
 		return responses.map((chat) => ({
 			recipient: chat.recipient,
@@ -455,51 +363,30 @@ export default class ChatBotService extends WhatsappLinkService {
 		);
 	}
 
-	private async botsEngaged<
-		T extends
-			| IChatBotFlowPopulated
-			| (Omit<
-					IChatBot &
-						Required<{
-							_id: Types.ObjectId;
-						}>,
-					'images' | 'videos' | 'audios' | 'documents' | 'contacts'
-			  > & {
-					images: IMedia[];
-					videos: IMedia[];
-					audios: IMedia[];
-					documents: IMedia[];
-					contacts: IContact[];
-			  })
-	>({
+	private async botsEngaged({
 		bots,
 		message_body,
 		recipient,
 	}: {
-		bots: T[];
+		bots: IChatBotFlowPopulated[];
 		message_body: string;
 		recipient: string;
-	}): Promise<T[]> {
+	}): Promise<IChatBotFlowPopulated[]> {
 		if (bots.length === 0) {
 			return [];
 		}
-		let last_messages: { [key: string]: number } = {};
-		if (instanceOfChatbot(bots[0])) {
-			last_messages = await this.lastMessages(
-				bots.map((bot) => bot._id),
-				recipient
-			);
-		}
+		let last_messages: { [key: string]: number } = await this.lastMessages(
+			bots.map((bot) => bot._id),
+			recipient
+		);
 
 		return bots.filter((bot) => {
-			if (instanceOfChatbot(bot)) {
-				if (!DateUtils.isTimeBetween(bot.startAt, bot.endAt, DateUtils.getMomentNow())) {
+			if (!DateUtils.isTimeBetween(bot.startAt, bot.endAt, DateUtils.getMomentNow())) {
+				return false;
+			} else if (bot.trigger_gap_seconds > 0) {
+				const last_message_time = last_messages[bot._id.toString()];
+				if (!isNaN(last_message_time) && last_message_time <= bot.trigger_gap_seconds) {
 					return false;
-				} else if (bot.trigger_gap_seconds > 0) {
-					const last_message_time = last_messages[bot._id.toString()];
-					if (!isNaN(last_message_time) && last_message_time <= bot.trigger_gap_seconds) {
-						return false;
-					}
 				}
 			}
 			if (bot.trigger.length === 0) {
@@ -558,23 +445,9 @@ export default class ChatBotService extends WhatsappLinkService {
 	}
 
 	public async handleMessage(recipient: string, text: string, meta_message_id?: string) {
-		const schedulerService = new SchedulerService(this.account, this.device);
+		const schedulerService = new MessageScheduler(this.account._id, this.device._id);
 		const phonebook = new PhoneBookService(this.account);
 		const contact = await phonebook.findRecordByPhone(recipient);
-
-		const chatBots = await ChatBotDB.find({
-			linked_to: this.userId,
-			device_id: this.deviceId,
-			active: true,
-		}).populate<{
-			images: IMedia[];
-			videos: IMedia[];
-			audios: IMedia[];
-			documents: IMedia[];
-			contacts: IContact[];
-		}>('images videos audios documents contacts');
-
-		// pupulate nurturing for chatbotflows
 
 		const flows: IChatBotFlowPopulated[] = await ChatBotFlowDB.find({
 			linked_to: this.userId,
@@ -588,83 +461,10 @@ export default class ChatBotService extends WhatsappLinkService {
 			{ path: 'nurturing.contacts' }, // ContactDB_name
 		]);
 
-		const chatbotEngaged = await this.botsEngaged({
-			bots: chatBots,
-			message_body: text,
-			recipient,
-		});
-
 		const flowsEngaged = await this.botsEngaged({
 			recipient,
 			bots: flows,
 			message_body: text,
-		});
-
-		chatbotEngaged.forEach(async (bot) => {
-			await Delay(bot.response_delay_seconds);
-
-			const schedulerOptions = {
-				scheduler_id: bot._id,
-				scheduler_type: ChatBotDB_name,
-				sendAt: DateUtils.getMomentNow().toDate(),
-				message_type: bot.respond_type as 'template' | 'normal' | 'interactive',
-			};
-
-			if (bot.respond_type === 'normal') {
-				this.sendDirectBotMessage(recipient, bot, {
-					meta_message_id,
-					contact,
-				});
-			} else if (bot.respond_type === 'template' && bot.template_id) {
-				const msgObj = generateTemplateMessageObject(
-					recipient,
-					{
-						template_name: bot.template_name,
-						header: bot.template_header,
-						body: bot.template_body,
-						contact: contact as unknown as IPhoneBook,
-					},
-					{
-						meta_message_id: bot.reply_to_message ? meta_message_id : undefined,
-					}
-				);
-				await schedulerService.schedule(recipient, msgObj, schedulerOptions);
-			}
-
-			if (bot.nurturing.length > 0) {
-				const dateGenerator = new TimeGenerator();
-
-				bot.nurturing.map(async (el) => {
-					const msgObj = generateTemplateMessageObject(recipient, {
-						template_name: bot.template_name,
-						header: bot.template_header,
-						body: bot.template_body,
-						contact: contact as unknown as IPhoneBook,
-					});
-
-					await schedulerService.schedule(recipient, msgObj, {
-						scheduler_id: bot._id,
-						scheduler_type: 'Lead Nurturing',
-						sendAt: dateGenerator.next(el.after).value,
-						message_type: 'template',
-					});
-				});
-			}
-
-			if (bot.forward && bot.forward.number) {
-				const custom_message = parseVariables(
-					bot.forward.message,
-					contact as unknown as Record<string, string>
-				).replace(`{{trigger}}`, text);
-
-				const msgObj = generateTextMessageObject(bot.forward.number, custom_message);
-				await schedulerService.schedule(bot.forward.number, msgObj, {
-					scheduler_id: bot._id,
-					scheduler_type: ChatBotFlowDB_name,
-					sendAt: DateUtils.getMomentNow().toDate(),
-					message_type: 'normal',
-				});
-			}
 		});
 
 		flowsEngaged.forEach(async (bot) => {
@@ -683,12 +483,14 @@ export default class ChatBotService extends WhatsappLinkService {
 					bot.forward.message,
 					contact as unknown as Record<string, string>
 				).replace(`{{trigger}}`, text);
-				const msgObj = generateTextMessageObject(bot.forward.number, custom_message);
-				await schedulerService.schedule(bot.forward.number, msgObj, {
+
+				const msg = new TextMessage(recipient, custom_message);
+
+				await schedulerService.scheduleMessage(msg, {
 					scheduler_id: bot._id,
 					scheduler_type: ChatBotFlowDB_name,
 					sendAt: DateUtils.getMomentNow().toDate(),
-					message_type: 'normal',
+					formattedMessage: extractFormattedMessage(msg.toObject()),
 				});
 			}
 		});
@@ -749,7 +551,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		}
 	) {
 		const phonebook = new PhoneBookService(this.account);
-		const schedulerService = new SchedulerService(this.account, this.device);
+		const schedulerService = new MessageScheduler(this.account._id, this.device._id);
 		const contact = await phonebook.findRecordByPhone(recipient);
 		const nodes = details.bot.nodes;
 		const edges = details.bot.edges;
@@ -821,13 +623,63 @@ export default class ChatBotService extends WhatsappLinkService {
 						}
 					);
 				} else if (el.respond_type === 'template' && el.template_id) {
-					const msgObj = generateTemplateMessageObject(recipient, {
-						template_name: el.template_name,
-						header: el.template_header,
-						body: el.template_body,
-						contact: contact as unknown as IPhoneBook,
+					const template = await TemplateFactory.findById(this.device, el.template_id);
+					if (!template || !contact) {
+						return;
+					}
+
+					const header = template.getHeader();
+					const tButtons = template.getURLButtonsWithVariable();
+					const tCarousel = template.getCarouselCards();
+
+					const msg = new TemplateMessage(recipient, template);
+
+					if (header && el.template_header) {
+						if (
+							header.format !== 'TEXT' &&
+							('link' in el.template_header || 'media_id' in el.template_header)
+						) {
+							msg.setMediaHeader(el.template_header as any);
+						} else if (el.template_header.text && header?.example.length > 0) {
+							const headerVariables = parseToBodyVariables({
+								variables: el.template_header.text,
+								fields: contact,
+							});
+							msg.setTextHeader(headerVariables);
+						}
+					}
+
+					const bodyVariables = parseToBodyVariables({
+						variables: el.template_body,
+						fields: contact,
 					});
-					await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+					msg.setBody(bodyVariables);
+
+					if (tButtons.length > 0) {
+						msg.setButtons(el?.template_buttons ?? []);
+					}
+
+					if (tCarousel.length > 0 && el.template_carousel) {
+						const cards = el.template_carousel.cards.map((card, index) => {
+							const bodyVariables = parseToBodyVariables({
+								variables: card.body,
+								fields: contact,
+							});
+							return {
+								header: card.header,
+								body: bodyVariables,
+								buttons: card.buttons,
+							};
+						});
+						msg.setCarousel(cards);
+					}
+
+					schedulerService.scheduleMessage(msg, {
+						...schedulerOptions,
+						formattedMessage: extractFormattedMessage(msg.toObject(), {
+							template,
+						}),
+					});
 				}
 			});
 		}
@@ -842,7 +694,7 @@ export default class ChatBotService extends WhatsappLinkService {
 			meta_message_id?: string;
 		}
 	) {
-		const schedulerService = new SchedulerService(this.account, this.device);
+		const schedulerService = new MessageScheduler(this.account._id, this.device._id);
 		const whatsappFlow = new WhatsappFlowService(this.account, this.device);
 		const mediaService = new MediaService(this.account, this.device);
 		const bot = await ChatBotFlowDB.findOne({
@@ -858,45 +710,37 @@ export default class ChatBotService extends WhatsappLinkService {
 			return;
 		}
 		const delay = (details?.extra_delay ?? 0) + Math.max(0, node.data.delay || 0);
-		let message_id;
+		let message_id: Types.ObjectId;
 		const schedulerOptions = {
 			scheduler_id: bot_id,
 			scheduler_type: ChatBotFlowDB_name,
 			sendAt: DateUtils.getMomentNow().add(delay, 'seconds').toDate(),
 			message_type: 'normal' as 'interactive' | 'normal' | 'template',
 		};
-		const context =
-			details?.meta_message_id && node.data.reply_to_message
-				? {
-						context: {
-							message_id: details.meta_message_id,
-						},
-				  }
-				: {};
+
 		if (node.node_type === 'textNode') {
-			const msgObj = {
-				messaging_product: 'whatsapp',
-				to: recipient,
-				type: 'text',
-				text: {
-					body: node.data.label,
-				},
-				...context,
-			};
-			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+			const msg = new TextMessage(recipient, node.data.label);
+
+			if (node.data.reply_to_message && details?.meta_message_id) {
+				msg.setContextMessage(details.meta_message_id);
+			}
+
+			message_id = await schedulerService.scheduleMessage(msg, {
+				...schedulerOptions,
+				formattedMessage: extractFormattedMessage(msg),
+			});
 		} else if (node.node_type === 'contactNode') {
 			const { id, formatted_name, ...contact } = node.data.contact;
+			const msg = new ContactMessage(recipient, contact);
 
-			try {
-				const msgObj = {
-					messaging_product: 'whatsapp',
-					to: recipient,
-					type: 'contacts',
-					contacts: [contact],
-					...context,
-				};
-				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
-			} catch (err) {}
+			if (node.data.reply_to_message && details?.meta_message_id) {
+				msg.setContextMessage(details.meta_message_id);
+			}
+
+			message_id = await schedulerService.scheduleMessage(msg, {
+				...schedulerOptions,
+				formattedMessage: extractFormattedMessage(msg),
+			});
 		} else if (
 			node.node_type === 'imageNode' ||
 			node.node_type === 'videoNode' ||
@@ -908,109 +752,81 @@ export default class ChatBotService extends WhatsappLinkService {
 				| 'video'
 				| 'audio'
 				| 'document';
+
 			if (type === 'audio') {
 				type = 'document';
 			}
+			const msg = new InteractiveMediaMessage(recipient, type);
 			const media = await mediaService.getMedia(node.data.id);
-			const msgObj = {
-				messaging_product: 'whatsapp',
-				to: recipient,
-				type: 'interactive',
-				interactive: {
-					type: 'button',
-					...generateHeader(type, media.media_id),
-					...generateBodyText(node.data.caption),
-					action: {
-						buttons: generateButtons(node.data.buttons),
-					},
-				},
-				...context,
-			};
-			schedulerOptions.message_type = 'interactive';
-			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
-		} else if (node.node_type === 'buttonNode') {
-			const msgObj = {
-				messaging_product: 'whatsapp',
-				to: recipient,
-				type: 'interactive',
-				interactive: {
-					type: 'button',
-					...generateBodyText(node.data.text),
-					action: {
-						buttons: generateButtons(node.data.buttons),
-					},
-				},
-				...context,
-			};
-			schedulerOptions.message_type = 'interactive';
-			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
-		} else if (node.node_type === 'listNode') {
-			const msgObj = {
-				messaging_product: 'whatsapp',
-				to: recipient,
-				type: 'interactive',
-				interactive: {
-					type: 'list',
-					...generateListBody(node.data),
-					action: {
-						button: 'Select an option',
-						sections: generateSections(node.data.sections),
-					},
-				},
-				...context,
-			};
-			schedulerOptions.message_type = 'interactive';
-			message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
-		} else if (node.node_type === 'flowNode') {
-			try {
-				const details = await whatsappFlow.getWhatsappFlowContents(node.data.flow_id);
+			msg.setMediaHeader({ media_id: media.media_id });
+			msg.setBody(node.data.caption);
+			msg.setButtons(generateButtons(node.data.buttons));
 
-				const msgObj = {
-					messaging_product: 'whatsapp',
-					to: recipient,
-					type: 'interactive',
-					interactive: {
-						type: 'flow',
-						...generateListBody(node.data),
-						action: {
-							name: 'flow',
-							parameters: {
-								flow_message_version: '3',
-								flow_action: 'navigate',
-								flow_token: `wautopilot_${node.data.flow_id}_${node.data.button.id}`,
-								flow_id: node.data.flow_id,
-								flow_cta: node.data.button.text,
-								flow_action_payload: {
-									screen: details[0].id,
-								},
-							},
-						},
-					},
-					...context,
-				};
-				schedulerOptions.message_type = 'interactive';
-				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
-			} catch (err) {}
+			if (node.data.reply_to_message && details?.meta_message_id) {
+				msg.setContextMessage(details.meta_message_id);
+			}
+
+			message_id = await schedulerService.scheduleMessage(msg, {
+				...schedulerOptions,
+				formattedMessage: extractFormattedMessage(msg),
+			});
+		} else if (node.node_type === 'buttonNode') {
+			const msg = new InteractiveMediaMessage(recipient, 'none');
+			msg.setBody(node.data.text);
+			msg.setButtons(generateButtons(node.data.buttons));
+
+			if (node.data.reply_to_message && details?.meta_message_id) {
+				msg.setContextMessage(details.meta_message_id);
+			}
+
+			message_id = await schedulerService.scheduleMessage(msg, {
+				...schedulerOptions,
+				formattedMessage: extractFormattedMessage(msg),
+			});
+		} else if (node.node_type === 'listNode') {
+			const msg = new InteractiveMediaMessage(recipient, 'none');
+			msg.setTextHeader(node.data.header);
+			msg.setBody(node.data.body);
+			msg.setFooter(node.data.footer);
+			msg.setSections(generateSections(node.data.sections));
+			msg.setInteractiveType('list');
+
+			if (node.data.reply_to_message && details?.meta_message_id) {
+				msg.setContextMessage(details.meta_message_id);
+			}
+
+			message_id = await schedulerService.scheduleMessage(msg, {
+				...schedulerOptions,
+				formattedMessage: extractFormattedMessage(msg),
+			});
+		} else if (node.node_type === 'flowNode') {
+			const fDetails = await whatsappFlow.getWhatsappFlowContents(node.data.flow_id);
+
+			const msg = new FlowMessage(recipient)
+				.setTextHeader(node.data.header)
+				.setBody(node.data.text)
+				.setFooter(node.data.footer)
+				.setFlowDetails(node.data.flow_id, node.data.button.text, fDetails[0]?.id || '');
+
+			if (node.data.reply_to_message && details?.meta_message_id) {
+				msg.setContextMessage(details.meta_message_id);
+			}
+
+			message_id = await schedulerService.scheduleMessage(msg, {
+				...schedulerOptions,
+				formattedMessage: extractFormattedMessage(msg),
+			});
 		} else if (node.node_type === 'locationRequestNode') {
-			try {
-				const msgObj = {
-					messaging_product: 'whatsapp',
-					to: recipient,
-					type: 'interactive',
-					interactive: {
-						type: 'location_request_message',
-						body: {
-							text: node.data.label,
-						},
-						action: {
-							name: 'send_location',
-						},
-					},
-					...context,
-				};
-				schedulerOptions.message_type = 'interactive';
-				message_id = await schedulerService.schedule(recipient, msgObj, schedulerOptions);
-			} catch (err) {}
+			const msg = new LocationRequestMessage(recipient).setBody(node.data.label);
+
+			if (node.data.reply_to_message && details?.meta_message_id) {
+				msg.setContextMessage(details.meta_message_id);
+			}
+
+			message_id = await schedulerService.scheduleMessage(msg, {
+				...schedulerOptions,
+				formattedMessage: extractFormattedMessage(msg),
+			});
 		} else {
 			return;
 		}
@@ -1060,88 +876,55 @@ export default class ChatBotService extends WhatsappLinkService {
 			sendAt?: Date;
 		}
 	) {
-		const schedulerService = new SchedulerService(this.account, this.device);
+		const schedulerService = new MessageScheduler(this.account._id, this.device._id);
 
 		const schedulerOptions = {
 			scheduler_id: bot._id,
-			scheduler_type: ChatBotDB_name,
+			scheduler_type: ChatBotFlowDB_name,
 			sendAt: opts.sendAt || DateUtils.getMomentNow().toDate(),
-			message_type: 'normal' as 'interactive' | 'normal' | 'template',
 		};
 
 		let msg = bot.message;
 		if (msg) {
 			msg = parseVariables(msg, opts.contact as unknown as Record<string, string>);
+			const message = new TextMessage(recipient, msg);
 
-			const msgObj = generateTextMessageObject(recipient, msg, {
-				meta_message_id: bot.reply_to_message ? opts.meta_message_id : undefined,
-			});
-			await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+			schedule(message);
 		}
 
-		for (const mediaObject of bot.images) {
-			const msgObj = generateMediaMessageObject(
-				recipient,
-				{
-					media_id: mediaObject.media_id,
-					type: 'image',
-				},
-				{
-					meta_message_id: bot.reply_to_message ? opts.meta_message_id : undefined,
-				}
-			);
-			await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+		for (const mediaObject of bot.images ?? []) {
+			const mediaMessage = new MediaMessage(recipient, 'image').setMediaId(mediaObject.media_id);
+			schedule(mediaMessage);
 		}
 
-		for (const mediaObject of bot.videos) {
-			const msgObj = generateMediaMessageObject(
-				recipient,
-				{
-					media_id: mediaObject.media_id,
-					type: 'video',
-				},
-				{
-					meta_message_id: bot.reply_to_message ? opts.meta_message_id : undefined,
-				}
-			);
-			await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+		for (const mediaObject of bot.videos ?? []) {
+			const mediaMessage = new MediaMessage(recipient, 'video').setMediaId(mediaObject.media_id);
+			schedule(mediaMessage);
 		}
 
-		for (const mediaObject of bot.audios) {
-			const msgObj = generateMediaMessageObject(
-				recipient,
-				{
-					media_id: mediaObject.media_id,
-					type: 'audio',
-				},
-				{
-					meta_message_id: bot.reply_to_message ? opts.meta_message_id : undefined,
-				}
-			);
-			await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+		for (const mediaObject of bot.audios ?? []) {
+			const mediaMessage = new MediaMessage(recipient, 'audio').setMediaId(mediaObject.media_id);
+			schedule(mediaMessage);
 		}
 
-		for (const mediaObject of bot.documents) {
-			const msgObj = generateMediaMessageObject(
-				recipient,
-				{
-					media_id: mediaObject.media_id,
-					type: 'document',
-				},
-				{
-					meta_message_id: bot.reply_to_message ? opts.meta_message_id : undefined,
-				}
-			);
-			await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+		for (const mediaObject of bot.documents ?? []) {
+			const mediaMessage = new MediaMessage(recipient, 'document').setMediaId(mediaObject.media_id);
+			schedule(mediaMessage);
 		}
 
 		(bot.contacts ?? []).forEach(async (card) => {
-			const msgObj = generateContactMessageObject(recipient, card);
-			await schedulerService.schedule(recipient, msgObj, schedulerOptions);
+			const contactMessage = new ContactMessage(recipient, card);
+			schedule(contactMessage);
 		});
-	}
-}
+		async function schedule(message: Message) {
+			if (bot.reply_to_message && opts.meta_message_id) {
+				message.setContextMessage(opts.meta_message_id);
+			}
 
-function instanceOfChatbot(object: any): object is IChatBot {
-	return 'startAt' in object || 'endAt' in object || 'trigger_gap_seconds' in object;
+			await schedulerService.scheduleMessage(message, {
+				...schedulerOptions,
+				formattedMessage: extractFormattedMessage(message.toObject()),
+			});
+		}
+	}
 }

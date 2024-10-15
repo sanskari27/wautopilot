@@ -37,9 +37,9 @@ export default function RecurringActionContextMenu({
 		const promise = RecurringService.rescheduleRecurring(campaignId);
 
 		toast.promise(promise, {
-			loading: 'Rescheduling Broadcast...',
-			success: 'Broadcast Rescheduled',
-			error: 'Failed to Reschedule Broadcast',
+			loading: 'Rescheduling Campaign...',
+			success: 'Campaign Rescheduled',
+			error: 'Failed to Reschedule Campaign',
 		});
 	};
 
@@ -47,13 +47,13 @@ export default function RecurringActionContextMenu({
 		const promise = toggleRecurring(campaignId);
 
 		toast.promise(promise, {
-			loading: 'Toggling Broadcast...',
+			loading: 'Updating Campaign...',
 			success: (res) => {
 				router.refresh();
 				router.push(`/panel/campaigns/recurring`);
-				return `Broadcast ${res.status === 'ACTIVE' ? 'Paused' : 'Resumed'}`;
+				return `Campaign ${res.status === 'ACTIVE' ? 'Paused' : 'Resumed'}`;
 			},
-			error: 'Failed to Toggle Broadcast',
+			error: 'Failed to Toggle Campaign',
 		});
 	};
 
@@ -61,9 +61,9 @@ export default function RecurringActionContextMenu({
 		const promise = RecurringService.downloadRecurring(campaignId);
 
 		toast.promise(promise, {
-			loading: 'Downloading Broadcast...',
-			success: 'Broadcast Downloaded',
-			error: 'Failed to Download Broadcast',
+			loading: 'Downloading Campaign Report...',
+			success: 'Campaign Report Downloaded',
+			error: 'Failed to Download Campaign Report',
 		});
 	};
 
@@ -71,12 +71,12 @@ export default function RecurringActionContextMenu({
 		const promise = deleteRecurring(campaignId);
 
 		toast.promise(promise, {
-			loading: 'Deleting Broadcast...',
+			loading: 'Deleting Campaign...',
 			success: () => {
 				router.refresh();
-				return 'Broadcast Deleted';
+				return 'Campaign Deleted';
 			},
-			error: 'Failed to Delete Broadcast',
+			error: 'Failed to Delete Campaign',
 		});
 	};
 	return (

@@ -1,6 +1,7 @@
 'use client';
 import Show from '@/components/containers/show';
 import { useChatListExpanded } from '@/components/context/chat-list-expanded';
+import { useMessages } from '@/components/context/message-store-provider';
 import { useRecipient } from '@/components/context/recipients';
 import ExpiryCountdown from '@/components/elements/expiry-countdown';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -11,7 +12,6 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import useBoolean from '@/hooks/useBoolean';
-import { useMessages } from '@/components/context/message-store-provider';
 import { getInitials } from '@/lib/utils';
 import MessagesService from '@/services/messages.service';
 import { ChevronLeft, EllipsisVertical } from 'lucide-react';
@@ -46,19 +46,19 @@ export default function ConversationScreen() {
 
 	return (
 		<div className={`${!isExpanded ? '!w-full' : '!hidden md:!flex'}`}>
-			<div className='flex p-4 border-b-2 justify-between w-full'>
+			<div className='flex p-1 md:p-4 border-b-2 justify-between w-full'>
 				<div className='flex gap-3 items-center'>
 					<ChevronLeft className='block md:!hidden' onClick={expand} />
 					<Avatar>
 						<AvatarFallback>{getInitials(recipient.profile_name) || 'Unknown'}</AvatarFallback>
 					</Avatar>
 					<div>
-						<p className='font-medium'>{recipient.profile_name}</p>
+						<p className='font-medium line-clamp-1'>{recipient.profile_name}</p>
 						<p className='text-sm'>{recipient.recipient}</p>
 					</div>
 				</div>
 				<div className='flex'>
-					<div className='flex items-center gap-3'>
+					<div className=' flex items-center gap-3'>
 						<Show.ShowIf condition={!loading}>
 							<ExpiryCountdown timeLeft={expiry === 'EXPIRED' ? 0 : expiry} />
 							<DropdownMenu modal={true}>

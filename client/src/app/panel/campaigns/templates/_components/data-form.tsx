@@ -16,11 +16,17 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { cn, countOccurrences } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { Carousel, Template, templateSchema } from '@/schema/template';
 import UploadService from '@/services/upload.service';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,6 +34,7 @@ import { CircleMinus, Trash } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
+import BodyWithVariables from './body-with-variables';
 import { AddQuickReply, CarouselTemplateDialog, PhoneNumberButton, URLButton } from './dialogs';
 
 export default function DataForm({
@@ -46,52 +53,57 @@ export default function DataForm({
 		defaultValues: defaultValues ?? {
 			name: '',
 			category: 'MARKETING',
-			components: [],
 			allow_category_change: true,
+			header: {
+				format: 'TEXT',
+				text: '',
+				example: [],
+			},
+			body: {
+				text: '',
+				example: [],
+			},
+			footer: {
+				text: '',
+			},
+			buttons: [],
 		},
 	});
 
-	const components = form.watch('components');
-	const headers = components.filter((component) => component.type === 'HEADER');
-	const header = headers.length > 0 ? headers[0] : null;
-	const bodies = components.filter((component) => component.type === 'BODY');
-	const body =
-		bodies.length > 0
-			? (bodies[0] as {
-					type: 'BODY';
-					text: '';
-					example: {
-						body_text: [string[]];
-					};
-			  })
-			: null;
-	const footers = components.filter((component) => component.type === 'FOOTER');
-	const footer = footers.length > 0 ? (footers[0] as { type: 'FOOTER'; text: '' }) : null;
-	const buttons =
-		components.filter((component) => component.type === 'BUTTONS')?.[0]?.buttons ?? [];
-
-	const carousel = components.filter((component) => component.type === 'CAROUSEL')?.[0];
+	const header = form.watch('header');
+	const body = form.watch('body');
+	const buttons = form.watch('buttons');
+	const carousel = form.watch('carousel');
+	const footer = form.watch('footer');
 
 	const saveTemplate = async (data: Template, handle?: string) => {
-		const buttons =
-			data.components.filter((component) => component.type === 'BUTTONS')?.[0]?.buttons ?? [];
-
-		if (buttons.length === 0) {
-			data.components = data.components.filter((c: { type: string }) => c.type !== 'BUTTONS');
+		if (data.buttons) {
+			data.buttons.some((button, buttonIndex) => {
+				if (button.type === 'URL') {
+					button.example.some((variable, variableIndex) => {
+						if (variable === '') {
+							return toast.error(
+								`Please fill the example value of button ${buttonIndex + 1} variable ${
+									variableIndex + 1
+								}`
+							);
+						}
+					});
+				}
+			});
+		}
+		if (data.buttons?.length === 0) {
+			delete data.buttons;
+		}
+		if (data.header?.format === 'NONE') {
+			delete data.header;
 		}
 
 		if (handle) {
-			data.components = data.components.map((component) => {
-				if (component.type === 'HEADER' && component.format !== 'TEXT') {
-					return {
-						...component,
-						example: {
-							header_handle: [handle],
-						},
-					};
-				}
-				return component;
-			});
+			data.header = {
+				format: data.header?.format as 'IMAGE' | 'VIDEO' | 'DOCUMENT',
+				example: handle,
+			};
 		}
 		onSave(data);
 	};
@@ -111,52 +123,39 @@ export default function DataForm({
 		}
 	}
 
-	const bodyVariables = countOccurrences(body?.text ?? '');
-
-	function addButton(payload: {
-		type: 'URL' | 'PHONE_NUMBER' | 'QUICK_REPLY' | 'VOICE_CALL';
-		text: string;
-		url?: string | undefined;
-		phone_number?: string | undefined;
-	}) {
-		if (buttons.length >= 3) return;
-		const _buttons = components.find((c: any) => c.type === 'BUTTONS');
-		if (_buttons) {
-			form.setValue(
-				'components',
-				components.map((component) => {
-					if (component.type === 'BUTTONS') {
-						return {
-							...component,
-							buttons: [...component.buttons, payload],
-						};
-					}
-					return component;
-				})
-			);
-		} else {
-			form.setValue('components', [
-				...components,
-				{
-					type: 'BUTTONS',
-					buttons: [payload],
-				},
-			]);
-		}
+	function addButton(
+		payload:
+			| {
+					type: 'QUICK_REPLY';
+					text: string;
+			  }
+			| {
+					type: 'URL';
+					text: string;
+					example: string[];
+					url: string;
+			  }
+			| {
+					type: 'PHONE_NUMBER';
+					text: string;
+					phone_number: string;
+			  }
+			| {
+					type: 'FLOW';
+					text: string;
+					flow_id: string;
+					flow_action: 'navigate' | 'data_exchange';
+					navigate_screen: string;
+			  }
+	) {
+		if ((buttons ?? []).length >= 3) return;
+		form.setValue('buttons', [...(buttons ?? []), payload]);
 	}
 
 	function removeButtonComponent(index: number) {
 		form.setValue(
-			'components',
-			components.map((component) => {
-				if (component.type === 'BUTTONS') {
-					return {
-						...component,
-						buttons: component.buttons.filter((_, i) => i !== index),
-					};
-				}
-				return component;
-			})
+			'buttons',
+			(buttons ?? []).filter((_, i) => i !== index)
 		);
 	}
 
@@ -168,61 +167,15 @@ export default function DataForm({
 		addButton({ type: 'PHONE_NUMBER', ...payload });
 	}
 
-	function addURLButton(payload: { text: string; url: string }) {
+	function addURLButton(payload: { text: string; url: string; example: string[] }) {
 		addButton({ type: 'URL', ...payload });
 	}
 
-	function handleBodyTextChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-		if (e.target.value.length > 2000) return;
-		if (!body) {
-			form.setValue('components', [...components, { type: 'BODY', text: e.target.value }]);
-		} else {
-			form.setValue(
-				'components',
-				components.map((component) => {
-					if (component.type === 'BODY') {
-						return {
-							...component,
-							text: e.target.value,
-						};
-					}
-					return component;
-				})
-			);
-		}
-		const _bodyVariableCount = countOccurrences(e.target.value);
-		if (_bodyVariableCount === 0 && body?.example) {
-			form.setValue(
-				'components',
-				components.map((component) => {
-					if (component.type === 'BODY') {
-						delete component.example;
-						return {
-							...component,
-							text: e.target.value,
-						};
-					}
-					return component;
-				})
-			);
-		}
+	function handleAddCarousels(carousels: Carousel) {
+		form.setValue('carousel', carousels);
 	}
 
 	const hasError = templateSchema.safeParse(form.getValues()).success === false;
-
-	const handleAddCarousel = (data: Carousel) => {
-		console.log(data);
-		form.setValue(
-			'components',
-
-			components.map((component) => {
-				if (component.type === 'CAROUSEL') {
-					return data;
-				}
-				return component;
-			})
-		);
-	};
 
 	return (
 		<Form {...form}>
@@ -251,142 +204,142 @@ export default function DataForm({
 						<Separator />
 
 						<div className='inline-flex justify-between w-full items-end'>
+							<div className='inline-flex gap-4'>
+								<FormField
+									control={form.control}
+									name='category'
+									render={({ field }) => (
+										<FormItem className='space-y-0 flex-1'>
+											<FormLabel className='text-primary'>
+												Template Type<span className='ml-[0.2rem] text-red-800'>*</span>
+											</FormLabel>
+											<FormControl>
+												<Select value={field.value} onValueChange={field.onChange}>
+													<SelectTrigger className='w-[180px]'>
+														<SelectValue placeholder='Select template type' />
+													</SelectTrigger>
+													<SelectContent>
+														<SelectGroup>
+															<Each
+																items={['MARKETING', 'UTILITY']}
+																render={(type) => <SelectItem value={type}>{type}</SelectItem>}
+															/>
+														</SelectGroup>
+													</SelectContent>
+												</Select>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name={'header'}
+									render={({ field }) => (
+										<Show.ShowIf condition={!!form.getValues('header')}>
+											<FormItem className='space-y-0 flex-1'>
+												<FormLabel className='text-primary'>
+													Template Header Type<span className='ml-[0.2rem] text-red-800'>*</span>
+												</FormLabel>
+												<FormControl>
+													<Select
+														value={field.value?.format}
+														onValueChange={(format) => {
+															if (format === 'TEXT') {
+																form.setValue('header', {
+																	format: 'TEXT',
+																	text: '',
+																	example: [],
+																});
+															} else if (
+																format === 'IMAGE' ||
+																format === 'VIDEO' ||
+																format === 'DOCUMENT'
+															) {
+																form.setValue('header', {
+																	format,
+																	example: '',
+																});
+															} else {
+																form.setValue('header', {
+																	format: 'NONE',
+																});
+															}
+														}}
+													>
+														<SelectTrigger className='w-[180px]'>
+															<SelectValue placeholder='Select header type' />
+														</SelectTrigger>
+														<SelectContent>
+															<SelectGroup>
+																<SelectItem value='NONE'>None</SelectItem>
+																<SelectItem value='TEXT'>Text</SelectItem>
+																<SelectItem value='IMAGE'>Image</SelectItem>
+																<SelectItem value='VIDEO'>Video</SelectItem>
+																<SelectItem value='DOCUMENT'>Document</SelectItem>
+															</SelectGroup>
+														</SelectContent>
+													</Select>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										</Show.ShowIf>
+									)}
+								/>
+							</div>
 							<FormField
 								control={form.control}
-								name='category'
+								name='carousel'
 								render={({ field }) => (
-									<FormItem className='space-y-0 flex-1'>
-										<FormLabel className='text-primary'>
-											Template Type<span className='ml-[0.2rem] text-red-800'>*</span>
-										</FormLabel>
+									<FormItem className='space-y-0 items-center justify-center inline-flex gap-3'>
+										<FormLabel className='text-primary'>Carousel Template</FormLabel>
 										<FormControl>
-											<ToggleGroup
-												className='justify-start'
-												type='single'
-												value={field.value}
-												onValueChange={field.onChange}
-											>
-												<ToggleGroupItem value='MARKETING' aria-label='Marketing'>
-													Marketing
-												</ToggleGroupItem>
-												<ToggleGroupItem value='UTILITY' aria-label='Utility'>
-													Utility
-												</ToggleGroupItem>
-											</ToggleGroup>
+											<Switch
+												checked={!!form.watch('carousel')}
+												onCheckedChange={(val) => {
+													if (val) {
+														form.setValue('header', undefined);
+														form.setValue('buttons', undefined);
+														form.setValue('footer', undefined);
+														form.setValue('carousel', { cards: [] });
+													} else {
+														form.setValue('header', {
+															format: 'TEXT',
+															text: '',
+															example: [],
+														});
+														form.setValue('footer', { text: '' });
+														form.setValue('buttons', []);
+														form.setValue('carousel', undefined);
+													}
+												}}
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>
 								)}
 							/>
-
-							<FormItem className='space-y-0 items-center justify-center inline-flex gap-3'>
-								<FormLabel className='text-primary'>Carousel Template</FormLabel>
-								<FormControl>
-									<Switch
-										checked={!!carousel}
-										onCheckedChange={(val) => {
-											if (val) {
-												form.setValue('components', [
-													...components.filter(
-														(component) =>
-															component.type !== 'HEADER' && component.type !== 'FOOTER'
-													),
-													{ type: 'CAROUSEL', cards: [] },
-												]);
-											} else {
-												form.setValue(
-													'components',
-													components.filter((component) => component.type !== 'CAROUSEL')
-												);
-											}
-										}}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
 						</div>
 
 						<Separator />
 
-						<Show.ShowIf condition={!carousel}>
-							<FormItem className='space-y-0 flex-1'>
-								<FormLabel className='text-primary'>
-									Template Header<span className='ml-[0.2rem] text-red-800'>*</span>
-								</FormLabel>
-								<FormControl>
-									<ToggleGroup
-										className='justify-start'
-										type='single'
-										value={header ? header.format : 'none'}
-										onValueChange={(format: 'none' | 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT') => {
-											if (fileInputRef.current) {
-												fileInputRef.current.value = '';
-											}
-											if (!header) {
-												if (format === 'none') return;
-												form.setValue('components', [...components, { type: 'HEADER', format }]);
-											} else {
-												if (format === 'none') {
-													form.setValue(
-														'components',
-														components.filter((component) => component.type !== 'HEADER')
-													);
-												} else {
-													form.setValue(
-														'components',
-														components.map((component) => {
-															if (component.type === 'HEADER') {
-																return { ...component, format };
-															}
-															return component;
-														})
-													);
-												}
-											}
-										}}
-									>
-										<ToggleGroupItem value='none' aria-label='None'>
-											None
-										</ToggleGroupItem>
-										<ToggleGroupItem value='TEXT' aria-label='Text'>
-											Text
-										</ToggleGroupItem>
-										<ToggleGroupItem value='IMAGE' aria-label='Image'>
-											Image
-										</ToggleGroupItem>
-										<ToggleGroupItem value='VIDEO' aria-label='Video'>
-											Video
-										</ToggleGroupItem>
-										<ToggleGroupItem value='DOCUMENT' aria-label='Document'>
-											Document
-										</ToggleGroupItem>
-									</ToggleGroup>
-								</FormControl>
-							</FormItem>
-
-							<Show.ShowIf condition={!!header && header.format === 'TEXT'}>
-								<FormItem className='space-y-0 flex-1'>
-									<FormLabel className='text-primary'>Header Text</FormLabel>
-									<FormControl>
-										<Input
-											placeholder='Header Text'
-											value={header?.text ?? ''}
-											onChange={(e) => {
-												form.setValue(
-													'components',
-													components.map((component) => {
-														if (component.type === 'HEADER') {
-															return { ...component, text: e.target.value };
-														}
-														return component;
-													})
-												);
-											}}
-										/>
-									</FormControl>
-								</FormItem>
+						<Show.ShowIf condition={!!header}>
+							<Show.ShowIf condition={!!header && header?.format === 'TEXT'}>
+								<BodyWithVariables
+									label='Header Text'
+									limit='60'
+									placeholder='Header Text'
+									text={header?.format === 'TEXT' ? header?.text : ''}
+									text_variables={header?.format === 'TEXT' ? header.example : []}
+									headerTextChange={(text, example) => {
+										form.setValue('header.text', text);
+										form.setValue('header.example', example);
+									}}
+								/>
 							</Show.ShowIf>
-							<Show.ShowIf condition={!!header && header.format !== 'TEXT'}>
+							<Show.ShowIf
+								condition={!!header && header.format !== 'TEXT' && header.format !== 'NONE'}
+							>
 								<FormItem className='space-y-0 flex-1'>
 									<FormLabel className='text-primary'>Header Media</FormLabel>
 									<FormControl>
@@ -412,76 +365,29 @@ export default function DataForm({
 						<Separator />
 
 						<div className='flex flex-col gap-3'>
-							<FormItem className='space-y-0 flex-1'>
-								<FormLabel className='text-primary'>
-									Template Body<span className='ml-[0.2rem] text-red-800'>*</span>
-								</FormLabel>
-								<FormDescription className='text-xs pb-2'>
-									{`Use dynamic variable like {{1}} {{2}} and so on`}. (Limit{' '}
-									{body?.text?.length ?? 0} / 2000)
-								</FormDescription>
-								<FormControl>
-									<Textarea
-										placeholder='Body Text'
-										value={body?.text ?? ''}
-										className='h-[300px]'
-										onChange={handleBodyTextChange}
-									/>
-								</FormControl>
-							</FormItem>
-
-							<Show.ShowIf condition={bodyVariables > 0}>
-								<FormItem className='space-y-0 flex-1'>
-									<FormLabel className='text-primary'>
-										Example Values (Total:- {bodyVariables})
-										<span className='ml-[0.2rem] text-red-800'>*</span>
-									</FormLabel>
-									<FormDescription className='text-xs'>
-										({body?.example?.body_text?.[0].filter((v) => v.trim().length > 0).length ?? 0}{' '}
-										of {bodyVariables} provided)
-									</FormDescription>
-									<Each
-										items={Array.from({ length: bodyVariables })}
-										render={(variable, index) => (
-											<FormControl>
-												<Input
-													key={index}
-													placeholder={`Example Value ${index + 1}`}
-													isInvalid={(body?.example?.body_text?.[0]?.[index] ?? '').length === 0}
-													value={(body?.example?.body_text?.[0] ?? [])[index] ?? ''}
-													onChange={(e) => {
-														form.setValue(
-															'components',
-															components.map((component, idx) => {
-																if (component.type === 'BODY') {
-																	if (!component.example) {
-																		component.example = {
-																			body_text: [
-																				Array.from({ length: bodyVariables }).map(() => ''),
-																			],
-																		};
-																	}
-																	component.example.body_text[0][index] = e.target.value;
-																}
-																return component;
-															})
-														);
-													}}
-												/>
-											</FormControl>
-										)}
-									/>
-								</FormItem>
-							</Show.ShowIf>
+							<BodyWithVariables
+								label='Body Text'
+								limit='1024'
+								placeholder='Body Text'
+								text={body?.text ?? ''}
+								text_variables={body?.example ?? []}
+								headerTextChange={(text, example) => {
+									form.setValue('body.text', text);
+									form.setValue('body.example', example);
+								}}
+							/>
 						</div>
 
 						<Separator />
 
 						<Show>
-							<Show.When condition={!!carousel}>
+							<Show.When condition={!!form.getValues('carousel')}>
 								<div className={'flex flex-col gap-3'}>
 									<div className='flex flex-col'>
-										<CarouselTemplateDialog carousel={carousel} onSubmit={handleAddCarousel}>
+										<CarouselTemplateDialog
+											carousel={carousel}
+											onSubmit={(carousels) => handleAddCarousels(carousels)}
+										>
 											<Button>Customize Carousel Cards</Button>
 										</CarouselTemplateDialog>
 									</div>
@@ -489,76 +395,66 @@ export default function DataForm({
 							</Show.When>
 							<Show.Else>
 								<div className={'flex flex-col gap-3'}>
-									<FormItem className='space-y-0 flex-1'>
-										<FormLabel className='text-primary'>Footer Text (Optional)</FormLabel>
-										<FormControl>
-											<Input
-												placeholder='Footer Text'
-												value={footer?.text ?? ''}
-												onChange={(e) => {
-													if (!footer) {
-														form.setValue('components', [
-															...components,
-															{ type: 'FOOTER', text: e.target.value },
-														]);
-													} else {
-														form.setValue(
-															'components',
-															components.map((component) => {
-																if (component.type === 'FOOTER') {
-																	return { ...component, text: e.target.value };
-																}
-																return component;
-															})
-														);
-													}
-												}}
-											/>
-										</FormControl>
-									</FormItem>
+									<FormField
+										control={form.control}
+										name='footer.text'
+										render={({ field }) => (
+											<FormItem className='space-y-0 flex-1'>
+												<FormLabel className='text-primary'>Footer Text (Optional)</FormLabel>
+												<FormControl>
+													<Input {...field} />
+												</FormControl>
+											</FormItem>
+										)}
+									/>
+								</div>
+								<Separator />
+
+								<div className='flex flex-col gap-3'>
+									<FormLabel className='text-primary'>Buttons</FormLabel>
+									<FormDescription className='text-xs pb-2'>
+										Insert buttons so your customers can take action and engage with your message!
+									</FormDescription>
+
+									<div
+										className={cn(
+											' gap-3 border border-dashed p-3',
+											(buttons ?? []).length > 0 ? 'inline-flex' : 'hidden'
+										)}
+									>
+										<Each
+											items={buttons ?? []}
+											render={(button: { type: string }, index) => (
+												<Badge>
+													<span className='text-sm font-medium'>
+														{button.type.replaceAll('_', ' ')}
+													</span>
+													<CircleMinus
+														className='w-3 h-3 ml-2 cursor-pointer'
+														onClick={() => removeButtonComponent(index)}
+													/>
+												</Badge>
+											)}
+										/>
+									</div>
+
+									<div className='flex flex-col md:flex-row gap-3'>
+										<AddQuickReply
+											disabled={(buttons ?? []).length >= 3}
+											onSubmit={addQuickReply}
+										/>
+										<PhoneNumberButton
+											disabled={(buttons ?? []).length >= 3}
+											onSubmit={addPhoneNumberButton}
+										/>
+										<URLButton disabled={(buttons ?? []).length >= 3} onSubmit={addURLButton} />
+									</div>
 								</div>
 							</Show.Else>
 						</Show>
-
-						<Separator />
-
-						<div className='flex flex-col gap-3'>
-							<FormLabel className='text-primary'>Buttons</FormLabel>
-							<FormDescription className='text-xs pb-2'>
-								Insert buttons so your customers can take action and engage with your message!
-							</FormDescription>
-
-							<div
-								className={cn(
-									' gap-3 border border-dashed p-3',
-									buttons.length > 0 ? 'inline-flex' : 'hidden'
-								)}
-							>
-								<Each
-									items={buttons}
-									render={(button: { type: string }, index) => (
-										<Badge>
-											<span className='text-sm font-medium'>
-												{button.type.replaceAll('_', ' ')}
-											</span>
-											<CircleMinus
-												className='w-3 h-3 ml-2 cursor-pointer'
-												onClick={() => removeButtonComponent(index)}
-											/>
-										</Badge>
-									)}
-								/>
-							</div>
-
-							<div className='flex flex-col md:flex-row gap-3'>
-								<AddQuickReply disabled={buttons.length >= 3} onSubmit={addQuickReply} />
-								<PhoneNumberButton disabled={buttons.length >= 3} onSubmit={addPhoneNumberButton} />
-								<URLButton disabled={buttons.length >= 3} onSubmit={addURLButton} />
-							</div>
-						</div>
 					</div>
 					<div className='w-full lg:w-[30%] flex flex-col-reverse lg:flex-col justify-start items-start gap-3'>
-						<TemplatePreview components={components} />
+						<TemplatePreview template={form.watch()} />
 						<div className='w-[90%] mx-auto'>
 							<div className='w-full flex gap-3'>
 								<Button type='submit' className='w-full' disabled={hasError}>

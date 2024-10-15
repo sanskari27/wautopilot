@@ -1,5 +1,6 @@
 import PageLayout from '@/components/containers/page-layout';
 import { AgentProvider } from '@/components/context/agents';
+import { BalanceReminder } from '@/components/context/balance-alert';
 import { DeviceAlertProvider } from '@/components/context/device-alert';
 import { DevicesStateProvider } from '@/components/context/devicesState';
 import { SettingStateProvider } from '@/components/context/settingState';
@@ -15,8 +16,7 @@ import PhoneBookService from '@/services/phonebook.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import DevicesAlertDialog from '../../components/elements/dialogs/devices-alert';
-
-export const dynamic = 'force-dynamic';
+import BalanceAlertDialog from '@/components/elements/dialogs/balance-alert-dialog';
 
 export const metadata: Metadata = {
 	title: 'Dashboard • Wautopilot',
@@ -38,21 +38,24 @@ export default async function Layout({
 			<main className='w-full h-full '>
 				<SettingStateProvider>
 					<UserDetailsProvider data={userDetails!}>
-						<DevicesStateProvider>
-							<DeviceAlertProvider data={userDetails?.no_of_devices!}>
-								<DevicesAlertDialog />
-								<Navbar />
-								<PageLayout className='overflow-scroll'>
-									<TagsProvider data={labels}>
-										<FieldsContextProvider data={fields}>
-											<AgentProvider data={agents}>{children}</AgentProvider>
-											<SettingsDialog />
-										</FieldsContextProvider>
-									</TagsProvider>
-									<DevicesDialog />
-								</PageLayout>
-							</DeviceAlertProvider>
-						</DevicesStateProvider>
+						<BalanceReminder balance={userDetails?.walletBalance ?? 0}>
+							<BalanceAlertDialog />
+							<DevicesStateProvider>
+								<DeviceAlertProvider data={userDetails?.no_of_devices!}>
+									<DevicesAlertDialog />
+									<Navbar />
+									<PageLayout className='overflow-scroll'>
+										<TagsProvider data={labels}>
+											<FieldsContextProvider data={fields}>
+												<AgentProvider data={agents}>{children}</AgentProvider>
+												<SettingsDialog />
+											</FieldsContextProvider>
+										</TagsProvider>
+										<DevicesDialog />
+									</PageLayout>
+								</DeviceAlertProvider>
+							</DevicesStateProvider>
+						</BalanceReminder>
 					</UserDetailsProvider>
 				</SettingStateProvider>
 			</main>

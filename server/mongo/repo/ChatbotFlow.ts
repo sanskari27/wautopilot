@@ -118,10 +118,21 @@ const schema = new mongoose.Schema<IChatBotFlow>(
 				template_header: {
 					type: {
 						type: String,
-						enum: ['TEXT', 'VIDEO', 'DOCUMENT'],
+						enum: ['IMAGE', 'TEXT', 'VIDEO', 'DOCUMENT'],
 					},
 					media_id: String,
 					link: String,
+					text: [
+						{
+							custom_text: String,
+							phonebook_data: String,
+							variable_from: {
+								type: String,
+								enum: ['custom_text', 'phonebook_data'],
+							},
+							fallback_value: String,
+						},
+					],
 				},
 				template_body: [
 					{
@@ -134,11 +145,45 @@ const schema = new mongoose.Schema<IChatBotFlow>(
 						fallback_value: String,
 					},
 				],
+				template_buttons: [[String]],
+				template_carousel: {
+					cards: [
+						{
+							header: {
+								media_id: String,
+							},
+							body: [
+								{
+									custom_text: String,
+									phonebook_data: String,
+									variable_from: {
+										type: String,
+										enum: ['custom_text', 'phonebook_data'],
+									},
+									fallback_value: String,
+								},
+							],
+							buttons: [[String]],
+						},
+					],
+				},
 			},
 		],
 		forward: {
 			number: String,
 			message: String,
+		},
+		startAt: {
+			type: String,
+			default: '10:00',
+		},
+		endAt: {
+			type: String,
+			default: '18:00',
+		},
+		trigger_gap_seconds: {
+			type: Number,
+			default: 0,
 		},
 	},
 	{

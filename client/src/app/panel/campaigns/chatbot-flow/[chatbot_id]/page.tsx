@@ -1,13 +1,13 @@
 'use client';
 
+import { QuickTemplateMessageProps } from '@/app/panel/conversations/_components/message-input';
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
 import { useFields } from '@/components/context/tags';
 import { useTemplates } from '@/components/context/templates';
 import ContactSelectorDialog from '@/components/elements/dialogs/contact-selector';
 import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
-import TemplatePreview from '@/components/elements/template-preview';
-import TemplateSelector from '@/components/elements/templetes-selector';
+import TemplateDialog from '@/components/elements/dialogs/template-data-selector';
 import AbsoluteCenter from '@/components/ui/absolute-center';
 import {
 	Accordion,
@@ -37,7 +37,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { countOccurrences, parseToObject } from '@/lib/utils';
+import { parseToObject } from '@/lib/utils';
 import { ChatbotFlow, ChatbotFlowSchema } from '@/schema/chatbot-flow';
 import { ContactWithID } from '@/schema/phonebook';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -113,17 +113,22 @@ export default function CreateChatbotFlow() {
 		}
 		const details = {
 			...data,
-			nurturing: data.nurturing.map((nurturing) => ({
-				...nurturing,
-				after:
-					Number(nurturing.after.value) *
-					(nurturing.after.type === 'min' ? 60 : nurturing.after.type === 'hours' ? 3600 : 86400),
-			})),
+			nurturing: data.nurturing.map((nurturing) => {
+				if (nurturing.template_header?.type === 'NONE') {
+					delete nurturing.template_header;
+				}
+				return {
+					...nurturing,
+					after:
+						Number(nurturing.after.value) *
+						(nurturing.after.type === 'min' ? 60 : nurturing.after.type === 'hours' ? 3600 : 86400),
+				};
+			}),
 		};
 		const promise = isEditing ? editChatbotFlow(data.id, details) : createChatbotFlow(details);
 		toast.promise(promise, {
 			loading: 'Saving...',
-			success: (res) => {
+			success: () => {
 				router.replace(`/panel/campaigns/chatbot-flow/${data.id}/customize`);
 				return 'Saved';
 			},
@@ -155,30 +160,14 @@ export default function CreateChatbotFlow() {
 		);
 	};
 
-	const handleTemplateChange = (index: number, details: { id: string; name: string } | null) => {
+	const handleTemplateChange = (index: number, details: QuickTemplateMessageProps) => {
 		if (!details) return;
-		form.setValue(`nurturing.${index}.template_name`, details.name);
-		const selectedTemplate = templates.find((template) => template.id === details.id);
-		form.setValue(`nurturing.${index}.template_id`, details.id);
-
-		const body = selectedTemplate?.components.find((c) => c.type === 'BODY');
-		const variables = countOccurrences(body?.text ?? '');
-
-		form.setValue(
-			`nurturing.${index}.template_body`,
-			Array.from({ length: variables }).map(() => ({
-				custom_text: '',
-				phonebook_data: '',
-				variable_from: 'custom_text' as 'custom_text' | 'phonebook_data',
-				fallback_value: '',
-			}))
-		);
-
-		const header = selectedTemplate?.components.find((c) => c.type === 'HEADER');
-		form.setValue(`nurturing.${index}.template_header`, {
-			type: header?.format ?? '',
-			media_id: '',
-		});
+		form.setValue(`nurturing.${index}.template_name`, details.template_name);
+		form.setValue(`nurturing.${index}.template_id`, details.template_id);
+		form.setValue(`nurturing.${index}.template_body`, details.body);
+		form.setValue(`nurturing.${index}.template_header`, details.header);
+		form.setValue(`nurturing.${index}.template_buttons`, details.buttons);
+		form.setValue(`nurturing.${index}.template_carousel`, details.carousel);
 	};
 
 	const addEmptyTrigger = () => {
@@ -202,10 +191,16 @@ export default function CreateChatbotFlow() {
 				contacts: [],
 				template_id: '',
 				template_name: '',
-				template_body: [],
 				template_header: {
-					type: '',
+					type: 'NONE',
+					text: [],
 					media_id: '',
+					link: '',
+				},
+				template_body: [],
+				template_buttons: [],
+				template_carousel: {
+					cards: [],
 				},
 			},
 		]);
@@ -573,18 +568,26 @@ export default function CreateChatbotFlow() {
 														render={({ field }) => (
 															<FormItem className='space-y-0 flex-1'>
 																<FormControl>
-																	<TemplateSelector
-																		onChange={(value) => handleTemplateChange(index, value)}
-																		value={field.value}
-																		placeholder='Select template'
-																	/>
+																	<TemplateDialog
+																		template={{
+																			template_id: nurturing[index].template_id,
+																			template_name: field.value,
+																			body: nurturing[index].template_body,
+																			header: nurturing[index].template_header,
+																			buttons: nurturing[index].template_buttons,
+																			carousel: nurturing[index].template_carousel,
+																		}}
+																		onConfirm={(value) => handleTemplateChange(index, value)}
+																	>
+																		<Button>{field.value ? field.value : 'Select template'}</Button>
+																	</TemplateDialog>
 																</FormControl>
 																<FormMessage />
 															</FormItem>
 														)}
 													/>
 													<Separator className='my-4' />
-													<div className='flex flex-col lg:flex-row w-full justify-between gap-3'>
+													{/* <div className='flex flex-col lg:flex-row w-full justify-between gap-3'>
 														<div className='flex flex-col w-full lg:w-[70%] space-y-2'>
 															<p
 																className='text-lg font-medium'
@@ -754,7 +757,7 @@ export default function CreateChatbotFlow() {
 																/>
 															</Show.ShowIf>
 														</div>
-													</div>
+													</div> */}
 												</TabsContent>
 											</Tabs>
 										</AccordionContent>

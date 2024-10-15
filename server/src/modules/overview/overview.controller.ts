@@ -5,8 +5,8 @@ import COMMON_ERRORS from '../../errors/common-errors';
 import ContactService from '../../services/contacts';
 import ConversationService from '../../services/conversation';
 import MediaService from '../../services/media';
+import MessageScheduler from '../../services/messageScheduler';
 import PhoneBookService from '../../services/phonebook';
-import SchedulerService from '../../services/scheduler';
 import WhatsappLinkService from '../../services/whatsappLink';
 import { Respond } from '../../utils/ExpressUtils';
 
@@ -41,7 +41,7 @@ async function dashboardDetails(req: Request, res: Response, next: NextFunction)
 		}
 
 		const conversation = new ConversationService(account, device);
-		const scheduler = new SchedulerService(account, device);
+		const scheduler = new MessageScheduler(account._id, device._id);
 		const whatsappLink = new WhatsappLinkService(account, device);
 		const media = new MediaService(account, device);
 

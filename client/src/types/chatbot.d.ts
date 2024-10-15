@@ -19,15 +19,38 @@ export type ChatbotFlow = {
 		contacts: string[];
 		template_id: string;
 		template_name: string;
-		template_body: {
+		template_body?: {
 			custom_text: string;
-			phonebook_data: string;
+			phonebook_data?: string;
 			variable_from: 'custom_text' | 'phonebook_data';
-			fallback_value: string;
+			fallback_value?: string;
 		}[];
-		template_header: {
-			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | 'AUDIO' | '';
-			media_id: string;
+		template_header?: {
+			type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | 'NONE';
+			text?:
+				| {
+						custom_text: string;
+						phonebook_data?: string;
+						variable_from: 'custom_text' | 'phonebook_data';
+						fallback_value?: string;
+				  }[];
+			media_id?: string | undefined;
+			link?: string | undefined;
+		};
+		template_buttons?: string[][];
+		template_carousel?: {
+			cards: {
+				header: {
+					media_id: string;
+				};
+				body: {
+					custom_text: string;
+					phonebook_data?: string;
+					variable_from: 'custom_text' | 'phonebook_data';
+					fallback_value?: string;
+				}[];
+				buttons: string[][];
+			}[];
 		};
 	}[];
 };

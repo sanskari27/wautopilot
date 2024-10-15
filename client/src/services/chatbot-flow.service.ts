@@ -1,5 +1,6 @@
 import api from '@/lib/api';
 import { ChatbotFlow } from '@/schema/chatbot-flow';
+import { ChatbotFlow as TChatbotFlow } from '@/types/chatbot';
 
 const validateChatBot = (bot: any) => {
 	return {
@@ -25,9 +26,18 @@ const validateChatBot = (bot: any) => {
 				fallback_value: body.fallback_value ?? '',
 			})),
 			template_header: {
-				type: nurturing.template_header?.type ?? '',
+				type: nurturing.template_header?.type ?? 'NONE',
 				media_id: nurturing.template_header?.media_id ?? '',
+				link: nurturing.template_header?.link ?? '',
+				text: nurturing.template_header?.text?.map((text: any) => ({
+					custom_text: text.custom_text ?? '',
+					phonebook_data: text.phonebook_data ?? '',
+					variable_from: text.variable_from ?? 'custom_text',
+					fallback_value: text.fallback_value ?? '',
+				})),
 			},
+			template_buttons: nurturing.template_buttons ?? [],
+			template_carousel: nurturing.template_carousel ?? [],
 			//after will have the property as value and type will be calculated with days min or hours
 			after: {
 				type:
@@ -53,107 +63,17 @@ export default class ChatbotFlowService {
 			return [];
 		}
 	}
-	static async createChatbotFlow(details: {
-		name: string;
-		trigger: string[];
-		options: string;
-		nurturing: {
-			after: number;
-			respond_type: 'template' | 'normal';
-			message?: string;
-			images?: string[];
-			videos?: string[];
-			audios?: string[];
-			documents?: string[];
-			contacts?: string[];
-			template_id?: string;
-			template_name?: string;
-			template_body?: {
-				custom_text: string;
-				phonebook_data: string;
-				variable_from: 'custom_text' | 'phonebook_data';
-				fallback_value: string;
-			}[];
-			template_header?: {
-				type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | 'AUDIO' | '';
-				media_id: string;
-			};
-		}[];
-	}) {
-		details.nurturing.map((nurturing) => {
-			if (nurturing.respond_type === 'template') {
-				delete nurturing.message;
-				delete nurturing.images;
-				delete nurturing.videos;
-				delete nurturing.audios;
-				delete nurturing.documents;
-				delete nurturing.contacts;
-			} else {
-				delete nurturing.template_id;
-				delete nurturing.template_name;
-				delete nurturing.template_body;
-				delete nurturing.template_header;
-			}
-		});
+	static async createChatbotFlow(details: TChatbotFlow) {
 		const { data } = await api.post(`/chatbot/flows`, details);
 		console.log(data.flow)
 		return validateChatBot(data.flow);
 	}
-	static async updateChatbotFlow({
-		bot_id,
-		details,
-	}: {
-		bot_id: string;
-		details: {
-			name: string;
-			trigger: string[];
-			options: string;
-			isActive: boolean;
-			nurturing: {
-				after: number;
-				respond_type: 'template' | 'normal';
-				message?: string;
-				images?: string[];
-				videos?: string[];
-				audios?: string[];
-				documents?: string[];
-				contacts?: string[];
-				template_id?: string;
-				template_name?: string;
-				template_body?: {
-					custom_text: string;
-					phonebook_data: string;
-					variable_from: 'custom_text' | 'phonebook_data';
-					fallback_value: string;
-				}[];
-				template_header?: {
-					type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT' | 'AUDIO' | '';
-					media_id: string;
-				};
-			}[];
-		};
-	}) {
-		details.nurturing.map((nurturing) => {
-			if (nurturing.respond_type === 'template') {
-				delete nurturing.message;
-				delete nurturing.images;
-				delete nurturing.videos;
-				delete nurturing.audios;
-				delete nurturing.documents;
-				delete nurturing.contacts;
-			} else {
-				delete nurturing.template_id;
-				delete nurturing.template_name;
-				delete nurturing.template_body;
-				delete nurturing.template_header;
-			}
-		});
-		const { data } = await api.patch(`/chatbot/flows/${bot_id}`, details);
-		console.log(data)
-		// return validateChatBot(data.flow);
+	static async updateChatbotFlow({ bot_id, details }: { bot_id: string; details: TChatbotFlow }) {
+		await api.patch(`/chatbot/flows/${bot_id}`, details);
+    revalidatePath('panel/campaigns/chatbot-flow', 'page');
 	}
 	static async updateNodesAndEdges(botId: string, details: { nodes: any[]; edges: any[] }) {
-			await api.patch(`/chatbot/flows/${botId}`, details);
+		await api.patch(`/chatbot/flows/${botId}`, details);
 	}
 	static async deleteChatbotFlow(botId: string) {
 		await api.delete(`/chatbot/flows/${botId}`);

@@ -22,7 +22,12 @@ export default interface IRecurringBroadcast extends Document {
 		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
 		media_id?: string;
 		link?: string;
-		text?: string;
+		text?: {
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
+		}[];
 	};
 	template_body: {
 		custom_text: string;
@@ -30,4 +35,19 @@ export default interface IRecurringBroadcast extends Document {
 		variable_from: 'custom_text' | 'phonebook_data';
 		fallback_value: string;
 	}[];
+	template_buttons: string[][];
+	template_carousel?: {
+		cards: {
+			header: {
+				media_id: string;
+			};
+			body: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
+			buttons: string[][];
+		}[];
+	};
 }

@@ -49,7 +49,17 @@ const schema = new mongoose.Schema<IRecurringBroadcast>(
 			},
 			media_id: String,
 			link: String,
-			text: String,
+			text: [
+				{
+					custom_text: String,
+					phonebook_data: String,
+					variable_from: {
+						type: String,
+						enum: ['custom_text', 'phonebook_data'],
+					},
+					fallback_value: String,
+				},
+			],
 		},
 		template_body: [
 			{
@@ -62,6 +72,29 @@ const schema = new mongoose.Schema<IRecurringBroadcast>(
 				fallback_value: String,
 			},
 		],
+
+		template_buttons: [[String]],
+		template_carousel: {
+			cards: [
+				{
+					header: {
+						media_id: String,
+					},
+					body: [
+						{
+							custom_text: String,
+							phonebook_data: String,
+							variable_from: {
+								type: String,
+								enum: ['custom_text', 'phonebook_data'],
+							},
+							fallback_value: String,
+						},
+					],
+					buttons: [[String]],
+				},
+			],
+		},
 	},
 	{
 		timestamps: { createdAt: true },

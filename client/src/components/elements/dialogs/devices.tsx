@@ -177,18 +177,14 @@ function DevicesList() {
 }
 
 function AddDeviceDialog() {
-	const router = useRouter();
-
 	const { value: isOpen, ...setIsOpen } = useBoolean(false);
 	const { value: loading, ...setLoading } = useBoolean();
-	const { value: facebookSignupLoading, ...setFacebookSignupLoading } = useBoolean();
 	const { setAddDevice, setDevices } = useDevicesDialogState();
 
 	const [details, setDetails] = useState({
 		phoneNumberId: '',
 		waid: '',
 		accessToken: '',
-		code: '',
 	});
 
 	const closeAddDevice = () => {
@@ -201,7 +197,11 @@ function AddDeviceDialog() {
 		setDevices(true);
 	}, [setAddDevice, setDevices]);
 
-	const handleSave = useCallback(async () => {
+	const handleSave = async () => {
+		if (!details.phoneNumberId || !details.waid || !details.accessToken) {
+			toast.error('Please fill all fields.');
+			return;
+		}
 		setLoading.on();
 		const success = await DeviceService.addDevice(details);
 
@@ -213,95 +213,7 @@ function AddDeviceDialog() {
 			toast.error('Entry already exists or invalid details. Please check and try again.');
 		}
 		setIsOpen.off();
-	}, [setLoading, details, setIsOpen, onDeviceAdded]);
-
-	const onClose = () => {
-		setIsOpen.off();
 	};
-
-	// --------------------------------------------- META REGISTRATION SCRIPTS ---------------------------------------------
-	useEffect(() => {
-		(window as any).fbAsyncInit = () => {
-			(window as any).FB.init({
-				appId: META_APP_ID,
-				cookie: true,
-				xfbml: true,
-				version: 'v20.0',
-			});
-		};
-
-		(function (d, s, id) {
-			const fjs = d.getElementsByTagName(s)[0];
-			if (d.getElementById(id)) {
-				return;
-			}
-			const js = d.createElement(s);
-			js.id = id;
-			(js as any).src = 'https://connect.facebook.net/en_US/sdk.js';
-			fjs.parentNode?.insertBefore(js, fjs);
-		})(document, 'script', 'facebook-jssdk');
-
-		const sessionInfoListener = (event: any) => {
-			try {
-				const data = JSON.parse(event.data);
-				if (data.type === 'WA_EMBEDDED_SIGNUP') {
-					// if user finishes the Embedded Signup flow
-					if (data.event === 'FINISH') {
-						const { phone_number_id, waba_id } = data.data;
-						setDetails((prev) => ({
-							...prev,
-							phoneNumberId: phone_number_id,
-							waid: waba_id,
-						}));
-					} else {
-						toast.error('Error signing up with facebook. Please try again.');
-					}
-				}
-			} catch (err) {
-				//ignore
-			}
-		};
-
-		window.addEventListener('message', sessionInfoListener);
-	}, []);
-
-	async function launchWhatsAppSignup() {
-		// Launch Facebook login
-		setFacebookSignupLoading.on();
-		(window as any).FB.login(
-			function (data: any) {
-				if (!data.authResponse) {
-					setFacebookSignupLoading.off();
-					toast.error('Login cancelled or did not fully authorize.');
-					return;
-				}
-
-				const code = data.authResponse.code;
-				setDetails((prev) => ({
-					...prev,
-					code,
-				}));
-			},
-			{
-				config_id: META_CONFIG_ID,
-				response_type: 'code',
-				override_default_response_type: true,
-				extras: {
-					feature: 'whatsapp_embedded_signup',
-					sessionInfoVersion: 2,
-				},
-			}
-		);
-	}
-
-	useEffect(() => {
-		if (!details.code || !details.phoneNumberId) {
-			return;
-		}
-		handleSave().then(() => {
-			setFacebookSignupLoading.off();
-		});
-	}, [details, handleSave, setFacebookSignupLoading]);
 
 	// --------------------------------------------- META REGISTRATION SCRIPTS  END ---------------------------------------------
 
@@ -319,14 +231,7 @@ function AddDeviceDialog() {
 					<DialogTitle className='text-center'>Add Device</DialogTitle>
 				</DialogHeader>
 				<div>
-					<Button
-						className='w-full bg-blue-500 hover:bg-blue-600'
-						onClick={launchWhatsAppSignup}
-						disabled={facebookSignupLoading}
-					>
-						<Facebook className='w-4 h-4 mr-2' />
-						Facebook Embedded Signup
-					</Button>
+					<EmbeddedSignupButton onConfirm={onDeviceAdded} />
 					<div className='relative my-4'>
 						<div className='absolute w-full top-[50%] -translate-y-[50%] -z-[10]'>
 							<div className='h-[1px] w-full bg-gray-300' />
@@ -375,7 +280,7 @@ function AddDeviceDialog() {
 							/>
 						</div>
 
-						<Button onClick={handleSave} disabled={loading} className='w-full'>
+						<Button onClick={() => handleSave()} disabled={loading} className='w-full'>
 							<ShieldCheck className='w-4 h-4 mr-2' />
 							Save
 						</Button>
@@ -390,3 +295,122 @@ function AddDeviceDialog() {
 		</Dialog>
 	);
 }
+
+export type EmbeddedSignupHandle = {
+	close: () => void;
+	open: () => void;
+};
+
+type EmbeddedSignupProps = {
+	onConfirm: () => void;
+};
+
+const EmbeddedSignupButton = (props: EmbeddedSignupProps) => {
+	const [details, setDetails] = useState({
+		phoneNumberId: '',
+		waid: '',
+		code: '',
+	});
+	const { value: isLoading, ...setLoading } = useBoolean();
+
+	useEffect(() => {
+		if (!details.code || !details.phoneNumberId || !details.waid) {
+			return;
+		}
+		DeviceService.addDevice(details).then((success) => {
+			if (success) {
+				props.onConfirm();
+			} else {
+				toast.error('Entry already exists or invalid details. Please check and try again.');
+			}
+		});
+	}, [details, props]);
+
+	// --------------------------------------------- META REGISTRATION SCRIPTS ---------------------------------------------
+
+	useEffect(() => {
+		(window as any).fbAsyncInit = () => {
+			(window as any).FB.init({
+				appId: META_APP_ID,
+				cookie: true,
+				xfbml: true,
+				version: 'v20.0',
+			});
+		};
+
+		(function (d, s, id) {
+			const fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(id)) {
+				return;
+			}
+			const js = d.createElement(s);
+			js.id = id;
+			(js as any).src = 'https://connect.facebook.net/en_US/sdk.js';
+			fjs.parentNode?.insertBefore(js, fjs);
+		})(document, 'script', 'facebook-jssdk');
+	}, []);
+
+	useEffect(() => {
+		const sessionInfoListener = (event: any) => {
+			try {
+				const data = JSON.parse(event.data);
+				if (data.type !== 'WA_EMBEDDED_SIGNUP') {
+					return;
+				}
+				// if user finishes the Embedded Signup flow
+				if (data.event !== 'FINISH') {
+					return toast.error('Error signing up with facebook. Please try again.');
+				}
+				const { phone_number_id, waba_id } = data.data;
+				setDetails((prev) => ({
+					...prev,
+					phoneNumberId: phone_number_id,
+					waid: waba_id,
+				}));
+			} catch (err) {
+				//ignore
+			}
+		};
+		window.addEventListener('message', sessionInfoListener);
+	}, []);
+
+	async function launchWhatsAppSignup() {
+		// Launch Facebook login
+		setLoading.on();
+		(window as any).FB.login(
+			function (data: any) {
+				if (!data.authResponse) {
+					setLoading.off();
+					toast.error('Login cancelled or did not fully authorize.');
+					return;
+				}
+				setDetails((prev) => ({
+					...prev,
+					code: data.authResponse.code,
+				}));
+			},
+			{
+				config_id: META_CONFIG_ID,
+				response_type: 'code',
+				override_default_response_type: true,
+				extras: {
+					feature: 'whatsapp_embedded_signup',
+					sessionInfoVersion: 2,
+				},
+			}
+		);
+	}
+
+	// --------------------------------------------- META REGISTRATION SCRIPTS  END ---------------------------------------------
+
+	return (
+		<Button
+			className='w-full bg-blue-500 hover:bg-blue-600'
+			onClick={launchWhatsAppSignup}
+			disabled={isLoading}
+		>
+			<Facebook className='w-4 h-4 mr-2' />
+			Facebook Embedded Signup
+		</Button>
+	);
+};

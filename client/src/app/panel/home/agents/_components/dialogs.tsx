@@ -441,7 +441,7 @@ export function PermissionDialog() {
 							</TableRow>
 
 							<TableRow>
-								<TableCell className='font-medium'>Broadcast</TableCell>
+								<TableCell className='font-medium'>Campaign</TableCell>
 								<TableCell className='text-center' />
 								<TableCell className='text-center'>
 									<Checkbox

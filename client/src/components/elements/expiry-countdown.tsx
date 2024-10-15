@@ -29,7 +29,7 @@ export default function ExpiryCountdown({ timeLeft }: { timeLeft: number }) {
 			{_timeLeft <= 0 ? (
 				<Badge variant={'destructive'}>Expired</Badge>
 			) : (
-				<Badge>Expires In :- {formatTime(_timeLeft)} </Badge>
+				<Badge className='line-clamp-1 hover:line-clamp-2'>Expires In :- {formatTime(_timeLeft)} </Badge>
 			)}
 		</>
 	);
