@@ -51,6 +51,8 @@ router
 	.route('/export')
 	.get(VerifyPermissions(Permissions.phonebook.export), Controller.exportRecords);
 
+router.route('/all-ids').get(Controller.allIds);
+
 router
 	.route('/:id')
 	.all(IDValidator)

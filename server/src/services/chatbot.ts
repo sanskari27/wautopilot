@@ -892,22 +892,22 @@ export default class ChatBotService extends WhatsappLinkService {
 			schedule(message);
 		}
 
-		for (const mediaObject of bot.images) {
+		for (const mediaObject of bot.images ?? []) {
 			const mediaMessage = new MediaMessage(recipient, 'image').setMediaId(mediaObject.media_id);
 			schedule(mediaMessage);
 		}
 
-		for (const mediaObject of bot.videos) {
+		for (const mediaObject of bot.videos ?? []) {
 			const mediaMessage = new MediaMessage(recipient, 'video').setMediaId(mediaObject.media_id);
 			schedule(mediaMessage);
 		}
 
-		for (const mediaObject of bot.audios) {
+		for (const mediaObject of bot.audios ?? []) {
 			const mediaMessage = new MediaMessage(recipient, 'audio').setMediaId(mediaObject.media_id);
 			schedule(mediaMessage);
 		}
 
-		for (const mediaObject of bot.documents) {
+		for (const mediaObject of bot.documents ?? []) {
 			const mediaMessage = new MediaMessage(recipient, 'document').setMediaId(mediaObject.media_id);
 			schedule(mediaMessage);
 		}

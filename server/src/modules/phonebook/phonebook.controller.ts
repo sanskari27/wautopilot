@@ -135,6 +135,73 @@ async function records(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
+async function allIds(req: Request, res: Response, next: NextFunction) {
+	const { user, serviceAccount } = req.locals;
+	const page = req.query.page ? parseInt(req.query.page as string) || 1 : 1;
+	const limit = req.query.limit ? parseInt(req.query.limit as string) || 20 : 20;
+	let labels = Array.isArray(req.query.labels)
+		? (req.query.labels as string[])
+		: typeof req.query.labels === 'string' && req.query.labels
+		? [req.query.labels]
+		: [];
+
+	const search = Array.isArray(req.query.search)
+		? (req.query.search as string[]).reduce(
+				(acc, val) => ({
+					...acc,
+					[val.split('=')[0]]: val.split('=')[1],
+				}),
+				{} as {
+					[key: string]: string;
+				}
+		  )
+		: {};
+
+	if (user.userLevel === UserLevel.Agent) {
+		const permissions = await user.getPermissions();
+		const allowedLabels = permissions.assigned_labels;
+
+		if (allowedLabels.length === 0) {
+			return Respond({
+				res,
+				status: 200,
+				data: {
+					records: [],
+					totalRecords: 0,
+				},
+			});
+		}
+		if (labels.length > 0) {
+			labels = intersection(labels, allowedLabels);
+		} else {
+			labels = allowedLabels;
+		}
+	}
+
+	try {
+		const phoneBookService = new PhoneBookService(serviceAccount);
+
+		const records = await phoneBookService.fetchRecords({
+			page,
+			limit,
+			labels,
+			search,
+		});
+
+		const ids = records.map((record) => record.id);
+
+		return Respond({
+			res,
+			status: 200,
+			data: {
+				list: ids,
+			},
+		});
+	} catch (err) {
+		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+}
+
 async function getAllIds(req: Request, res: Response, next: NextFunction) {
 	const { user, serviceAccount } = req.locals;
 
@@ -560,6 +627,7 @@ const Controller = {
 	bulkUpload,
 	addFields,
 	getAllIds,
+	allIds,
 };
 
 export default Controller;
