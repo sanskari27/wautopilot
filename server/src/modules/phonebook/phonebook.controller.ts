@@ -167,11 +167,18 @@ async function getAllIds(req: Request, res: Response, next: NextFunction) {
 			search: {},
 		});
 
+		const trueAsValue = records
+			.map((record) => record.id)
+			.reduce((acc, val) => {
+				acc[val.toString()] = true;
+				return acc;
+			}, {} as { [key: string]: boolean });
+
 		return Respond({
 			res,
 			status: 200,
 			data: {
-				ids: records.map((record) => record.id),
+				selected: trueAsValue,
 			},
 		});
 	} catch (err) {
