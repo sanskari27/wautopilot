@@ -44,6 +44,7 @@ export default class MediaMessage extends Message {
 		}
 
 		return {
+			messaging_product: 'whatsapp',
 			recipient_type: 'individual',
 			to: this.recipient,
 			type: this.media_type,
