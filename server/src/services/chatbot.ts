@@ -759,14 +759,10 @@ export default class ChatBotService extends WhatsappLinkService {
 				| 'audio'
 				| 'document';
 
-			if (type === 'audio') {
-				type = 'document';
-			}
-			const msg = new InteractiveMediaMessage(recipient, type);
+			const msg = new MediaMessage(recipient, type);
 			const media = await mediaService.getMedia(node.data.id);
-			msg.setMediaHeader({ media_id: media.media_id });
-			msg.setBody(node.data.caption);
-			msg.setButtons(generateButtons(node.data.buttons));
+			msg.setMediaId(media.media_id);
+			msg.setCaption(node.data.caption);
 
 			if (node.data.reply_to_message && details?.meta_message_id) {
 				msg.setContextMessage(details.meta_message_id);
