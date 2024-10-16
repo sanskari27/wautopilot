@@ -42,6 +42,9 @@ type CreateFlowData = {
 	name: string;
 	options: BOT_TRIGGER_OPTIONS;
 	trigger: string[];
+	startAt: string;
+	endAt: string;
+	trigger_gap_seconds: number;
 	nodes: {
 		type:
 			| 'startNode'
@@ -132,6 +135,9 @@ function processFlowDocs(docs: IChatBotFlow[]) {
 			name: bot.name,
 			trigger: bot.trigger,
 			options: bot.options,
+			startAt: bot.startAt,
+			endAt: bot.endAt,
+			trigger_gap_seconds: bot.trigger_gap_seconds,
 			nodes: bot.nodes.map((node) => ({
 				type: node.node_type,
 				id: node.id,

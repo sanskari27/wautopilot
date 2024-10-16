@@ -20,6 +20,7 @@ export default class TextMessage extends Message {
 		return {
 			to: this.recipient,
 			type: 'text',
+			messaging_product: 'whatsapp',
 			text: {
 				preview_url: false,
 				body: this.message,

@@ -9,6 +9,9 @@ export type CreateFlowValidationResult = {
 	name: string;
 	options: BOT_TRIGGER_OPTIONS;
 	trigger: string[];
+	startAt: string;
+	endAt: string;
+	trigger_gap_seconds: number;
 	nodes: {
 		type:
 			| 'startNode'
@@ -169,6 +172,9 @@ export async function CreateFlowValidator(req: Request, res: Response, next: Nex
 		]),
 
 		name: z.string().trim(),
+		startAt: z.string().trim().default('10:00'),
+		endAt: z.string().trim().default('18:00'),
+		trigger_gap_seconds: z.number().default(0),
 		nodes: z
 			.array(
 				z.object({
