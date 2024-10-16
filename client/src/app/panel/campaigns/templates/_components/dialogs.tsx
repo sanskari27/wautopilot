@@ -363,10 +363,10 @@ export function CarouselTemplateDialog({
 		const buttonLength = new Set();
 		const buttonType = new Set();
 		data.cards.forEach((card, index) => {
-			if (!card.header.example) {
-				hasError = true;
-				return toast.error(`Please upload media file in card ${index + 1}`);
-			}
+			// if (!card.header.example) {
+			// 	hasError = true;
+			// 	return toast.error(`Please upload media file in card ${index + 1}`);
+			// }
 			if (card.body.text.length === 0) {
 				hasError = true;
 
