@@ -883,7 +883,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 		const schedulerOptions = {
 			scheduler_id: bot._id,
-			scheduler_type: ChatBotFlowDB_name,
+			scheduler_type: `${ChatBotFlowDB_name} Nurturing`,
 			sendAt: opts.sendAt || DateUtils.getMomentNow().toDate(),
 		};
 
