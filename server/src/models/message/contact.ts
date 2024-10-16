@@ -177,6 +177,7 @@ export default class ContactMessage extends Message {
 	toObject() {
 		return {
 			to: this.recipient,
+			messaging_product: 'whatsapp',
 			type: 'contacts',
 			contacts: [
 				{

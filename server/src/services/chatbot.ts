@@ -734,7 +734,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			message_id = await schedulerService.scheduleMessage(msg, {
 				...schedulerOptions,
-				formattedMessage: extractFormattedMessage(msg),
+				formattedMessage: extractFormattedMessage(msg.toObject()),
 			});
 		} else if (node.node_type === 'contactNode') {
 			const { id, formatted_name, ...contact } = node.data.contact;
@@ -746,7 +746,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			message_id = await schedulerService.scheduleMessage(msg, {
 				...schedulerOptions,
-				formattedMessage: extractFormattedMessage(msg),
+				formattedMessage: extractFormattedMessage(msg.toObject()),
 			});
 		} else if (
 			node.node_type === 'imageNode' ||
@@ -771,7 +771,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			message_id = await schedulerService.scheduleMessage(msg, {
 				...schedulerOptions,
-				formattedMessage: extractFormattedMessage(msg),
+				formattedMessage: extractFormattedMessage(msg.toObject()),
 			});
 		} else if (node.node_type === 'buttonNode') {
 			const msg = new InteractiveMediaMessage(recipient, 'none');
@@ -784,7 +784,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			message_id = await schedulerService.scheduleMessage(msg, {
 				...schedulerOptions,
-				formattedMessage: extractFormattedMessage(msg),
+				formattedMessage: extractFormattedMessage(msg.toObject()),
 			});
 		} else if (node.node_type === 'listNode') {
 			const msg = new InteractiveMediaMessage(recipient, 'none');
@@ -800,7 +800,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			message_id = await schedulerService.scheduleMessage(msg, {
 				...schedulerOptions,
-				formattedMessage: extractFormattedMessage(msg),
+				formattedMessage: extractFormattedMessage(msg.toObject()),
 			});
 		} else if (node.node_type === 'flowNode') {
 			const fDetails = await whatsappFlow.getWhatsappFlowContents(node.data.flow_id);
@@ -817,7 +817,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			message_id = await schedulerService.scheduleMessage(msg, {
 				...schedulerOptions,
-				formattedMessage: extractFormattedMessage(msg),
+				formattedMessage: extractFormattedMessage(msg.toObject()),
 			});
 		} else if (node.node_type === 'locationRequestNode') {
 			const msg = new LocationRequestMessage(recipient).setBody(node.data.label);
@@ -828,7 +828,7 @@ export default class ChatBotService extends WhatsappLinkService {
 
 			message_id = await schedulerService.scheduleMessage(msg, {
 				...schedulerOptions,
-				formattedMessage: extractFormattedMessage(msg),
+				formattedMessage: extractFormattedMessage(msg.toObject()),
 			});
 		} else {
 			return;
