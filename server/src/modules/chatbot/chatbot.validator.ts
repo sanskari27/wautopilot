@@ -325,6 +325,9 @@ export async function UpdateFlowValidator(req: Request, res: Response, next: Nex
 			.optional(),
 
 		name: z.string().trim().optional(),
+		startAt: z.string().trim().default('10:00'),
+		endAt: z.string().trim().default('18:00'),
+		trigger_gap_seconds: z.number().default(0),
 		nodes: z
 			.array(
 				z.object({
