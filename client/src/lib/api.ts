@@ -20,7 +20,6 @@ api.interceptors.request.use(async (config) => {
 			.join('; ');
 		config.headers['Cookie'] = cookiesString;
 	}
-	console.log('Request:', config.url)
 	return config;
 });
 

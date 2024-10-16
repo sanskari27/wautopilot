@@ -319,7 +319,6 @@ export default function TemplateDialog({
 			});
 		}
 	};
-	console.log(template_buttons);
 	return (
 		<Dialog>
 			<DialogTrigger ref={buttonRef} asChild>

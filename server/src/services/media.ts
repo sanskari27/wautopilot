@@ -64,6 +64,18 @@ export default class MediaService extends WhatsappLinkService {
 		return processMediaDocs([media])[0];
 	}
 
+	async getLocalPathByMediaId(media_id: string) {
+		const media = await MediaDB.findOne({
+			linked_to: this.userId,
+			device_id: this.deviceId,
+			media_id,
+		});
+		if (!media) {
+			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
+		}
+		return media.local_path;
+	}
+
 	async getMediaLocalPath(id: Types.ObjectId) {
 		const media = await MediaDB.findOne({
 			linked_to: this.userId,

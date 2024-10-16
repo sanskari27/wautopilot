@@ -62,7 +62,7 @@ export default function APIWebhook() {
 							</p>
 						</div>
 					</section>
-					<section id='text message'>
+					<section id='text-message'>
 						<Separator className='w-full' />
 						<div>
 							<p className='text-2xl pt-4 font-medium'>Send Message</p>
@@ -1180,6 +1180,310 @@ export default function APIWebhook() {
 									language={'javascript'}
 								/>
 							</div>
+						</div>
+					</section>
+					<section id='media'>
+						<Separator className='w-full' />
+						<div>
+							<p className='text-2xl pt-4 font-medium'>Media</p>
+						</div>
+						<div>
+							<div>
+								<p className='text-lg pt-4 font-medium'>List Media</p>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2'>
+								<div>
+									<Separator className='w-3/4' />
+									<p className='mt-4'>Lists of media</p>
+								</div>
+								<CodeBlocks
+									title='Request Example'
+									code={`curl --location 'https://api.wautopilot.com/v1/media' \--header 'Authorization: ••••••' \}'`}
+									language={'bash'}
+								/>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2'>
+								<div>
+									<p className='mt-4 text-lg'>Arguments:</p>
+									<p>No args required.</p>
+								</div>
+								<CodeBlocks
+									title='Request body example'
+									code={`{
+    "list": [
+        {
+            "id": "1064042408267933",
+            "filename": "DP-8049E",
+            "file_length": 922113,
+            "mime_type": "image/jpeg"
+        },
+    ],
+    "success": true
+}`}
+									language={'javascript'}
+								/>
+							</div>
+						</div>
+						<div>
+							<div>
+								<p className='text-lg pt-4 font-medium'>Download Media</p>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2'>
+								<div>
+									<Separator className='w-3/4' />
+									<p className='mt-4'>Download media by media id</p>
+								</div>
+								<CodeBlocks
+									title='Request Example'
+									code={`curl --location 'https://api.wautopilot.com/v1/media/<MEDIA_ID>/download' \--header 'Authorization: ••••••' \}'`}
+									language={'bash'}
+								/>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2'>
+								<div>
+									<p className='mt-4 text-lg'>Arguments:</p>
+									<Separator className='w-3/4 my-4' />
+									<p className=''>
+										{`<MEDIA_ID>`}: <span className='text-muted-foreground'>string</span>
+										<span className='text-destructive'> (required)</span>
+									</p>
+									<Separator className='w-3/4 my-4' />
+								</div>
+							</div>
+						</div>
+					</section>
+					<section id='template'>
+						<Separator className='w-full' />
+						<div>
+							<p className='text-2xl pt-4 font-medium'>Template</p>
+						</div>
+						<div>
+							<div>
+								<p className='text-lg pt-4 font-medium'>List templates</p>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2'>
+								<div>
+									<Separator className='w-3/4' />
+									<p className='mt-4'>Lists of all template registered to meta.</p>
+								</div>
+								<CodeBlocks
+									title='Request Example'
+									code={`curl --location 'https://api.wautopilot.com/v1/templates' \--header 'Authorization: ••••••' \}'`}
+									language={'bash'}
+								/>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2'>
+								<div>
+									<p className='mt-4 text-lg'>Arguments:</p>
+									<p>No args required.</p>
+								</div>
+								<CodeBlocks
+									title='Response body example'
+									code={`{
+    "templates": [
+        {
+            "id": "3837455136535795",
+            "name": "product_catalog",
+            "status": "APPROVED",
+            "category": "MARKETING"
+        },
+    ],
+    "success": true
+}`}
+									language={'javascript'}
+								/>
+							</div>
+						</div>
+						<div>
+							<div>
+								<p className='text-lg pt-4 font-medium'>Template Details</p>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2'>
+								<div>
+									<Separator className='w-3/4' />
+									<p className='mt-4'>Details of the template.</p>
+								</div>
+								<CodeBlocks
+									title='Request Example'
+									code={`curl --location 'https://api.wautopilot.com/v1/templates/<TEMPLATE_ID>' \--header 'Authorization: ••••••' \}'`}
+									language={'bash'}
+								/>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2'>
+								<div>
+									<p className='mt-4 text-lg'>Arguments:</p>
+									<Separator className='w-3/4 my-4' />
+									<p className=''>
+										{`<TEMPLATE_ID>`}: <span className='text-muted-foreground'>string</span>
+										<span className='text-destructive'> (required)</span>
+									</p>
+									<Separator className='w-3/4 my-4' />
+								</div>
+								<CodeBlocks
+									title='Response body example'
+									code={`{
+    "template": {
+        "id": "<TEMPLATE_ID>",
+        "name": "mar_bni_pincode_message",
+        "category": "MARKETING",
+        "allow_category_change": true,
+        "language": "en_US",
+        "components": [
+            {
+                "type": "BODY",
+                "text": "Good Morning {{1}} ,\n\nWhile going through my leads a few days ago, I saw your office is in {{2}} .\n\nI visit {{2}} regularly, and would like to do 1-2-1 when I visit next time .\n\nPlease share your *Google Location of your Business* .",
+                "example": {
+                    "body_text": [
+                        [
+                            "Name",
+                            "Colony"
+                        ]
+                    ]
+                }
+            },
+            {
+                "type": "BUTTONS",
+                "buttons": [
+                    {
+                        "type": "QUICK_REPLY",
+                        "text": "Let's Connect"
+                    },
+                    {
+                        "type": "QUICK_REPLY",
+                        "text": "I will connect later"
+                    }
+                ]
+            }
+        ]
+    },
+    "success": true
+}`}
+									language={'javascript'}
+								/>
+							</div>
+						</div>
+						<div className='text-center font-medium'>
+							Please refer to the meta documentation for more details on the template.
+						</div>
+					</section>
+					<section id='flows'>
+						<Separator className='w-full' />
+						<div>
+							<p className='text-2xl pt-4 font-medium'>Whatsapp Flows / Forms</p>
+						</div>
+						<div>
+							<div>
+								<p className='text-lg pt-4 font-medium'>List FLows</p>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2'>
+								<div>
+									<Separator className='w-3/4' />
+									<p className='mt-4'>Lists all the flows registered to meta.</p>
+								</div>
+								<CodeBlocks
+									title='Request Example'
+									code={`curl --location 'https://api.wautopilot.com/v1/flows' \--header 'Authorization: ••••••' \}'`}
+									language={'bash'}
+								/>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2'>
+								<div>
+									<p className='mt-4 text-lg'>Arguments:</p>
+									<p>No args required.</p>
+								</div>
+								<CodeBlocks
+									title='Response body example'
+									code={`{
+    "flows": [
+        {
+            "id": "505642542401463",
+            "name": "Digital Marketing Expertise Survey",
+            "status": "PUBLISHED",
+            "categories": [
+                "LEAD_GENERATION"
+            ]
+        }
+    ],
+    "success": true
+}`}
+									language={'javascript'}
+								/>
+							</div>
+						</div>
+						<div>
+							<div>
+								<p className='text-lg pt-4 font-medium'>Whatsapp Flow Details</p>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2'>
+								<div>
+									<Separator className='w-3/4' />
+									<p className='mt-4'>Details of the flow.</p>
+								</div>
+								<CodeBlocks
+									title='Request Example'
+									code={`curl --location 'https://api.wautopilot.com/v1/flows/<FLOW_ID>' \--header 'Authorization: ••••••' \}'`}
+									language={'bash'}
+								/>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2'>
+								<div>
+									<p className='mt-4 text-lg'>Arguments:</p>
+									<Separator className='w-3/4 my-4' />
+									<p className=''>
+										{`<FLOW_ID>`}: <span className='text-muted-foreground'>string</span>
+										<span className='text-destructive'> (required)</span>
+									</p>
+									<Separator className='w-3/4 my-4' />
+								</div>
+								<CodeBlocks
+									title='Response body example'
+									code={`{
+    "screens": [
+        {
+            "id": "kindly_share_your_expertise_in_digital_marketing",
+            "title": "Kindly share your expertise in Digital Marketing",
+            "children": [
+                {
+                    "type": "CheckboxGroup",
+                    "name": "multiple_choice",
+                    "label": "Expert Area",
+                    "required": false,
+                    "data-source": [
+                        "Social Media Marketing",
+                        "Search Engine Marketing",
+                        "SEO",
+                        "Meta Whatsapp Business API"
+                    ]
+                },
+                {
+                    "type": "TextArea",
+                    "name": "textarea",
+                    "label": "Industries you cater",
+                    "required": false,
+                    "helper-text": "Kindly specify industries you specialize in generating leads for."
+                },
+                {
+                    "type": "Footer",
+                    "label": "Submit",
+                    "on-click-action": {
+                        "name": "complete",
+                        "payload": {
+                            "multiple_choice": "{form.multiple_choice}",
+                            "textarea": "{form.textarea}"
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "success": true
+}`}
+									language={'javascript'}
+								/>
+							</div>
+						</div>
+						<div className='text-center font-medium'>
+							Please refer to the meta documentation for more details on the flow.
 						</div>
 					</section>
 				</TabsContent>

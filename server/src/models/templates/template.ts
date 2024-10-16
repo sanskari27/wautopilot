@@ -164,6 +164,15 @@ export default class Template {
 		};
 	}
 
+	getDetails() {
+		return {
+			id: this.id,
+			name: this.name,
+			status: this.status,
+			category: this.category,
+		};
+	}
+
 	getStatus() {
 		return this.status;
 	}

@@ -37,6 +37,8 @@ const schema = new mongoose.Schema<IMedia>({
 	},
 });
 
+schema.index({ linked_to: 1, device_id: 1, media_id: 1 });
+
 const MediaDB = mongoose.model<IMedia>(MediaDB_name, schema);
 
 export default MediaDB;
