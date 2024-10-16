@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import {
 	Dialog,
 	DialogContent,
+	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
@@ -435,21 +436,23 @@ export function CarouselTemplateDialog({
 			<DialogTrigger ref={buttonRef} asChild>
 				{children}
 			</DialogTrigger>
-			<DialogContent className='sm:max-w-[425px] md:max-w-xl lg:max-w-3xl'>
-				<DialogHeader>
+			<DialogContent className='sm:max-w-[425px] md:max-w-xl lg:max-w-3xl p-0'>
+				<DialogHeader className='p-4'>
 					<DialogTitle>Carousel Template</DialogTitle>
 				</DialogHeader>
-				<Button onClick={addBlankCard}>Add Card</Button>
-				<ScrollArea className='max-h-[800px] px-1'>
+				<Button className='mx-6' onClick={addBlankCard}>
+					Add Card
+				</Button>
+				<ScrollArea className='max-h-[800px] p-6'>
 					<form onSubmit={form.handleSubmit((data, e) => handleSave(data, e))}>
 						<FormField
 							control={form.control}
 							name='cards'
 							render={({ field }) => (
-								<Each
-									items={field.value}
-									render={(item, index) => (
-										<Accordion type='single' collapsible key={index}>
+								<Accordion type='single' collapsible>
+									<Each
+										items={field.value}
+										render={(item, index) => (
 											<AccordionItem value={`${index}`}>
 												<AccordionTrigger>Card {index + 1}</AccordionTrigger>
 												<AccordionContent>
@@ -615,22 +618,24 @@ export function CarouselTemplateDialog({
 													</FormItem>
 												</AccordionContent>
 											</AccordionItem>
-										</Accordion>
-									)}
-								/>
+										)}
+									/>
+								</Accordion>
 							)}
 						/>
 					</form>
-					<Button
-						onClick={(e) => {
-							e.stopPropagation();
-							e.preventDefault();
-							handleSave(form.watch(), e);
-						}}
-						disabled={!form.formState.errors}
-					>
-						Submit
-					</Button>
+					<DialogFooter className='mt-4'>
+						<Button
+							onClick={(e) => {
+								e.stopPropagation();
+								e.preventDefault();
+								handleSave(form.watch(), e);
+							}}
+							disabled={!form.formState.errors}
+						>
+							Submit
+						</Button>
+					</DialogFooter>
 				</ScrollArea>
 			</DialogContent>
 		</Dialog>

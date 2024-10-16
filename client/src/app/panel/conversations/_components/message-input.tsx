@@ -5,7 +5,7 @@ import { useQuickReplies } from '@/components/context/quick-replies';
 import { useRecipient } from '@/components/context/recipients';
 import ContactSelectorDialog from '@/components/elements/dialogs/contact-selector';
 import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
-import TemplateDialog from '@/components/elements/dialogs/template-data-selector';
+import TemplateDialog from '@/components/elements/dialogs/template-data-input';
 import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,

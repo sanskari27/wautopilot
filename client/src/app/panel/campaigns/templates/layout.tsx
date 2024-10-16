@@ -8,7 +8,6 @@ export const metadata: Metadata = {
 	title: 'Broadcasts • Wautopilot',
 };
 
-
 export default async function Layout({
 	children,
 }: Readonly<{

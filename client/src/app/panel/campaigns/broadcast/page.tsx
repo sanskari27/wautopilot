@@ -3,7 +3,7 @@ import Show from '@/components/containers/show';
 import { useFields } from '@/components/context/tags';
 import { usePermissions } from '@/components/context/user-details';
 import NumberInputDialog from '@/components/elements/dialogs/numberInput';
-import TemplateDialog from '@/components/elements/dialogs/template-data-selector';
+import TemplateDialog from '@/components/elements/dialogs/template-data-input';
 import TagsSelector from '@/components/elements/popover/tags';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
