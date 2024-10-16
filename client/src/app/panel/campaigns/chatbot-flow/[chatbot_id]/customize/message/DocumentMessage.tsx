@@ -1,6 +1,5 @@
 'use client';
 import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
-import AbsoluteCenter from '@/components/ui/absolute-center';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -25,16 +24,11 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { parseToSeconds } from '@/lib/utils';
 import { useState } from 'react';
-import { AddButton, ListButtons } from '../_components/buttons';
 
 export type DocumentMessageProps = {
 	onDocumentMessageAdded: (
 		id: string,
 		caption: string,
-		buttons: {
-			id: string;
-			text: string;
-		}[],
 		delay: number,
 		reply_to_message: boolean
 	) => void;
@@ -47,21 +41,9 @@ const DocumentMessage = ({ onDocumentMessageAdded, children }: DocumentMessagePr
 	const [caption, setCaption] = useState('');
 	const [delay, setDelay] = useState(0);
 	const [delayType, setDelayType] = useState<'sec' | 'min' | 'hour'>('sec');
-	const [buttons, setButtons] = useState<
-		{
-			id: string;
-			text: string;
-		}[]
-	>([]);
 
 	const handleSave = () => {
-		onDocumentMessageAdded(
-			attachment,
-			caption,
-			buttons,
-			parseToSeconds(delay, delayType),
-			reply_to_message
-		);
+		onDocumentMessageAdded(attachment, caption, parseToSeconds(delay, delayType), reply_to_message);
 	};
 
 	return (
@@ -98,16 +80,6 @@ const DocumentMessage = ({ onDocumentMessageAdded, children }: DocumentMessagePr
 							onChange={(e) => setCaption(e.target.value)}
 						/>
 					</div>
-					<AbsoluteCenter>Reply Back Buttons</AbsoluteCenter>
-					<ListButtons
-						buttons={buttons}
-						onRemove={(id) => setButtons(buttons.filter((el) => el.id !== id))}
-					/>
-
-					<AddButton
-						isDisabled={buttons.length >= 3}
-						onSubmit={(data) => setButtons([...buttons, data])}
-					/>
 				</div>
 				<Separator />
 				<DialogFooter>

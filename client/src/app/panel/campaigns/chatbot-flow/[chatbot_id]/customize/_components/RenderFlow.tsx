@@ -67,10 +67,6 @@ export type DocumentNodeDetails = {
 		reply_to_message: boolean;
 		id: string;
 		caption: string;
-		buttons: {
-			id: string;
-			text: string;
-		}[];
 		delay: number;
 	};
 };

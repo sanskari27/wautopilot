@@ -31,10 +31,6 @@ export type ImageMessageProps = {
 	onImageMessageAdded: (
 		id: string,
 		caption: string,
-		buttons: {
-			id: string;
-			text: string;
-		}[],
 		delay: number,
 		reply_to_message: boolean
 	) => void;
@@ -46,19 +42,12 @@ const ImageMessage = ({ onImageMessageAdded, children }: ImageMessageProps) => {
 	const [caption, setCaption] = useState('');
 	const [delay, setDelay] = useState(0);
 	const [delayType, setDelayType] = useState<'sec' | 'min' | 'hour'>('sec');
-	const [buttons, setButtons] = useState<
-		{
-			id: string;
-			text: string;
-		}[]
-	>([]);
 	const [reply_to_message, setReplyToMessage] = useState(false);
 
 	const handleSave = () => {
 		onImageMessageAdded(
 			attachment,
 			caption,
-			buttons,
 			parseToSeconds(delay, delayType),
 			reply_to_message
 		);
@@ -98,16 +87,6 @@ const ImageMessage = ({ onImageMessageAdded, children }: ImageMessageProps) => {
 							onChange={(e) => setCaption(e.target.value)}
 						/>
 					</div>
-					<AbsoluteCenter>Reply Back Buttons</AbsoluteCenter>
-					<ListButtons
-						buttons={buttons}
-						onRemove={(id) => setButtons(buttons.filter((el) => el.id !== id))}
-					/>
-
-					<AddButton
-						isDisabled={buttons.length >= 3}
-						onSubmit={(data) => setButtons([...buttons, data])}
-					/>
 				</div>
 				<Separator />
 				<DialogFooter>

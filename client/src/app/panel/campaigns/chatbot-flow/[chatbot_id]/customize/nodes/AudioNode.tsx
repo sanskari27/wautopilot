@@ -9,42 +9,16 @@ import { Handle, Position, useNodeId } from '@xyflow/react';
 const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
 
 export default function AudioNode({
-	data: { id,reply_to_message, caption, buttons, delay },
+	data: { id, reply_to_message, caption, delay },
 }: {
 	data: {
 		id: string;
-		reply_to_message:boolean;
+		reply_to_message: boolean;
 		caption: string;
-		buttons: {
-			id: string;
-			text: string;
-		}[];
 		delay: number;
 	};
 }) {
 	const nodeId = useNodeId();
-
-	function RenderButtons() {
-		return (
-			<Each
-				items={buttons}
-				render={(button) => (
-					<div className='relative'>
-						<div className='bg-gray-50 my-1 rounded-lg border border-gray-400 p-2 relative'>
-							{button.text}
-						</div>
-						<Handle
-							type='source'
-							position={Position.Right}
-							id={button.id}
-							style={{ ...dotStyle, right: -8, top: '50%' }}
-							isConnectable
-						/>
-					</div>
-				)}
-			/>
-		);
-	}
 
 	return (
 		<>
@@ -70,6 +44,7 @@ export default function AudioNode({
 				) : (
 					<div className='p-1 text-center text-sm '>Send immediately</div>
 				)}
+				{reply_to_message && <div className='p-1 text-center text-sm '>Reply to the message</div>}
 				<div className='p-2'>
 					<div className='rounded-lg border border-black p-2 max-h-[400px] max-w-[400px]'>
 						<PreviewFile
@@ -83,8 +58,6 @@ export default function AudioNode({
 					<div className='rounded-lg border border-black p-2 mt-2' hidden={!caption}>
 						{caption}
 					</div>
-					<AbsoluteCenter>Reply Back Buttons</AbsoluteCenter>
-					<RenderButtons />
 				</div>
 			</div>
 		</>

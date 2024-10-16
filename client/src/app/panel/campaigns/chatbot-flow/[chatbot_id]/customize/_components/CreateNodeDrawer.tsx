@@ -109,7 +109,6 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 		type: 'IMAGE' | 'AUDIO' | 'VIDEO' | 'DOCUMENT',
 		id: string,
 		caption: string,
-		buttons: Button[],
 		delay: number,
 		reply_to_message: boolean
 	) => {
@@ -119,7 +118,6 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 				reply_to_message,
 				id,
 				caption,
-				buttons,
 				delay,
 			},
 		});
@@ -203,8 +201,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</TextMessage>
 						<ImageMessage
-							onImageMessageAdded={(id, cap, buttons, delay, reply_to_message) =>
-								handleDocumentElement('IMAGE', id, cap, buttons, delay, reply_to_message)
+							onImageMessageAdded={(id, cap,   delay, reply_to_message) =>
+								handleDocumentElement('IMAGE', id, cap,   delay, reply_to_message)
 							}
 						>
 							<MessageType
@@ -214,8 +212,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</ImageMessage>
 						<AudioMessage
-							onAudioMessageAdded={(id, cap, buttons, delay, reply_to_message) =>
-								handleDocumentElement('AUDIO', id, cap, buttons, delay, reply_to_message)
+							onAudioMessageAdded={(id, cap,   delay, reply_to_message) =>
+								handleDocumentElement('AUDIO', id, cap,   delay, reply_to_message)
 							}
 						>
 							<MessageType
@@ -225,8 +223,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</AudioMessage>
 						<VideoMessage
-							onVideoMessageAdded={(id, cap, buttons, delay, reply_to_message) =>
-								handleDocumentElement('VIDEO', id, cap, buttons, delay, reply_to_message)
+							onVideoMessageAdded={(id, cap,   delay, reply_to_message) =>
+								handleDocumentElement('VIDEO', id, cap,   delay, reply_to_message)
 							}
 						>
 							<MessageType
@@ -237,8 +235,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 						</VideoMessage>
 
 						<DocumentMessage
-							onDocumentMessageAdded={(id, cap, buttons, delay, reply_to_message) =>
-								handleDocumentElement('DOCUMENT', id, cap, buttons, delay, reply_to_message)
+							onDocumentMessageAdded={(id, cap,   delay, reply_to_message) =>
+								handleDocumentElement('DOCUMENT', id, cap,   delay, reply_to_message)
 							}
 						>
 							<MessageType

@@ -60,6 +60,10 @@ const DEFAULT_VALUE = {
 		number: '',
 		message: '',
 	},
+	trigger_gap_type: 'MINUTE',
+	trigger_gap_time: '1',
+	startAt: '10:00',
+	endAt: '18:00',
 };
 
 const tagsVariable = [
@@ -124,6 +128,9 @@ export default function CreateChatbotFlow() {
 						(nurturing.after.type === 'min' ? 60 : nurturing.after.type === 'hours' ? 3600 : 86400),
 				};
 			}),
+			trigger_gap_seconds:
+				Number(data.trigger_gap_time) *
+				(data.trigger_gap_type === 'SEC' ? 1 : data.trigger_gap_type === 'MINUTE' ? 60 : 3600),
 		};
 		const promise = isEditing ? editChatbotFlow(data.id, details) : createChatbotFlow(details);
 		toast.promise(promise, {
@@ -294,7 +301,7 @@ export default function CreateChatbotFlow() {
 
 					{/*--------------------------------- RECIPIENTS SECTION--------------------------- */}
 
-					<div className='grid grid-cols-1 gap-4'>
+					<div className='grid grid-cols-2 gap-4'>
 						<FormField
 							control={form.control}
 							name='options'
@@ -320,6 +327,77 @@ export default function CreateChatbotFlow() {
 								</FormItem>
 							)}
 						/>
+						<div className='flex flex-col md:flex-row gap-4'>
+							<div className='flex flex-col md:flex-row gap-4 flex-1'>
+								<div className='flex flex-col gap-2'>
+									<div className='grid grid-cols-2 gap-2 items-end'>
+										<FormField
+											control={form.control}
+											name='trigger_gap_time'
+											render={({ field }) => (
+												<FormItem className='space-y-0 flex-1 max-w-md'>
+													<FormLabel>Gap Delay</FormLabel>
+													<FormControl>
+														<Input type='number' placeholder='eg. 10' {...field} />
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+
+										<FormField
+											control={form.control}
+											name='trigger_gap_type'
+											render={({ field }) => (
+												<FormItem className='space-y-0 flex-1 max-w-md'>
+													<FormControl>
+														<Select value={field.value} onValueChange={field.onChange}>
+															<SelectTrigger>
+																<SelectValue />
+															</SelectTrigger>
+															<SelectContent>
+																<SelectItem value='SEC'>Second</SelectItem>
+																<SelectItem value='MINUTE'>Min</SelectItem>
+																<SelectItem value='HOUR'>Hour</SelectItem>
+															</SelectContent>
+														</Select>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+									</div>
+								</div>
+							</div>
+							<div className='flex flex-col md:flex-row gap-4 flex-1'>
+								<FormField
+									control={form.control}
+									name='startAt'
+									render={({ field }) => (
+										<FormItem className='space-y-0 flex-1 max-w-md'>
+											<FormLabel>Start At (in IST)</FormLabel>
+											<FormControl>
+												<Input type='time' value={field.value} onChange={field.onChange} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name='endAt'
+									render={({ field }) => (
+										<FormItem className='space-y-0 flex-1 max-w-md'>
+											<FormLabel>End At (in IST)</FormLabel>
+											<FormControl>
+												<Input type='time' {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+						</div>
 					</div>
 
 					{/* -------------------------------- FORWARD SECTION -------------------------- */}

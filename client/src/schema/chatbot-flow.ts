@@ -10,6 +10,13 @@ export const ChatbotFlowSchema = z.object({
 		z.literal('EXACT_IGNORE_CASE'),
 		z.literal('EXACT_MATCH_CASE'),
 	]),
+	trigger_gap_time: z.string().refine((value) => {
+		if (isNaN(Number(value))) return false;
+		return Number(value) > 0;
+	}, 'Trigger gap time must be greater than 0'),
+	trigger_gap_type: z.enum(['SEC', 'MINUTE', 'HOUR']).default('MINUTE'),
+	startAt: z.string().default('10:00'),
+	endAt: z.string().default('18:00'),
 	isActive: z.boolean().default(false),
 	nurturing: z.array(
 		z.object({
@@ -29,14 +36,16 @@ export const ChatbotFlowSchema = z.object({
 			template_header: z
 				.object({
 					type: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT', 'NONE']),
-					text: z.array(
-						z.object({
-							custom_text: z.string().trim(),
-							phonebook_data: z.string().trim().optional(),
-							variable_from: z.enum(['custom_text', 'phonebook_data']),
-							fallback_value: z.string().trim().optional(),
-						})
-					).optional(),
+					text: z
+						.array(
+							z.object({
+								custom_text: z.string().trim(),
+								phonebook_data: z.string().trim().optional(),
+								variable_from: z.enum(['custom_text', 'phonebook_data']),
+								fallback_value: z.string().trim().optional(),
+							})
+						)
+						.optional(),
 					media_id: z.string().trim().optional(),
 					link: z.string().trim().optional(),
 				})

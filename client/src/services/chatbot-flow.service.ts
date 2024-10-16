@@ -9,6 +9,20 @@ const validateChatBot = (bot: any) => {
 		trigger: bot.trigger ?? [],
 		options: bot.options ?? '',
 		isActive: bot.isActive ?? false,
+		trigger_gap_time: (bot.trigger_gap_seconds % 3600 === 0
+			? bot.trigger_gap_seconds / 3600
+			: bot.trigger_gap_seconds % 60 === 0
+			? bot.trigger_gap_seconds / 60
+			: bot.trigger_gap_seconds
+		).toString(),
+		trigger_gap_type:
+			bot.trigger_gap_seconds % 3600 === 0
+				? 'HOUR'
+				: bot.trigger_gap_seconds % 60 === 0
+				? 'MINUTE'
+				: 'SEC',
+		startAt: bot.startAt ?? '',
+		endAt: bot.endAt ?? '',
 		nurturing: (bot.nurturing ?? []).map((nurturing: any) => ({
 			message: nurturing.message ?? '',
 			respond_type: nurturing.respond_type ?? 'normal',

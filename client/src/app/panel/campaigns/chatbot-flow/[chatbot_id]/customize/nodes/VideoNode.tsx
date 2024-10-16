@@ -9,42 +9,16 @@ import { Handle, Position, useNodeId } from '@xyflow/react';
 const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
 
 export default function VideoNode({
-	data: { id, caption, buttons, delay, reply_to_message },
+	data: { id, caption, delay, reply_to_message },
 }: {
 	data: {
 		id: string;
 		caption: string;
-		buttons: {
-			id: string;
-			text: string;
-		}[];
 		delay: number;
 		reply_to_message: boolean;
 	};
 }) {
 	const nodeId = useNodeId();
-
-	function RenderButtons() {
-		return (
-			<Each
-				items={buttons}
-				render={(button) => (
-					<div className='relative'>
-						<div className='bg-gray-50 my-1 rounded-lg border border-gray-400 p-2 relative'>
-							{button.text}
-						</div>
-						<Handle
-							type='source'
-							position={Position.Right}
-							id={button.id}
-							style={{ ...dotStyle, right: -8, top: '50%' }}
-							isConnectable
-						/>
-					</div>
-				)}
-			/>
-		);
-	}
 
 	return (
 		<>
@@ -84,8 +58,6 @@ export default function VideoNode({
 					<div className='rounded-lg border border-black p-2 mt-2' hidden={!caption}>
 						{caption}
 					</div>
-					<AbsoluteCenter>Reply Back Buttons</AbsoluteCenter>
-					<RenderButtons />
 				</div>
 			</div>
 		</>
