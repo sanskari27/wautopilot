@@ -55,55 +55,9 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 		| TemplateMessage
 		| null = null;
 
-	if (type === 'audio' || type === 'video' || type === 'document' || type === 'image') {
-		const msg = new MediaMessage(data.recipient, type);
+	let formattedMessage: any = null;
 
-		if (data.message.media_link) {
-			const id = await new MediaService(serviceAccount, device).linkToMediaId(
-				data.message.media_link
-			);
-			if (!id) {
-				return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
-			}
-			msg.setMediaId(id);
-		} else {
-			msg.setMediaId(data.message.media_id);
-		}
-
-		messageInst = msg;
-	} else if (type === 'location') {
-		const msg = new LocationMessage(data.recipient, data.message.location)
-			.setName(data.message.location.name)
-			.setAddress(data.message.location.address);
-
-		messageInst = msg;
-	} else if (type === 'contacts') {
-		const msg = new ContactMessage(data.recipient, data.message.contacts[0]);
-		messageInst = msg;
-	} else if (type === 'button') {
-		const msg = new InteractiveMediaMessage(data.recipient, 'none')
-			.setBody(data.message.text)
-			.setButtons(generateButtons(data.message.buttons));
-
-		messageInst = msg;
-	} else if (type === 'list') {
-		const msg = new InteractiveMediaMessage(data.recipient, 'none')
-			.setTextHeader(data.message.header)
-			.setBody(data.message.body)
-			.setSections(generateSections(data.message.sections))
-			.setInteractiveType('list');
-
-		messageInst = msg;
-	} else if (type === 'whatsapp_flow') {
-		const details = await whatsappFlow.getWhatsappFlowContents(data.message.flow_id);
-		const msg = new FlowMessage(data.recipient)
-			.setTextHeader(data.message.header)
-			.setBody(data.message.body)
-			.setFooter(data.message.footer)
-			.setFlowDetails(data.message.flow_id, data.message.button_text, details[0].id);
-
-		messageInst = msg;
-	} else if (type === 'template') {
+	if (type === 'template') {
 		const template = await TemplateFactory.findById(device, data.message.template_id);
 		if (!template) {
 			return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
@@ -160,9 +114,67 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 		}
 
 		messageInst = msg;
-	} else if (type === 'text') {
-		const msg = new TextMessage(data.recipient, data.message.text);
-		messageInst = msg;
+		formattedMessage = extractFormattedMessage(messageInst.toObject().template, {
+			template: template.buildToSave(),
+			type: 'template',
+		});
+	} else {
+		if (type === 'audio' || type === 'video' || type === 'document' || type === 'image') {
+			const msg = new MediaMessage(data.recipient, type);
+
+			if (data.message.media_link) {
+				const id = await new MediaService(serviceAccount, device).linkToMediaId(
+					data.message.media_link
+				);
+				if (!id) {
+					return next(new CustomError(COMMON_ERRORS.INTERNAL_SERVER_ERROR));
+				}
+				msg.setMediaId(id);
+			} else {
+				msg.setMediaId(data.message.media_id);
+			}
+
+			messageInst = msg;
+		} else if (type === 'location') {
+			const msg = new LocationMessage(data.recipient, data.message.location)
+				.setName(data.message.location.name)
+				.setAddress(data.message.location.address);
+
+			messageInst = msg;
+		} else if (type === 'contacts') {
+			const msg = new ContactMessage(data.recipient, data.message.contacts[0]);
+			messageInst = msg;
+		} else if (type === 'button') {
+			const msg = new InteractiveMediaMessage(data.recipient, 'none')
+				.setBody(data.message.text)
+				.setButtons(generateButtons(data.message.buttons));
+
+			messageInst = msg;
+		} else if (type === 'list') {
+			const msg = new InteractiveMediaMessage(data.recipient, 'none')
+				.setTextHeader(data.message.header)
+				.setBody(data.message.body)
+				.setSections(generateSections(data.message.sections))
+				.setInteractiveType('list');
+
+			messageInst = msg;
+		} else if (type === 'whatsapp_flow') {
+			const details = await whatsappFlow.getWhatsappFlowContents(data.message.flow_id);
+			const msg = new FlowMessage(data.recipient)
+				.setTextHeader(data.message.header)
+				.setBody(data.message.body)
+				.setFooter(data.message.footer)
+				.setFlowDetails(data.message.flow_id, data.message.button_text, details[0].id);
+
+			messageInst = msg;
+		} else if (type === 'text') {
+			const msg = new TextMessage(data.recipient, data.message.text);
+			messageInst = msg;
+		} else {
+			return next(new CustomError(COMMON_ERRORS.INVALID_FIELDS));
+		}
+
+		formattedMessage = extractFormattedMessage(messageInst.toObject());
 	}
 
 	if (!messageInst) {
@@ -179,6 +191,7 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 	await conversationService.addMessageToConversation(recipient._id, {
 		recipient: data.recipient,
 		...result,
+		...formattedMessage,
 		...(extractFormattedMessage(messageInst.toObject()) as any),
 		...(data.context
 			? {

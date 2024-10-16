@@ -682,8 +682,9 @@ export default class ChatBotService extends WhatsappLinkService {
 
 					schedulerService.scheduleMessage(msg, {
 						...schedulerOptions,
-						formattedMessage: extractFormattedMessage(msg.toObject(), {
-							template,
+						formattedMessage: extractFormattedMessage(msg.toObject().template, {
+							template: template.buildToSave(),
+							type: 'template',
 						}),
 					});
 				}

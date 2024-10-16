@@ -289,8 +289,9 @@ export default class BroadcastService extends WhatsappLinkService {
 				scheduler_id: broadcast._id,
 				scheduler_type: RecurringBroadcastDB_name,
 				sendAt,
-				formattedMessage: extractFormattedMessage(msg.toObject(), {
-					template,
+				formattedMessage: extractFormattedMessage(msg.toObject().template, {
+					template: template.buildToSave(),
+					type: 'template',
 				}),
 			});
 		});
@@ -877,8 +878,9 @@ export default class BroadcastService extends WhatsappLinkService {
 					scheduler_id: broadcast._id,
 					scheduler_type: RecurringBroadcastDB_name,
 					sendAt,
-					formattedMessage: extractFormattedMessage(msg.toObject(), {
-						template,
+					formattedMessage: extractFormattedMessage(msg.toObject().template, {
+						template: template.buildToSave(),
+						type: 'template',
 					}),
 				});
 			});
