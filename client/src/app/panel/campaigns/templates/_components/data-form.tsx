@@ -74,7 +74,6 @@ export default function DataForm({
 	const body = form.watch('body');
 	const buttons = form.watch('buttons');
 	const carousel = form.watch('carousel');
-	const footer = form.watch('footer');
 
 	const saveTemplate = async (data: Template, handle?: string) => {
 		if (data.buttons) {
