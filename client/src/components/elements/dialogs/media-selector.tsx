@@ -13,6 +13,7 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { SearchBar } from '@/components/ui/searchbar';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import api from '@/lib/api';
@@ -40,6 +41,11 @@ export default function MediaSelectorDialog({
 	const buttonRef = React.useRef<HTMLButtonElement>(null);
 
 	const list = useMedia();
+
+	const [searchText, setSearchText] = useState('');
+	const records = list.filter((record) =>
+		`${record.filename} ${record.mime_type}`.toLowerCase().includes(searchText.toLowerCase())
+	);
 
 	const [previewMode, setPreviewMode] = React.useState(false);
 	const [selectedMedia, setSelectedMedia] = React.useState<string[]>(selectedValue || []);
@@ -85,10 +91,21 @@ export default function MediaSelectorDialog({
 					<DialogTitle className='flex justify-between'>Select Media</DialogTitle>
 				</DialogHeader>
 				<DialogDescription>
-					<span className='flex items-center gap-2 justify-end'>
-						Preview{' '}
-						<Switch checked={previewMode} onCheckedChange={(checked) => setPreviewMode(checked)} />
-					</span>
+					<div className='flex'>
+						<SearchBar
+							size='sm'
+							onChange={setSearchText}
+							onSubmit={setSearchText}
+							placeholders={['Search by name', 'Search by type']}
+						/>
+						<span className='flex items-center gap-2 justify-end'>
+							Preview{' '}
+							<Switch
+								checked={previewMode}
+								onCheckedChange={(checked) => setPreviewMode(checked)}
+							/>
+						</span>
+					</div>
 				</DialogDescription>
 				<ScrollArea className='gap-4 h-[400px]'>
 					<Show>
@@ -102,7 +119,7 @@ export default function MediaSelectorDialog({
 								</TableHeader>
 								<TableBody>
 									<Each
-										items={mediaList}
+										items={records}
 										render={(media) => (
 											<TableRow>
 												<TableCell>
