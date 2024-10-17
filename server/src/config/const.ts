@@ -23,6 +23,7 @@ export const RAZORPAY_API_SECRET = process.env.RAZORPAY_API_SECRET ?? '';
 export const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET ?? '';
 
 export const LOGO_PATH = '/static/assets/logo-primary.svg';
+export const TAX_RATE = 0.18;
 
 export const SHORT_LINK_REDIRECT = 'https://open.wautopilot.com/';
 
@@ -41,6 +42,20 @@ export enum UserLevel {
 export enum Path {
 	Misc = '/static/misc/',
 	Media = '/static/media/',
+	Invoice = '/static/invoice/',
+}
+
+export enum TRANSACTION_STATUS {
+	SUCCESS = 'success',
+	FAILED = 'failed',
+	PENDING = 'pending',
+	CANCELLED = 'cancelled',
+}
+
+export enum SUBSCRIPTION_STATUS {
+	ACTIVE = 'ACTIVE',
+	INACTIVE = 'INACTIVE',
+	CLOSED = 'CLOSED',
 }
 
 export const Permissions = {

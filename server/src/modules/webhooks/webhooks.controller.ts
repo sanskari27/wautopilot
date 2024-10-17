@@ -16,6 +16,7 @@ import BroadcastService from '../../services/broadcast';
 import ButtonResponseService from '../../services/buttonResponse';
 import ChatBotService from '../../services/chatbot';
 import ConversationService from '../../services/conversation';
+import PaymentService from '../../services/payment';
 import DateUtils from '../../utils/DateUtils';
 import { objectToMessageBody } from '../../utils/MessageHelper';
 
@@ -107,6 +108,27 @@ async function razorpayPayment(req: Request, res: Response) {
 	} else if (!data.contains.includes('payment')) {
 		return res.status(400).json({ status: 'Bad Request' });
 	}
+
+	if (data.event === 'invoice.paid') {
+		const order_id = data.payload?.payment?.entity?.order_id ?? '';
+		const token_id = data.payload?.payment?.entity?.token_id ?? '';
+		if (!order_id || !token_id) {
+			return res.status(400).json({ status: 'Bad Request' });
+		}
+
+		await PaymentService.confirmTokenPayment(order_id, token_id);
+		return res.status(200).json({ status: 'OK' });
+	} else if (data.event === 'payment.captured') {
+		const order_id = data.payload?.payment?.entity?.order_id ?? '';
+		const payment_id = data.payload?.payment?.entity?.id ?? '';
+		if (!order_id || !payment_id) {
+			return res.status(400).json({ status: 'Bad Request' });
+		}
+
+		await PaymentService.confirmPaymentByOrderId(order_id, payment_id);
+		return res.status(200).json({ status: 'OK' });
+	}
+
 	// const payment = data.payload.payment.entity;
 	// const { id: payment_id, order_id, status } = payment;
 

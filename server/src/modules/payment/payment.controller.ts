@@ -25,6 +25,7 @@ async function startSubscription(req: Request, res: Response, next: NextFunction
 		const order = await RazorpayProvider.emandate.createOrder({
 			customer_id: contact.id,
 			reference_id,
+			frequency: 'monthly',
 		});
 
 		return Respond({

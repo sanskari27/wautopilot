@@ -15,7 +15,6 @@ const schema = new mongoose.Schema<ISubscriptionDetails>({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: PlanDB_name,
 	},
-	start_date: Date,
 	end_date: Date,
 });
 

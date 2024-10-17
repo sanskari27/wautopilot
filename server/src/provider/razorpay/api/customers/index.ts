@@ -26,15 +26,15 @@ async function createCustomer(details: {
 		return {
 			id: customer.id,
 			name: customer.name,
-			contact: customer.contact,
+			contact: customer.contact as string,
 			email: customer.email,
 			billing_address: {
-				street: customer.notes?.street ?? '',
-				city: customer.notes?.city ?? '',
-				district: customer.notes?.district ?? '',
-				state: customer.notes?.state ?? '',
-				country: customer.notes?.country ?? '',
-				pincode: customer.notes?.pincode ?? '',
+				street: (customer.notes?.street as string) ?? '',
+				city: (customer.notes?.city as string) ?? '',
+				district: (customer.notes?.district as string) ?? '',
+				state: (customer.notes?.state as string) ?? '',
+				country: (customer.notes?.country as string) ?? '',
+				pincode: (customer.notes?.pincode as string) ?? '',
 			},
 		};
 	} catch (err: any) {
@@ -59,15 +59,15 @@ async function fetchCustomerByContact(number: string) {
 	return {
 		id: customer.id,
 		name: customer.name,
-		contact: customer.contact,
+		contact: customer.contact as string,
 		email: customer.email,
 		billing_address: {
-			street: customer.notes?.street as string | undefined | null,
-			city: customer.notes?.city as string | undefined | null,
-			district: customer.notes?.district as string | undefined | null,
-			state: customer.notes?.state as string | undefined | null,
-			country: customer.notes?.country as string | undefined | null,
-			pincode: customer.notes?.pincode as string | undefined | null,
+			street: customer.notes?.street as string,
+			city: customer.notes?.city as string,
+			district: customer.notes?.district as string,
+			state: customer.notes?.state as string,
+			country: customer.notes?.country as string,
+			pincode: customer.notes?.pincode as string,
 		},
 	};
 }
