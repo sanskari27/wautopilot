@@ -228,7 +228,7 @@ export default function RenderFlow({
 			node.type = 'locationRequestNode';
 			node.data = details.data;
 		} else if (details.type === 'TEMPLATE_MESSAGE') {
-			node.type = 'templateMessage';
+			node.type = 'templateNode';
 			node.data = details.data;
 		} else if (details.type === 'END') {
 			node.type = 'endNode';
