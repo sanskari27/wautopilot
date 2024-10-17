@@ -220,6 +220,7 @@ export default function CreateChatbotFlow() {
 		const newNurturing = [...nurturing];
 		newNurturing.splice(index, 1);
 		form.setValue('nurturing', newNurturing);
+		return;
 	};
 
 	const isValid = ChatbotFlowSchema.safeParse(form.getValues()).success;
