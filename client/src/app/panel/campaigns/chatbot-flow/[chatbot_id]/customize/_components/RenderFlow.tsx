@@ -38,7 +38,7 @@ import {
 	VideoNode,
 	WaFlowNode,
 } from '../nodes';
-import TemplateMessageNode from '../nodes/TemplateMessageNode';
+import TemplateNode from '../nodes/TemplateMessageNode';
 import CreateNodeDrawer from './CreateNodeDrawer';
 
 export type StartNodeDetails = {
@@ -128,7 +128,7 @@ export type LocationRequestNodeDetails = {
 	};
 };
 
-export type TemplateMessageNodeDetails = {
+export type TemplateNodeDetails = {
 	type: 'TEMPLATE_MESSAGE';
 	data: {
 		reply_to_message: boolean;
@@ -148,7 +148,7 @@ const nodeTypes = {
 	flowNode: WaFlowNode,
 	contactNode: ContactNode,
 	locationRequestNode: LocationRequestNode,
-	templateMessage: TemplateMessageNode,
+	templateNode: TemplateNode,
 	endNode: EndNode,
 };
 
@@ -176,7 +176,7 @@ export default function RenderFlow({
 			| ContactNodeDetails
 			| LocationRequestNodeDetails
 			| EndNodeDetails
-			| TemplateMessageNodeDetails
+			| TemplateNodeDetails
 	) => {
 		const node: Node = {
 			id: randomString(),

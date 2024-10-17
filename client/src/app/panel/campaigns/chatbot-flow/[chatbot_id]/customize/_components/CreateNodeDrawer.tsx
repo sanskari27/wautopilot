@@ -35,7 +35,7 @@ import {
 	ListNodeDetails,
 	LocationRequestNodeDetails,
 	StartNodeDetails,
-	TemplateMessageNodeDetails,
+	TemplateNodeDetails,
 	TextNodeDetails,
 } from './RenderFlow';
 
@@ -51,7 +51,7 @@ type Props = {
 			| ContactNodeDetails
 			| LocationRequestNodeDetails
 			| EndNodeDetails
-			| TemplateMessageNodeDetails
+			| TemplateNodeDetails
 	) => void;
 };
 

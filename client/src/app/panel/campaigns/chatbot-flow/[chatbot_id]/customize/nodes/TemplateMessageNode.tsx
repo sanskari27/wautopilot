@@ -6,7 +6,7 @@ import { Handle, Position, useNodeId } from '@xyflow/react';
 
 const dotStyle = { background: '#555', width: '0.75rem', height: '0.75rem', top: 'auto' };
 
-export default function TemplateMessageNode({
+export default function TemplateNode({
 	data: { template_id, delay, reply_to_message },
 }: {
 	data: {
