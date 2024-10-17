@@ -67,6 +67,7 @@ export default class Template {
 	private name?: string;
 	private status?: 'APPROVED' | 'PENDING' | 'REJECTED';
 	private category?: 'AUTHENTICATION' | 'MARKETING' | 'UTILITY';
+	private language?: string;
 
 	private header?: HeaderTemplate;
 	private body?: Body;
@@ -150,6 +151,14 @@ export default class Template {
 		return this;
 	}
 
+	setLanguage(language: string) {
+		if (!language) {
+			return;
+		}
+		this.language = language;
+		return;
+	}
+
 	toObject() {
 		return {
 			id: this.id,
@@ -162,6 +171,10 @@ export default class Template {
 			buttons: this.buttons,
 			carousel: this.carousel,
 		};
+	}
+
+	getLanguage() {
+		return this.language || DEFAULT_TEMPLATE_LANGUAGE;
 	}
 
 	getDetails() {
@@ -292,7 +305,7 @@ export default class Template {
 			name: this.name,
 			category: this.category,
 			allow_category_change: true,
-			language: DEFAULT_TEMPLATE_LANGUAGE,
+			language: this.language || DEFAULT_TEMPLATE_LANGUAGE,
 			components: [
 				...(this.header ? [header] : []),
 				...(this.body ? [body] : []),

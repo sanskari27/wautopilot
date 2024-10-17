@@ -267,7 +267,7 @@ export default class TemplateMessage extends Message {
 			template: {
 				name: this.template.getName(),
 				language: {
-					code: 'en_US',
+					code: this.template.getLanguage(),
 				},
 				components: [
 					...(this.header ? [this.header] : []),

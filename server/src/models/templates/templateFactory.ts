@@ -11,6 +11,7 @@ type WhatsappDevice = {
 export default class TemplateFactory {
 	static convertToTemplate(data: any) {
 		const template = new Template();
+		template.setLanguage(data.language);
 		template.setId(data.id).setName(data.name).setStatus(data.status).setCategory(data.category);
 
 		for (const component of data.components) {
