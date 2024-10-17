@@ -57,6 +57,7 @@ type CreateFlowData = {
 			| 'listNode'
 			| 'flowNode'
 			| 'contactNode'
+			| 'templateNode'
 			| 'locationRequestNode'
 			| 'endNode';
 		id: string;
@@ -126,6 +127,43 @@ type CreateFlowData = {
 		};
 	}[];
 	forward: { number: string; message: string };
+};
+
+type TemplateNode = {
+	template_id: string;
+	template_name: string;
+	header?: {
+		type: 'IMAGE' | 'TEXT' | 'VIDEO' | 'DOCUMENT';
+		text?: {
+			custom_text: string;
+			phonebook_data: string;
+			variable_from: 'custom_text' | 'phonebook_data';
+			fallback_value: string;
+		}[];
+		media_id?: string;
+		link?: string;
+	};
+	body: {
+		custom_text: string;
+		phonebook_data: string;
+		variable_from: 'custom_text' | 'phonebook_data';
+		fallback_value: string;
+	}[];
+	buttons: string[][];
+	carousel?: {
+		cards: {
+			header: {
+				media_id: string;
+			};
+			body: {
+				custom_text: string;
+				phonebook_data: string;
+				variable_from: 'custom_text' | 'phonebook_data';
+				fallback_value: string;
+			}[];
+			buttons: string[][];
+		}[];
+	};
 };
 
 function processFlowDocs(docs: IChatBotFlow[]) {
@@ -713,6 +751,7 @@ export default class ChatBotService extends WhatsappLinkService {
 		const schedulerService = new MessageScheduler(this.account._id, this.device._id);
 		const whatsappFlow = new WhatsappFlowService(this.account, this.device);
 		const mediaService = new MediaService(this.account, this.device);
+		const phoneBookService = new PhoneBookService(this.account);
 		const bot = await ChatBotFlowDB.findOne({
 			_id: bot_id,
 			linked_to: this.userId,
@@ -838,6 +877,65 @@ export default class ChatBotService extends WhatsappLinkService {
 			message_id = await schedulerService.scheduleMessage(msg, {
 				...schedulerOptions,
 				formattedMessage: extractFormattedMessage(msg.toObject()),
+			});
+		} else if (node.node_type === 'templateNode') {
+			const { body, buttons, carousel, header, template_id } = node.data as TemplateNode;
+			const template = await TemplateFactory.findById(this.device, template_id);
+			if (!template) {
+				return;
+			}
+
+			const msg = new TemplateMessage(recipient, template);
+			const fields = await phoneBookService.findRecordByPhone(recipient);
+
+			const tHeader = template.getHeader();
+			const tButtons = template.getURLButtonsWithVariable();
+			const tCarousel = template.getCarouselCards();
+
+			if (header && tHeader && tHeader.format !== 'TEXT') {
+				msg.setMediaHeader(header as any);
+			} else if (header?.text && tHeader && tHeader.format === 'TEXT') {
+				if (tHeader?.example.length > 0) {
+					const headerVariables = parseToBodyVariables({
+						variables: header.text,
+						fields: fields || ({} as IPhonebookRecord),
+					});
+					msg.setTextHeader(headerVariables);
+				}
+			}
+
+			const bodyVariables = parseToBodyVariables({
+				variables: body,
+				fields: fields || ({} as IPhonebookRecord),
+			});
+
+			msg.setBody(bodyVariables);
+
+			if (tButtons.length > 0) {
+				msg.setButtons(buttons);
+			}
+
+			if (tCarousel.length > 0 && carousel) {
+				const cards = carousel.cards.map((card, index) => {
+					const bodyVariables = parseToBodyVariables({
+						variables: card.body,
+						fields: fields || ({} as IPhonebookRecord),
+					});
+					return {
+						header: card.header,
+						body: bodyVariables,
+						buttons: card.buttons,
+					};
+				});
+				msg.setCarousel(cards);
+			}
+
+			message_id = await schedulerService.scheduleMessage(msg, {
+				...schedulerOptions,
+				formattedMessage: extractFormattedMessage(msg.toObject().template, {
+					template: template.buildToSave(),
+					type: 'template',
+				}),
 			});
 		} else {
 			return;
