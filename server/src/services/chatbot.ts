@@ -621,7 +621,16 @@ export default class ChatBotService extends WhatsappLinkService {
 				if (el.respond_type === 'normal') {
 					this.sendDirectBotMessage(
 						recipient,
-						{ ...el, _id: details.bot._id },
+						{
+							audios: el.audios,
+							documents: el.documents,
+							images: el.images,
+							message: el.message,
+							videos: el.videos,
+							contacts: el.contacts,
+							_id: details.bot._id,
+						},
+
 						{
 							meta_message_id: details.meta_message_id,
 							contact,
