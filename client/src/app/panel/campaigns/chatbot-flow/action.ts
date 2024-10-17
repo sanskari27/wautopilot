@@ -19,8 +19,9 @@ export async function updateNodesAndEdges(id: string, details: { nodes: any[]; e
 }
 
 export async function createChatbotFlow(chatbotFlow: ChatbotFlow) {
-	await ChatbotFlowService.createChatbotFlow(chatbotFlow);
+	const data = await ChatbotFlowService.createChatbotFlow(chatbotFlow);
 	revalidatePath('panel/campaigns/chatbot-flow', 'page');
+	return data;
 }
 
 export async function editChatbotFlow(id: string, details: ChatbotFlow) {

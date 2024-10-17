@@ -135,9 +135,14 @@ export default function CreateChatbotFlow() {
 		const promise = isEditing ? editChatbotFlow(data.id, details) : createChatbotFlow(details);
 		toast.promise(promise, {
 			loading: 'Saving...',
-			success: () => {
-				router.replace(`/panel/campaigns/chatbot-flow/${data.id}/customize`);
-				return 'Saved';
+			success: (res) => {
+				if (!res) {
+					router.replace(`/panel/campaigns/chatbot-flow/${data.id}/customize`);
+					return 'Saved';
+				} else {
+					router.replace(`/panel/campaigns/chatbot-flow/${res}/customize`);
+					return 'Save';
+				}
 			},
 			error: (err) => {
 				return 'Failed to save';

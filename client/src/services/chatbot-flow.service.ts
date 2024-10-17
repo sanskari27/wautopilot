@@ -78,7 +78,8 @@ export default class ChatbotFlowService {
 		}
 	}
 	static async createChatbotFlow(details: TChatbotFlow) {
-		await api.post(`/chatbot/flows`, details);
+		const { data } = await api.post(`/chatbot/flows`, details);
+		return data.flow.bot_id;
 	}
 	static async updateChatbotFlow({ bot_id, details }: { bot_id: string; details: TChatbotFlow }) {
 		await api.patch(`/chatbot/flows/${bot_id}`, details);
