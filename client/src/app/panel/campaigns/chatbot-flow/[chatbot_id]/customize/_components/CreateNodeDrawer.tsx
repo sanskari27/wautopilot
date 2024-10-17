@@ -1,4 +1,5 @@
 'use client';
+import { QuickTemplateMessageProps } from '@/app/panel/conversations/_components/message-input';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import useBoolean from '@/hooks/useBoolean';
@@ -24,6 +25,7 @@ import {
 	WhatsappFlowMessage,
 } from '../message';
 import ContactMessage from '../message/ContactMessage';
+import TemplateMessage from '../message/TemplateMessage';
 import {
 	ButtonNodeDetails,
 	ContactNodeDetails,
@@ -33,6 +35,7 @@ import {
 	ListNodeDetails,
 	LocationRequestNodeDetails,
 	StartNodeDetails,
+	TemplateMessageNodeDetails,
 	TextNodeDetails,
 } from './RenderFlow';
 
@@ -48,6 +51,7 @@ type Props = {
 			| ContactNodeDetails
 			| LocationRequestNodeDetails
 			| EndNodeDetails
+			| TemplateMessageNodeDetails
 	) => void;
 };
 
@@ -160,12 +164,27 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 		});
 	};
 
-	const handleContactElement = (contact: Contact, delay: number, reply_to_message:boolean) => {
+	const handleContactElement = (contact: Contact, delay: number, reply_to_message: boolean) => {
 		addNode({
 			type: 'CONTACT',
 			data: {
 				reply_to_message,
 				contact,
+				delay,
+			},
+		});
+	};
+
+	const handleTemplateMessage = (
+		details: QuickTemplateMessageProps,
+		delay: number,
+		reply_to_message: boolean
+	) => {
+		addNode({
+			type: 'TEMPLATE_MESSAGE',
+			data: {
+				reply_to_message,
+				...details,
 				delay,
 			},
 		});
@@ -201,8 +220,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</TextMessage>
 						<ImageMessage
-							onImageMessageAdded={(id, cap,   delay, reply_to_message) =>
-								handleDocumentElement('IMAGE', id, cap,   delay, reply_to_message)
+							onImageMessageAdded={(id, cap, delay, reply_to_message) =>
+								handleDocumentElement('IMAGE', id, cap, delay, reply_to_message)
 							}
 						>
 							<MessageType
@@ -212,8 +231,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</ImageMessage>
 						<AudioMessage
-							onAudioMessageAdded={(id, cap,   delay, reply_to_message) =>
-								handleDocumentElement('AUDIO', id, cap,   delay, reply_to_message)
+							onAudioMessageAdded={(id, cap, delay, reply_to_message) =>
+								handleDocumentElement('AUDIO', id, cap, delay, reply_to_message)
 							}
 						>
 							<MessageType
@@ -223,8 +242,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 							/>
 						</AudioMessage>
 						<VideoMessage
-							onVideoMessageAdded={(id, cap,   delay, reply_to_message) =>
-								handleDocumentElement('VIDEO', id, cap,   delay, reply_to_message)
+							onVideoMessageAdded={(id, cap, delay, reply_to_message) =>
+								handleDocumentElement('VIDEO', id, cap, delay, reply_to_message)
 							}
 						>
 							<MessageType
@@ -235,8 +254,8 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 						</VideoMessage>
 
 						<DocumentMessage
-							onDocumentMessageAdded={(id, cap,   delay, reply_to_message) =>
-								handleDocumentElement('DOCUMENT', id, cap,   delay, reply_to_message)
+							onDocumentMessageAdded={(id, cap, delay, reply_to_message) =>
+								handleDocumentElement('DOCUMENT', id, cap, delay, reply_to_message)
 							}
 						>
 							<MessageType
@@ -276,6 +295,13 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 								className={'bg-orange-500'}
 							/>
 						</LocationRequestMessage>
+						<TemplateMessage onTemplateMessageAdded={handleTemplateMessage}>
+							<MessageType
+								body={'Template Message'}
+								icon={<IoMdText size={'1.25rem'} />}
+								className={'bg-red-500'}
+							/>
+						</TemplateMessage>
 						<WhatsappFlowMessage onWhatsappFlowMessageAdded={handleWhatsappFlowMessage}>
 							<MessageType
 								body={'Whatsapp Flow Message'}

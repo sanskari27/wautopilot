@@ -1,4 +1,5 @@
 'use client';
+import { QuickTemplateMessageProps } from '@/app/panel/conversations/_components/message-input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { randomString } from '@/lib/utils';
@@ -37,6 +38,7 @@ import {
 	VideoNode,
 	WaFlowNode,
 } from '../nodes';
+import TemplateMessageNode from '../nodes/TemplateMessageNode';
 import CreateNodeDrawer from './CreateNodeDrawer';
 
 export type StartNodeDetails = {
@@ -126,6 +128,14 @@ export type LocationRequestNodeDetails = {
 	};
 };
 
+export type TemplateMessageNodeDetails = {
+	type: 'TEMPLATE_MESSAGE';
+	data: {
+		reply_to_message: boolean;
+		delay: number;
+	} & QuickTemplateMessageProps;
+};
+
 const nodeTypes = {
 	startNode: StartNode,
 	textNode: TextNode,
@@ -138,6 +148,7 @@ const nodeTypes = {
 	flowNode: WaFlowNode,
 	contactNode: ContactNode,
 	locationRequestNode: LocationRequestNode,
+	templateMessage: TemplateMessageNode,
 	endNode: EndNode,
 };
 
@@ -165,6 +176,7 @@ export default function RenderFlow({
 			| ContactNodeDetails
 			| LocationRequestNodeDetails
 			| EndNodeDetails
+			| TemplateMessageNodeDetails
 	) => {
 		const node: Node = {
 			id: randomString(),
@@ -214,6 +226,9 @@ export default function RenderFlow({
 			node.data = details.data;
 		} else if (details.type === 'LOCATION_REQUEST') {
 			node.type = 'locationRequestNode';
+			node.data = details.data;
+		} else if (details.type === 'TEMPLATE_MESSAGE') {
+			node.type = 'templateMessage';
 			node.data = details.data;
 		} else if (details.type === 'END') {
 			node.type = 'endNode';
