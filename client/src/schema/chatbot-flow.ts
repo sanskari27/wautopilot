@@ -21,7 +21,7 @@ export const ChatbotFlowSchema = z.object({
 	nurturing: z.array(
 		z.object({
 			after: z.object({
-				type: z.union([z.literal('min'), z.literal('days'), z.literal('hours')]),
+				type: z.union([z.literal('sec'), z.literal('min'), z.literal('days'), z.literal('hours')]),
 				value: z.string(),
 			}),
 			respond_type: z.union([z.literal('template'), z.literal('normal')]),

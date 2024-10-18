@@ -55,12 +55,20 @@ const validateChatBot = (bot: any) => {
 			//after will have the property as value and type will be calculated with days min or hours
 			after: {
 				type:
-					nurturing.after % 86400 === 0 ? 'days' : nurturing.after % 3600 === 0 ? 'hours' : 'min',
+					nurturing.after % 86400 === 0
+						? 'days'
+						: nurturing.after % 3600 === 0
+						? 'hours'
+						: nurturing.after % 60 === 0
+						? 'min'
+						: 'sec',
 				value: (nurturing.after % 86400 === 0
 					? nurturing.after / 86400
 					: nurturing.after % 3600 === 0
 					? nurturing.after / 3600
-					: nurturing.after / 60
+					: nurturing.after % 60 === 0
+					? nurturing.after / 60
+					: nurturing.after
 				).toString(),
 			},
 		})),

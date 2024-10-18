@@ -103,7 +103,9 @@ export default function CreateChatbotFlow() {
 			if (data.nurturing[i].respond_type === 'normal') {
 				if (
 					Number(data.nurturing[i].after.value) *
-						(data.nurturing[i].after.type === 'min'
+						(data.nurturing[i].after.type === 'sec'
+							? 1
+							: data.nurturing[i].after.type === 'min'
 							? 60
 							: data.nurturing[i].after.type === 'hours'
 							? 3600
@@ -125,7 +127,13 @@ export default function CreateChatbotFlow() {
 					...nurturing,
 					after:
 						Number(nurturing.after.value) *
-						(nurturing.after.type === 'min' ? 60 : nurturing.after.type === 'hours' ? 3600 : 86400),
+						(nurturing.after.type === 'sec'
+							? 1
+							: nurturing.after.type === 'min'
+							? 60
+							: nurturing.after.type === 'hours'
+							? 3600
+							: 86400),
 				};
 			}),
 			trigger_gap_seconds:
@@ -506,6 +514,7 @@ export default function CreateChatbotFlow() {
 																				<SelectValue />
 																			</SelectTrigger>
 																			<SelectContent>
+																				<SelectItem value='sec'>Seconds</SelectItem>
 																				<SelectItem value='min'>Minutes</SelectItem>
 																				<SelectItem value='hours'>Hours</SelectItem>
 																				<SelectItem value='days'>Days</SelectItem>
