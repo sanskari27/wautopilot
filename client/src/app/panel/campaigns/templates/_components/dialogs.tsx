@@ -599,6 +599,10 @@ export function CarouselTemplateDialog({
 																				disabled={(field.value ?? []).length >= 3}
 																				onSubmit={(payload) => addURLButton(index, payload)}
 																			/>
+																			<PhoneNumberButton
+																				disabled={(field.value ?? []).length >= 3}
+																				onSubmit={(payload) => addPhoneNumberButton(index, payload)}
+																			/>
 																		</div>
 																		<Button
 																			onClick={() => handleDeleteCard(index)}

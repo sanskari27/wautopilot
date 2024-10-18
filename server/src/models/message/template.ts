@@ -203,31 +203,35 @@ export default class TemplateMessage extends Message {
 				const selectedCard = cCards[card_index];
 				const headerFormat = selectedCard.header.format === 'IMAGE' ? 'image' : 'video';
 				const selectedCardButtons = selectedCard.buttons;
-				const buttons = card.buttons.map((button, index) => {
-					if (selectedCardButtons[index].type === 'QUICK_REPLY') {
-						return {
-							type: 'button',
-							sub_type: 'quick_reply',
-							index,
-							parameters: [
-								{
-									type: 'payload',
-									payload: selectedCardButtons[index].text,
-								},
-							],
-						} as ReplyButton;
-					} else {
-						return {
-							type: 'button',
-							sub_type: 'url',
-							index,
-							parameters: button.map((text) => ({
-								type: 'text',
-								text,
-							})),
-						} as URLButton;
-					}
-				});
+				const buttons = card.buttons
+					.map((button, index) => {
+						if (selectedCardButtons[index].type === 'QUICK_REPLY') {
+							return {
+								type: 'button',
+								sub_type: 'quick_reply',
+								index,
+								parameters: [
+									{
+										type: 'payload',
+										payload: selectedCardButtons[index].text,
+									},
+								],
+							} as ReplyButton;
+						} else if (selectedCardButtons[index].type === 'URL') {
+							return {
+								type: 'button',
+								sub_type: 'url',
+								index,
+								parameters: button.map((text) => ({
+									type: 'text',
+									text,
+								})),
+							} as URLButton;
+						} else {
+							return null;
+						}
+					})
+					.filter((button) => button !== null) as (URLButton | ReplyButton)[];
 				return {
 					card_index,
 					components: [

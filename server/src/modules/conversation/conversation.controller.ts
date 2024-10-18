@@ -89,8 +89,6 @@ async function assignLabelToMessage(req: Request, res: Response, next: NextFunct
 			status: 200,
 		});
 	} catch (err) {
-		console.log(err);
-
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
 	}
 }

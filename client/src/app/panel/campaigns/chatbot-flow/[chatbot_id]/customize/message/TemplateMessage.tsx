@@ -790,7 +790,7 @@ const TemplateMessage = ({ onTemplateMessageAdded, children }: TextMessageProps)
 																	<div className='text-center'>Button number {buttonIndex + 1}</div>
 																	<Show.ShowIf condition={card.buttons[buttonIndex].length == 0}>
 																		<div className='text-center text-destructive'>
-																			Not required for reply back buttons
+																			Not required for reply or phone buttons
 																		</div>
 																	</Show.ShowIf>
 																	<Each
@@ -841,7 +841,7 @@ const TemplateMessage = ({ onTemplateMessageAdded, children }: TextMessageProps)
 												<div className='text-center'>Button number {buttonIndex + 1}</div>
 												<Show.ShowIf condition={template_buttons[buttonIndex].length === 0}>
 													<div className='text-center text-destructive'>
-														Not required for reply back buttons
+														Not required for reply or phone buttons
 													</div>
 												</Show.ShowIf>
 												<Each
