@@ -122,17 +122,16 @@ export function RecipientProvider({
 		);
 	}, []);
 
-	const markUnread = React.useCallback(
-		(id: string) => {
-			const unModified = list.filter((item) => item.id !== id);
-			const modified = list.find((item) => item.id === id);
-			if (modified) {
-				modified.unreadCount++;
-				setList([modified, ...unModified]);
-			}
-		},
-		[list]
-	);
+	const markUnread = React.useCallback((id: string) => {
+		setList((prev) =>
+			prev.map((item) => {
+				if (item.id === id) {
+					return { ...item, unreadCount: item.unreadCount + 1 };
+				}
+				return item;
+			})
+		);
+	}, []);
 
 	const markRead = React.useCallback((id: string) => {
 		setList((prev) =>
