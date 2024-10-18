@@ -103,6 +103,10 @@ async function sendMessageToConversation(req: Request, res: Response, next: Next
 	} = req.locals;
 	const data = req.locals.data as SendMessageValidationResult;
 
+	if (serviceAccount.walletBalance < serviceAccount.markupPrice) {
+		return next(new CustomError(COMMON_ERRORS.INSUFFICIENT_BALANCE));
+	}
+
 	const conversationService = new ConversationService(serviceAccount, device);
 	const recipient = await conversationService.findRecipientByConversation(id);
 	if (!recipient) {
@@ -190,6 +194,10 @@ async function sendQuickReply(req: Request, res: Response, next: NextFunction) {
 	const recipient = await conversationService.findRecipientByConversation(id);
 	if (!recipient) {
 		return next(new CustomError(COMMON_ERRORS.NOT_FOUND));
+	}
+
+	if (serviceAccount.walletBalance < serviceAccount.markupPrice) {
+		return next(new CustomError(COMMON_ERRORS.INSUFFICIENT_BALANCE));
 	}
 
 	let message:
