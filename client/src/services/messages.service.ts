@@ -17,6 +17,7 @@ export default class MessagesService {
 					recipient: conversation.recipient ?? '',
 					profile_name: conversation.profile_name ?? '',
 					labels: conversation.labels ?? [],
+					message_labels: conversation.message_labels ?? [],
 					archived: conversation.archived ?? false,
 					pinned: conversation.pinned ?? false,
 					unreadCount: conversation.unreadCount ?? 0,

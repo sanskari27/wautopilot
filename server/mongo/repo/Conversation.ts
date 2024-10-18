@@ -48,6 +48,11 @@ const schema = new mongoose.Schema<IConversation>(
 			type: Number,
 			default: 0,
 		},
+
+		message_labels: {
+			type: [String],
+			default: [],
+		},
 	},
 	{
 		timestamps: { createdAt: true },

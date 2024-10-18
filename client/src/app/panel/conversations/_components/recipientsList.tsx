@@ -14,7 +14,6 @@ import { ArchiveRestore, BellDot, Headset, ListFilter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AgentFilter from './agent-selector';
 import Recipient from './recipient';
-import { PopoverAnchor } from '@radix-ui/react-popover';
 
 export default function RecipientsList() {
 	const { isExpanded, collapse } = useChatListExpanded();
@@ -23,6 +22,7 @@ export default function RecipientsList() {
 		unpinnedConversations,
 		setSearchText,
 		setLabelFilter,
+		setMessageLabelFilter,
 		selectedConversations,
 		setSelectedRecipient,
 		showArchived,
@@ -32,6 +32,7 @@ export default function RecipientsList() {
 		selected_recipient,
 		agentFilter,
 		setAgentFilter,
+		message_tags,
 	} = useRecipient();
 
 	const handleRecipientClick = (item: TRecipient) => {
@@ -115,11 +116,16 @@ export default function RecipientsList() {
 							<ListFilter className='w-4 h-4' strokeWidth={3} />
 						</Button>
 					</PopoverTrigger>
-					<PopoverContent  side='right' className='p-1 w-fit'>
+					<PopoverContent side='right' className='p-1 w-fit'>
 						<div className='flex gap-1'>
 							<TagsSelector onChange={setLabelFilter}>
 								<Button variant='outline' size={'sm'}>
 									Tag Filter
+								</Button>
+							</TagsSelector>
+							<TagsSelector labels={message_tags} onChange={setMessageLabelFilter}>
+								<Button variant='outline' size={'sm'}>
+									Message Tag Filter
 								</Button>
 							</TagsSelector>
 							<AgentFilter onConfirm={setAgentFilter} selected={agentFilter}>

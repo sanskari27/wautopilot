@@ -3,6 +3,7 @@ export type Recipient = {
 	recipient: string;
 	profile_name: string;
 	labels: string[];
+	message_labels: string[];
 	unreadCount: number;
 	pinned: boolean;
 	archived: boolean;

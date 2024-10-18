@@ -18,4 +18,6 @@ export default interface IConversation extends Document {
 	pinned: boolean;
 	archived: boolean;
 	unreadCount: number;
+
+	message_labels: string[];
 }

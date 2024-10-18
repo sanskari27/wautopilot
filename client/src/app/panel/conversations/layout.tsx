@@ -12,6 +12,7 @@ import ContactService from '@/services/contact.service';
 import MediaService from '@/services/media.service';
 import MessagesService from '@/services/messages.service';
 import TemplateService from '@/services/template.service';
+import UserService from '@/services/users.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 
@@ -23,14 +24,16 @@ export default async function Layout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const [conversations, quickReplies, media, contacts,template, flow] = await Promise.all([
-		MessagesService.fetchAllConversation(),
-		MessagesService.fetchQuickReplies(),
-		MediaService.getMedias(),
-		ContactService.listContacts(),
-		TemplateService.listTemplates(),
-		ChatBotService.listWhatsappFlows(),
-	]);
+	const [conversations, quickReplies, media, contacts, template, flow, message_tags] =
+		await Promise.all([
+			MessagesService.fetchAllConversation(),
+			MessagesService.fetchQuickReplies(),
+			MediaService.getMedias(),
+			ContactService.listContacts(),
+			TemplateService.listTemplates(),
+			ChatBotService.listWhatsappFlows(),
+			UserService.listMessageTags(),
+		]);
 
 	return (
 		<Suspense fallback={<Loading />}>
@@ -40,7 +43,7 @@ export default async function Layout({
 						<TemplatesProvider data={template}>
 							<ContactsProvider data={contacts}>
 								<QuickReplyProvider data={quickReplies}>
-									<RecipientProvider data={conversations}>
+									<RecipientProvider data={conversations} message_tags={message_tags}>
 										<MessagesProvider>
 											<ChatListExpandedProvider>{children}</ChatListExpandedProvider>
 										</MessagesProvider>

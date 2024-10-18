@@ -34,6 +34,7 @@ function processConversationDocs(
 			archived: doc.archived,
 			unreadCount: doc.unreadCount,
 			assigned_to: doc.assigned_to?.name ?? 'Unassigned',
+			message_labels: doc.message_labels ?? [],
 		};
 	});
 }
@@ -422,6 +423,7 @@ export default class ConversationService extends WhatsappLinkService {
 					pinned: { $first: '$pinned' },
 					archived: { $first: '$archived' },
 					unreadCount: { $first: '$unreadCount' },
+					message_labels: { $first: '$message_labels' },
 				},
 			},
 			{
@@ -516,13 +518,48 @@ export default class ConversationService extends WhatsappLinkService {
 	}
 
 	public async assignLabelToMessage(id: Types.ObjectId, labels: string[]) {
-		await ConversationMessageDB.updateOne(
+		const message = await ConversationMessageDB.findOneAndUpdate(
 			{
 				_id: id,
 			},
 			{
 				$set: {
 					labels,
+				},
+			},
+			{ returnOriginal: true }
+		);
+		if (!message) {
+			return;
+		}
+
+		const _all_labels = await ConversationMessageDB.aggregate([
+			{
+				$match: {
+					linked_to: this.userId,
+					device_id: this.deviceId,
+					conversation_id: message.conversation_id,
+				},
+			},
+			{
+				$group: {
+					_id: null,
+					labels: {
+						$addToSet: '$labels',
+					},
+				},
+			},
+		]);
+
+		const all_labels = (_all_labels?.[0]?.labels ?? []).flat();
+
+		await ConversationDB.updateOne(
+			{
+				_id: message.conversation_id,
+			},
+			{
+				$set: {
+					message_labels: all_labels,
 				},
 			}
 		);

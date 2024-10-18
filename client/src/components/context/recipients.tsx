@@ -14,9 +14,11 @@ const RecipientsContext = React.createContext<{
 	selected_recipient: Recipient | null;
 	showArchived: boolean;
 	showUnread: boolean;
+	message_tags: string[];
 	markRead: (id: string) => void;
 	toggleSelected: (id: string) => void;
 	setLabelFilter: (labels: string[]) => void;
+	setMessageLabelFilter: (labels: string[]) => void;
 	setSearchText: (text: string) => void;
 	setSelectedRecipient: (recipient: Recipient) => void;
 	toggleShowArchived: () => void;
@@ -31,11 +33,13 @@ const RecipientsContext = React.createContext<{
 	selected_recipient: null,
 	showArchived: false,
 	showUnread: false,
+	message_tags: [],
 	toggleShowArchived: () => {},
 	toggleShowUnread: () => {},
 	markRead: () => {},
 	toggleSelected: () => {},
 	setLabelFilter: () => {},
+	setMessageLabelFilter: () => {},
 	setSearchText: () => {},
 	setSelectedRecipient: () => {},
 	setAgentFilter: () => {},
@@ -44,12 +48,15 @@ const RecipientsContext = React.createContext<{
 export function RecipientProvider({
 	children,
 	data,
+	message_tags,
 }: {
 	children: React.ReactNode;
 	data: Recipient[];
+	message_tags: string[];
 }) {
 	const [searchText, setSearchText] = React.useState('');
 	const [label_filter, setLabelFilter] = React.useState<string[]>([]);
+	const [message_label_filter, setMessageLabelFilter] = React.useState<string[]>([]);
 	const [agent_filter, setAgentFilter] = React.useState<string[]>([]);
 	const [list, setList] = React.useState<Recipient[]>(data);
 	const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
@@ -66,9 +73,19 @@ export function RecipientProvider({
 			const cond3 = label_filter.every((label) => item.labels.includes(label));
 			const cond4 = agent_filter.every((agent) => item.assigned_to === agent);
 			const cond5 = showUnread ? item.unreadCount > 0 : true;
-			return cond1 && cond2 && cond3 && cond4 && cond5;
+			const cond6 = message_label_filter.every((label) => item.message_labels.includes(label));
+
+			return cond1 && cond2 && cond3 && cond4 && cond5 && cond6;
 		});
-	}, [list, searchText, showArchived, label_filter, agent_filter, showUnread]);
+	}, [
+		list,
+		searchText,
+		showArchived,
+		label_filter,
+		agent_filter,
+		showUnread,
+		message_label_filter,
+	]);
 
 	const { pinnedConversations, unpinnedConversations } = React.useMemo(
 		() =>
@@ -123,14 +140,20 @@ export function RecipientProvider({
 	}, []);
 
 	const markUnread = React.useCallback((id: string, count: number) => {
-		setList((prev) =>
-			prev.map((item) => {
-				if (item.id === id) {
-					return { ...item, unreadCount: count };
-				}
-				return item;
-			})
-		);
+		setList((prev) => {
+			const unModified = prev.filter((item) => item.id !== id);
+			const modified = prev.find((item) => item.id === id);
+			if (modified) {
+				return [
+					{
+						...modified,
+						unreadCount: count,
+					},
+					...unModified,
+				];
+			}
+			return prev;
+		});
 	}, []);
 
 	const markRead = React.useCallback((id: string) => {
@@ -185,11 +208,13 @@ export function RecipientProvider({
 				selected_recipient,
 				showArchived,
 				showUnread,
+				message_tags: message_tags,
 				toggleShowUnread,
 				toggleShowArchived,
 				markRead,
 				toggleSelected,
 				setLabelFilter,
+				setMessageLabelFilter,
 				setSearchText,
 				setSelectedRecipient,
 				setAgentFilter,
