@@ -170,7 +170,7 @@ export default class ConversationService extends WhatsappLinkService {
 				...details,
 			});
 
-			await ConversationDB.updateOne(
+			const conversation = await ConversationDB.findOneAndUpdate(
 				{
 					_id: conversation_id,
 				},
@@ -193,6 +193,9 @@ export default class ConversationService extends WhatsappLinkService {
 									unreadCount: 0,
 								},
 						  }),
+				},
+				{
+					new: true,
 				}
 			);
 
@@ -200,7 +203,8 @@ export default class ConversationService extends WhatsappLinkService {
 			SocketServer.getInstance().sendMessage(conversation_id.toString(), data);
 			SocketServer.getInstance().sendNewMessageNotification(
 				this.userId.toString(),
-				conversation_id.toString()
+				conversation_id.toString(),
+				conversation?.unreadCount ?? 0
 			);
 
 			return data;

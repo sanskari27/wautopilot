@@ -122,11 +122,11 @@ export function RecipientProvider({
 		);
 	}, []);
 
-	const markUnread = React.useCallback((id: string) => {
+	const markUnread = React.useCallback((id: string, count: number) => {
 		setList((prev) =>
 			prev.map((item) => {
 				if (item.id === id) {
-					return { ...item, unreadCount: item.unreadCount + 1 };
+					return { ...item, unreadCount: count };
 				}
 				return item;
 			})
@@ -153,8 +153,8 @@ export function RecipientProvider({
 	}
 
 	React.useEffect(() => {
-		socket.on('new_message_notification', (conversation_id) => {
-			markUnread(conversation_id);
+		socket.on('new_message_notification', (conversation_id, count) => {
+			markUnread(conversation_id, isNaN(parseInt(count)) ? 1 : parseInt(count));
 		});
 
 		socket.on('conversation_read', (conversation_id) => {

@@ -61,8 +61,11 @@ export default class SocketServer {
 		this.io.of('/conversation').to(conversation_id).emit('message_updated', message);
 	}
 
-	public sendNewMessageNotification(user_id: string, conversation_id: string) {
-		this.io.of('/conversation').to(user_id).emit('new_message_notification', conversation_id);
+	public sendNewMessageNotification(user_id: string, conversation_id: string, unreadCount: number) {
+		this.io
+			.of('/conversation')
+			.to(user_id)
+			.emit('new_message_notification', conversation_id, unreadCount.toString());
 	}
 
 	public markRead(user_id: string, conversation_id: string) {
