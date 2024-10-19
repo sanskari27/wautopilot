@@ -78,14 +78,14 @@ export function AddQuickReply({
 				<div className='grid gap-4'>
 					<div className='grid gap-2'>
 						<Label className='text-primary' htmlFor='name'>
-							Text ({text.length} / 25)
+							Text ({text.length} / 20)
 						</Label>
 						<Textarea
 							id='name'
 							className='h-48'
 							value={text}
 							placeholder='enter preferred text'
-							onChange={(e) => setText(e.target.value.substring(0, 25))}
+							onChange={(e) => setText(e.target.value.substring(0, 20))}
 						/>
 					</div>
 				</div>
@@ -129,13 +129,13 @@ export function PhoneNumberButton({
 				<div className='grid gap-3'>
 					<div className='grid gap-2'>
 						<Label className='text-primary' htmlFor='name'>
-							Text to be displayed
+							Text to be displayed ({text.length} / 20)
 						</Label>
 						<Input
 							id='name'
 							value={text}
 							placeholder='enter preferred text'
-							onChange={(e) => setText(e.target.value)}
+							onChange={(e) => setText(e.target.value.substring(0, 20))}
 						/>
 					</div>
 					<div className='grid gap-2'>
@@ -204,13 +204,13 @@ export function URLButton({
 				<div className='grid gap-3'>
 					<div className='grid gap-2'>
 						<Label className='text-primary' htmlFor='name'>
-							Text to be displayed
+							Text to be displayed ({text.length} / 20)
 						</Label>
 						<Input
 							id='name'
 							value={text}
 							placeholder='enter preferred text'
-							onChange={(e) => setText(e.target.value)}
+							onChange={(e) => setText(e.target.value.substring(0,20))}
 						/>
 					</div>
 					<div className='grid gap-2'>
