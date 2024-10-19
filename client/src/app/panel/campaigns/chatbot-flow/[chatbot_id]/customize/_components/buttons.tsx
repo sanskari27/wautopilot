@@ -53,9 +53,9 @@ export function AddButton({
 			</div>
 			<div>
 				<Button
-					disabled={isDisabled}
+					disabled={isDisabled || buttonText.length > 20}
 					onClick={() => {
-						if (!buttonText) return;
+						if (!buttonText || buttonText.length > 20) return;
 						onSubmit({ id: randomString(), text: buttonText });
 						setButtonText('');
 					}}
