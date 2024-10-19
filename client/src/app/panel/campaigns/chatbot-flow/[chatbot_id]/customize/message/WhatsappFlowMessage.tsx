@@ -24,6 +24,7 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { parseToSeconds, randomString } from '@/lib/utils';
 import { useState } from 'react';
+import { AddButton } from '../_components/buttons';
 
 export type WhatsappFlowMessageProps = {
 	onWhatsappFlowMessageAdded: (details: {
@@ -124,11 +125,11 @@ const WhatsappFlowMessage = ({
 						/>
 					</div>
 					<div>
-						<p className='text-sm mt-2'>Enter Button Text</p>
+						<p className='text-sm mt-2'>Enter Button Text ({button_text.length}/20)</p>
 						<Input
 							placeholder={'Enter your cta button text here.'}
 							value={button_text}
-							onChange={(e) => setButtonText(e.target.value)}
+							onChange={(e) => setButtonText(e.target.value.substring(0, 20))}
 						/>
 					</div>
 				</div>

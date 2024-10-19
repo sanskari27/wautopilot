@@ -26,6 +26,7 @@ import { parseToSeconds, randomString } from '@/lib/utils';
 import { useState } from 'react';
 import { AddButton, ListButtons } from '../_components/buttons';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AddSection } from '../_components/section';
 
 export type ListMessageProps = {
 	onListMessageAdded: (details: {
@@ -174,7 +175,7 @@ const ListMessage = ({ onListMessageAdded, children }: ListMessageProps) => {
 
 					<Separator className='bg-gray-400' />
 
-					<AddButton
+					<AddSection
 						placeholder={'Create a new section. \nex. Menu 1'}
 						onSubmit={(data) => {
 							setSections([...sections, { title: data.text, buttons: [] }]);

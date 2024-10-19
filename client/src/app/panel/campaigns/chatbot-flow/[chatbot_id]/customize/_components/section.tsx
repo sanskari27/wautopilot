@@ -32,35 +32,35 @@ export function ListButtons({
 	);
 }
 
-export function AddButton({
+export function AddSection({
 	isDisabled,
 	onSubmit,
-	placeholder = 'Enter button text here. \nex. Click here to know more.',
+	placeholder = 'Enter section text here. \nex. Cart action.',
 }: {
 	isDisabled?: boolean;
 	onSubmit: (data: { id: string; text: string }) => void;
 	placeholder?: string;
 }) {
-	const [buttonText, setButtonText] = useState('');
+	const [sectionText, setButtonText] = useState('');
 
 	return (
 		<div className='flex gap-3 items-end'>
 			<div className='flex-1'>
-				<Label>Button text ({buttonText.length}/20)</Label>
+				<Label>Section text ({sectionText.length}/20)</Label>
 				<div className='flex-1'>
 					<Input
 						placeholder={placeholder}
-						value={buttonText}
+						value={sectionText}
 						onChange={(e) => setButtonText(e.target.value.substring(0, 20))}
 					/>
 				</div>
 			</div>
 			<div>
 				<Button
-					disabled={isDisabled || buttonText.length > 20}
+					disabled={isDisabled || sectionText.length > 20}
 					onClick={() => {
-						if (!buttonText || buttonText.length > 20) return;
-						onSubmit({ id: randomString(), text: buttonText });
+						if (!sectionText || sectionText.length > 20) return;
+						onSubmit({ id: randomString(), text: sectionText });
 						setButtonText('');
 					}}
 				>
