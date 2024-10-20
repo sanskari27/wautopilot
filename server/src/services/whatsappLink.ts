@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { WhatsappLinkDB } from '../../mongo';
+import { APIKeyDB, WhatsappLinkDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
 import MetaAPI from '../config/MetaAPI';
@@ -119,6 +119,7 @@ export default class WhatsappLinkService extends UserService {
 		}
 
 		await WhatsappLinkDB.deleteOne({ _id: recordId });
+		await APIKeyDB.deleteMany({ device_id: recordId });
 	}
 
 	public static async fetchDeviceDoc(recordId: Types.ObjectId, user: Types.ObjectId) {
