@@ -192,7 +192,6 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 		recipient: data.recipient,
 		...result,
 		...formattedMessage,
-		...(extractFormattedMessage(messageInst.toObject()) as any),
 		...(data.context
 			? {
 					context: {
