@@ -137,7 +137,7 @@ export default function APIWebhook() {
 								</div>
 								<CodeBlocks
 									title='Request Example'
-									code={`curl --location 'https://api.wautopilot.com/message/send-messaget'
+									code={`curl --location 'https://api.wautopilot.com/message/send-message'
 --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' 
 --header 'Content-Type: application/json' 
 --data '{
@@ -197,7 +197,7 @@ export default function APIWebhook() {
 								</div>
 								<CodeBlocks
 									title='Request Example'
-									code={`curl --location 'https://api.wautopilot.com/message/send-messaget' 
+									code={`curl --location 'https://api.wautopilot.com/message/send-message' 
 --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' 
 --header 'Content-Type: application/json' 
 --data '{
@@ -285,7 +285,7 @@ export default function APIWebhook() {
 								</div>
 								<CodeBlocks
 									title='Request Example'
-									code={`curl --location 'https://api.wautopilot.com/message/send-messaget' --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' --header 'Content-Type: application/json' --data-raw '{
+									code={`curl --location 'https://api.wautopilot.com/message/send-message' --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' --header 'Content-Type: application/json' --data-raw '{
     "message": {
         "type": "contacts",
         "contacts": [{
@@ -551,7 +551,7 @@ export default function APIWebhook() {
 								</div>
 								<CodeBlocks
 									title='Request Example'
-									code={`curl --location 'https://api.wautopilot.com/message/send-messaget' --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' --header 'Content-Type: application/json' --data '{
+									code={`curl --location 'https://api.wautopilot.com/message/send-message' --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' --header 'Content-Type: application/json' --data '{
     "message": {
         "type": "button",
         "text": "Choose an option:",
@@ -638,7 +638,7 @@ export default function APIWebhook() {
 								</div>
 								<CodeBlocks
 									title='Request Example'
-									code={`curl --location 'https://api.wautopilot.com/message/send-messaget' --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' --header 'Content-Type: application/json' --data '{
+									code={`curl --location 'https://api.wautopilot.com/message/send-message' --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' --header 'Content-Type: application/json' --data '{
     "message": {
         "type": "list",
         "header": "Available Services",
@@ -784,7 +784,7 @@ export default function APIWebhook() {
 								</div>
 								<CodeBlocks
 									title='Request Example'
-									code={`curl --location 'https://api.wautopilot.com/message/send-messaget' --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' --header 'Content-Type: application/json' --data '{
+									code={`curl --location 'https://api.wautopilot.com/message/send-message' --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' --header 'Content-Type: application/json' --data '{
     "message": {
         "type": "whatsapp_flow",
         "header": "Welcome to Our Service", 
@@ -869,7 +869,7 @@ export default function APIWebhook() {
 								</div>
 								<CodeBlocks
 									title='Request Example'
-									code={`curl --location 'https://api.wautopilot.com/message/send-messaget' --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' --header 'Content-Type: application/json' --data '{
+									code={`curl --location 'https://api.wautopilot.com/message/send-message' --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' --header 'Content-Type: application/json' --data '{
     "message": {
         "type": "template",
         "template_id": "703008418565758",
@@ -1031,7 +1031,7 @@ export default function APIWebhook() {
 								</div>
 								<CodeBlocks
 									title='Request Example'
-									code={`curl --location 'https://api.wautopilot.com/message/send-messaget' --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' --header 'Content-Type: application/json' --data '{
+									code={`curl --location 'https://api.wautopilot.com/message/send-message' --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' --header 'Content-Type: application/json' --data '{
     "message": {
         "type": "template",
         "template_id": "703008418565758",
