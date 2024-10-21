@@ -1,3 +1,4 @@
+export { default as AssignLabelNode } from './AssignLabelNode';
 export { default as AudioNode } from './AudioNode';
 export { default as ButtonNode } from './ButtonNode';
 export { default as ContactNode } from './ContactNode';

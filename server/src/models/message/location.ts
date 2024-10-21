@@ -34,6 +34,7 @@ export default class LocationMessage extends Message {
 		return {
 			to: this.recipient,
 			type: 'location',
+			messaging_product: 'whatsapp',
 			location: {
 				latitude: this.location.latitude,
 				longitude: this.location.longitude,

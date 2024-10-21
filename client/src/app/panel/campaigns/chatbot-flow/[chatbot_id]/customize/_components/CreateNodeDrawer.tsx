@@ -11,9 +11,10 @@ import { FaGooglePlay, FaImage, FaListAlt, FaVideo } from 'react-icons/fa';
 import { FaPause } from 'react-icons/fa6';
 import { IoMdRadioButtonOn, IoMdText } from 'react-icons/io';
 import { IoDocumentText, IoLocationSharp } from 'react-icons/io5';
-import { MdAudiotrack, MdContactPage } from 'react-icons/md';
+import { MdAudiotrack, MdContactPage, MdLabel, MdLabelImportant } from 'react-icons/md';
 import { PiFlowArrowBold } from 'react-icons/pi';
 import {
+	AssignLabel,
 	AudioMessage,
 	ButtonMessage,
 	DocumentMessage,
@@ -27,6 +28,7 @@ import {
 import ContactMessage from '../message/ContactMessage';
 import TemplateMessage from '../message/TemplateMessage';
 import {
+	AssignLabelDetails,
 	ButtonNodeDetails,
 	ContactNodeDetails,
 	DocumentNodeDetails,
@@ -50,8 +52,9 @@ type Props = {
 			| FlowNodeDetails
 			| ContactNodeDetails
 			| LocationRequestNodeDetails
-			| EndNodeDetails
 			| TemplateNodeDetails
+			| AssignLabelDetails
+			| EndNodeDetails
 	) => void;
 };
 
@@ -190,6 +193,15 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 		});
 	};
 
+	const handleAssignLabel = (labels: string[]) => {
+		addNode({
+			type: 'ASSIGN_LABEL',
+			data: {
+				labels,
+			},
+		});
+	};
+
 	return (
 		<Sheet open={isOpen} onOpenChange={setSheetOpen}>
 			<SheetTrigger asChild>
@@ -309,6 +321,13 @@ export default function CreateNodeDrawer({ addNode }: Props) {
 								className={'bg-indigo-500'}
 							/>
 						</WhatsappFlowMessage>
+						<AssignLabel onAssignLabelAdded={handleAssignLabel}>
+							<MessageType
+								body={'Assign Label'}
+								icon={<MdLabelImportant size={'1.25rem'} />}
+								className={'bg-cyan-500'}
+							/>
+						</AssignLabel>
 						<MessageType
 							body={'End Flow'}
 							icon={<FaPause size={'1.25rem'} />}

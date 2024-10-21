@@ -255,7 +255,14 @@ export default class PhoneBookService extends UserService {
 	public async addLabels(recordId: Types.ObjectId[], tags: string[]) {
 		await PhoneBookDB.updateMany(
 			{ _id: { $in: recordId } },
-			{ $push: { labels: { $each: tags } } }
+			{ $addToSet: { labels: { $each: tags } } }
+		);
+	}
+
+	public async addLabelsByNumbers(numbers: string[], tags: string[]) {
+		await PhoneBookDB.updateMany(
+			{ phone_number: { $in: numbers } },
+			{ $addToSet: { labels: { $each: tags } } }
 		);
 	}
 

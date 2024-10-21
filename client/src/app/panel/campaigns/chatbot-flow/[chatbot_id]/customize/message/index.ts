@@ -1,3 +1,5 @@
+export { default as AssignLabel } from './AssignLabel';
+export type { AssignLabelProps } from './AssignLabel';
 export { default as AudioMessage } from './AudioMessage';
 export type { AudioMessageProps } from './AudioMessage';
 export { default as ButtonMessage } from './ButtonMessage';

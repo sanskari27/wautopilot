@@ -25,6 +25,7 @@ import { useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { updateNodesAndEdges } from '../../../action';
 import {
+	AssignLabelNode,
 	AudioNode,
 	ButtonNode,
 	ContactNode,
@@ -136,6 +137,13 @@ export type TemplateNodeDetails = {
 	} & QuickTemplateMessageProps;
 };
 
+export type AssignLabelDetails = {
+	type: 'ASSIGN_LABEL';
+	data: {
+		labels: string[];
+	};
+};
+
 const nodeTypes = {
 	startNode: StartNode,
 	textNode: TextNode,
@@ -149,6 +157,7 @@ const nodeTypes = {
 	contactNode: ContactNode,
 	locationRequestNode: LocationRequestNode,
 	templateNode: TemplateNode,
+	assignLabelNode: AssignLabelNode,
 	endNode: EndNode,
 };
 
@@ -175,8 +184,9 @@ export default function RenderFlow({
 			| FlowNodeDetails
 			| ContactNodeDetails
 			| LocationRequestNodeDetails
-			| EndNodeDetails
 			| TemplateNodeDetails
+			| AssignLabelDetails
+			| EndNodeDetails
 	) => {
 		const node: Node = {
 			id: randomString(),
@@ -229,6 +239,9 @@ export default function RenderFlow({
 			node.data = details.data;
 		} else if (details.type === 'TEMPLATE_MESSAGE') {
 			node.type = 'templateNode';
+			node.data = details.data;
+		} else if (details.type === 'ASSIGN_LABEL') {
+			node.type = 'assignLabelNode';
 			node.data = details.data;
 		} else if (details.type === 'END') {
 			node.type = 'endNode';

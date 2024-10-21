@@ -59,6 +59,7 @@ type CreateFlowData = {
 			| 'contactNode'
 			| 'templateNode'
 			| 'locationRequestNode'
+			| 'assignLabelNode'
 			| 'endNode';
 		id: string;
 		position: {
@@ -937,6 +938,11 @@ export default class ChatBotService extends WhatsappLinkService {
 					type: 'template',
 				}),
 			});
+		} else if (node.node_type === 'assignLabelNode') {
+			if (node.data.labels) {
+				await phoneBookService.addLabelsByNumbers([recipient], node.data.labels);
+			}
+			return;
 		} else {
 			return;
 		}

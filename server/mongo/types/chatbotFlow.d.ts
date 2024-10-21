@@ -25,6 +25,7 @@ export default interface IChatBotFlow extends Document {
 			| 'contactNode'
 			| 'templateNode'
 			| 'locationRequestNode'
+			| 'assignLabelNode'
 			| 'endNode';
 		id: string;
 		position: {

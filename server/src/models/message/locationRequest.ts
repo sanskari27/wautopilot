@@ -19,6 +19,7 @@ export default class LocationRequestMessage extends Message {
 		return {
 			to: this.recipient,
 			type: 'interactive',
+			messaging_product: 'whatsapp',
 			interactive: {
 				type: 'location_request_message',
 				body: {
