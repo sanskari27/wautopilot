@@ -26,6 +26,9 @@ export const LOGO_PATH = '/static/assets/logo-primary.svg';
 
 export const SHORT_LINK_REDIRECT = 'https://open.wautopilot.com/';
 
+export const UNSUBSCRIBE_TOKENS = process.env.UNSUBSCRIBE_TOKENS?.split(',') ?? [];
+export const UNSUBSCRIBE_LABEL = process.env.UNSUBSCRIBE_LABEL ?? 'Unsubscribe';
+
 export enum Cookie {
 	Auth = 'auth-cookie',
 	Refresh = 'refresh-cookie',

@@ -2,6 +2,7 @@ import { FilterQuery, Types } from 'mongoose';
 import { PhoneBookDB } from '../../mongo';
 import IAccount from '../../mongo/types/account';
 import IPhoneBook from '../../mongo/types/phonebook';
+import { UNSUBSCRIBE_LABEL } from '../config/const';
 import { CustomError } from '../errors';
 import COMMON_ERRORS from '../errors/common-errors';
 import { filterUndefinedKeys } from '../utils/ExpressUtils';
@@ -372,6 +373,18 @@ export default class PhoneBookService extends UserService {
 				$set: {
 					[key]: defaultValue,
 				},
+			}
+		);
+	}
+
+	public async unsubscribeUser(recipient: string) {
+		await PhoneBookDB.updateOne(
+			{
+				phone_number: recipient,
+				linked_to: this.userId,
+			},
+			{
+				$addToSet: { labels: UNSUBSCRIBE_LABEL },
 			}
 		);
 	}

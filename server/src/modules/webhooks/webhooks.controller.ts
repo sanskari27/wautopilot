@@ -10,12 +10,14 @@ import {
 	META_VERIFY_STRING,
 	META_VERIFY_USER_STRING,
 	RAZORPAY_WEBHOOK_SECRET,
+	UNSUBSCRIBE_TOKENS,
 } from '../../config/const';
 import ApiKeyService from '../../services/apiKeys';
 import BroadcastService from '../../services/broadcast';
 import ButtonResponseService from '../../services/buttonResponse';
 import ChatBotService from '../../services/chatbot';
 import ConversationService from '../../services/conversation';
+import PhoneBookService from '../../services/phonebook';
 import DateUtils from '../../utils/DateUtils';
 import { objectToMessageBody } from '../../utils/MessageHelper';
 
@@ -144,6 +146,7 @@ async function processIncomingMessage(details: {
 	const chatBotService = new ChatBotService(user, link);
 	const buttonResponseService = new ButtonResponseService(user, link);
 	const timestamp = DateUtils.fromUnixTime(message.timestamp).toDate();
+	const phoneBookService = new PhoneBookService(user);
 
 	if (message.type === 'text') {
 		conversationService.addMessageToConversation(conversation_id, {
@@ -159,6 +162,9 @@ async function processIncomingMessage(details: {
 			message_type: 'normal',
 		});
 		chatBotService.handleMessage(recipient, message.text.body, meta_message_id);
+		if (UNSUBSCRIBE_TOKENS.includes(message.text.body.toLowerCase())) {
+			phoneBookService.unsubscribeUser(recipient);
+		}
 	} else if (
 		message.type === 'image' ||
 		message.type === 'video' ||
