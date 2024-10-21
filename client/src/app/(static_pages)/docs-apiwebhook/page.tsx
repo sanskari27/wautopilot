@@ -135,20 +135,36 @@ export default function APIWebhook() {
 									<Separator className='w-3/4' />
 									<p className='mt-4'>Sends a media (image, video, audio, document).</p>
 								</div>
-								<CodeBlocks
-									title='Request Example'
-									code={`curl --location 'https://api.wautopilot.com/message/send-message'
+								<div>
+									<CodeBlocks
+										title='Request Example'
+										code={`curl --location 'https://api.wautopilot.com/message/send-message'
 --header 'Authorization: Bearer toknxxxxxxxxxxxxxxxxxxx' 
 --header 'Content-Type: application/json' 
 --data '{
     "message":{
         "type":"image", 
         "media_id":"729961535887623"
+		},
+		"recipient":"91XXXXXXXXXX"
+		}'`}
+										language={'bash'}
+									/>
+									<CodeBlocks
+										title='Request Example'
+										code={`curl --location 'https://api.wautopilot.com/message/send-message'
+--header 'Content-Type: application/json'
+--header 'Authorization: Bearer xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+--data '{
+    "message":{
+        "type": "image",
+        "media_link": "https://________" 
     },
-    "recipient":"91XXXXXXXXXX"
-}'`}
-									language={'bash'}
-								/>
+    "recipient" : "91XXXXXXXXXX"
+}''`}
+										language={'bash'}
+									/>
+								</div>
 							</div>
 							<div className='grid grid-cols-1 md:grid-cols-2'>
 								<div>
@@ -164,6 +180,19 @@ export default function APIWebhook() {
 										<span className='text-destructive'> (required)</span>
 									</p>
 									<p>Media id of the media you want to send.</p>
+									<div className='flex items-center'>
+										<Separator className='w-1/4 my-4' />
+										OR
+										<Separator className='w-1/4 my-4' />
+									</div>
+									<p>
+										media_link: <span className='text-muted-foreground'>string</span>
+										<span className='text-destructive'> (required)</span>
+									</p>
+									<p>
+										URL of media.
+										<span className='text-destructive'> (any downloadable URL)</span>
+									</p>
 									<Separator className='w-3/4 my-4' />
 									<p>
 										recipient: <span className='text-muted-foreground'>string</span>
@@ -172,17 +201,31 @@ export default function APIWebhook() {
 									<p>Recipient number with country code (without &lsquo;+&lsquo;).</p>
 									<Separator className='w-3/4 my-4' />
 								</div>
-								<CodeBlocks
-									title='Request body example'
-									code={`{
+								<div>
+									<CodeBlocks
+										title='Request body example (with media id)'
+										code={`{
 	"message":{
 		"type":"image", //(image, video, document, audio)
 		"media_id":"729961535887623"
 		},
     "recipient":"91XXXXXXXXXX"
-}`}
-									language={'javascript'}
-								/>
+	}`}
+										language={'javascript'}
+									/>
+
+									<CodeBlocks
+										title='Request body example (with url)'
+										code={`{
+	"message":{
+		"type":"image", //(image, video, document, audio)
+		"media_link":"https://media.istockphoto.com/id/1500285927/photo/young-woman-a-university-student-studying-online.jpg?s=2048x2048&w=is&k=20&c=95BgS0lojrWD3QEmbec0nJv2DOHvUO4G6QoXF80S_9Y="
+		},
+    "recipient":"91XXXXXXXXXX"
+	}`}
+										language={'javascript'}
+									/>
+								</div>
 							</div>
 						</div>
 						<Separator className='w-full py-1 rounded-full my-4' />
@@ -937,6 +980,11 @@ export default function APIWebhook() {
 										</span>
 									</p>
 									<p>
+										<span className='text-destructive'>
+											NOTE: Any one of media_id or media_link is required
+										</span>
+									</p>
+									<p>
 										text: <span className='text-muted-foreground'>string</span>
 										<span className='text-destructive'>
 											{' '}
@@ -1096,6 +1144,11 @@ export default function APIWebhook() {
 											{' '}
 											(required when &apos;type&apos; is &apos;IMAGE&apos; &apos;VIDEO&apos;
 											&apos;AUDIO&apos; &apos;DOCUMENT&apos;)
+										</span>
+									</p>
+									<p>
+										<span className='text-destructive'>
+											NOTE: Any one of media_id or media_link is required
 										</span>
 									</p>
 									<p>
