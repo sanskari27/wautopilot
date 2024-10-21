@@ -706,7 +706,9 @@ export default class BroadcastService extends WhatsappLinkService {
 			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
 		}
 
-		await ScheduledMessageDB.deleteMany({ _id: campaign.unProcessedMessages });
+		await ScheduledMessageDB.deleteMany({
+			scheduler_id: campaign_id,
+		});
 		await campaign.delete();
 		return campaign;
 	}
