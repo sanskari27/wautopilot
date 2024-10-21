@@ -616,7 +616,7 @@ export default class BroadcastService extends WhatsappLinkService {
 			throw new CustomError(COMMON_ERRORS.NOT_FOUND);
 		}
 		await ScheduledMessageDB.updateMany(
-			{ _id: campaign.unProcessedMessages, status: MESSAGE_STATUS.PENDING },
+			{ scheduler_id: campaign._id, status: MESSAGE_STATUS.PENDING },
 			{
 				$set: {
 					status: MESSAGE_STATUS.PAUSED,
@@ -648,7 +648,7 @@ export default class BroadcastService extends WhatsappLinkService {
 		});
 
 		const messages = await ScheduledMessageDB.find({
-			_id: campaign.unProcessedMessages,
+			scheduler_id: campaign_id,
 			status: MESSAGE_STATUS.PAUSED,
 		});
 
