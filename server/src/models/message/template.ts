@@ -16,15 +16,15 @@ type MediaHeader = {
 		type: MediaType;
 		image?: {
 			link?: string;
-			media_id?: string;
+			id?: string;
 		};
 		video?: {
 			link?: string;
-			media_id?: string;
+			id?: string;
 		};
 		document?: {
 			link?: string;
-			media_id?: string;
+			id?: string;
 		};
 	}[];
 	type: 'header';
@@ -140,13 +140,13 @@ export default class TemplateMessage extends Message {
 		if (!format || format === 'TEXT') {
 			throw new Error('Header is already a text header');
 		}
-		const mediaObj = 'media_id' in media ? { media_id: media.media_id } : { link: media.link };
+		const mediaObj = 'media_id' in media ? { id: media.media_id } : { link: media.link };
 		this.header = {
 			type: 'header',
 			parameters: [
 				{
 					type: format.toLowerCase() as MediaType,
-					[format]: mediaObj,
+					[format.toLowerCase()]: mediaObj,
 				},
 			],
 		};
