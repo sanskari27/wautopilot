@@ -1,39 +1,25 @@
-import api from '@/lib/api';
-import { PhonebookRecordWithID } from '@/schema/phonebook';
+'use client'
+
+import Loading from '@/components/elements/loading';
+import { usePhonebookStore } from '@/stores/phonebook-store';
+import { useEffect } from 'react';
 import { DataTable } from './_components/data-table';
 
-export default async function Phonebook({
+export default function Phonebook({
 	searchParams,
 }: {
 	searchParams: {
 		tags: string[];
 		page: string;
 		limit: string;
-	} & {
-		[key: string]: string;
+		[key: string]: string | string[];
 	};
 }) {
-	const search = [];
-	for (const key in searchParams) {
-		if (key.startsWith('search_')) {
-			search.push(key.replace('search_', '') + '=' + searchParams[key]);
-		}
-	}
+	const { records, totalRecords, isLoading, fetchPhonebook } = usePhonebookStore();
 
-	const { data } = await api.get(`/phonebook`, {
-		params: {
-			page: searchParams.page || '1',
-			limit: searchParams.limit || '20',
-			search: search || [],
-			labels: searchParams.tags || [],
-		},
-	});
-	const records = data.records as PhonebookRecordWithID[];
-	const totalRecords = data.totalRecords as number;
+	useEffect(() => {
+		fetchPhonebook(searchParams);
+	}, [searchParams, fetchPhonebook]);
 
-	return (
-		<>
-			<DataTable records={records} maxRecord={totalRecords} />
-		</>
-	);
+	return <>{isLoading ? <Loading /> : <DataTable records={records} maxRecord={totalRecords} />}</>;
 }
