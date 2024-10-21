@@ -684,7 +684,7 @@ export default class BroadcastService extends WhatsappLinkService {
 		});
 
 		const messages = await ScheduledMessageDB.find({
-			_id: campaign.unProcessedMessages,
+			scheduler_id: campaign_id,
 			status: MESSAGE_STATUS.FAILED,
 		});
 
