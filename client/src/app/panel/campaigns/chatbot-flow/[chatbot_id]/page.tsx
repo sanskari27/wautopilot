@@ -41,7 +41,7 @@ import { parseToObject } from '@/lib/utils';
 import { ChatbotFlow, ChatbotFlowSchema } from '@/schema/chatbot-flow';
 import { ContactWithID } from '@/schema/phonebook';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChevronLeftIcon, InfoIcon, Plus, TrashIcon } from 'lucide-react';
+import { ChevronLeftIcon, InfoIcon, Plus, Trash, TrashIcon } from 'lucide-react';
 import { notFound, useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
@@ -302,9 +302,28 @@ export default function CreateChatbotFlow() {
 									name={`trigger.${index}`}
 									render={({ field }) => (
 										<FormItem className='space-y-0 flex-1'>
-											<FormControl>
-												<Textarea placeholder='eg. Fanfest' {...field} />
-											</FormControl>
+											<div className='flex gap-2'>
+												<FormControl>
+													<Textarea
+														placeholder='eg. Fanfest'
+														value={item}
+														onChange={(e) => form.setValue(`trigger.${index}`, e.target.value)}
+													/>
+												</FormControl>
+												<Button
+													type='button'
+													onClick={() => {
+														form.setValue(
+															'trigger',
+															trigger.filter((_, i) => i !== index)
+														);
+													}}
+													variant={'destructive'}
+													size={'icon'}
+												>
+													<Trash />
+												</Button>
+											</div>
 											<FormMessage />
 										</FormItem>
 									)}
