@@ -2,10 +2,11 @@
 
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
+import { useBroadcast } from '@/components/context/broadcast-report';
 import { usePermissions } from '@/components/context/user-details';
-import DeleteDialog from '@/components/elements/dialogs/delete';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { SearchBar } from '@/components/ui/searchbar';
 import {
 	Table,
 	TableBody,
@@ -20,22 +21,9 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import toast from 'react-hot-toast';
 
-export default function ReportDataTable({
-	list,
-}: {
-	list: {
-		broadcast_id: string;
-		name: string;
-		description: string;
-		template_name: string;
-		status: 'ACTIVE' | 'PAUSED';
-		sent: number;
-		failed: number;
-		pending: number;
-		isPaused: boolean;
-		createdAt: string;
-	}[];
-}) {
+export default function ReportDataTable() {
+	const { list, search, setSearchText } = useBroadcast();
+
 	const permissions = usePermissions().broadcast;
 	const router = useRouter();
 	const [selectedBroadcast, setSelectedBroadcast] = React.useState<string[]>([]);
@@ -80,19 +68,20 @@ export default function ReportDataTable({
 		<div>
 			<div className='justify-between flex'>
 				<h2 className='text-2xl font-bold'>Campaign Report</h2>
-				<div className='flex gap-x-2 gap-y-1 flex-wrap '>
+				<div className='flex gap-x-2 gap-y-1 my-2 items-center'>
+					<SearchBar placeholders={['Search name, Search descriptions']} onChange={setSearchText} />
 					<Show.ShowIf condition={permissions.export}>
 						<Button onClick={handleExport} size={'sm'}>
 							Export
 						</Button>
 					</Show.ShowIf>
-					<Show.ShowIf condition={permissions.update}>
+					{/* <Show.ShowIf condition={permissions.update}>
 						<DeleteDialog onDelete={deleteCampaign}>
 							<Button variant={'destructive'} size={'sm'}>
 								Delete
 							</Button>
 						</DeleteDialog>
-					</Show.ShowIf>
+					</Show.ShowIf> */}
 				</div>
 			</div>
 			<Table>
