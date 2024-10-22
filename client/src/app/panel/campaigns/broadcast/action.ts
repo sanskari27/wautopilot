@@ -4,7 +4,11 @@ import api from '@/lib/api';
 import { Broadcast } from '@/schema/broadcastSchema';
 import { revalidatePath } from 'next/cache';
 
-export const ScheduleBroadcast = async (data: Broadcast) => {
+export const ScheduleBroadcast = async (
+	data: Broadcast & {
+		forceSchedule?: boolean;
+	}
+) => {
 	await api.post(`/broadcast/send`, {
 		name: data.name,
 		description: data.description,
@@ -17,6 +21,7 @@ export const ScheduleBroadcast = async (data: Broadcast) => {
 		...(data.carousel && { carousel: data.carousel }),
 		...(data.buttons && { buttons: data.buttons }),
 		...(data.header && data.header.type !== 'NONE' && { header: data.header }),
+		forceSchedule: data.forceSchedule || false,
 	});
 
 	revalidatePath('/panel/campaigns/report', 'page');

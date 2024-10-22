@@ -237,9 +237,15 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 		const tButtons = template.getURLButtonsWithVariable();
 		const tCarousel = template.getCarouselCards();
 
-		const messages = _to.map(async (number) => {
+		const numberWithDetails = await phoneBookService.findRecordsByPhones(_to);
+		const numberDetailsMap = numberWithDetails.reduce((acc, record) => {
+			acc[record.phone_number] = record;
+			return acc;
+		}, {} as Record<string, IPhonebookRecord>);
+
+		const messages = _to.map((number) => {
 			const msg = new TemplateMessage(number, template);
-			const fields = await phoneBookService.findRecordByPhone(number);
+			const fields = numberDetailsMap[number];
 
 			if (header && tHeader && tHeader.format !== 'TEXT') {
 				msg.setMediaHeader(header as any);
@@ -282,13 +288,15 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 			return msg;
 		});
 
+		const messagesCollected = await Promise.all(messages);
+
 		await broadcastService.startBroadcast(
 			{
 				description,
 				name,
 				template_id,
 				template_name,
-				messages: await Promise.all(messages),
+				messages: messagesCollected,
 			},
 			broadcast_options
 		);

@@ -21,6 +21,28 @@ export default class MessageScheduler {
 		this.user_id = user_id;
 	}
 
+	public createScheduleMessageObject(
+		message: Message,
+		opts: {
+			sendAt: Date;
+			scheduler_id: Types.ObjectId;
+			scheduler_type: string;
+			formattedMessage: FormattedMessage;
+		}
+	) {
+		return {
+			linked_to: this.user_id,
+			device_id: this.device,
+			scheduler_id: opts.scheduler_id,
+			scheduler_type: opts.scheduler_type,
+			status: MESSAGE_STATUS.PENDING,
+			to: message.getRecipient(),
+			sendAt: opts.sendAt,
+			messageObject: message.toObject(),
+			formattedMessage: opts.formattedMessage,
+		};
+	}
+
 	async scheduleMessage(
 		message: Message,
 		opts: {
@@ -42,6 +64,10 @@ export default class MessageScheduler {
 			formattedMessage: opts.formattedMessage,
 		});
 		return msg._id;
+	}
+
+	async scheduleMessages(messages: ReturnType<typeof this.createScheduleMessageObject>[]) {
+		await ScheduledMessageDB.insertMany(messages);
 	}
 
 	async cancelScheduledMessage(scheduler_id: Types.ObjectId) {

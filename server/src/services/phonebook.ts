@@ -351,7 +351,7 @@ export default class PhoneBookService extends UserService {
 		return processPhonebookDocs([record])[0];
 	}
 
-	public async findRecordsByPhone(phones: string[]) {
+	public async findRecordsByPhones(phones: string[]) {
 		const records = await PhoneBookDB.find({
 			phone_number: { $in: phones },
 			linked_to: this.userId,

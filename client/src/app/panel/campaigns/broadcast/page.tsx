@@ -3,6 +3,7 @@ import Show from '@/components/containers/show';
 import { useBroadcast } from '@/components/context/broadcast-report';
 import { useFields } from '@/components/context/tags';
 import { usePermissions } from '@/components/context/user-details';
+import ForceScheduleDialog from '@/components/elements/dialogs/ForceSchedule';
 import NumberInputDialog from '@/components/elements/dialogs/numberInput';
 import TemplateDialog from '@/components/elements/dialogs/template-data-selector';
 import TagsSelector from '@/components/elements/popover/tags';
@@ -70,12 +71,13 @@ export default function BroadcastPage() {
 		form.setValue('header', template.header);
 	};
 
-	function handleSave(data: Broadcast) {
+	function scheduleCampaign(forceSchedule: boolean) {
+		const data: Broadcast = form.getValues();
 		if (!permissions.create) return toast.error('You do not have permission to create a broadcast');
-		if(list.some((broadcast) => broadcast.name === data.name)) {
+		if (list.some((broadcast) => broadcast.name === data.name)) {
 			return toast.error('Broadcast with this name already exists');
 		}
-		const promise = ScheduleBroadcast(data);
+		const promise = ScheduleBroadcast({ ...data, forceSchedule });
 
 		toast.promise(promise, {
 			loading: 'Scheduling Broadcast...',
@@ -93,7 +95,7 @@ export default function BroadcastPage() {
 				<h2 className='text-2xl font-bold'>Campaign</h2>
 			</div>
 			<Form {...form}>
-				<form onSubmit={form.handleSubmit(handleSave)} className='w-full space-y-2'>
+				<form className='w-full space-y-2'>
 					<div className='flex flex-col gap-3 w-full'>
 						<div className='flex gap-x-3 gap-y-2 flex-wrap'>
 							<FormField
@@ -314,7 +316,10 @@ export default function BroadcastPage() {
 							</Show.ShowIf>
 						</div>
 					</div>
-					<Button className='w-[150px]'>Start</Button>
+
+					<ForceScheduleDialog onConfirm={scheduleCampaign}>
+						<Button className='w-[150px]'>Start</Button>
+					</ForceScheduleDialog>
 				</form>
 			</Form>
 		</div>

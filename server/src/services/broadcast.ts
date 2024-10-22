@@ -587,23 +587,25 @@ export default class BroadcastService extends WhatsappLinkService {
 					: broadcast.messages.length,
 		});
 
-		const messages = broadcast.messages.map(async (message) => {
+		const template = await TemplateFactory.findByName(this.device, broadcast.template_name);
+
+		const messages = broadcast.messages.map((message) => {
 			const sendAt = timeGenerator.next(
 				options.broadcast_type === 'scheduled' ? undefined : 5
 			).value;
 
-			return await schedulerService.scheduleMessage(message, {
+			return schedulerService.createScheduleMessageObject(message, {
 				scheduler_id: broadcastDoc._id,
 				scheduler_type: BroadcastDB_name,
 				sendAt,
 				formattedMessage: extractFormattedMessage(message.toObject().template, {
-					template: (
-						await TemplateFactory.findByName(this.device, broadcast.template_name)
-					)?.buildToSave(),
+					template: template?.buildToSave(),
 					type: 'template',
 				}),
 			});
 		});
+
+		await schedulerService.scheduleMessages(messages);
 
 		await Promise.all(messages);
 	}
