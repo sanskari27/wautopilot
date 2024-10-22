@@ -279,7 +279,7 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 		);
 
 		agentLogService?.addLog({
-			text: `Create broadcast ${name}`,
+			text: `Create broadcast ${name} of template ${template_name} to ${messages.length} numbers`,
 		});
 
 		return Respond({
