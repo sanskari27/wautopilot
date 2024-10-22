@@ -373,16 +373,16 @@ export default class BroadcastService extends WhatsappLinkService {
 			{
 				$lookup: {
 					from: ConversationMessageDB.collection.name, // Ensure this is correct
-					localField: 'processedMessages',
-					foreignField: '_id',
+					localField: '_id',
+					foreignField: 'scheduled_by.id',
 					as: 'conversationMessages',
 				},
 			},
 			{
 				$lookup: {
 					from: ScheduledMessageDB.collection.name, // Ensure this is correct
-					localField: 'unProcessedMessages',
-					foreignField: '_id',
+					localField: '_id',
+					foreignField: 'scheduler_id',
 					as: 'scheduledMessages',
 				},
 			},

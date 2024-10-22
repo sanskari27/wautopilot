@@ -131,6 +131,8 @@ const schema = new mongoose.Schema<IConversationMessage>(
 	}
 );
 
+schema.index({ scheduled_by: 1 });
+
 const ConversationMessageDB = mongoose.model<IConversationMessage>(
 	ConversationMessageDB_name,
 	schema
