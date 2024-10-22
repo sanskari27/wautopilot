@@ -842,10 +842,10 @@ export default class BroadcastService extends WhatsappLinkService {
 				return msg;
 			});
 
-			formattedMessages.forEach((msg) => {
+			const messagesObjects = formattedMessages.map((msg) => {
 				const sendAt = timeGenerator.next(5).value;
 
-				schedulerService.scheduleMessage(msg, {
+				return schedulerService.createScheduleMessageObject(msg, {
 					scheduler_id: broadcast._id,
 					scheduler_type: RecurringBroadcastDB_name,
 					sendAt,
@@ -855,6 +855,8 @@ export default class BroadcastService extends WhatsappLinkService {
 					}),
 				});
 			});
+
+			schedulerService.scheduleMessages(messagesObjects);
 		});
 	}
 }
