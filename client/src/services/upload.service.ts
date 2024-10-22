@@ -35,7 +35,7 @@ export default class UploadService {
 		});
 		const data = response.data;
 		const extension = response.headers['content-type']?.split('/')[1];
-		const filename = 'download.' + extension ?? 'file';
+		const filename = 'download.' + (extension ?? 'file');
 		const url = window.URL.createObjectURL(new Blob([data]));
 		const link = document.createElement('a');
 		link.href = url;

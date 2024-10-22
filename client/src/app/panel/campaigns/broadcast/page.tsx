@@ -1,5 +1,6 @@
 'use client';
 import Show from '@/components/containers/show';
+import { useBroadcast } from '@/components/context/broadcast-report';
 import { useFields } from '@/components/context/tags';
 import { usePermissions } from '@/components/context/user-details';
 import NumberInputDialog from '@/components/elements/dialogs/numberInput';
@@ -18,18 +19,20 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import api from '@/lib/api';
 import { getDateObject, getFormattedDate } from '@/lib/utils';
 import { Broadcast, broadcastSchema } from '@/schema/broadcastSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { QuickTemplateMessageProps } from '../../conversations/_components/message-input';
+import { ScheduleBroadcast } from './action';
 
 export default function BroadcastPage() {
 	const permissions = usePermissions().broadcast;
 	let phonebook_fields = useFields();
 	phonebook_fields = phonebook_fields.filter((field) => field.value !== 'all');
+
+	const { list } = useBroadcast();
 
 	const form = useForm<Broadcast>({
 		resolver: zodResolver(broadcastSchema),
@@ -69,19 +72,10 @@ export default function BroadcastPage() {
 
 	function handleSave(data: Broadcast) {
 		if (!permissions.create) return toast.error('You do not have permission to create a broadcast');
-		const promise = api.post(`/broadcast/send`, {
-			name: data.name,
-			description: data.description,
-			template_id: data.template_id,
-			template_name: data.template_name,
-			to: data.recipients_from === 'numbers' ? data.to : [],
-			labels: data.recipients_from === 'tags' ? data.labels : [],
-			broadcast_options: data.broadcast_options,
-			...(data.body && { body: data.body }),
-			...(data.carousel && { carousel: data.carousel }),
-			...(data.buttons && { buttons: data.buttons }),
-			...(data.header && data.header.type !== 'NONE' && { header: data.header }),
-		});
+		if(list.some((broadcast) => broadcast.name === data.name)) {
+			return toast.error('Broadcast with this name already exists');
+		}
+		const promise = ScheduleBroadcast(data);
 
 		toast.promise(promise, {
 			loading: 'Scheduling Broadcast...',

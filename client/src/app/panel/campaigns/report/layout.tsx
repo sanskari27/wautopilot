@@ -1,4 +1,6 @@
+import { BroadcastProvider } from '@/components/context/broadcast-report';
 import Loading from '@/components/elements/loading';
+import BroadcastService from '@/services/broadcast.service';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 
@@ -11,5 +13,10 @@ export default async function Layout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	return <Suspense fallback={<Loading />}>{children}</Suspense>;
+	const list = await BroadcastService.broadcastReport();
+	return (
+		<Suspense fallback={<Loading />}>
+			<BroadcastProvider data={list}>{children}</BroadcastProvider>
+		</Suspense>
+	);
 }
