@@ -22,7 +22,7 @@ import {
 import { LogoutButton } from './logout-button';
 
 export default function Navbar() {
-	const { isMaster } = useUserDetails();
+	const { isMaster, isAdmin } = useUserDetails();
 	const userDetails = useUserDetails();
 	const { setDevices } = useDevicesDialogState();
 	const { setSetting } = useSettingDialogState();
@@ -51,7 +51,7 @@ export default function Navbar() {
 					<MenubarSeparator />
 					<MenubarLink href={getLink('/home/agents')}>Agents</MenubarLink>
 					<MenubarLink onClick={openDevices}>Devices</MenubarLink>
-					<Show.ShowIf condition={isMaster}>
+					<Show.ShowIf condition={isMaster || isAdmin}>
 						<MenubarLink href={getLink('/home/api-webhook')}>API & Webhooks</MenubarLink>
 					</Show.ShowIf>
 					<Show.ShowIf condition={isMaster}>
