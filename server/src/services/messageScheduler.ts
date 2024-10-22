@@ -1,6 +1,5 @@
 import { Types } from 'mongoose';
 import { ScheduledMessageDB } from '../../mongo';
-import { BroadcastDB_name } from '../../mongo/repo/Broadcast';
 import { ChatBotFlowDB_name } from '../../mongo/repo/ChatbotFlow';
 import IAccount from '../../mongo/types/account';
 import IWhatsappLink from '../../mongo/types/whatsappLink';
@@ -8,7 +7,6 @@ import { MESSAGE_STATUS } from '../config/const';
 import { Message } from '../models/message';
 import DateUtils from '../utils/DateUtils';
 import { FormattedMessage } from '../utils/MessageHelper';
-import BroadcastService from './broadcast';
 import ChatBotService from './chatbot';
 import ConversationService from './conversation';
 import MessageSender from './messageSender';
@@ -125,12 +123,6 @@ export default class MessageScheduler {
 				message_type: msg.message_type,
 			});
 
-			if (addedMessage && msg.scheduler_type === BroadcastDB_name) {
-				BroadcastService.updateBroadcastMessageId(msg.scheduler_id, {
-					prev_id: msg._id,
-					new_id: addedMessage._id,
-				});
-			}
 			if (addedMessage && msg.scheduler_type === ChatBotFlowDB_name) {
 				ChatBotService.updateMessageId(msg.scheduler_id, {
 					prev_id: msg._id,

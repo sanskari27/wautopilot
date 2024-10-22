@@ -605,9 +605,7 @@ export default class BroadcastService extends WhatsappLinkService {
 			});
 		});
 
-		const message_ids = await Promise.all(messages);
-
-		await BroadcastDB.updateOne({ _id: broadcastDoc._id }, { unProcessedMessages: message_ids });
+		await Promise.all(messages);
 	}
 
 	public async pauseBroadcast(broadcast_id: Types.ObjectId) {
@@ -642,9 +640,7 @@ export default class BroadcastService extends WhatsappLinkService {
 			startTime: campaign.broadcast_type === 'scheduled' ? campaign.startTime : '00:01',
 			endTime: campaign.broadcast_type === 'scheduled' ? campaign.endTime : '23:59',
 			daily_count:
-				campaign.broadcast_type === 'scheduled'
-					? campaign.daily_messages_count
-					: campaign.unProcessedMessages.length,
+				campaign.broadcast_type === 'scheduled' ? campaign.daily_messages_count : 9999999,
 		});
 
 		const messages = await ScheduledMessageDB.find({
@@ -677,10 +673,7 @@ export default class BroadcastService extends WhatsappLinkService {
 					: DateUtils.getDate('YYYY-MM-DD'),
 			startTime: campaign.broadcast_type === 'scheduled' ? campaign.startTime : '00:01',
 			endTime: campaign.broadcast_type === 'scheduled' ? campaign.endTime : '23:59',
-			daily_count:
-				campaign.broadcast_type === 'scheduled'
-					? campaign.daily_messages_count
-					: campaign.unProcessedMessages.length,
+			daily_count: campaign.broadcast_type === 'scheduled' ? campaign.daily_messages_count : 999999,
 		});
 
 		const messages = await ScheduledMessageDB.find({
@@ -740,32 +733,6 @@ export default class BroadcastService extends WhatsappLinkService {
 				message_id: msgID,
 			},
 			details
-		);
-	}
-
-	public static async updateBroadcastMessageId(
-		broadcast_id: Types.ObjectId,
-		{
-			prev_id,
-			new_id,
-		}: {
-			prev_id: Types.ObjectId;
-			new_id: Types.ObjectId;
-		}
-	) {
-		await BroadcastDB.updateOne(
-			{
-				_id: broadcast_id,
-				unProcessedMessages: prev_id,
-			},
-			{
-				$push: {
-					processedMessages: new_id,
-				},
-				$pull: {
-					unProcessedMessages: prev_id,
-				},
-			}
 		);
 	}
 
