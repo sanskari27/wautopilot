@@ -53,6 +53,8 @@ export type CreateBroadcastValidationResult = {
 				endTime: string;
 				daily_messages_count: number;
 		  };
+
+	forceSchedule?: boolean;
 };
 
 export type CreateRecurringValidationResult = {
@@ -173,6 +175,7 @@ export async function CreateBroadcastValidator(req: Request, res: Response, next
 				),
 			})
 			.optional(),
+		forceSchedule: z.boolean().default(false),
 	});
 
 	const reqValidatorResult = reqValidator.safeParse(req.body);

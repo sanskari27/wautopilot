@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { UserLevel } from '../../config/const';
+import { UNSUBSCRIBE_LABEL, UserLevel } from '../../config/const';
 import { CustomError } from '../../errors';
 import COMMON_ERRORS from '../../errors/common-errors';
 import { TemplateMessage } from '../../models/message';
@@ -184,6 +184,7 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 		header,
 		buttons,
 		carousel,
+		forceSchedule,
 	} = req.locals.data as CreateBroadcastValidationResult;
 
 	const {
@@ -207,6 +208,20 @@ async function sendTemplateMessage(req: Request, res: Response, next: NextFuncti
 			)
 				.map((record) => record.phone_number)
 				.filter((number) => number);
+		}
+
+		if (!forceSchedule) {
+			const unsubscribed = (
+				await phoneBookService.fetchRecords({
+					page: 1,
+					limit: 99999999,
+					labels: [UNSUBSCRIBE_LABEL],
+				})
+			)
+				.map((record) => record.phone_number)
+				.filter((number) => number);
+
+			_to = _to.filter((number) => !unsubscribed.includes(number));
 		}
 
 		if (_to.length === 0) {
