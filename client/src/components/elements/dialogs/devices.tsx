@@ -137,7 +137,7 @@ function DevicesList() {
 										<TableCell>XXXX{device.waid.substring(device.waid.length - 4)}</TableCell>
 										<TableCell>
 											<Show.ShowIf condition={!isAgent}>
-												<DeleteDialog onDelete={() => handleRemoveDevice(device.id)}>
+												<DeleteDialog onDelete={() => handleRemoveDevice(device.id)} action='Device'>
 													<Button variant='destructive' size='icon'>
 														<Trash className='h-4 w-4' />
 													</Button>

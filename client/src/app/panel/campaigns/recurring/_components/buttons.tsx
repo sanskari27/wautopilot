@@ -75,7 +75,7 @@ export function DeleteButton({ ids }: { ids: string[] }) {
 	}
 
 	return (
-		<DeleteDialog onDelete={handleDelete}>
+		<DeleteDialog onDelete={handleDelete} action='Recurring'>
 			<Button size={'sm'} className='bg-red-600 hover:bg-red-700'>
 				<Trash className='w-4 h-4 mr-2' />
 				Delete

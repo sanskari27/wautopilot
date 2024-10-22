@@ -321,7 +321,7 @@ export default function CreateChatbotFlow() {
 													variant={'destructive'}
 													size={'icon'}
 												>
-													<Trash />
+													<Trash className='w-4 h-4' />
 												</Button>
 											</div>
 											<FormMessage />

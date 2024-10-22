@@ -114,7 +114,7 @@ export function MainContextMenu({
 					</Link>
 				</Show.ShowIf>
 				<Show.ShowIf condition={permissions.delete}>
-					<DeleteDialog onDelete={handleDelete}>
+					<DeleteDialog onDelete={handleDelete} action='Chatbot'>
 						<Button size={'sm'} variant={'destructive'} className='w-full p-2'>
 							<Delete className='mr-2 h-4 w-4' />
 							<span className='mr-auto'>Delete</span>

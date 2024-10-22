@@ -20,7 +20,7 @@ export function DeleteAPIKey({ id }: { id: string }) {
 	};
 
 	return (
-		<DeleteDialog onDelete={deleteAPIKey}>
+		<DeleteDialog onDelete={deleteAPIKey} action='API Key'>
 			<Button variant={'destructive'} size={'icon'}>
 				<Trash className='w-4 h-4' />
 			</Button>
@@ -39,7 +39,7 @@ export function DeleteWebhookButton({ id }: { id: string }) {
 	};
 
 	return (
-		<DeleteDialog onDelete={handleWebhookDelete}>
+		<DeleteDialog onDelete={handleWebhookDelete} action='Webhook'>
 			<Button variant={'destructive'} size={'icon'}>
 				<Trash className='w-4 h-4' />
 			</Button>

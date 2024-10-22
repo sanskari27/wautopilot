@@ -68,7 +68,7 @@ export function DeleteButton({ id }: { id: string }) {
 	}
 
 	return (
-		<DeleteDialog onDelete={handleExport}>
+		<DeleteDialog onDelete={handleExport} action='Media'>
 			<Button variant={'outline'} size={'icon'} className='border-red-600 w-8 h-8'>
 				<Trash className='w-4 h-4 text-red-600' strokeWidth={2} />
 			</Button>

@@ -114,7 +114,7 @@ export default function RecurringActionContextMenu({
 					</DropdownMenuItem>
 				</Show.ShowIf>
 				<Show.ShowIf condition={permission.delete}>
-					<DeleteDialog onDelete={deleteRecurringCampaign}>
+					<DeleteDialog onDelete={deleteRecurringCampaign} action='Recurring'>
 						<Button size={'sm'} className='w-full bg-destructive hover:bg-destructive/50'>
 							<Delete className='mr-2 h-4 w-4' />
 							<span className='mr-auto'>Delete</span>

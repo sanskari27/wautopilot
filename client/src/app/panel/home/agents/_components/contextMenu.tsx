@@ -103,7 +103,7 @@ export function AgentContextMenu({
 								Login as {agent.name}
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
-							<DeleteDialog onDelete={handleDelete}>
+							<DeleteDialog onDelete={handleDelete} action='Agent'>
 								<DropdownMenuLabel className='hover:text-red-400 cursor-pointer hover:bg-accent font-normal'>
 									Delete
 								</DropdownMenuLabel>

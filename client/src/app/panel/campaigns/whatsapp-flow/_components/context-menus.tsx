@@ -100,7 +100,7 @@ export default function WhatsappFlowContextMenu({
 						<span>Update Flow Structure</span>
 					</DropdownMenuItem>
 				</Link>
-				<DeleteDialog onDelete={handleDelete}>
+				<DeleteDialog onDelete={handleDelete} action='Whatsapp Flow'>
 					<Button size={'sm'} variant={'destructive'} className='w-full p-2'>
 						<Delete className='mr-2 h-4 w-4' />
 						<span className='mr-auto'>Delete</span>

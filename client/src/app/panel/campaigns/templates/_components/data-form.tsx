@@ -460,7 +460,7 @@ export default function DataForm({
 									Save
 								</Button>
 								<Show.ShowIf condition={!!defaultValues}>
-									<DeleteDialog onDelete={onDelete}>
+									<DeleteDialog onDelete={onDelete} action='Template'>
 										<Button variant={'destructive'} size={'icon'}>
 											<Trash className='w-4 h-4' />
 										</Button>

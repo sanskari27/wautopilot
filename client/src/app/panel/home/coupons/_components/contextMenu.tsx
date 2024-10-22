@@ -43,7 +43,7 @@ export default function CouponContextMenu({
 				<Link className='w-full' href={`?coupon=${coupon.id}&data=${JSON.stringify(coupon)}`}>
 					<DropdownMenuItem>Edit</DropdownMenuItem>
 				</Link>
-				<DeleteDialog onDelete={handleDeleteCoupon}>
+				<DeleteDialog onDelete={handleDeleteCoupon} action='Coupon'>
 					<Button variant={'destructive'} size={'sm'} className='w-full'>
 						<span className='mr-auto'>Delete</span>
 					</Button>

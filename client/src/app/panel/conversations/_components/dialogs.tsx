@@ -2,15 +2,10 @@
 import Each from '@/components/containers/each';
 import Show from '@/components/containers/show';
 import { useQuickReplies } from '@/components/context/quick-replies';
-import { useFields } from '@/components/context/tags';
-import { useTemplates } from '@/components/context/templates';
 import { useUserDetails } from '@/components/context/user-details';
 import DeleteDialog from '@/components/elements/dialogs/delete';
-import MediaSelectorDialog from '@/components/elements/dialogs/media-selector';
 import TagsSelector from '@/components/elements/popover/tags';
 import PreviewFile from '@/components/elements/preview-file';
-import TemplatePreview from '@/components/elements/template-preview';
-import TemplateSelector from '@/components/elements/templetes-selector';
 import WhatsappFlowSelector from '@/components/elements/wa-flow-selector';
 import AbsoluteCenter from '@/components/ui/absolute-center';
 import { Badge } from '@/components/ui/badge';
@@ -34,13 +29,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import {
 	Table,
@@ -51,8 +39,6 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import { countOccurrences } from '@/lib/utils';
-import { Carousel } from '@/schema/template';
 import MessagesService from '@/services/messages.service';
 import UploadService from '@/services/upload.service';
 import { Recipient } from '@/types/recipient';
@@ -480,7 +466,10 @@ export function QuickButtonTemplateMessage({
 																</Button>
 															</AddQuickButtonMessage>
 														</DropdownMenuItem>
-														<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)}>
+														<DeleteDialog
+															onDelete={() => handleRemoveQuickReply(template.id)}
+															action='Button Reply'
+														>
 															<Button
 																variant={'destructive'}
 																className='w-full p-2 font-normal'
@@ -757,7 +746,7 @@ export function QuickListTemplateMessage({
 																</Button>
 															</AddQuickListMessage>
 														</DropdownMenuItem>
-														<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)}>
+														<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)} action='List Reply'>
 															<Button
 																variant={'destructive'}
 																className='w-full p-2 font-normal'
@@ -1091,7 +1080,7 @@ export function QuickFlowTemplateMessage({
 																</Button>
 															</AddQuickFlowTemplateMessage>
 														</DropdownMenuItem>
-														<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)}>
+														<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)} action='Flow Reply'>
 															<Button
 																variant={'destructive'}
 																className='w-full p-2 font-normal'
@@ -1351,7 +1340,7 @@ export function QuickLocationTemplateMessage({
 																</Button>
 															</AddQuickLocationTemplateMessage>
 														</DropdownMenuItem>
-														<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)}>
+														<DeleteDialog onDelete={() => handleRemoveQuickReply(template.id)} action='Location Reply'>
 															<Button
 																variant={'destructive'}
 																className='w-full p-2 font-normal'

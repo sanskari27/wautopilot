@@ -39,7 +39,7 @@ export function FAQContextMenu({
 				<Link href={`?faq=${id}&data=${JSON.stringify(FAQ)}`}>
 					<DropdownMenuItem>Edit</DropdownMenuItem>
 				</Link>
-				<DeleteDialog onDelete={handleDeleteFAQ}>
+				<DeleteDialog onDelete={handleDeleteFAQ} action='FAQ'>
 					<Button variant={'destructive'} size={'sm'} className='w-full'>
 						<span className='mr-auto'>Delete</span>
 					</Button>
@@ -90,7 +90,7 @@ export function TestimonialsContextMenu({
 				<Link href={`?testimonial=${id}&data=${JSON.stringify(testimonial)}`}>
 					<DropdownMenuItem>Edit</DropdownMenuItem>
 				</Link>
-				<DeleteDialog onDelete={handleDeleteTestimonial}>
+				<DeleteDialog onDelete={handleDeleteTestimonial} action='Testimonial'>
 					<Button variant={'destructive'} size={'sm'} className='w-full'>
 						<span className='mr-auto'>Delete</span>
 					</Button>
