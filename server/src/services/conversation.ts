@@ -176,9 +176,6 @@ export default class ConversationService extends WhatsappLinkService {
 					_id: conversation_id,
 				},
 				{
-					$push: {
-						messages: doc._id,
-					},
 					$set: {
 						last_message_at: details.received_at || DateUtils.getMomentNow().toDate(),
 					},

@@ -8,8 +8,6 @@ export default interface IConversation extends Document {
 	profile_name: string;
 	recipient: string;
 
-	messages: Types.ObjectId[];
-
 	last_message_at: Date;
 	createdAt: Date;
 	assigned_to: Types.ObjectId;

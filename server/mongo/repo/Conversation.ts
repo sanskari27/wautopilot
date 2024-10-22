@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import IConversation from '../types/conversation';
 import { AccountDB_name } from './Account';
-import { ConversationMessageDB_name } from './ConversationMessage';
 import { WhatsappLinkDB_name } from './WhatsappLink';
 
 export const ConversationDB_name = 'Conversation';
@@ -24,12 +23,6 @@ const schema = new mongoose.Schema<IConversation>(
 			type: String,
 			required: true,
 		},
-		messages: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: ConversationMessageDB_name,
-			},
-		],
 		assigned_to: mongoose.Schema.Types.ObjectId,
 		last_message_at: Date,
 		note: {
