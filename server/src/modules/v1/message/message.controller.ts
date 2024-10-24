@@ -200,13 +200,22 @@ async function sendMessage(req: Request, res: Response, next: NextFunction) {
 			  }
 			: {}),
 	});
+	if (result.success) {
+		serviceUser.deductCredit(1);
 
-	serviceUser.deductCredit(1);
-
-	return Respond({
-		res,
-		status: 200,
-	});
+		return Respond({
+			res,
+			status: 200,
+		});
+	} else {
+		return Respond({
+			res,
+			status: 400,
+			data: {
+				fail_reason: result.failed_reason,
+			},
+		});
+	}
 }
 
 const Controller = {
